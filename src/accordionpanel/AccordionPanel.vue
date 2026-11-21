@@ -6,6 +6,7 @@
 </template>
 
 <script lang="ts">
+import type { AccordionContext } from '../accordion/context';
 import { defineComponent, mergeProps } from 'vue';
 import BaseAccordionPanel from './BaseAccordionPanel.vue';
 
@@ -16,7 +17,7 @@ export default defineComponent({
     inject: ['$pcAccordion'],
     computed: {
         active() {
-            return (this.$pcAccordion as { isItemActive: (value: string | number | undefined) => boolean }).isItemActive(this.value);
+            return (this.$pcAccordion as AccordionContext).isItemActive(this.value);
         },
         attrs() {
             return mergeProps(this.a11yAttrs, this.ptmi('root', this.ptParams));

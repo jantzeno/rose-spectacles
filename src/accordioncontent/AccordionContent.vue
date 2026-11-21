@@ -2,8 +2,8 @@
     <template v-if="!asChild">
         <transition name="rs-collapsible" v-bind="ptm('transition', ptParams)">
             <component
-                v-if="$pcAccordion.lazy ? $pcAccordionPanel.active : true"
-                v-show="$pcAccordion.lazy ? true : $pcAccordionPanel.active"
+                v-if="accordion.lazy ? accordionPanel.active : true"
+                v-show="accordion.lazy ? true : accordionPanel.active"
                 :is="as"
                 :class="cx('root')"
                 v-bind="attrs"
@@ -16,24 +16,31 @@
             </component>
         </transition>
     </template>
-    <slot v-else :class="cx('root')" :active="$pcAccordionPanel.active" :a11yAttrs="a11yAttrs"></slot>
+    <slot v-else :class="cx('root')" :active="accordionPanel.active" :a11yAttrs="a11yAttrs"></slot>
 </template>
 
-<script>
-import { mergeProps } from 'vue';
+<script lang="ts">
+import type { AccordionContext, AccordionPanelContext } from '../accordion/context';
+import { defineComponent, mergeProps } from 'vue';
 import BaseAccordionContent from './BaseAccordionContent.vue';
 
-export default {
+export default defineComponent({
     name: 'AccordionContent',
     extends: BaseAccordionContent,
     inheritAttrs: false,
     inject: ['$pcAccordion', '$pcAccordionPanel'],
     computed: {
+        accordion() {
+            return this.$pcAccordion as AccordionContext;
+        },
+        accordionPanel() {
+            return this.$pcAccordionPanel as AccordionPanelContext;
+        },
         id() {
-            return `${this.$pcAccordion.$id}_accordioncontent_${this.$pcAccordionPanel.value}`;
+            return `${this.accordion.$id}_accordioncontent_${this.accordionPanel.value}`;
         },
         ariaLabelledby() {
-            return `${this.$pcAccordion.$id}_accordionheader_${this.$pcAccordionPanel.value}`;
+            return `${this.accordion.$id}_accordionheader_${this.accordionPanel.value}`;
         },
         attrs() {
             return mergeProps(this.a11yAttrs, this.ptmi('root', this.ptParams));
@@ -44,16 +51,16 @@ export default {
                 role: 'region',
                 'aria-labelledby': this.ariaLabelledby,
                 'data-pc-name': 'accordioncontent',
-                'data-p-active': this.$pcAccordionPanel.active
+                'data-p-active': this.accordionPanel.active
             };
         },
         ptParams() {
             return {
                 context: {
-                    active: this.$pcAccordionPanel.active
+                    active: this.accordionPanel.active
                 }
             };
         }
     }
-};
+});
 </script>
