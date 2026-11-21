@@ -30,9 +30,12 @@
             "labels": [],
             "component": "Password",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "The named Password strength test confirms that typing changes the existing polite live region from Weak to Strong.",
+                "The feedback overlay is now referenced from the visible password input while it is open. See #132."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-aeq5sb1t?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome 142. Verify the reported behavior: Password Component: Strength Meter Not Announced to Screen Readers (WCAG 1.3.1 / 4.1.3)."
+            "evidenceGap": "The Linux test observes the DOM and available ARIA relationships. Whether NVDA 2025.3.1 actually announces the changes in Chrome 142 on Windows 11 remains unverified."
         },
         {
             "number": 20,
@@ -1117,10 +1120,17 @@
             "title": "Password uses invalid aria attribute",
             "labels": ["bug", "accessibility", "regression"],
             "component": "Password",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Mounted Password with its strength popup open. The regression confirmed that the password input exposed an unsupported aria-expanded attribute, then passed when the input described its actual feedback panel instead.",
+                "Compared the DOM changes with the linked upstream patch at https://github.com/primefaces/primevue/pull/8209."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Password uses invalid aria attribute."
+            "resolvingCommit": "d9f1506ca139174651ed227db7d82bd88896b0eb",
+            "test": {
+                "path": "src/password/Password.spec.ts",
+                "name": "describes password feedback with the visible panel"
+            }
         },
         {
             "number": 133,
@@ -2129,10 +2139,17 @@
             "title": "validateOnBlur does not work for Password component (maybe other components as well?)",
             "labels": ["bug", "regression"],
             "component": "Password",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The local Form resolver runs on input blur with validateOnValueUpdate disabled.",
+                "Fork history includes the revision that removed the Password inner input novalidate override. Reapplying the exact override from the 4.3.5 regression reproduced the blur failure in the local test."
+            ],
             "reproducer": "https://stackblitz.com/edit/17gmapt5",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Google Chrome, Version 136.0.7103.92 (Official Build) (64-bit). Verify the reported behavior: validateOnBlur does not work for Password component (maybe other components as well?)."
+            "resolvingCommit": "189b05419f11e3b8917d3fcca7a391853d503e68",
+            "test": {
+                "path": "src/password/PasswordForm.spec.ts",
+                "name": "marks the Password field touched and validates it on blur"
+            }
         },
         {
             "number": 227,
@@ -2172,10 +2189,17 @@
             "title": "The \"touched\" form state of Password fields is never updated to \"true\"",
             "labels": ["bug"],
             "component": "Form, Password",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The local field stays untouched while typing and becomes touched when the real input blurs.",
+                "Fork history includes the revision that removed the Password inner input novalidate override. Reapplying the exact override from the 4.3.5 regression reproduced the blur failure in the local test."
+            ],
             "reproducer": "https://stackblitz.com/edit/vitejs-vite-dc9uzmvq",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: The \"touched\" form state of Password fields is never updated to \"true\"."
+            "resolvingCommit": "189b05419f11e3b8917d3fcca7a391853d503e68",
+            "test": {
+                "path": "src/password/PasswordForm.spec.ts",
+                "name": "marks the Password field touched and validates it on blur"
+            }
         },
         {
             "number": 231,
@@ -4915,10 +4939,16 @@
             "title": "TabView: Show active tab with autoscroll ",
             "labels": ["bug"],
             "component": "TabView, Tab",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Mounted a scrollable legacy TabView with the eleventh tab initially selected. The test saw no scroll request before the fix and then verified that the selected header is scrolled into view on mount."
+            ],
             "reproducer": "https://codesandbox.io/p/sandbox/green-wave-7x2d4y?file=%2Fsrc%2FApp.vue%3A23%2C11",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using All. Verify the reported behavior: TabView: Show active tab with autoscroll ."
+            "resolvingCommit": "cef165abde247d87878a93e97c3afaab0197c8bd",
+            "test": {
+                "path": "src/tabview/TabView.spec.ts",
+                "name": "scrolls the initially active header into view in a scrollable TabView"
+            }
         },
         {
             "number": 493,
