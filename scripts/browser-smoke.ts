@@ -77,6 +77,25 @@ try {
             'Escape closes the dialog and restores trigger focus'
         );
         console.log('Escape closes the dialog and restores trigger focus');
+
+        await show('#popover');
+        await browser.evaluate(`Object.assign(document.querySelector('[data-example="popover"] button').style, {
+            position: 'fixed',
+            top: '8rem',
+            right: '1rem'
+        })`);
+        await browser.click('[data-example="popover"] button');
+        await wait('document.querySelector(".rs-popover")?.getBoundingClientRect().width > 0', 'Popover opens beside its trigger');
+        const widthBeforeResize = await browser.evaluate<number>('document.querySelector(".rs-popover").getBoundingClientRect().width');
+        await browser.evaluate(`document.querySelector('.rs-popover-content p').style.width = 'min(60vw, 550px)'`);
+        await wait(
+            `(() => {
+                const { left, right, width } = document.querySelector('.rs-popover').getBoundingClientRect();
+                return width > ${widthBeforeResize} + 50 && left >= 0 && right <= innerWidth + 1;
+            })()`,
+            'Popover stays inside the viewport as its content widens'
+        );
+        console.log('Popover stays inside the viewport as its content widens');
     } finally {
         await browser.close();
     }

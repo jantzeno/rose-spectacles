@@ -368,10 +368,17 @@
             "title": "Popover placement goes outside of body",
             "labels": ["bug", "styling"],
             "component": "Popover",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "Firefox opened a Popover near the right viewport edge, widened its content, and verified that the overlay remained within the viewport. The same check failed after removing content resize registration in a disposable copy.",
+                "The content resize listener was present at the fork checkpoint."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-ryf6wazb?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using in All. Verify the reported behavior: Popover placement goes outside of body."
+            "resolvingCommit": "af69e2c2f767ca961e7454fa8ad42b30e29c9242",
+            "test": {
+                "path": "scripts/browser-smoke.ts",
+                "name": "Popover stays inside the viewport as its content widens"
+            }
         },
         {
             "number": 68,
