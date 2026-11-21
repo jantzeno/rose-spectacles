@@ -1,7 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import DatePickerStyle from './style/DatePickerStyle';
+import type { DatePickerResponsiveOptions } from './DatePicker';
 
 export default defineComponent({
     name: 'BaseDatePicker',
@@ -63,7 +64,7 @@ export default defineComponent({
             type: Number,
             default: 1
         },
-        responsiveOptions: Array,
+        responsiveOptions: Array as PropType<DatePickerResponsiveOptions[]>,
         breakpoint: {
             type: String,
             default: '769px'
@@ -81,11 +82,11 @@ export default defineComponent({
             value: null
         },
         disabledDates: {
-            type: Array,
+            type: Array as PropType<Date[]>,
             value: null
         },
         disabledDays: {
-            type: Array,
+            type: Array as PropType<number[]>,
             value: null
         },
         maxDateCount: {

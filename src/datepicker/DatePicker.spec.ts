@@ -122,15 +122,12 @@ describe('DatePicker.vue', () => {
         expect(wrapper.find('.rs-datepicker-today').text()).toEqual(new Date().getDate().toString());
     });
 
-    it('should select a date', async () => {
-        await wrapper.setProps({ inline: true });
+    it('selects a date through the calendar grid', async () => {
+        await wrapper.setProps({ inline: true, modelValue: new Date(2022, 2, 1) });
 
-        const event = { day: 8, month: 2, year: 2022, today: false, selectable: true };
+        await wrapper.get('td[aria-label="8"] [data-pc-section="day"]').trigger('click');
 
-        const onDateSelect = vi.spyOn(wrapper.vm, 'onDateSelect');
-
-        await wrapper.vm.onDateSelect({ currentTarget: { focus: () => {} } }, event);
-        expect(onDateSelect).toHaveBeenCalled();
+        expect(wrapper.emitted('update:modelValue')).toEqual([[new Date(2022, 2, 8)]]);
     });
 
     it('should calculate the correct view date when in range mode', async () => {

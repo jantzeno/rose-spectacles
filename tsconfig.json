@@ -10,7 +10,6 @@
         "skipLibCheck": true,
         "strict": true,
         "noEmit": true,
-        "allowJs": true,
         "types": ["node", "vite/client", "vitest/globals"]
     },
     "include": ["src/**/*", "gallery/**/*", "*.config.ts", "scripts/**/*.ts"]
