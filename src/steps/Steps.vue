@@ -94,7 +94,7 @@ export default {
                 index: index
             });
         },
-        onItemKeydown(event, item) {
+        onItemKeydown(event, item, index) {
             switch (event.code) {
                 case 'ArrowRight': {
                     this.navigateToNextItem(event.target);
@@ -128,7 +128,7 @@ export default {
                 case 'NumpadEnter':
 
                 case 'Space': {
-                    this.onItemClick(event, item);
+                    this.onItemClick(event, item, index);
                     event.preventDefault();
                     break;
                 }
@@ -202,8 +202,8 @@ export default {
                 action: mergeProps(
                     {
                         class: this.cx('itemLink'),
-                        onClick: ($event) => this.onItemClick($event, item),
-                        onKeyDown: ($event) => this.onItemKeydown($event, item)
+                        onClick: ($event) => this.onItemClick($event, item, index),
+                        onKeyDown: ($event) => this.onItemKeydown($event, item, index)
                     },
                     this.getPTOptions('itemLink', item, index)
                 ),
