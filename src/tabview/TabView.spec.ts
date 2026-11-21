@@ -1,4 +1,5 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
+import { h } from 'vue';
 import TabPanel from '../tabpanel/TabPanel.vue';
 import TabView from './TabView.vue';
 
@@ -40,11 +41,28 @@ describe('TabPanel.vue', () => {
     });
 
     it('should change the active item', async () => {
-        await wrapper.vm.onTabClick({}, 1);
+        await wrapper.findAll('[role="tab"]')[1].trigger('click');
 
-        // expect(wrapper.findAll('li[role="presentation"]')[1].classes()).toContain('rs-tabview-header');
+        expect(wrapper.findAll('[role="tab"]')[1].attributes('aria-selected')).toBe('true');
         expect(wrapper.findAll('.rs-tabview-panel')[0].attributes().style).toBe('display: none;');
     });
+});
+
+it('scrolls the initially active header into view in a scrollable TabView', () => {
+    const scrollIntoView = vi.spyOn(HTMLElement.prototype, 'scrollIntoView');
+    const wrapper = mount(TabView, {
+        props: { activeIndex: 10, scrollable: true },
+        slots: { default: () => Array.from({ length: 12 }, (_, index) => h(TabPanel, { header: `Tab ${index + 1}` })) }
+    });
+
+    try {
+        const header = wrapper.get('[role="tab"][aria-selected="true"]');
+        expect(header.text()).toBe('Tab 11');
+        expect(scrollIntoView.mock.instances).toContain(header.element.parentElement);
+    } finally {
+        wrapper.unmount();
+        scrollIntoView.mockRestore();
+    }
 });
 
 // todo deprecate?

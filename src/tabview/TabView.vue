@@ -123,7 +123,10 @@ export default defineComponent({
         console.warn('Deprecated since v4. Use Tabs component instead.');
 
         this.updateInkBar();
-        this.scrollable && this.updateButtonState();
+        if (this.scrollable) {
+            this.scrollInView({ index: this.d_activeIndex });
+            this.updateButtonState();
+        }
     },
     updated() {
         this.updateInkBar();
