@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { MenuItem } from '../menuitem/MenuItem';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import SpeedDialStyle from './style/SpeedDialStyle';
 
@@ -7,7 +8,7 @@ export default defineComponent({
     name: 'BaseSpeedDial',
     extends: BaseComponent,
     props: {
-        model: null,
+        model: Array as PropType<MenuItem[]>,
         visible: {
             type: Boolean,
             default: false

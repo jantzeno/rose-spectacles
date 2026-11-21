@@ -65,7 +65,7 @@
                             :tabindex="-1"
                             role="menuitem"
                             :class="cx('pcAction', { item })"
-                            :aria-label="item.label"
+                            :aria-label="item.label == null ? undefined : String(item.label)"
                             :disabled="disabled || isItemDisabled(item)"
                             :unstyled="unstyled"
                             @click="onItemClick($event, item)"
@@ -83,8 +83,8 @@
                         v-else
                         :is="$slots.item"
                         :item="item"
-                        :onClick="(event) => onItemClick(event, item)"
-                        :toggleCallback="(event) => onItemClick(event, item)"
+                        :onClick="(event: MouseEvent) => onItemClick(event, item)"
+                        :toggleCallback="(event: MouseEvent) => onItemClick(event, item)"
                     ></component>
                 </li>
             </template>
@@ -95,32 +95,33 @@
     </Transition>
 </template>
 
-<script>
+<script lang="ts">
 import { $dt } from '../internal/styled/index';
 import { find, findSingle, focus } from '../internal/utils/dom/index';
 import PlusIcon from '../icons/plus/PlusIcon.vue';
 import Button from '../button/Button.vue';
 import Ripple from '../ripple/Ripple';
 import Tooltip from '../tooltip/Tooltip';
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+import type { MenuItem } from '../menuitem/MenuItem';
 import BaseSpeedDial from './BaseSpeedDial.vue';
 
 // Set fix value for SSR.
 const Math_PI = 3.14159265358979;
 
-export default {
+export default defineComponent({
     name: 'SpeedDial',
     extends: BaseSpeedDial,
     inheritAttrs: false,
     emits: ['click', 'show', 'hide', 'focus', 'blur'],
-    documentClickListener: null,
-    container: null,
-    list: null,
     data() {
         return {
             d_visible: this.visible,
             isItemClicked: false,
-            focused: false,
-            focusedOptionIndex: -1
+            focusedOptionIndex: -1 as string | -1,
+            documentClickListener: null as ((event: MouseEvent) => void) | null,
+            container: null as HTMLElement | null,
+            list: null as HTMLElement | null
         };
     },
     watch: {
@@ -129,11 +130,11 @@ export default {
         }
     },
     mounted() {
-        if (this.type !== 'linear') {
+        if (this.type !== 'linear' && this.container && this.list) {
             const button = findSingle(this.container, '[data-pc-name="pcbutton"]');
             const firstItem = findSingle(this.list, '[data-pc-section="item"]');
 
-            if (button && firstItem) {
+            if (button instanceof HTMLElement && firstItem instanceof HTMLElement) {
                 const wDiff = Math.abs(button.offsetWidth - firstItem.offsetWidth);
                 const hDiff = Math.abs(button.offsetHeight - firstItem.offsetHeight);
 
@@ -150,7 +151,7 @@ export default {
         this.unbindDocumentClickListener();
     },
     methods: {
-        getPTOptions(id, key) {
+        getPTOptions(id: string, key: string) {
             return this.ptm(key, {
                 context: {
                     active: this.isItemActive(id),
@@ -158,14 +159,14 @@ export default {
                 }
             });
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent | KeyboardEvent) {
             this.focusedOptionIndex = -1;
             this.$emit('blur', event);
         },
-        onItemClick(e, item) {
+        onItemClick(e: MouseEvent | KeyboardEvent, item: MenuItem) {
             if (this.isItemDisabled(item)) {
                 e.preventDefault();
 
@@ -181,7 +182,7 @@ export default {
             this.isItemClicked = true;
             e.preventDefault();
         },
-        onClick(event) {
+        onClick(event: MouseEvent) {
             this.d_visible ? this.hide() : this.show();
             this.isItemClicked = true;
             this.$emit('click', event);
@@ -194,13 +195,13 @@ export default {
             this.d_visible = false;
             this.$emit('hide');
         },
-        calculateTransitionDelay(index) {
-            const length = this.model.length;
+        calculateTransitionDelay(index: number) {
+            const length = this.model?.length ?? 0;
             const visible = this.d_visible;
 
             return (visible ? index : length - index - 1) * this.transitionDelay;
         },
-        onTogglerKeydown(event) {
+        onTogglerKeydown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown':
                 case 'ArrowLeft':
@@ -223,7 +224,7 @@ export default {
                     break;
             }
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown':
                     this.onArrowDown(event);
@@ -248,7 +249,7 @@ export default {
                     break;
 
                 case 'Escape':
-                    this.onEscapeKey(event);
+                    this.onEscapeKey();
                     break;
 
                 case 'Home':
@@ -263,24 +264,24 @@ export default {
                     break;
             }
         },
-        onTogglerArrowUp(event) {
+        onTogglerArrowUp(event: KeyboardEvent) {
             this.show();
             this.navigatePrevItem(event);
 
             event.preventDefault();
         },
-        onTogglerArrowDown(event) {
+        onTogglerArrowDown(event: KeyboardEvent) {
             this.show();
             this.navigateNextItem(event);
 
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEnterKey(event: KeyboardEvent) {
             const item = this.model?.find((_, index) => `${this.$id}_${index}` === this.focusedOptionIndex);
 
             if (!item) return;
 
-            const buttonEl = findSingle(this.container, 'button');
+            const buttonEl = this.container?.querySelector('button');
 
             this.onItemClick(event, item);
             this.onBlur(event);
@@ -290,18 +291,18 @@ export default {
         onEscapeKey() {
             this.hide();
 
-            const buttonEl = findSingle(this.container, 'button');
+            const buttonEl = this.container?.querySelector('button');
 
             buttonEl && focus(buttonEl);
         },
-        onArrowUp(event) {
+        onArrowUp(event: KeyboardEvent) {
             if (this.direction === 'down') {
                 this.navigatePrevItem(event);
             } else {
                 this.navigateNextItem(event);
             }
         },
-        onArrowDown(event) {
+        onArrowDown(event: KeyboardEvent) {
             if (this.direction === 'down') {
                 this.navigateNextItem(event);
             } else {
@@ -309,7 +310,7 @@ export default {
             }
         },
 
-        onArrowLeft(event) {
+        onArrowLeft(event: KeyboardEvent) {
             const leftValidDirections = ['left', 'up-right', 'down-left'];
             const rightValidDirections = ['right', 'up-left', 'down-right'];
 
@@ -322,7 +323,7 @@ export default {
             }
         },
 
-        onArrowRight(event) {
+        onArrowRight(event: KeyboardEvent) {
             const leftValidDirections = ['left', 'up-right', 'down-left'];
             const rightValidDirections = ['right', 'up-left', 'down-right'];
 
@@ -334,74 +335,74 @@ export default {
                 this.navigateNextItem(event);
             }
         },
-        onEndKey(event) {
+        onEndKey(event: KeyboardEvent) {
             event.preventDefault();
 
             this.focusedOptionIndex = -1;
             this.navigatePrevItem(event);
         },
-        onHomeKey(event) {
+        onHomeKey(event: KeyboardEvent) {
             event.preventDefault();
 
             this.focusedOptionIndex = -1;
             this.navigateNextItem(event);
         },
-        navigateNextItem(event) {
+        navigateNextItem(event: KeyboardEvent) {
             const optionIndex = this.findNextOptionIndex(this.focusedOptionIndex);
 
             this.changeFocusedOptionIndex(optionIndex);
 
             event.preventDefault();
         },
-        navigatePrevItem(event) {
+        navigatePrevItem(event: KeyboardEvent) {
             const optionIndex = this.findPrevOptionIndex(this.focusedOptionIndex);
 
             this.changeFocusedOptionIndex(optionIndex);
 
             event.preventDefault();
         },
-        changeFocusedOptionIndex(index) {
-            const items = find(this.container, '[data-pc-section="item"]');
+        changeFocusedOptionIndex(index: number) {
+            const items = this.container ? find(this.container, '[data-pc-section="item"]') : [];
             const filteredItems = [...items].filter((item) => item.getAttribute('data-p-disabled') !== 'true');
 
             if (filteredItems[index]) {
-                this.focusedOptionIndex = filteredItems[index].getAttribute('id');
-                const buttonEl = findSingle(filteredItems[index], '[type="button"]');
+                this.focusedOptionIndex = filteredItems[index].id;
+                const buttonEl = filteredItems[index].querySelector<HTMLButtonElement>('[type="button"]');
 
                 buttonEl && focus(buttonEl);
             }
         },
-        findPrevOptionIndex(index) {
-            const items = find(this.container, '[data-pc-section="item"]');
+        findPrevOptionIndex(index: string | -1) {
+            const items = this.container ? find(this.container, '[data-pc-section="item"]') : [];
             const enabledItems = items.filter((item) => item.getAttribute('data-p-disabled') !== 'true');
 
             return index === -1 ? enabledItems.length - 1 : enabledItems.findIndex((item) => item.id === index) - 1;
         },
-        findNextOptionIndex(index) {
-            const items = find(this.container, '[data-pc-section="item"]');
+        findNextOptionIndex(index: string | -1) {
+            const items = this.container ? find(this.container, '[data-pc-section="item"]') : [];
             const enabledItems = items.filter((item) => item.getAttribute('data-p-disabled') !== 'true');
 
             return index === -1 ? 0 : enabledItems.findIndex((item) => item.id === index) + 1;
         },
-        calculatePointStyle(index) {
+        calculatePointStyle(index: number) {
             const type = this.type;
 
             if (type !== 'linear') {
-                const length = this.model.length;
+                const length = this.model?.length ?? 0;
                 const radius = this.radius || length * 20;
 
                 if (type === 'circle') {
                     const step = (2 * Math_PI) / length;
 
                     return {
-                        left: `calc(${radius * Math.cos(step * index)}px + ${$dt('item.diff.x', '0px').variable})`,
-                        top: `calc(${radius * Math.sin(step * index)}px + ${$dt('item.diff.y', '0px').variable})`
+                        left: `calc(${radius * Math.cos(step * index)}px + ${$dt('item.diff.x').variable})`,
+                        top: `calc(${radius * Math.sin(step * index)}px + ${$dt('item.diff.y').variable})`
                     };
                 } else if (type === 'semi-circle') {
                     const direction = this.direction;
                     const step = Math_PI / (length - 1);
-                    const x = `calc(${radius * Math.cos(step * index)}px + ${$dt('item.diff.x', '0px').variable})`;
-                    const y = `calc(${radius * Math.sin(step * index)}px + ${$dt('item.diff.y', '0px').variable})`;
+                    const x = `calc(${radius * Math.cos(step * index)}px + ${$dt('item.diff.x').variable})`;
+                    const y = `calc(${radius * Math.sin(step * index)}px + ${$dt('item.diff.y').variable})`;
 
                     if (direction === 'up') {
                         return { left: x, bottom: y };
@@ -415,8 +416,8 @@ export default {
                 } else if (type === 'quarter-circle') {
                     const direction = this.direction;
                     const step = Math_PI / (2 * (length - 1));
-                    const x = `calc(${radius * Math.cos(step * index)}px + ${$dt('item.diff.x', '0px').variable})`;
-                    const y = `calc(${radius * Math.sin(step * index)}px + ${$dt('item.diff.y', '0px').variable})`;
+                    const x = `calc(${radius * Math.cos(step * index)}px + ${$dt('item.diff.x').variable})`;
+                    const y = `calc(${radius * Math.sin(step * index)}px + ${$dt('item.diff.y').variable})`;
 
                     if (direction === 'up-left') {
                         return { right: x, bottom: y };
@@ -432,7 +433,7 @@ export default {
 
             return {};
         },
-        getItemStyle(index) {
+        getItemStyle(index: number) {
             const transitionDelay = this.calculateTransitionDelay(index);
             const pointStyle = this.calculatePointStyle(index);
 
@@ -460,23 +461,23 @@ export default {
                 this.documentClickListener = null;
             }
         },
-        isOutsideClicked(event) {
-            return this.container && !(this.container.isSameNode(event.target) || this.container.contains(event.target) || this.isItemClicked);
+        isOutsideClicked(event: MouseEvent) {
+            return this.container && event.target instanceof Node && !this.container.contains(event.target) && !this.isItemClicked;
         },
-        isItemVisible(item) {
+        isItemVisible(item: MenuItem) {
             return typeof item.visible === 'function' ? item.visible() : item.visible !== false;
         },
-        isItemDisabled(item) {
+        isItemDisabled(item: MenuItem) {
             return typeof item.disabled === 'function' ? item.disabled() : !!item.disabled;
         },
-        isItemActive(id) {
+        isItemActive(id: string) {
             return id === this.focusedOptionId;
         },
-        containerRef(el) {
-            this.container = el;
+        containerRef(el: Element | ComponentPublicInstance | null) {
+            this.container = el instanceof HTMLElement ? el : null;
         },
-        listRef(el) {
-            this.list = el;
+        listRef(el: Element | ComponentPublicInstance | null) {
+            this.list = el instanceof HTMLElement ? el : null;
         }
     },
     computed: {
@@ -495,5 +496,5 @@ export default {
         ripple: Ripple,
         tooltip: Tooltip
     }
-};
+});
 </script>
