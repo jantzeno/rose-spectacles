@@ -120,6 +120,7 @@
 </template>
 
 <script>
+import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { HelperSet, getVNodeProp } from '../core/utils/Utils';
 import { mergeProps } from 'vue';
@@ -293,7 +294,7 @@ export default {
         },
         getColumnPT(column, key, index) {
             const columnMetaData = {
-                props: column.props,
+                props: getColumnPassThroughProps(column),
                 parent: {
                     instance: this,
                     props: this.$props,

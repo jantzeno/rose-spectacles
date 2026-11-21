@@ -91,6 +91,7 @@
 </template>
 
 <script>
+import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
@@ -183,7 +184,7 @@ export default {
         },
         getColumnPT(key) {
             const columnMetaData = {
-                props: this.column.props,
+                props: getColumnPassThroughProps(this.column),
                 parent: {
                     instance: this,
                     props: this.$props,
@@ -212,7 +213,7 @@ export default {
         },
         getColumnCheckboxPT(key) {
             const columnMetaData = {
-                props: this.column.props,
+                props: getColumnPassThroughProps(this.column),
                 parent: {
                     instance: this,
                     props: this.$props,

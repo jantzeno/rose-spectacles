@@ -12,6 +12,7 @@
 </template>
 
 <script lang="ts">
+import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
@@ -53,7 +54,7 @@ export default defineComponent({
         getColumnPT(key: string) {
             const { $parentInstance: parent } = this as typeof this & { $parentInstance?: { size?: string } };
             const columnMetaData = {
-                props: this.column.props,
+                props: getColumnPassThroughProps(this.column as VNode),
                 parent: {
                     instance: this,
                     props: this.$props,

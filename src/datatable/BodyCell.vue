@@ -190,6 +190,7 @@
 </template>
 
 <script>
+import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import {
     getAttribute,
     getFirstFocusableElement,
@@ -349,7 +350,7 @@ export default {
         },
         getColumnPT(key) {
             const columnMetaData = {
-                props: this.column.props,
+                props: getColumnPassThroughProps(this.column),
                 parent: {
                     instance: this,
                     props: this.$props,

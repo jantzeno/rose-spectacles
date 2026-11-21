@@ -11,6 +11,7 @@
 </template>
 
 <script lang="ts">
+import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import RadioButton from '../radiobutton/RadioButton.vue';
 import { defineComponent, mergeProps } from 'vue';
@@ -33,7 +34,7 @@ export default defineComponent({
     methods: {
         getColumnPT(key: string) {
             const columnMetaData = {
-                props: this.column.props,
+                props: getColumnPassThroughProps(this.column),
                 parent: {
                     instance: this,
                     props: this.$props,

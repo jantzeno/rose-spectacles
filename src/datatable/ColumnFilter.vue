@@ -185,6 +185,7 @@
 </template>
 
 <script>
+import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { absolutePosition, addStyle, focus, getAttribute, isTouchDevice } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { FilterOperator } from '../core/api/Api';
@@ -354,7 +355,7 @@ export default {
     methods: {
         getColumnPT(key, params) {
             const columnMetaData = {
-                props: this.column.props,
+                props: getColumnPassThroughProps(this.column),
                 parent: {
                     instance: this,
                     props: this.$props,
