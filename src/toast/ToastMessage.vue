@@ -14,15 +14,7 @@
         <div v-else :class="[cx('messageContent'), message.contentStyleClass]" v-bind="ptm('messageContent')">
             <template v-if="!templates.message">
                 <component
-                    :is="
-                        templates.messageicon
-                            ? templates.messageicon
-                            : templates.icon
-                              ? templates.icon
-                              : iconComponent && iconComponent.name
-                                ? iconComponent
-                                : 'span'
-                    "
+                    :is="templates.messageicon ? templates.messageicon : templates.icon ? templates.icon : iconComponent || 'span'"
                     :class="cx('messageIcon')"
                     v-bind="ptm('messageIcon')"
                 />
@@ -50,7 +42,9 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type Component, type PropType, type Slots } from 'vue';
+import type { ToastMessageOptions } from 'rose-spectacles/toast';
 import { cn } from '../internal/utils/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import CheckIcon from '../icons/check/CheckIcon.vue';
@@ -60,22 +54,29 @@ import TimesIcon from '../icons/times/TimesIcon.vue';
 import TimesCircleIcon from '../icons/timescircle/TimesCircleIcon.vue';
 import Ripple from '../ripple/Ripple';
 
-export default {
+export type ToastRemoval = { message: ToastMessageOptions; type: 'close' | 'life-end' };
+export type ToastInteraction = (event: { originalEvent: MouseEvent; message: ToastMessageOptions }) => void;
+
+export default defineComponent({
     name: 'ToastMessage',
     hostName: 'Toast',
     extends: BaseComponent,
     emits: ['close'],
-    closeTimeout: null,
-    createdAt: null,
-    lifeRemaining: null,
+    data() {
+        return {
+            closeTimeout: null as ReturnType<typeof setTimeout> | null,
+            createdAt: null as number | null,
+            lifeRemaining: 0
+        };
+    },
     props: {
         message: {
-            type: null,
-            default: null
+            type: Object as PropType<ToastMessageOptions>,
+            required: true
         },
         templates: {
-            type: Object,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         closeIcon: {
             type: String,
@@ -102,15 +103,15 @@ export default {
             default: null
         },
         onMouseEnter: {
-            type: Function,
+            type: Function as PropType<ToastInteraction>,
             default: undefined
         },
         onMouseLeave: {
-            type: Function,
+            type: Function as PropType<ToastInteraction>,
             default: undefined
         },
         onClick: {
-            type: Function,
+            type: Function as PropType<ToastInteraction>,
             default: undefined
         }
     },
@@ -130,7 +131,7 @@ export default {
                 this.close({ message: this.message, type: 'life-end' });
             }, this.lifeRemaining);
         },
-        close(params) {
+        close(params: ToastRemoval) {
             this.$emit('close', params);
         },
         onCloseClick() {
@@ -143,10 +144,10 @@ export default {
                 this.closeTimeout = null;
             }
         },
-        onMessageClick(event) {
+        onMessageClick(event: MouseEvent) {
             this.onClick?.({ originalEvent: event, message: this.message });
         },
-        handleMouseEnter(event) {
+        handleMouseEnter(event: MouseEvent) {
             if (this.onMouseEnter) {
                 this.onMouseEnter({ originalEvent: event, message: this.message });
 
@@ -154,14 +155,14 @@ export default {
                     return;
                 }
 
-                if (this.message.life) {
+                if (this.message.life && this.createdAt !== null) {
                     this.lifeRemaining = this.createdAt + this.lifeRemaining - new Date().valueOf();
                     this.createdAt = null;
                     this.clearCloseTimeout();
                 }
             }
         },
-        handleMouseLeave(event) {
+        handleMouseLeave(event: MouseEvent) {
             if (this.onMouseLeave) {
                 this.onMouseLeave({ originalEvent: event, message: this.message });
 
@@ -177,19 +178,24 @@ export default {
     },
     computed: {
         iconComponent() {
-            return {
+            const icons: Record<string, Component | false> = {
                 info: !this.infoIcon && InfoCircleIcon,
                 success: !this.successIcon && CheckIcon,
                 warn: !this.warnIcon && ExclamationTriangleIcon,
                 error: !this.errorIcon && TimesCircleIcon
-            }[this.message.severity];
+            };
+            const severity = this.message.severity;
+
+            return severity && Object.hasOwn(icons, severity) ? icons[severity] : undefined;
         },
         closeAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.close : undefined;
+            return this.$primevue?.config.locale?.aria?.close;
         },
         dataP() {
+            const severity = this.message.severity;
+
             return cn({
-                [this.message.severity]: this.message.severity
+                [severity ?? '']: severity
             });
         }
     },
@@ -203,5 +209,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

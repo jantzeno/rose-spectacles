@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
+import type { ToastInteraction } from './ToastMessage.vue';
 import ToastStyle from './style/ToastStyle';
 
 export default defineComponent({
@@ -52,15 +53,15 @@ export default defineComponent({
             default: null
         },
         onMouseEnter: {
-            type: Function,
+            type: Function as PropType<ToastInteraction>,
             default: undefined
         },
         onMouseLeave: {
-            type: Function,
+            type: Function as PropType<ToastInteraction>,
             default: undefined
         },
         onClick: {
-            type: Function,
+            type: Function as PropType<ToastInteraction>,
             default: undefined
         }
     },

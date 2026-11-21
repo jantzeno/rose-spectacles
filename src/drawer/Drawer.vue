@@ -74,7 +74,8 @@
     </Portal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { cn } from '../internal/utils/index';
 import { addClass, focus } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
@@ -85,24 +86,26 @@ import Portal from '../portal/Portal.vue';
 import { blockBodyScroll, unblockBodyScroll } from '../utils/Utils';
 import BaseDrawer from './BaseDrawer.vue';
 
-export default {
+type DrawerRef = Element | ComponentPublicInstance | null;
+
+export default defineComponent({
     name: 'Drawer',
     extends: BaseDrawer,
     inheritAttrs: false,
     emits: ['update:visible', 'show', 'after-show', 'hide', 'after-hide', 'before-hide'],
     data() {
         return {
-            containerVisible: this.visible
+            containerVisible: this.visible,
+            container: null as HTMLElement | null,
+            mask: null as HTMLElement | null,
+            content: null as HTMLElement | null,
+            headerContainer: null as HTMLElement | null,
+            footerContainer: null as HTMLElement | null,
+            closeButton: null as HTMLElement | null,
+            outsideClickListener: null as ((event: MouseEvent) => void) | null,
+            documentKeydownListener: null as ((event: KeyboardEvent) => void) | null
         };
     },
-    container: null,
-    mask: null,
-    content: null,
-    headerContainer: null,
-    footerContainer: null,
-    closeButton: null,
-    outsideClickListener: null,
-    documentKeydownListener: null,
     watch: {
         dismissable(newValue) {
             if (newValue && !this.modal) {
@@ -137,8 +140,8 @@ export default {
             this.focus();
             this.bindDocumentKeyDownListener();
 
-            if (this.autoZIndex) {
-                ZIndex.set('modal', this.mask, this.baseZIndex || this.$primevue.config.zIndex.modal);
+            if (this.autoZIndex && this.mask) {
+                ZIndex.set('modal', this.mask, this.baseZIndex || this.$primevue?.config.zIndex?.modal);
             }
         },
         onAfterEnter() {
@@ -146,8 +149,8 @@ export default {
             this.$emit('after-show');
         },
         onBeforeLeave() {
-            if (this.modal) {
-                !this.isUnstyled && addClass(this.mask, 'rs-overlay-mask-leave-active');
+            if (this.modal && !this.isUnstyled && this.mask) {
+                addClass(this.mask, 'rs-overlay-mask-leave-active');
             }
 
             this.$emit('before-hide');
@@ -156,7 +159,7 @@ export default {
             this.$emit('hide');
         },
         onAfterLeave() {
-            if (this.autoZIndex) {
+            if (this.autoZIndex && this.mask) {
                 ZIndex.clear(this.mask);
             }
 
@@ -165,29 +168,18 @@ export default {
             this.disableDocumentSettings();
             this.$emit('after-hide');
         },
-        onMaskClick(event) {
+        onMaskClick(event: MouseEvent) {
             if (this.dismissable && this.modal && this.mask === event.target) {
                 this.hide();
             }
         },
         focus() {
-            const findFocusableElement = (container) => {
-                return container && container.querySelector('[autofocus]');
-            };
-
-            let focusTarget = this.$slots.header && findFocusableElement(this.headerContainer);
-
-            if (!focusTarget) {
-                focusTarget = this.$slots.default && findFocusableElement(this.container);
-
-                if (!focusTarget) {
-                    focusTarget = this.$slots.footer && findFocusableElement(this.footerContainer);
-
-                    if (!focusTarget) {
-                        focusTarget = this.closeButton;
-                    }
-                }
-            }
+            const autofocus = (container: HTMLElement | null) => container?.querySelector<HTMLElement>('[autofocus]');
+            const focusTarget =
+                (this.$slots.header && autofocus(this.headerContainer)) ||
+                (this.$slots.default && autofocus(this.container)) ||
+                (this.$slots.footer && autofocus(this.footerContainer)) ||
+                this.closeButton;
 
             focusTarget && focus(focusTarget);
         },
@@ -207,28 +199,30 @@ export default {
                 unblockBodyScroll();
             }
         },
-        onKeydown(event) {
+        onKeydown(event: KeyboardEvent) {
             if (event.code === 'Escape' && this.closeOnEscape) {
                 this.hide();
             }
         },
-        containerRef(el) {
-            this.container = el;
+        containerRef(el: DrawerRef) {
+            this.container = el instanceof HTMLElement ? el : null;
         },
-        maskRef(el) {
-            this.mask = el;
+        maskRef(el: DrawerRef) {
+            this.mask = el instanceof HTMLElement ? el : null;
         },
-        contentRef(el) {
-            this.content = el;
+        contentRef(el: DrawerRef) {
+            this.content = el instanceof HTMLElement ? el : null;
         },
-        headerContainerRef(el) {
-            this.headerContainer = el;
+        headerContainerRef(el: DrawerRef) {
+            this.headerContainer = el instanceof HTMLElement ? el : null;
         },
-        footerContainerRef(el) {
-            this.footerContainer = el;
+        footerContainerRef(el: DrawerRef) {
+            this.footerContainer = el instanceof HTMLElement ? el : null;
         },
-        closeButtonRef(el) {
-            this.closeButton = el ? el.$el : undefined;
+        closeButtonRef(el: DrawerRef) {
+            const button = el && !(el instanceof Element) ? el.$el : el;
+
+            this.closeButton = button instanceof HTMLElement ? button : null;
         },
         bindDocumentKeyDownListener() {
             if (!this.documentKeydownListener) {
@@ -259,8 +253,8 @@ export default {
                 this.outsideClickListener = null;
             }
         },
-        isOutsideClicked(event) {
-            return this.container && !this.container.contains(event.target);
+        isOutsideClicked(event: MouseEvent) {
+            return this.container && event.target instanceof Node && !this.container.contains(event.target);
         }
     },
     computed: {
@@ -268,7 +262,7 @@ export default {
             return this.position === 'full';
         },
         closeAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.close : undefined;
+            return this.$primevue?.config.locale?.aria?.close;
         },
         dataP() {
             return cn({
@@ -287,5 +281,5 @@ export default {
         Portal,
         TimesIcon
     }
-};
+});
 </script>

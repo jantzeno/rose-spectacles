@@ -77,6 +77,19 @@ describe('Drawer.vue', () => {
         expect(wrapper.emitted()['update:visible'].length).toBe(1);
     });
 
+    it('controls mask dismissal and Escape independently', async () => {
+        await wrapper.setProps({ dismissable: false });
+        await wrapper.get('.rs-drawer-mask').trigger('mousedown');
+        expect(wrapper.emitted('update:visible')).toBeUndefined();
+
+        wrapper.vm.onKeydown(new KeyboardEvent('keydown', { code: 'Escape' }));
+        expect(wrapper.emitted('update:visible')).toEqual([[false]]);
+
+        await wrapper.setProps({ closeOnEscape: false });
+        wrapper.vm.onKeydown(new KeyboardEvent('keydown', { code: 'Escape' }));
+        expect(wrapper.emitted('update:visible')).toEqual([[false]]);
+    });
+
     it('stops handling Escape when an open drawer unmounts', () => {
         const hide = vi.spyOn(wrapper.vm, 'hide');
         const pressEscape = () => document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
@@ -104,7 +117,7 @@ describe('Drawer.vue', () => {
         await wrapper.unmount();
 
         expect(unbindOutsideClickListenerSpy).toHaveBeenCalled();
-        expect(Drawer.container).toBe(null);
+        expect(wrapper.vm.container).toBe(null);
     });
 
     it('When onBeforeLeave is triggered , addClass util should be called', async () => {

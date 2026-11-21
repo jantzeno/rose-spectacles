@@ -35,11 +35,9 @@ import { ZIndex } from '../internal/utils/zindex/index';
 import Portal from '../portal/Portal.vue';
 import ToastEventBus from '../toasteventbus/ToastEventBus';
 import BaseToast from './BaseToast.vue';
-import ToastMessage from './ToastMessage.vue';
+import ToastMessage, { type ToastRemoval } from './ToastMessage.vue';
 
 var messageIdx = 0;
-
-type ToastRemoval = { message: ToastMessageOptions; type: 'close' | 'life-end' };
 
 export default defineComponent({
     name: 'Toast',
