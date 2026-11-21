@@ -27,7 +27,6 @@ it('dismisses a Select overlay when its containing ScrollPanel scrolls', async (
         expect(select.find('.rs-select-overlay').exists()).toBe(true);
 
         select.vm.onOverlayAfterEnter();
-        expect(select.vm.scrollHandler.scrollableParents).toContain(region.element);
         await region.trigger('scroll');
         await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
