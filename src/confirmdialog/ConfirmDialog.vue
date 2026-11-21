@@ -29,7 +29,7 @@
             <template v-if="!$slots.message">
                 <slot name="icon">
                     <component v-if="$slots.icon" :is="$slots.icon" :class="cx('icon')" />
-                    <span v-else-if="confirmation.icon" :class="[confirmation.icon, cx('icon')]" v-bind="ptm('icon')" />
+                    <span v-else-if="confirmation?.icon" :class="[confirmation?.icon, cx('icon')]" v-bind="ptm('icon')" />
                 </slot>
                 <span :class="cx('message')" v-bind="ptm('message')">{{ message }}</span>
             </template>
@@ -37,12 +37,12 @@
         </template>
         <template v-if="!$slots.container" #footer>
             <Button
-                :class="[cx('pcRejectButton'), confirmation.rejectClass]"
+                :class="[cx('pcRejectButton'), confirmation?.rejectClass]"
                 :autofocus="autoFocusReject"
                 :unstyled="unstyled"
-                :text="confirmation.rejectProps?.text || false"
+                :text="confirmation?.rejectProps?.text || false"
                 @click="reject()"
-                v-bind="confirmation.rejectProps"
+                v-bind="confirmation?.rejectProps"
                 :label="rejectLabel"
                 :pt="ptm('pcRejectButton')"
             >
@@ -54,11 +54,11 @@
             </Button>
             <Button
                 :label="acceptLabel"
-                :class="[cx('pcAcceptButton'), confirmation.acceptClass]"
+                :class="[cx('pcAcceptButton'), confirmation?.acceptClass]"
                 :autofocus="autoFocusAccept"
                 :unstyled="unstyled"
                 @click="accept()"
-                v-bind="confirmation.acceptProps"
+                v-bind="confirmation?.acceptProps"
                 :pt="ptm('pcAcceptButton')"
             >
                 <template v-if="acceptIcon || $slots.accepticon" #icon="iconProps">
@@ -71,71 +71,57 @@
     </Dialog>
 </template>
 
-<script>
+<script lang="ts">
+import type { ConfirmationRenderOptions } from '../confirmationoptions/render-options';
+import { defineComponent } from 'vue';
 import Button from '../button/Button.vue';
 import ConfirmationEventBus from '../confirmationeventbus/ConfirmationEventBus';
 import Dialog from '../dialog/Dialog.vue';
 import BaseConfirmDialog from './BaseConfirmDialog.vue';
 
-export default {
+export default defineComponent({
     name: 'ConfirmDialog',
     extends: BaseConfirmDialog,
-    confirmListener: null,
-    closeListener: null,
     data() {
         return {
             visible: false,
-            confirmation: null
+            confirmation: null as ConfirmationRenderOptions | null
         };
     },
     mounted() {
-        this.confirmListener = (options) => {
-            if (!options) {
-                return;
-            }
-
-            if (options.group === this.group) {
-                this.confirmation = options;
-
-                if (this.confirmation.onShow) {
-                    this.confirmation.onShow();
-                }
-
-                this.visible = true;
-            }
-        };
-
-        this.closeListener = () => {
-            this.visible = false;
-            this.confirmation = null;
-        };
-
-        ConfirmationEventBus.on('confirm', this.confirmListener);
-        ConfirmationEventBus.on('close', this.closeListener);
+        ConfirmationEventBus.on('confirm', this.onConfirm);
+        ConfirmationEventBus.on('close', this.closeConfirmation);
     },
     beforeUnmount() {
-        ConfirmationEventBus.off('confirm', this.confirmListener);
-        ConfirmationEventBus.off('close', this.closeListener);
+        ConfirmationEventBus.off('confirm', this.onConfirm);
+        ConfirmationEventBus.off('close', this.closeConfirmation);
     },
     methods: {
-        accept() {
-            if (this.confirmation.accept) {
-                this.confirmation.accept();
+        onConfirm(event: unknown) {
+            const options = event as ConfirmationRenderOptions | undefined;
+
+            if (options && options.group === this.group) {
+                this.confirmation = options;
+                this.confirmation.onShow?.();
+                this.visible = true;
             }
+        },
+        closeConfirmation() {
+            this.visible = false;
+            this.confirmation = null;
+        },
+        accept() {
+            this.confirmation?.accept?.();
 
             this.visible = false;
         },
         reject() {
-            if (this.confirmation.reject) {
-                this.confirmation.reject();
-            }
+            this.confirmation?.reject?.();
 
             this.visible = false;
         },
         onHide() {
-            if (this.confirmation.onHide) {
-                this.confirmation.onHide();
-            }
+            this.confirmation?.onHide?.();
 
             this.visible = false;
         }
@@ -160,37 +146,37 @@ export default {
             return this.confirmation ? this.confirmation.blockScroll : true;
         },
         position() {
-            return this.confirmation ? this.confirmation.position : null;
+            return this.confirmation?.position;
         },
         acceptLabel() {
             if (this.confirmation) {
                 const confirmation = this.confirmation;
 
-                return confirmation.acceptLabel || confirmation.acceptProps?.label || this.$primevue.config.locale.accept;
+                return confirmation.acceptLabel || confirmation.acceptProps?.label || this.$primevue.config.locale?.accept;
             }
 
-            return this.$primevue.config.locale.accept;
+            return this.$primevue.config.locale?.accept;
         },
         rejectLabel() {
             if (this.confirmation) {
                 const confirmation = this.confirmation;
 
-                return confirmation.rejectLabel || confirmation.rejectProps?.label || this.$primevue.config.locale.reject;
+                return confirmation.rejectLabel || confirmation.rejectProps?.label || this.$primevue.config.locale?.reject;
             }
 
-            return this.$primevue.config.locale.reject;
+            return this.$primevue.config.locale?.reject;
         },
         acceptIcon() {
-            return this.confirmation ? this.confirmation.acceptIcon : this.confirmation?.acceptProps ? this.confirmation.acceptProps.icon : null;
+            return this.confirmation ? this.confirmation.acceptIcon : null;
         },
         rejectIcon() {
-            return this.confirmation ? this.confirmation.rejectIcon : this.confirmation?.rejectProps ? this.confirmation.rejectProps.icon : null;
+            return this.confirmation ? this.confirmation.rejectIcon : null;
         },
         autoFocusAccept() {
-            return this.confirmation.defaultFocus === undefined || this.confirmation.defaultFocus === 'accept' ? true : false;
+            return this.confirmation?.defaultFocus === undefined || this.confirmation?.defaultFocus === 'accept' ? true : false;
         },
         autoFocusReject() {
-            return this.confirmation.defaultFocus === 'reject' ? true : false;
+            return this.confirmation?.defaultFocus === 'reject' ? true : false;
         },
         closeOnEscape() {
             return this.confirmation ? this.confirmation.closeOnEscape : true;
@@ -200,5 +186,5 @@ export default {
         Dialog,
         Button
     }
-};
+});
 </script>

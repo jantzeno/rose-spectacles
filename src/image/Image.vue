@@ -115,7 +115,13 @@
                             :style="imagePreviewStyle"
                             :previewCallback="onPreviewImageClick"
                         >
-                            <img :src="$attrs.src" :class="cx('original')" :style="imagePreviewStyle" @click="onPreviewImageClick" v-bind="ptm('original')" />
+                            <img
+                                :src="$attrs.src as string | undefined"
+                                :class="cx('original')"
+                                :style="imagePreviewStyle"
+                                @click="onPreviewImageClick"
+                                v-bind="ptm('original')"
+                            />
                         </slot>
                     </div>
                 </transition>
@@ -124,7 +130,8 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { addClass, focus, isAttributeEquals } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import EyeIcon from '../icons/eye/EyeIcon.vue';
@@ -138,17 +145,18 @@ import Portal from '../portal/Portal.vue';
 import { blockBodyScroll, unblockBodyScroll } from '../utils/Utils';
 import BaseImage from './BaseImage.vue';
 
-export default {
+export default defineComponent({
     name: 'Image',
     extends: BaseImage,
     inheritAttrs: false,
     emits: ['show', 'hide', 'error'],
-    mask: null,
     data() {
         return {
             maskVisible: false,
+            mask: null as HTMLElement | null,
+            previewClick: false,
             previewVisible: false,
-            previewTimer: undefined,
+            previewTimer: undefined as ReturnType<typeof setTimeout> | undefined,
             scrollLocked: false,
             rotate: 0,
             scale: 1
@@ -163,11 +171,8 @@ export default {
         }
     },
     methods: {
-        maskRef(el) {
-            this.mask = el;
-        },
-        toolbarRef(el) {
-            this.toolbarRef = el;
+        maskRef(el: Element | ComponentPublicInstance | null) {
+            this.mask = el as HTMLElement | null;
         },
         onImageClick() {
             if (this.preview) {
@@ -187,9 +192,9 @@ export default {
         onPreviewImageClick() {
             this.previewClick = true;
         },
-        onMaskClick(event) {
-            const isBarActionsClicked =
-                isAttributeEquals(event.target, 'data-pc-section-group', 'action') || event.target.closest('[data-pc-section-group="action"]');
+        onMaskClick(event: MouseEvent) {
+            const target = event.target as Element;
+            const isBarActionsClicked = isAttributeEquals(target, 'data-pc-section-group', 'action') || target.closest('[data-pc-section-group="action"]');
 
             if (!this.previewClick && !isBarActionsClicked) {
                 this.previewVisible = false;
@@ -199,12 +204,12 @@ export default {
 
             this.previewClick = false;
         },
-        onMaskKeydown(event) {
+        onMaskKeydown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'Escape':
                     this.hidePreview();
                     setTimeout(() => {
-                        focus(this.$refs.previewButton);
+                        focus(this.$refs.previewButton as HTMLElement);
                     }, 200);
                     event.preventDefault();
 
@@ -234,25 +239,25 @@ export default {
             this.previewClick = true;
         },
         onBeforeEnter() {
-            ZIndex.set('modal', this.mask, this.$primevue.config.zIndex.modal);
+            ZIndex.set('modal', this.mask!, this.$primevue.config.zIndex!.modal);
         },
         onEnter() {
             this.focus();
             this.$emit('show');
         },
         onBeforeLeave() {
-            !this.isUnstyled && addClass(this.mask, 'rs-overlay-mask-leave-active');
+            !this.isUnstyled && addClass(this.mask!, 'rs-overlay-mask-leave-active');
         },
         onLeave() {
             this.releaseScrollLock();
             this.$emit('hide');
         },
-        onAfterLeave(el) {
-            ZIndex.clear(el);
+        onAfterLeave(el: Element) {
+            ZIndex.clear(el as HTMLElement);
             this.maskVisible = false;
         },
         focus() {
-            let focusTarget = this.mask.querySelector('[autofocus]');
+            let focusTarget = this.mask?.querySelector<HTMLElement>('[autofocus]');
 
             if (focusTarget) {
                 focusTarget.focus();
@@ -288,22 +293,22 @@ export default {
             return this.zoomOutDisabled || this.scale <= 0.5;
         },
         rightAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.rotateRight : undefined;
+            return this.$primevue.config.locale?.aria?.rotateRight;
         },
         leftAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.rotateLeft : undefined;
+            return this.$primevue.config.locale?.aria?.rotateLeft;
         },
         zoomInAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.zoomIn : undefined;
+            return this.$primevue.config.locale?.aria?.zoomIn;
         },
         zoomOutAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.zoomOut : undefined;
+            return this.$primevue.config.locale?.aria?.zoomOut;
         },
         zoomImageAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.zoomImage : undefined;
+            return this.$primevue.config.locale?.aria?.zoomImage;
         },
         closeAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.close : undefined;
+            return this.$primevue.config.locale?.aria?.close;
         }
     },
     components: {
@@ -318,5 +323,5 @@ export default {
     directives: {
         focustrap: FocusTrap
     }
-};
+});
 </script>

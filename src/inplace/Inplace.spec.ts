@@ -27,11 +27,11 @@ describe('Inplace.vue', () => {
 
         expect(wrapper.find('.rs-inplace-display').exists()).toBe(true);
 
-        wrapper.vm.open({});
+        wrapper.vm.open(new MouseEvent('click'));
 
         expect(wrapper.emitted()['update:active'][0]).toEqual([true]);
 
-        wrapper.vm.close({});
+        wrapper.vm.close(new MouseEvent('click'));
 
         expect(wrapper.emitted()['update:active'][1]).toEqual([false]);
     });
