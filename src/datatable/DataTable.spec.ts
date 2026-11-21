@@ -48,6 +48,34 @@ it('removes the outside edit listener when the active cell unmounts', async () =
     }
 });
 
+it('removes document resize listeners when the table unmounts during a drag', async () => {
+    const wrapper = mount(DataTable, {
+        props: { value: [{ name: 'Copper', code: 'Cu' }], resizableColumns: true },
+        global: { components: { Column } },
+        slots: { default: '<Column field="name" /><Column field="code" />' }
+    });
+    const addListener = vi.spyOn(document, 'addEventListener');
+    const removeListener = vi.spyOn(document, 'removeEventListener');
+
+    try {
+        await wrapper.get('.rs-datatable-column-resizer').trigger('mousedown');
+    } finally {
+        wrapper.unmount();
+    }
+
+    try {
+        for (const type of ['mousemove', 'mouseup']) {
+            const listener = addListener.mock.calls.find(([name]) => name === type)?.[1];
+
+            expect(listener).toBeTypeOf('function');
+            expect(removeListener).toHaveBeenCalledWith(type, listener);
+        }
+    } finally {
+        addListener.mockRestore();
+        removeListener.mockRestore();
+    }
+});
+
 window.URL.createObjectURL = () => 'blob:rose-spectacles-test';
 
 const smallData = [

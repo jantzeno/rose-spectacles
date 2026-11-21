@@ -1496,12 +1496,12 @@ export default {
         },
         unbindColumnResizeEvents() {
             if (this.documentColumnResizeListener) {
-                document.removeEventListener('document', this.documentColumnResizeListener);
+                document.removeEventListener('mousemove', this.documentColumnResizeListener);
                 this.documentColumnResizeListener = null;
             }
 
             if (this.documentColumnResizeEndListener) {
-                document.removeEventListener('document', this.documentColumnResizeEndListener);
+                document.removeEventListener('mouseup', this.documentColumnResizeEndListener);
                 this.documentColumnResizeEndListener = null;
             }
         },
