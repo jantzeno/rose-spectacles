@@ -101,7 +101,7 @@
                 :progress="progress"
                 :messages="messages"
             >
-                <ProgressBar v-if="hasFiles" :value="progress" :showValue="false" :unstyled="unstyled" :pt="ptm('pcProgressbar')" />
+                <ProgressBar v-if="hasFiles" :value="progress ?? undefined" :showValue="false" :unstyled="unstyled" :pt="ptm('pcProgressbar')" />
                 <Message v-for="msg of messages" :key="msg" severity="error" @close="onMessageClose" :unstyled="unstyled" :pt="ptm('pcMessage')">{{
                     msg
                 }}</Message>
@@ -182,7 +182,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { addClass, removeClass } from '../internal/utils/dom/index';
 import PlusIcon from '../icons/plus/PlusIcon.vue';
 import TimesIcon from '../icons/times/TimesIcon.vue';
@@ -191,33 +191,40 @@ import Button from '../button/Button.vue';
 import Message from '../message/Message.vue';
 import ProgressBar from '../progressbar/ProgressBar.vue';
 import Ripple from '../ripple/Ripple';
+import { defineComponent } from 'vue';
 import BaseFileUpload from './BaseFileUpload.vue';
 import FileContent from './FileContent.vue';
 
-export default {
+type SelectedFile = File & { objectURL?: string };
+
+function getSelectedFiles(event: Event): FileList | null | undefined {
+    return (event as DragEvent).dataTransfer?.files ?? (event.target as HTMLInputElement | null)?.files;
+}
+
+export default defineComponent({
     name: 'FileUpload',
     extends: BaseFileUpload,
     inheritAttrs: false,
     emits: ['select', 'uploader', 'before-upload', 'progress', 'upload', 'error', 'before-send', 'clear', 'remove', 'remove-uploaded-file'],
-    duplicateIEEvent: false,
     data() {
         return {
+            duplicateIEEvent: false,
             uploadedFileCount: 0,
-            files: [],
-            messages: [],
+            files: [] as SelectedFile[],
+            messages: [] as string[] | null,
             focused: false,
-            progress: null,
-            uploadedFiles: []
+            progress: null as number | null,
+            uploadedFiles: [] as SelectedFile[]
         };
     },
     methods: {
         upload() {
             if (this.hasFiles) this.uploader();
         },
-        onBasicUploaderClick(event) {
-            if (event.button === 0) this.$refs.fileInput.click();
+        onBasicUploaderClick(event: MouseEvent) {
+            if (event.button === 0) this.choose();
         },
-        onFileSelect(event) {
+        onFileSelect(event: Event) {
             if (event.type !== 'drop' && this.isIE11() && this.duplicateIEEvent) {
                 this.duplicateIEEvent = false;
 
@@ -230,10 +237,10 @@ export default {
 
             this.messages = [];
             this.files = this.files || [];
-            const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+            const files = getSelectedFiles(event);
             let rejectedByLimit = false;
 
-            for (const file of files) {
+            for (const file of (files ?? []) as Iterable<SelectedFile>) {
                 if (this.isFileSelected(file)) continue;
 
                 if (this.fileLimit && this.files.length + this.uploadedFileCount >= this.fileLimit) {
@@ -267,7 +274,7 @@ export default {
             }
         },
         choose() {
-            this.$refs.fileInput.click();
+            (this.$refs.fileInput as HTMLInputElement | undefined)?.click();
         },
         uploader() {
             if (this.customUpload) {
@@ -354,7 +361,7 @@ export default {
         onBlur() {
             this.focused = false;
         },
-        isFileSelected(file) {
+        isFileSelected(file: File) {
             if (this.files && this.files.length) {
                 for (let sFile of this.files) {
                     if (sFile.name + sFile.type + sFile.size === file.name + file.type + file.size) return true;
@@ -364,24 +371,27 @@ export default {
             return false;
         },
         isIE11() {
-            return !!window['MSInputMethodContext'] && !!document['documentMode'];
+            return (
+                !!(window as Window & { MSInputMethodContext?: unknown }).MSInputMethodContext &&
+                !!(document as Document & { documentMode?: number }).documentMode
+            );
         },
-        validate(file) {
+        validate(file: File) {
             if (this.accept && !this.isFileTypeValid(file)) {
-                this.messages.push(this.invalidFileTypeMessage.replace('{0}', file.name).replace('{1}', this.accept));
+                this.messages?.push(this.invalidFileTypeMessage.replace('{0}', file.name).replace('{1}', this.accept));
 
                 return false;
             }
 
             if (this.maxFileSize && file.size > this.maxFileSize) {
-                this.messages.push(this.invalidFileSizeMessage.replace('{0}', file.name).replace('{1}', this.formatSize(this.maxFileSize)));
+                this.messages?.push(this.invalidFileSizeMessage.replace('{0}', file.name).replace('{1}', this.formatSize(this.maxFileSize)));
 
                 return false;
             }
 
             return true;
         },
-        isFileTypeValid(file) {
+        isFileTypeValid(file: File) {
             let acceptableTypes = this.accept.split(',').map((type) => type.trim());
 
             for (let type of acceptableTypes) {
@@ -396,46 +406,58 @@ export default {
 
             return false;
         },
-        getTypeClass(fileType) {
+        getTypeClass(fileType: string) {
             return fileType.substring(0, fileType.indexOf('/'));
         },
-        isWildcard(fileType) {
+        isWildcard(fileType: string) {
             return fileType.indexOf('*') !== -1;
         },
-        getFileExtension(file) {
+        getFileExtension(file: File) {
             return '.' + file.name.split('.').pop();
         },
-        isImage(file) {
+        isImage(file: File) {
             return /^image\//.test(file.type);
         },
-        onDragEnter(event) {
+        onDragEnter(event: DragEvent) {
             if (!this.disabled && (!this.hasFiles || this.multiple)) {
                 event.stopPropagation();
                 event.preventDefault();
             }
         },
-        onDragOver(event) {
+        onDragOver(event: DragEvent) {
             if (!this.disabled && (!this.hasFiles || this.multiple)) {
-                !this.isUnstyled && addClass(this.$refs.content, 'rs-fileupload-highlight');
-                this.$refs.content && this.$refs.content.setAttribute('data-p-highlight', true);
+                const content = this.$refs.content as HTMLElement | undefined;
+
+                if (content) {
+                    if (!this.isUnstyled) addClass(content, 'rs-fileupload-highlight');
+                    content.setAttribute('data-p-highlight', 'true');
+                }
                 event.stopPropagation();
                 event.preventDefault();
             }
         },
         onDragLeave() {
             if (!this.disabled) {
-                !this.isUnstyled && removeClass(this.$refs.content, 'rs-fileupload-highlight');
-                this.$refs.content && this.$refs.content.setAttribute('data-p-highlight', false);
+                const content = this.$refs.content as HTMLElement | undefined;
+
+                if (content) {
+                    if (!this.isUnstyled) removeClass(content, 'rs-fileupload-highlight');
+                    content.setAttribute('data-p-highlight', 'false');
+                }
             }
         },
-        onDrop(event) {
+        onDrop(event: DragEvent) {
             if (!this.disabled) {
-                !this.isUnstyled && removeClass(this.$refs.content, 'rs-fileupload-highlight');
-                this.$refs.content && this.$refs.content.setAttribute('data-p-highlight', false);
+                const content = this.$refs.content as HTMLElement | undefined;
+
+                if (content) {
+                    if (!this.isUnstyled) removeClass(content, 'rs-fileupload-highlight');
+                    content.setAttribute('data-p-highlight', 'false');
+                }
                 event.stopPropagation();
                 event.preventDefault();
 
-                const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+                const files = getSelectedFiles(event);
                 const allowDrop = this.multiple || (files && files.length === 1);
 
                 if (allowDrop) {
@@ -443,7 +465,7 @@ export default {
                 }
             }
         },
-        remove(index) {
+        remove(index: number) {
             this.clearInputElement();
             let removedFile = this.files.splice(index, 1)[0];
 
@@ -453,7 +475,7 @@ export default {
                 files: this.files
             });
         },
-        removeUploadedFile(index) {
+        removeUploadedFile(index: number) {
             let removedFile = this.uploadedFiles.splice(index, 1)[0];
 
             this.uploadedFiles = [...this.uploadedFiles];
@@ -463,15 +485,16 @@ export default {
             });
         },
         clearInputElement() {
-            this.$refs.fileInput.value = '';
+            const input = this.$refs.fileInput as HTMLInputElement | undefined;
+            if (input) input.value = '';
         },
         clearIEInput() {
             if (this.$refs.fileInput) {
-                this.duplicateIEEvent = true; //IE11 fix to prevent onFileChange trigger again
-                this.$refs.fileInput.value = '';
+                this.duplicateIEEvent = true;
+                this.clearInputElement();
             }
         },
-        formatSize(bytes) {
+        formatSize(bytes: number) {
             const k = 1024;
             const dm = 3;
             const sizes = this.$primevue.config.locale?.fileSizeTypes || ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -494,7 +517,7 @@ export default {
         },
         checkFileLimit(rejectedByLimit = false) {
             if (this.isFileLimitExceeded() || rejectedByLimit) {
-                this.messages.push(this.invalidFileLimitMessage.replace('{0}', this.fileLimit.toString()));
+                this.messages?.push(this.invalidFileLimitMessage.replace('{0}', String(this.fileLimit)));
             }
         },
         onMessageClose() {
@@ -516,7 +539,7 @@ export default {
             else if (this.hasFiles) {
                 if (this.files && this.files.length === 1) return this.files[0].name;
 
-                return this.$primevue.config.locale?.fileChosenMessage?.replace('{0}', this.files.length);
+                return this.$primevue.config.locale?.fileChosenMessage?.replace('{0}', String(this.files.length));
             }
 
             return this.$primevue.config.locale?.noFileChosenMessage || '';
@@ -528,28 +551,28 @@ export default {
             return this.uploadedFiles && this.uploadedFiles.length > 0;
         },
         chooseDisabled() {
-            return this.disabled || (this.fileLimit && this.fileLimit <= this.files.length + this.uploadedFileCount);
+            return this.disabled || (!!this.fileLimit && this.fileLimit <= this.files.length + this.uploadedFileCount);
         },
         uploadDisabled() {
-            return this.disabled || !this.hasFiles || (this.fileLimit && this.fileLimit < this.files.length);
+            return this.disabled || !this.hasFiles || (!!this.fileLimit && this.fileLimit < this.files.length);
         },
         cancelDisabled() {
             return this.disabled || !this.hasFiles;
         },
         chooseButtonLabel() {
-            return this.chooseLabel || this.$primevue.config.locale.choose;
+            return this.chooseLabel || this.$primevue.config.locale?.choose;
         },
         uploadButtonLabel() {
-            return this.uploadLabel || this.$primevue.config.locale.upload;
+            return this.uploadLabel || this.$primevue.config.locale?.upload;
         },
         cancelButtonLabel() {
-            return this.cancelLabel || this.$primevue.config.locale.cancel;
+            return this.cancelLabel || this.$primevue.config.locale?.cancel;
         },
         completedLabel() {
-            return this.$primevue.config.locale.completed;
+            return this.$primevue.config.locale?.completed;
         },
         pendingLabel() {
-            return this.$primevue.config.locale.pending;
+            return this.$primevue.config.locale?.pending;
         }
     },
     components: {
@@ -564,5 +587,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
