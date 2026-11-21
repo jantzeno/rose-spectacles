@@ -2,6 +2,40 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import TreeSelect from './TreeSelect.vue';
 
+it('expands only the selected branches in one update for an initial checkbox model', () => {
+    const selectedLeaves = Array.from({ length: 80 }, (_, index) => ({ key: `selected-${index}`, label: `Selected ${index}` }));
+    const options = [
+        {
+            key: 'root',
+            children: [
+                { key: 'untouched', children: [{ key: 'untouched-leaf' }] },
+                { key: 'selected-branch', children: selectedLeaves }
+            ]
+        }
+    ];
+    const modelValue = Object.fromEntries(selectedLeaves.map(({ key }) => [key, { checked: true }]));
+    const host = mount(TreeSelect, { props: { options, modelValue, selectionMode: 'checkbox' } });
+
+    try {
+        expect(host.emitted('update:expandedKeys')).toEqual([[{ root: true, 'selected-branch': true }]]);
+    } finally {
+        host.unmount();
+    }
+});
+
+it('keeps the visible selection when the model includes a key missing from the options', async () => {
+    const host = mount(TreeSelect, { props: { options: [{ key: 'oak', label: 'Oak' }], modelValue: { oak: true, missing: true }, selectionMode: 'multiple' } });
+
+    try {
+        expect(host.get('.rs-treeselect-label').text()).toBe('Oak');
+
+        await host.setProps({ options: [{ key: 'missing', label: 'New tree' }] });
+        expect(host.get('.rs-treeselect-label').text()).toBe('New tree');
+    } finally {
+        host.unmount();
+    }
+});
+
 it('dismisses on the first outside click after an interaction in its header', async () => {
     const host = mount(TreeSelect, {
         attachTo: document.body,

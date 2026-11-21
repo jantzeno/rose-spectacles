@@ -256,9 +256,6 @@ export default defineComponent({
             this.overlay = null;
         }
     },
-    mounted() {
-        this.updateTreeState();
-    },
     methods: {
         show() {
             this.$emit('before-show');
@@ -512,41 +509,40 @@ export default defineComponent({
                 node.children.forEach((children) => this.fillNodeMap(children, nodeMap));
             }
         },
-        isSelected(node: TreeNode | undefined, keys: SelectionKeys) {
-            if (!node) return false;
-
-            const value = keys[node.key];
+        isSelected(key: string, keys: SelectionKeys) {
+            const value = keys[key];
             return this.selectionMode === 'checkbox' ? typeof value === 'object' && value?.checked : value;
         },
         updateTreeState() {
-            const keys: SelectionKeys = { ...this.d_value };
+            const keys: SelectionKeys = this.d_value ?? {};
+            const remaining = new Set(Object.keys(keys).filter((key) => this.isSelected(key, keys)));
+            if (!remaining.size) return;
 
+            const expanded = new Set<string>();
             for (const option of this.options ?? []) {
-                this.updateTreeBranchState(option, [], keys);
-            }
-        },
-        updateTreeBranchState(node: TreeNode, path: string[], keys: SelectionKeys) {
-            if (this.isSelected(node, keys)) {
-                this.expandPath(path);
-                delete keys[node.key];
+                this.updateTreeBranchState(option, [], remaining, expanded);
+                if (!remaining.size) break;
             }
 
-            if (Object.keys(keys).length && node.children) {
-                for (const childNode of node.children) {
-                    path.push(node.key);
-                    this.updateTreeBranchState(childNode, path, keys);
-                }
-            }
-        },
-        expandPath(path: string[]) {
-            if (path.length > 0) {
-                for (let key of path) {
-                    this.d_expandedKeys[key] = true;
-                }
+            const newAncestors = [...expanded].filter((key) => this.d_expandedKeys[key] !== true);
+            if (!newAncestors.length) return;
 
-                this.d_expandedKeys = { ...this.d_expandedKeys };
-                this.$emit('update:expandedKeys', this.d_expandedKeys);
+            this.d_expandedKeys = { ...this.d_expandedKeys, ...Object.fromEntries(newAncestors.map((key) => [key, true])) };
+            this.$emit('update:expandedKeys', this.d_expandedKeys);
+        },
+        updateTreeBranchState(node: TreeNode, path: string[], remaining: Set<string>, expanded: Set<string>) {
+            if (remaining.delete(node.key)) {
+                for (const key of path) expanded.add(key);
             }
+
+            if (!remaining.size || !node.children?.length) return;
+
+            path.push(node.key);
+            for (const child of node.children) {
+                this.updateTreeBranchState(child, path, remaining, expanded);
+                if (!remaining.size) break;
+            }
+            path.pop();
         },
         scrollValueInView() {
             if (this.overlay) {
@@ -573,7 +569,7 @@ export default defineComponent({
                 Object.keys(this.d_value).forEach((key) => {
                     const node = this.nodeMap[key];
 
-                    if (node && this.isSelected(node, this.d_value)) {
+                    if (node && this.isSelected(key, this.d_value)) {
                         selectedNodes.push(node);
                     }
                 });
