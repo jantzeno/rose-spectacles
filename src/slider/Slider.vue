@@ -18,7 +18,7 @@
             :aria-valuemax="max"
             :aria-labelledby="ariaLabelledby"
             :aria-label="ariaLabel"
-            :aria-orientation="orientation"
+            :aria-orientation="horizontal ? 'horizontal' : 'vertical'"
             v-bind="ptm('handle')"
             :data-p="dataP"
         ></span>
@@ -35,11 +35,11 @@
             :tabindex="tabindex"
             role="slider"
             :aria-valuemin="min"
-            :aria-valuenow="d_value ? d_value[0] : null"
+            :aria-valuenow="d_value?.[0]"
             :aria-valuemax="max"
             :aria-labelledby="ariaLabelledby"
             :aria-label="ariaLabel"
-            :aria-orientation="orientation"
+            :aria-orientation="horizontal ? 'horizontal' : 'vertical'"
             v-bind="ptm('startHandler')"
             :data-p="dataP"
         ></span>
@@ -56,35 +56,44 @@
             :tabindex="tabindex"
             role="slider"
             :aria-valuemin="min"
-            :aria-valuenow="d_value ? d_value[1] : null"
+            :aria-valuenow="d_value?.[1]"
             :aria-valuemax="max"
             :aria-labelledby="ariaLabelledby"
             :aria-label="ariaLabel"
-            :aria-orientation="orientation"
+            :aria-orientation="horizontal ? 'horizontal' : 'vertical'"
             v-bind="ptm('endHandler')"
             :data-p="dataP"
         ></span>
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type CSSProperties } from 'vue';
 import { cn } from '../internal/utils/index';
 import { getAttribute, getWindowScrollLeft, getWindowScrollTop, isRTL } from '../internal/utils/dom/index';
 import BaseSlider from './BaseSlider.vue';
 
-export default {
+type SliderRange = [number, number];
+type PointerInput = MouseEvent | TouchEvent;
+type HandleIndex = 0 | 1;
+
+export default defineComponent({
     name: 'Slider',
     extends: BaseSlider,
     inheritAttrs: false,
     emits: ['change', 'slideend'],
-    dragging: false,
-    handleIndex: null,
-    initX: null,
-    initY: null,
-    barWidth: null,
-    barHeight: null,
-    dragListener: null,
-    dragEndListener: null,
+    data() {
+        return {
+            dragging: false,
+            handleIndex: null as HandleIndex | null,
+            initX: 0,
+            initY: 0,
+            barWidth: 0,
+            barHeight: 0,
+            dragListener: null as ((event: MouseEvent) => void) | null,
+            dragEndListener: null as ((event: MouseEvent) => void) | null
+        };
+    },
     beforeUnmount() {
         this.unbindDragListeners();
     },
@@ -97,10 +106,13 @@ export default {
             this.barWidth = this.$el.offsetWidth;
             this.barHeight = this.$el.offsetHeight;
         },
-        setValue(event) {
+        setValue(event: PointerInput) {
+            const point = 'touches' in event ? event.touches[0] : event;
+
+            if (!point) return;
+
+            const { pageX, pageY } = point;
             let handleValue;
-            let pageX = event.touches ? event.touches[0].pageX : event.pageX;
-            let pageY = event.touches ? event.touches[0].pageY : event.pageY;
 
             if (this.orientation === 'horizontal') {
                 // @todo: Check this
@@ -117,19 +129,19 @@ export default {
 
             this.updateModel(event, this.snapToStep(newValue));
         },
-        snapToStep(value) {
+        snapToStep(value: number) {
             const clamped = Math.min(Math.max(value, this.min), this.max);
             const snapped = this.min + Math.round((clamped - this.min) / this.stepSize) * this.stepSize;
 
             return Math.min(this.roundToPrecision(snapped), this.max);
         },
-        roundToPrecision(value) {
+        roundToPrecision(value: number) {
             const factor = 10 ** this.precision;
 
             return Math.round(value * factor) / factor;
         },
-        stepBy(event, count) {
-            const value = this.range ? this.value[this.handleIndex] : this.value;
+        stepBy(event: KeyboardEvent, count: number) {
+            const value = this.range ? this.rangeValue[this.handleIndex === 0 ? 0 : 1] : this.singleValue;
             const position = (value - this.min) / this.stepSize;
             const nearest = Math.round(position);
             let current;
@@ -143,15 +155,15 @@ export default {
                 this.updateModel(event, newValue);
             }
         },
-        updateModel(event, value) {
-            let modelValue;
+        updateModel(event: Event, value: number) {
+            let modelValue: number | SliderRange;
 
             if (this.range) {
                 const index = this.handleIndex === 0 ? 0 : 1;
 
                 if (this.d_value?.[index] === value) return;
 
-                modelValue = [...this.value];
+                modelValue = [...this.rangeValue];
                 modelValue[index] = value;
             } else {
                 if (this.d_value === value) return;
@@ -162,51 +174,51 @@ export default {
             this.writeValue(modelValue, event);
             this.$emit('change', modelValue);
         },
-        onDragStart(event, index) {
+        onDragStart(event: PointerInput, index?: HandleIndex) {
             if (this.disabled) {
                 return;
             }
 
-            this.$el.setAttribute('data-p-sliding', true);
+            this.$el.setAttribute('data-p-sliding', 'true');
             this.dragging = true;
             this.updateDomData();
 
-            if (this.range && this.value[0] === this.snapToStep(this.max)) {
+            if (this.range && this.rangeValue[0] === this.snapToStep(this.max)) {
                 this.handleIndex = 0;
             } else {
-                this.handleIndex = index;
+                this.handleIndex = index ?? null;
             }
 
-            event.currentTarget.focus();
+            (event.currentTarget as HTMLElement | null)?.focus();
         },
-        onDrag(event) {
+        onDrag(event: PointerInput) {
             if (this.dragging) {
                 this.setValue(event);
             }
         },
-        onDragEnd(event) {
+        onDragEnd(event?: PointerInput) {
             if (this.dragging) {
                 this.dragging = false;
-                this.$el.setAttribute('data-p-sliding', false);
+                this.$el.setAttribute('data-p-sliding', 'false');
                 this.$emit('slideend', { originalEvent: event, value: this.value });
             }
         },
-        onBarClick(event) {
+        onBarClick(event: MouseEvent) {
             if (this.disabled) {
                 return;
             }
 
-            if (getAttribute(event.target, 'data-pc-section') !== 'handle') {
+            if (!(event.target instanceof Element) || getAttribute(event.target, 'data-pc-section') !== 'handle') {
                 this.updateDomData();
                 this.setValue(event);
             }
         },
-        onMouseDown(event, index) {
+        onMouseDown(event: MouseEvent, index?: HandleIndex) {
             this.bindDragListeners();
             this.onDragStart(event, index);
         },
-        onKeyDown(event, index) {
-            this.handleIndex = index;
+        onKeyDown(event: KeyboardEvent, index?: HandleIndex) {
+            this.handleIndex = index ?? null;
 
             switch (event.code) {
                 case 'ArrowDown':
@@ -241,7 +253,7 @@ export default {
 
             event.preventDefault();
         },
-        onBlur(event, index) {
+        onBlur(event: FocusEvent, _index?: HandleIndex) {
             this.formField.onBlur?.(event);
         },
         bindDragListeners() {
@@ -266,7 +278,7 @@ export default {
                 this.dragEndListener = null;
             }
         },
-        rangeStyle() {
+        rangeStyle(): CSSProperties {
             if (this.range) {
                 const rangeSliderWidth =
                     this.rangeEndPosition > this.rangeStartPosition
@@ -275,7 +287,7 @@ export default {
                 const rangeSliderPosition = this.rangeEndPosition > this.rangeStartPosition ? this.rangeStartPosition : this.rangeEndPosition;
 
                 if (this.horizontal) {
-                    return { 'inset-inline-start': rangeSliderPosition + '%', width: rangeSliderWidth + '%' };
+                    return { insetInlineStart: rangeSliderPosition + '%', width: rangeSliderWidth + '%' };
                 } else {
                     return { bottom: rangeSliderPosition + '%', height: rangeSliderWidth + '%' };
                 }
@@ -287,41 +299,43 @@ export default {
                 }
             }
         },
-        handleStyle() {
+        handleStyle(): CSSProperties {
             if (this.horizontal) {
-                return { 'inset-inline-start': this.handlePosition + '%' };
+                return { insetInlineStart: this.handlePosition + '%' };
             } else {
                 return { bottom: this.handlePosition + '%' };
             }
         },
-        rangeStartHandleStyle() {
+        rangeStartHandleStyle(): CSSProperties {
             if (this.horizontal) {
-                return { 'inset-inline-start': this.rangeStartPosition + '%' };
+                return { insetInlineStart: this.rangeStartPosition + '%' };
             } else {
                 return { bottom: this.rangeStartPosition + '%' };
             }
         },
-        rangeEndHandleStyle() {
+        rangeEndHandleStyle(): CSSProperties {
             if (this.horizontal) {
-                return { 'inset-inline-start': this.rangeEndPosition + '%' };
+                return { insetInlineStart: this.rangeEndPosition + '%' };
             } else {
                 return { bottom: this.rangeEndPosition + '%' };
             }
         }
     },
     computed: {
-        value() {
-            if (this.range) {
-                return [this.d_value?.[0] ?? this.min, this.d_value?.[1] ?? this.max];
-            }
-
+        value(): number | SliderRange {
+            return this.range ? this.rangeValue : this.singleValue;
+        },
+        rangeValue(): SliderRange {
+            return [this.d_value?.[0] ?? this.min, this.d_value?.[1] ?? this.max];
+        },
+        singleValue(): number {
             return this.d_value ?? this.min;
         },
         stepSize() {
             return this.step || 1;
         },
         precision() {
-            const decimals = (number) => String(number).split('.')[1]?.length ?? 0;
+            const decimals = (number: number) => String(number).split('.')[1]?.length ?? 0;
 
             return Math.max(decimals(this.stepSize), decimals(this.min));
         },
@@ -332,21 +346,20 @@ export default {
             return this.orientation === 'vertical';
         },
         handlePosition() {
-            if (this.value < this.min) return 0;
-            else if (this.value > this.max) return 100;
-            else return ((this.value - this.min) * 100) / (this.max - this.min);
+            if (this.singleValue < this.min) return 0;
+            if (this.singleValue > this.max) return 100;
+
+            return ((this.singleValue - this.min) * 100) / (this.max - this.min);
         },
         rangeStartPosition() {
-            if (this.value && this.value[0] !== undefined) {
-                if (this.value[0] < this.min) return 0;
-                else return ((this.value[0] - this.min) * 100) / (this.max - this.min);
-            } else return 0;
+            const [start] = this.rangeValue;
+
+            return start < this.min ? 0 : ((start - this.min) * 100) / (this.max - this.min);
         },
         rangeEndPosition() {
-            if (this.value && this.value.length === 2 && this.value[1] !== undefined) {
-                if (this.value[1] > this.max) return 100;
-                else return ((this.value[1] - this.min) * 100) / (this.max - this.min);
-            } else return 100;
+            const [, end] = this.rangeValue;
+
+            return end > this.max ? 100 : ((end - this.min) * 100) / (this.max - this.min);
         },
         dataP() {
             return cn({
@@ -354,5 +367,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

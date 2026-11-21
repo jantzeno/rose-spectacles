@@ -17,37 +17,46 @@ describe('Slider.vue', () => {
         });
     });
 
+    afterEach(() => {
+        wrapper.unmount();
+    });
+
     it('should exist', () => {
         expect(wrapper.find('.rs-slider.rs-component').exists()).toBe(true);
         expect(wrapper.find('.rs-slider').classes()).toContain('rs-slider-horizontal');
     });
 
     it('should drag start and end', async () => {
-        await wrapper.vm.onDragStart({ preventDefault: () => {}, currentTarget: { focus: () => {} } });
+        await wrapper.get('[role="slider"]').trigger('mousedown');
 
-        expect(wrapper.find('.rs-slider').classes()).toStrictEqual(['rs-slider', 'rs-component', 'rs-slider-horizontal']);
+        expect(wrapper.attributes('data-p-sliding')).toBe('true');
 
-        await wrapper.vm.onDragEnd();
+        document.dispatchEvent(new MouseEvent('mouseup'));
 
-        expect(wrapper.find('.rs-slider').classes()).not.toContain('rs-slider-sliding');
+        expect(wrapper.attributes('data-p-sliding')).toBe('false');
     });
 
     it('should set value', async () => {
-        wrapper.element.setAttribute('width', '14rem');
+        Object.defineProperty(wrapper.element, 'offsetWidth', { value: 100 });
+        const pointer = new MouseEvent('mousemove');
 
-        await wrapper.vm.updateDomData();
+        Object.defineProperty(pointer, 'pageX', { value: 60 });
 
-        await wrapper.vm.setValue({ pageX: 60 }); // TODO:
+        wrapper.vm.updateDomData();
+        wrapper.vm.setValue(pointer);
 
         expect(wrapper.emitted<[number]>('update:modelValue')?.[0][0]).toBeGreaterThan(0);
     });
 
     it('should set value on vertical mode', async () => {
         await wrapper.setProps({ orientation: 'vertical', modelValue: 50 });
+        Object.defineProperty(wrapper.element, 'offsetHeight', { value: 100 });
+        const pointer = new MouseEvent('mousemove');
 
-        await wrapper.vm.updateDomData();
+        Object.defineProperty(pointer, 'pageY', { value: 111 });
 
-        await wrapper.vm.setValue({ pageY: 111 }); // TODO:
+        wrapper.vm.updateDomData();
+        wrapper.vm.setValue(pointer);
 
         expect(wrapper.emitted<[number]>('update:modelValue')?.[0][0]).toBe(0);
     });
