@@ -76,6 +76,21 @@ it('removes document resize listeners when the table unmounts during a drag', as
     }
 });
 
+it('generates selection-only CSV for a single selected row', () => {
+    const selected = { name: 'Copper' };
+    const wrapper = mount(DataTable, {
+        props: { value: [selected, { name: 'Tin' }], selection: selected, selectionMode: 'single' },
+        global: { components: { Column } },
+        slots: { default: '<Column field="name" header="Metal" />' }
+    });
+
+    try {
+        expect(wrapper.vm.generateCSV({ selectionOnly: true })).toBe('\uFEFF"Metal"\n"Copper"\n');
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 window.URL.createObjectURL = () => 'blob:rose-spectacles-test';
 
 const smallData = [

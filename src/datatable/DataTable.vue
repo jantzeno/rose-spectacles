@@ -1258,7 +1258,7 @@ export default {
             if (!data) {
                 data = this.processedData;
 
-                if (options && options.selectionOnly) data = this.selection || [];
+                if (options && options.selectionOnly) data = Array.isArray(this.selection) ? this.selection : this.selection ? [this.selection] : [];
                 else if (this.frozenValue) data = data ? [...this.frozenValue, ...data] : this.frozenValue;
             }
 
