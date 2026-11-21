@@ -864,10 +864,16 @@
             "title": "TreeTable - If some children are not selectable, the parent can't still be checked and not partialChecked",
             "labels": ["bug"],
             "component": "TreeTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "With checkbox selection, selecting the parent also selected descendants marked selectable: false. The regression verifies a mixed parent, unchanged disabled descendants, and a second toggle that clears the eligible selection. It also checks that Enter on a disabled row cannot change selection."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-baxnmdsw?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: TreeTable - If some children are not selectable, the parent can't still be checked and not partialChecked."
+            "resolvingCommit": "c6f4d28d838ea9b18cb23c152899ec3143e62633",
+            "test": {
+                "path": "src/treetable/TreeTable.spec.ts",
+                "name": "keeps non-selectable descendants unchecked when toggling their parent"
+            }
         },
         {
             "number": 105,
