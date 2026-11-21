@@ -2114,23 +2114,17 @@ export default {
             }
         },
         isValidSelection(value) {
-            if (value == null) {
-                return true;
-            }
+            if (value == null) return true;
 
-            let isValid = true;
+            const canSelect = (date) => isDate(date) && this.isSelectable(date.getDate(), date.getMonth(), date.getFullYear(), false);
 
-            if (this.isSingleSelection()) {
-                if (!this.isSelectable(value.getDate(), value.getMonth(), value.getFullYear(), false)) {
-                    isValid = false;
-                }
-            } else if (value.every((v) => this.isSelectable(v.getDate(), v.getMonth(), v.getFullYear(), false))) {
-                if (this.isRangeSelection()) {
-                    isValid = value.length > 1 && value[1] >= value[0];
-                }
-            }
+            if (this.isSingleSelection()) return canSelect(value);
+            if (!Array.isArray(value)) return false;
+            if (!this.isRangeSelection()) return value.every(canSelect);
 
-            return isValid;
+            const [start, end] = value;
+
+            return value.length <= 2 && canSelect(start) && (end == null || (end >= start && canSelect(end)));
         },
         parseValue(text) {
             if (!text || text.trim().length === 0) {
@@ -2157,6 +2151,8 @@ export default {
                 for (let i = 0; i < tokens.length; i++) {
                     value[i] = this.parseDateTime(tokens[i].trim());
                 }
+
+                if (value.length === 1) value.push(null);
             }
 
             return value;
@@ -3028,7 +3024,7 @@ export default {
 
                 if (this.isValidSelection(value)) {
                     this.typeUpdate = true;
-                    this.updateModel(this.updateModelType === 'string' ? this.formatValue(value) : value);
+                    this.updateModel(value);
                     this.updateCurrentMetaData();
                 }
             } catch (err) {

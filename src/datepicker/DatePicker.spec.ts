@@ -3,6 +3,28 @@ import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
+it.each([
+    ['date', '2026-06-10', [new Date(2026, 5, 10), null]],
+    ['string', '2026-06-10 - 2026-06-15', ['2026-06-10', '2026-06-15']]
+] as const)('keeps manually entered ranges after blur with %s model values', async (updateModelType, typed, expected) => {
+    const wrapper = mount(DatePicker, {
+        props: { selectionMode: 'range', updateModelType, dateFormat: 'yy-mm-dd', modelValue: null },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        const input = wrapper.get('input');
+
+        await input.setValue(typed);
+        await input.trigger('blur');
+
+        expect(input.element.value).toBe(typed);
+        expect(wrapper.emitted('update:modelValue')).toEqual([[expected]]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it('keeps the range start visible when selection mode changes to single', async () => {
     const wrapper = mount(DatePicker, {
         props: { selectionMode: 'range', modelValue: [new Date(2026, 5, 10), new Date(2026, 5, 15)], dateFormat: 'yy-mm-dd' },
