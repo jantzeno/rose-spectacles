@@ -78,6 +78,23 @@ it('renders the content slot in place of the default suggestion list', async () 
     }
 });
 
+it('extends text selection from the caret with Shift+Home and Shift+End', async () => {
+    const wrapper = mountAutoComplete({ multiple: false, modelValue: 'Amsterdam' });
+
+    try {
+        const input = wrapper.get('input');
+
+        input.element.setSelectionRange(3, 3);
+        await input.trigger('keydown', { code: 'Home', shiftKey: true });
+        expect([input.element.selectionStart, input.element.selectionEnd, input.element.selectionDirection]).toEqual([0, 3, 'backward']);
+
+        await input.trigger('keydown', { code: 'End', shiftKey: true });
+        expect([input.element.selectionStart, input.element.selectionEnd, input.element.selectionDirection]).toEqual([3, 9, 'forward']);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it.each(['Ber', 'Berlin'])('commits only the clicked suggestion with force selection after typing %s', async (query) => {
     const wrapper = mountAutoComplete({ multiple: false, forceSelection: true, suggestions: ['Berlin', 'Berlin 2'], optionLabel: undefined });
 

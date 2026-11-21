@@ -792,7 +792,6 @@ export default {
         },
         onHomeKey(event) {
             const { currentTarget } = event;
-            const len = currentTarget.value.length;
             const metaKey = event.metaKey || event.ctrlKey;
             const optionIndex = this.findFirstOptionIndex();
 
@@ -800,7 +799,9 @@ export default {
                 this.onOptionSelectRange(event, optionIndex, this.startRangeIndex);
             }
 
-            currentTarget.setSelectionRange(0, event.shiftKey ? len : 0);
+            const anchor = this.selectionAnchor(currentTarget);
+
+            currentTarget.setSelectionRange(0, event.shiftKey ? anchor : 0, event.shiftKey ? 'backward' : 'none');
             this.focusedOptionIndex = -1;
 
             event.preventDefault();
@@ -815,10 +816,15 @@ export default {
                 this.onOptionSelectRange(event, this.startRangeIndex, optionIndex);
             }
 
-            currentTarget.setSelectionRange(event.shiftKey ? 0 : len, len);
+            const anchor = this.selectionAnchor(currentTarget);
+
+            currentTarget.setSelectionRange(event.shiftKey ? anchor : len, len, event.shiftKey ? 'forward' : 'none');
             this.focusedOptionIndex = -1;
 
             event.preventDefault();
+        },
+        selectionAnchor(input) {
+            return input.selectionDirection === 'backward' ? input.selectionEnd : input.selectionStart;
         },
         onPageUpKey(event) {
             this.scrollInView(0);
