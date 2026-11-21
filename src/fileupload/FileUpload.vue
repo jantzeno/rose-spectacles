@@ -230,24 +230,30 @@ export default {
 
             this.messages = [];
             this.files = this.files || [];
-            let files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+            const files = event.dataTransfer ? event.dataTransfer.files : event.target.files;
+            let rejectedByLimit = false;
 
-            for (let file of files) {
-                if (!this.isFileSelected(file) && !this.isFileLimitExceeded()) {
-                    if (this.validate(file)) {
-                        if (this.isImage(file)) {
-                            file.objectURL = window.URL.createObjectURL(file);
-                        }
+            for (const file of files) {
+                if (this.isFileSelected(file)) continue;
 
-                        this.files.push(file);
+                if (this.fileLimit && this.files.length + this.uploadedFileCount >= this.fileLimit) {
+                    rejectedByLimit = true;
+                    break;
+                }
+
+                if (this.validate(file)) {
+                    if (this.isImage(file)) {
+                        file.objectURL = window.URL.createObjectURL(file);
                     }
+
+                    this.files.push(file);
                 }
             }
 
             this.$emit('select', { originalEvent: event, files: this.files });
 
             if (this.fileLimit) {
-                this.checkFileLimit();
+                this.checkFileLimit(rejectedByLimit);
             }
 
             if (this.auto && this.hasFiles && !this.isFileLimitExceeded()) {
@@ -486,8 +492,8 @@ export default {
 
             return this.fileLimit && this.fileLimit < this.files.length + this.uploadedFileCount;
         },
-        checkFileLimit() {
-            if (this.isFileLimitExceeded()) {
+        checkFileLimit(rejectedByLimit = false) {
+            if (this.isFileLimitExceeded() || rejectedByLimit) {
                 this.messages.push(this.invalidFileLimitMessage.replace('{0}', this.fileLimit.toString()));
             }
         },
