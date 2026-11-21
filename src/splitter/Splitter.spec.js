@@ -41,3 +41,30 @@ describe('Splitter.vue', () => {
         expect(wrapper.find('.rs-splitter').classes()).toContain('rs-splitter-horizontal');
     });
 });
+
+it('sizes a newly inserted panel after the splitter DOM updates', async () => {
+    const host = mount({
+        components: { Splitter, SplitterPanel },
+        props: { showPreview: Boolean },
+        template: `
+            <Splitter>
+                <SplitterPanel key="main" :size="60">Main</SplitterPanel>
+                <SplitterPanel v-if="showPreview" key="preview" :size="40">Preview</SplitterPanel>
+            </Splitter>
+        `
+    });
+
+    try {
+        await host.setProps({ showPreview: true });
+
+        const panels = host.findAll('.rs-splitterpanel');
+
+        expect(panels.map((panel) => panel.text())).toEqual(['Main', 'Preview']);
+        expect(panels.map((panel) => panel.element.style.flexBasis)).toEqual(['calc(60% - 4px)', 'calc(40% - 4px)']);
+
+        await host.setProps({ showPreview: false });
+        expect(host.findAll('.rs-splitterpanel').map((panel) => panel.text())).toEqual(['Main']);
+    } finally {
+        host.unmount();
+    }
+});

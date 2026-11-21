@@ -68,8 +68,11 @@ export default {
         this.initializePanels();
     },
     watch: {
-        panelSizeConfig() {
-            this.initializePanels();
+        panelSizeConfig: {
+            flush: 'post',
+            handler() {
+                this.initializePanels();
+            }
         }
     },
     beforeUnmount() {
