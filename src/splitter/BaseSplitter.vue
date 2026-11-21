@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import SplitterStyle from './style/SplitterStyle';
 
@@ -8,7 +8,7 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         layout: {
-            type: String,
+            type: String as PropType<'horizontal' | 'vertical'>,
             default: 'horizontal'
         },
         gutterSize: {

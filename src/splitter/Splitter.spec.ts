@@ -32,16 +32,14 @@ describe('Splitter.vue', () => {
         expect(wrapper.find('.rs-splitter-gutter-handle').exists()).toBe(true);
     });
 
-    it('should mousedown', async () => {
-        const gutter = wrapper.find('.rs-splitter-gutter-handle').element;
-        const siblings = wrapper.findAll('.rs-splitterpanel');
+    it('completes a mouse resize on document mouseup', async () => {
+        await wrapper.get('.rs-splitter-gutter').trigger('mousedown', { clientX: 123 });
+        expect(wrapper.attributes('data-p-resizing')).toBe('true');
 
-        await wrapper.vm.onGutterMouseDown(
-            { currentTarget: { gutter, previousElementSibling: siblings[0].element, nextElementSibling: siblings[1].element }, pageX: 123 },
-            0
-        );
+        document.dispatchEvent(new MouseEvent('mouseup'));
 
-        expect(wrapper.find('.rs-splitter').classes()).toContain('rs-splitter-horizontal');
+        expect(wrapper.emitted('resizeend')).toHaveLength(1);
+        expect(wrapper.attributes('data-p-resizing')).toBe('false');
     });
 
     afterEach(() => {
