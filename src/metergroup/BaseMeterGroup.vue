@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { MeterItem } from 'rose-spectacles/metergroup';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import MeterGroupStyle from './style/MeterGroupStyle';
 
@@ -8,7 +9,7 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         value: {
-            type: Array,
+            type: Array as PropType<MeterItem[]>,
             default: null
         },
         min: {

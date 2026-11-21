@@ -38,7 +38,7 @@ export default defineComponent({
     },
     computed: {
         meterGroup() {
-            return this.$pcMeterGroup as { percentValue: (value: number) => number; labelOrientation: string };
+            return this.$pcMeterGroup as { percentValue: (value: number) => string; labelOrientation: string };
         },
         dataP() {
             return cn({

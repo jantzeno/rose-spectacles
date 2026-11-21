@@ -32,17 +32,19 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import type { MeterItem } from 'rose-spectacles/metergroup';
+import { defineComponent, type CSSProperties } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseMeterGroup from './BaseMeterGroup.vue';
 import MeterGroupLabel from './MeterGroupLabel.vue';
 
-export default {
+export default defineComponent({
     name: 'MeterGroup',
     extends: BaseMeterGroup,
     inheritAttrs: false,
     methods: {
-        getPTOptions(key, value, index) {
+        getPTOptions(key: string, value: MeterItem, index: number) {
             return this.ptm(key, {
                 context: {
                     value,
@@ -57,26 +59,26 @@ export default {
         roundedPercent(meter = 0) {
             return Math.round(this.percent(meter));
         },
-        percentValue(meter) {
+        percentValue(meter: number) {
             return this.roundedPercent(meter) + '%';
         },
-        meterCalculatedStyles(val) {
+        meterCalculatedStyles(val: MeterItem): CSSProperties {
             return {
                 backgroundColor: val.color,
-                width: this.orientation === 'horizontal' && this.percent(val.value) + '%',
-                height: this.orientation === 'vertical' && this.percent(val.value) + '%'
+                width: this.orientation === 'horizontal' ? this.percent(val.value) + '%' : undefined,
+                height: this.orientation === 'vertical' ? this.percent(val.value) + '%' : undefined
             };
         }
     },
     computed: {
         totalPercent() {
-            return this.roundedPercent(this.value.reduce((total, val) => total + val.value, 0));
+            return this.roundedPercent((this.value ?? []).reduce((total, val) => total + val.value, 0));
         },
         percentages() {
             let sum = 0;
-            const sumsArray = [];
+            const sumsArray: number[] = [];
 
-            this.value.forEach((item) => {
+            this.value?.forEach((item) => {
                 sum += item.value;
                 sumsArray.push(sum);
             });
@@ -92,5 +94,5 @@ export default {
     components: {
         MeterGroupLabel
     }
-};
+});
 </script>

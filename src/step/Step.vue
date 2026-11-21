@@ -32,14 +32,22 @@
     <slot v-else :class="cx('root')" :active="active" :value="value" :a11yAttrs="a11yAttrs" :activateCallback="onStepClick" />
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import type Stepper from '../stepper/Stepper.vue';
 import { cn } from '../internal/utils/index';
 import { find, findSingle } from '../internal/utils/dom/index';
 import { findIndexInList } from '../internal/utils/object/index';
 import StepperSeparator from '../stepper/StepperSeparator.vue';
 import BaseStep from './BaseStep.vue';
 
-export default {
+type StepperContext = Pick<InstanceType<typeof Stepper>, '$el' | '$id' | 'd_value' | 'isStepActive' | 'isStepDisabled' | 'updateValue' | 'linear'>;
+interface StepItemContext {
+    $el: HTMLElement;
+    value?: string | number;
+}
+
+export default defineComponent({
     name: 'Step',
     extends: BaseStep,
     inheritAttrs: false,
@@ -63,18 +71,18 @@ export default {
     methods: {
         updateState() {
             if (this.$el && this.$pcStepList) {
-                let index = findIndexInList(this.$el, find(this.$pcStepper.$el, '[data-pc-name="step"]'));
+                let index = findIndexInList(this.$el, find(this.stepper.$el, '[data-pc-name="step"]'));
                 let activeIndex = findIndexInList(
-                    findSingle(this.$pcStepper.$el, '[data-pc-name="step"][data-p-active="true"]'),
-                    find(this.$pcStepper.$el, '[data-pc-name="step"]')
+                    findSingle(this.stepper.$el, '[data-pc-name="step"][data-p-active="true"]'),
+                    find(this.stepper.$el, '[data-pc-name="step"]')
                 );
-                let stepLen = find(this.$pcStepper.$el, '[data-pc-name="step"]').length;
+                let stepLen = find(this.stepper.$el, '[data-pc-name="step"]').length;
 
                 this.isSeparatorVisible = index !== stepLen - 1;
                 this.isCompleted = index < activeIndex;
             }
         },
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             const _ptm = key === 'root' ? this.ptmi : this.ptm;
 
             return _ptm(key, {
@@ -85,24 +93,30 @@ export default {
             });
         },
         onStepClick() {
-            this.$pcStepper.updateValue(this.activeValue);
+            this.stepper.updateValue(this.activeValue);
         }
     },
     computed: {
+        stepper() {
+            return this.$pcStepper as StepperContext;
+        },
+        stepItem() {
+            return this.$pcStepItem as StepItemContext | null;
+        },
         active() {
-            return this.$pcStepper.isStepActive(this.activeValue);
+            return this.stepper.isStepActive(this.activeValue);
         },
         activeValue() {
-            return !!this.$pcStepItem ? this.$pcStepItem?.value : this.value;
+            return !!this.stepItem ? this.stepItem?.value : this.value;
         },
         isStepDisabled() {
-            return !this.active && (this.$pcStepper.isStepDisabled() || this.disabled);
+            return !this.active && (this.stepper.isStepDisabled() || this.disabled);
         },
         id() {
-            return `${this.$pcStepper?.$id}_step_${this.activeValue}`;
+            return `${this.stepper?.$id}_step_${this.activeValue}`;
         },
         ariaControls() {
-            return `${this.$pcStepper?.$id}_steppanel_${this.activeValue}`;
+            return `${this.stepper?.$id}_steppanel_${this.activeValue}`;
         },
         a11yAttrs() {
             return {
@@ -128,15 +142,15 @@ export default {
         dataP() {
             return cn({
                 disabled: this.isStepDisabled,
-                readonly: this.$pcStepper.linear,
+                readonly: this.stepper.linear,
                 active: this.active,
                 completed: this.isCompleted,
-                vertical: this.$pcStepItem != null
+                vertical: this.stepItem != null
             });
         }
     },
     components: {
         StepperSeparator
     }
-};
+});
 </script>
