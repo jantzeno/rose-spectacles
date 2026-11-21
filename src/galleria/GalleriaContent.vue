@@ -1,16 +1,16 @@
 <template>
     <div
-        v-if="$attrs.value && $attrs.value.length > 0"
+        v-if="value && value.length > 0"
         :id="$id"
         role="region"
-        :class="[cx('root'), $attrs.containerClass]"
-        :style="$attrs.containerStyle"
-        :aria-label="$attrs.ariaLabel"
-        :aria-roledescription="$attrs.ariaRoledescription"
-        v-bind="{ ...$attrs.containerProps, ...getPTOptions('root') }"
+        :class="[cx('root'), containerClass]"
+        :style="containerStyle"
+        :aria-label="ariaLabel"
+        :aria-roledescription="ariaRoledescription"
+        v-bind="{ ...containerProps, ...getPTOptions('root') }"
     >
         <button
-            v-if="$attrs.fullScreen"
+            v-if="fullScreen"
             v-ripple
             autofocus
             type="button"
@@ -19,23 +19,23 @@
             @click="$emit('mask-hide')"
             v-bind="getPTOptions('closeButton')"
         >
-            <component :is="$attrs.templates['closeicon'] || 'TimesIcon'" :class="cx('closeIcon')" v-bind="getPTOptions('closeIcon')" />
+            <component :is="templates['closeicon'] || 'TimesIcon'" :class="cx('closeIcon')" v-bind="getPTOptions('closeIcon')" />
         </button>
-        <div v-if="$attrs.templates && $attrs.templates['header']" :class="cx('header')" v-bind="getPTOptions('header')">
-            <component :is="$attrs.templates['header']" />
+        <div v-if="templates && templates['header']" :class="cx('header')" v-bind="getPTOptions('header')">
+            <component :is="templates['header']" />
         </div>
-        <div :class="cx('content')" :aria-live="$attrs.autoPlay ? 'polite' : 'off'" v-bind="getPTOptions('content')">
+        <div :class="cx('content')" :aria-live="autoPlay ? 'polite' : 'off'" v-bind="getPTOptions('content')">
             <GalleriaItem
                 :id="$id"
-                v-model:activeIndex="activeIndex"
+                v-model:activeIndex="currentIndex"
                 v-model:slideShowActive="slideShowActive"
-                :value="$attrs.value"
-                :circular="$attrs.circular"
-                :templates="$attrs.templates"
-                :showIndicators="$attrs.showIndicators"
-                :changeItemOnIndicatorHover="$attrs.changeItemOnIndicatorHover"
-                :showItemNavigators="$attrs.showItemNavigators"
-                :autoPlay="$attrs.autoPlay"
+                :value="value"
+                :circular="circular"
+                :templates="templates"
+                :showIndicators="showIndicators"
+                :changeItemOnIndicatorHover="changeItemOnIndicatorHover"
+                :showItemNavigators="showItemNavigators"
+                :autoPlay="autoPlay"
                 @start-slideshow="startSlideShow"
                 @stop-slideshow="stopSlideShow"
                 :pt="pt"
@@ -43,70 +43,79 @@
             />
 
             <GalleriaThumbnails
-                v-if="$attrs.showThumbnails"
-                v-model:activeIndex="activeIndex"
+                v-if="showThumbnails"
+                v-model:activeIndex="currentIndex"
                 v-model:slideShowActive="slideShowActive"
                 :containerId="$id"
-                :value="$attrs.value"
-                :templates="$attrs.templates"
-                :numVisible="numVisible"
-                :responsiveOptions="$attrs.responsiveOptions"
-                :circular="$attrs.circular"
+                :value="value"
+                :templates="templates"
+                :numVisible="visibleCount"
+                :responsiveOptions="responsiveOptions"
+                :circular="circular"
                 :isVertical="isVertical()"
-                :contentHeight="$attrs.verticalThumbnailViewPortHeight"
-                :showThumbnailNavigators="$attrs.showThumbnailNavigators"
-                :prevButtonProps="$attrs.prevButtonProps"
-                :nextButtonProps="$attrs.nextButtonProps"
+                :contentHeight="verticalThumbnailViewPortHeight"
+                :showThumbnailNavigators="showThumbnailNavigators"
+                :prevButtonProps="prevButtonProps"
+                :nextButtonProps="nextButtonProps"
                 @stop-slideshow="stopSlideShow"
                 :pt="pt"
                 :unstyled="unstyled"
             />
         </div>
-        <div v-if="$attrs.templates && $attrs.templates['footer']" :class="cx('footer')" v-bind="getPTOptions('footer')">
-            <component :is="$attrs.templates['footer']" />
+        <div v-if="templates && templates['footer']" :class="cx('footer')" v-bind="getPTOptions('footer')">
+            <component :is="templates['footer']" />
         </div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType, type Slots } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TimesIcon from '../icons/times/TimesIcon.vue';
 import Ripple from '../ripple/Ripple';
+import { galleriaProps } from './BaseGalleria.vue';
 import GalleriaItem from './GalleriaItem.vue';
 import GalleriaThumbnails from './GalleriaThumbnails.vue';
 
-export default {
+export default defineComponent({
     name: 'GalleriaContent',
     hostName: 'Galleria',
     extends: BaseComponent,
     inheritAttrs: false,
-    interval: null,
     emits: ['activeitem-change', 'mask-hide'],
+    props: {
+        ...galleriaProps,
+        templates: {
+            type: Object as PropType<Slots>,
+            default: () => ({})
+        }
+    },
     data() {
         return {
-            activeIndex: this.$attrs.activeIndex,
-            numVisible: this.$attrs.numVisible,
-            slideShowActive: false
+            currentIndex: this.activeIndex,
+            visibleCount: this.numVisible,
+            slideShowActive: false,
+            interval: null as ReturnType<typeof setInterval> | null
         };
     },
     watch: {
-        '$attrs.value': function (newVal) {
-            if (newVal && newVal.length < this.numVisible) {
-                this.numVisible = newVal.length;
+        value(newVal) {
+            if (newVal && newVal.length < this.visibleCount) {
+                this.visibleCount = newVal.length;
             }
         },
-        '$attrs.activeIndex': function (newVal) {
-            this.activeIndex = newVal;
+        activeIndex(newVal) {
+            this.currentIndex = newVal;
         },
-        '$attrs.numVisible': function (newVal) {
-            this.numVisible = newVal;
+        numVisible(newVal) {
+            this.visibleCount = newVal;
         },
-        '$attrs.autoPlay': function (newVal) {
+        autoPlay(newVal) {
             newVal ? this.startSlideShow() : this.stopSlideShow();
         }
     },
     updated() {
-        this.$emit('activeitem-change', this.activeIndex);
+        this.$emit('activeitem-change', this.currentIndex);
     },
     beforeUnmount() {
         if (this.slideShowActive) {
@@ -114,12 +123,11 @@ export default {
         }
     },
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             return this.ptm(key, {
                 props: {
                     ...this.$attrs,
-                    pt: this.pt,
-                    unstyled: this.unstyled
+                    ...this.$props
                 }
             });
         },
@@ -128,33 +136,32 @@ export default {
         },
         startSlideShow() {
             this.interval = setInterval(() => {
-                let activeIndex = this.$attrs.circular && this.$attrs.value.length - 1 === this.activeIndex ? 0 : this.activeIndex + 1;
-
-                this.activeIndex = activeIndex;
-            }, this.$attrs.transitionInterval);
+                this.currentIndex = this.circular && this.value && this.value.length - 1 === this.currentIndex ? 0 : this.currentIndex + 1;
+            }, this.transitionInterval);
 
             this.slideShowActive = true;
         },
         stopSlideShow() {
             if (this.interval) {
                 clearInterval(this.interval);
+                this.interval = null;
             }
 
             this.slideShowActive = false;
         },
-        getPositionClass(preClassName, position) {
+        getPositionClass(preClassName: string, position: string) {
             const positions = ['top', 'left', 'bottom', 'right'];
             const pos = positions.find((item) => item === position);
 
             return pos ? `${preClassName}-${pos}` : '';
         },
         isVertical() {
-            return this.$attrs.thumbnailsPosition === 'left' || this.$attrs.thumbnailsPosition === 'right';
+            return this.thumbnailsPosition === 'left' || this.thumbnailsPosition === 'right';
         }
     },
     computed: {
         closeAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.close : undefined;
+            return this.$primevue?.config.locale?.aria?.close;
         }
     },
     components: {
@@ -165,5 +172,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

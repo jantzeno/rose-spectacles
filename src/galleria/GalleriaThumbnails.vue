@@ -78,7 +78,9 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType, type Slots } from 'vue';
+import type { GalleriaResponsiveOptions } from 'rose-spectacles/galleria';
 import { addClass, find, findSingle, getAttribute, removeClass, setAttribute } from '../internal/utils/dom/index';
 import { localeComparator, sort } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
@@ -88,7 +90,7 @@ import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
 import ChevronUpIcon from '../icons/chevronup/ChevronUpIcon.vue';
 import Ripple from '../ripple/Ripple';
 
-export default {
+export default defineComponent({
     name: 'GalleriaThumbnails',
     hostName: 'Galleria',
     extends: BaseComponent,
@@ -99,8 +101,8 @@ export default {
             default: null
         },
         value: {
-            type: Array,
-            default: null
+            type: Array as PropType<unknown[]>,
+            default: () => []
         },
         numVisible: {
             type: Number,
@@ -123,7 +125,7 @@ export default {
             default: false
         },
         responsiveOptions: {
-            type: Array,
+            type: Array as PropType<GalleriaResponsiveOptions[]>,
             default: null
         },
         contentHeight: {
@@ -135,8 +137,8 @@ export default {
             default: true
         },
         templates: {
-            type: null,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         prevButtonProps: {
             type: null,
@@ -147,9 +149,6 @@ export default {
             default: null
         }
     },
-    startPos: null,
-    thumbnailsStyle: null,
-    sortedResponsiveOptions: null,
     data() {
         return {
             d_numVisible: this.numVisible,
@@ -157,7 +156,10 @@ export default {
             d_activeIndex: this.activeIndex,
             d_oldActiveItemIndex: this.activeIndex,
             totalShiftedItems: 0,
-            page: 0
+            page: 0,
+            startPos: null as { x: number; y: number } | null,
+            thumbnailsStyle: null as HTMLStyleElement | null,
+            sortedResponsiveOptions: null as GalleriaResponsiveOptions[] | null
         };
     },
     watch: {
@@ -175,10 +177,11 @@ export default {
         this.calculatePosition();
 
         if (this.responsiveOptions) {
-            this.bindDocumentListeners();
+            window.addEventListener('resize', this.calculatePosition);
         }
     },
     updated() {
+        const itemsContainer = this.$refs.itemsContainer as HTMLElement;
         let totalShiftedItems = this.totalShiftedItems;
 
         if (this.d_oldNumVisible !== this.d_numVisible || this.d_oldActiveItemIndex !== this.d_activeIndex) {
@@ -196,14 +199,14 @@ export default {
                 this.totalShiftedItems = totalShiftedItems;
             }
 
-            this.$refs.itemsContainer.style.transform = this.isVertical
+            itemsContainer.style.transform = this.isVertical
                 ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
                 : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
 
             if (this.d_oldActiveItemIndex !== this.d_activeIndex) {
                 document.body.setAttribute('data-p-items-hidden', 'false');
-                !this.isUnstyled && removeClass(this.$refs.itemsContainer, 'rs-items-hidden');
-                this.$refs.itemsContainer.style.transition = 'transform 500ms ease 0s';
+                !this.isUnstyled && removeClass(itemsContainer, 'rs-items-hidden');
+                itemsContainer.style.transition = 'transform 500ms ease 0s';
             }
 
             this.d_oldActiveItemIndex = this.d_activeIndex;
@@ -211,16 +214,11 @@ export default {
         }
     },
     beforeUnmount() {
-        if (this.responsiveOptions) {
-            this.unbindDocumentListeners();
-        }
-
-        if (this.thumbnailsStyle) {
-            this.thumbnailsStyle.parentNode.removeChild(this.thumbnailsStyle);
-        }
+        window.removeEventListener('resize', this.calculatePosition);
+        this.thumbnailsStyle?.remove();
     },
     methods: {
-        step(dir) {
+        step(dir: number) {
             let totalShiftedItems = this.totalShiftedItems + dir;
 
             if (dir < 0 && -1 * totalShiftedItems + this.d_numVisible > this.value.length - 1) {
@@ -237,19 +235,21 @@ export default {
                 }
             }
 
-            if (this.$refs.itemsContainer) {
+            const itemsContainer = this.$refs.itemsContainer as HTMLElement | undefined;
+
+            if (itemsContainer) {
                 document.body.setAttribute('data-p-items-hidden', 'false');
-                !this.isUnstyled && removeClass(this.$refs.itemsContainer, 'rs-items-hidden');
-                this.$refs.itemsContainer.style.transform = this.isVertical
+                !this.isUnstyled && removeClass(itemsContainer, 'rs-items-hidden');
+                itemsContainer.style.transform = this.isVertical
                     ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
                     : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
-                this.$refs.itemsContainer.style.transition = 'transform 500ms ease 0s';
+                itemsContainer.style.transition = 'transform 500ms ease 0s';
             }
 
             this.totalShiftedItems = totalShiftedItems;
         },
         stopSlideShow() {
-            if (this.slideShowActive && this.stopSlideShow) {
+            if (this.slideShowActive) {
                 this.$emit('stop-slideshow');
             }
         },
@@ -258,7 +258,7 @@ export default {
 
             return this.d_numVisible % 2 ? index : index - 1;
         },
-        navBackward(e) {
+        navBackward(e: Event) {
             this.stopSlideShow();
 
             let prevItemIndex = this.d_activeIndex !== 0 ? this.d_activeIndex - 1 : 0;
@@ -276,7 +276,7 @@ export default {
                 e.preventDefault();
             }
         },
-        navForward(e) {
+        navForward(e: Event) {
             this.stopSlideShow();
 
             let nextItemIndex = this.d_activeIndex === this.value.length - 1 ? this.value.length - 1 : this.d_activeIndex + 1;
@@ -296,7 +296,7 @@ export default {
                 e.preventDefault();
             }
         },
-        onItemClick(index) {
+        onItemClick(index: number) {
             this.stopSlideShow();
 
             let selectedItemIndex = index;
@@ -322,7 +322,7 @@ export default {
                 this.$emit('update:activeIndex', selectedItemIndex);
             }
         },
-        onThumbnailKeydown(event, index) {
+        onThumbnailKeydown(event: KeyboardEvent, index: number) {
             if (event.code === 'Enter' || event.code === 'NumpadEnter' || event.code === 'Space') {
                 this.onItemClick(index);
                 event.preventDefault();
@@ -361,7 +361,7 @@ export default {
             }
         },
         onRightKey() {
-            const indicators = find(this.$refs.itemsContainer, '[data-pc-section="thumbnailitem"]');
+            const indicators = this.getIndicators();
             const activeIndex = this.findFocusedIndicatorIndex();
 
             this.changedFocusedIndicator(activeIndex, activeIndex + 1 === indicators.length ? indicators.length - 1 : activeIndex + 1);
@@ -377,57 +377,70 @@ export default {
             this.changedFocusedIndicator(activeIndex, 0);
         },
         onEndKey() {
-            const indicators = find(this.$refs.itemsContainer, '[data-pc-section="thumbnailitem"]');
+            const indicators = this.getIndicators();
             const activeIndex = this.findFocusedIndicatorIndex();
 
             this.changedFocusedIndicator(activeIndex, indicators.length - 1);
         },
         onTabKey() {
-            const indicators = [...find(this.$refs.itemsContainer, '[data-pc-section="thumbnailitem"]')];
-            const highlightedIndex = indicators.findIndex((ind) => getAttribute(ind, 'data-p-active') === true);
+            const indicators = this.getIndicators();
+            const highlightedIndex = indicators.findIndex((item) => getAttribute(item, 'data-p-active') === true);
+            const activeIndex = this.findFocusedIndicatorIndex();
+            const active = indicators[activeIndex]?.firstElementChild;
+            const highlighted = indicators[highlightedIndex]?.firstElementChild;
 
-            const activeIndicator = findSingle(this.$refs.itemsContainer, '[tabindex="0"]');
-
-            const activeIndex = indicators.findIndex((ind) => ind === activeIndicator.parentElement);
-
-            indicators[activeIndex].children[0].tabIndex = '-1';
-            indicators[highlightedIndex].children[0].tabIndex = '0';
-        },
-        findFocusedIndicatorIndex() {
-            const indicators = [...find(this.$refs.itemsContainer, '[data-pc-section="thumbnailitem"]')];
-            const activeIndicator = findSingle(this.$refs.itemsContainer, '[data-pc-section="thumbnailitem"] > [tabindex="0"]');
-
-            return indicators.findIndex((ind) => ind === activeIndicator.parentElement);
-        },
-        changedFocusedIndicator(prevInd, nextInd) {
-            const indicators = find(this.$refs.itemsContainer, '[data-pc-section="thumbnailitem"]');
-
-            indicators[prevInd].children[0].tabIndex = '-1';
-            indicators[nextInd].children[0].tabIndex = '0';
-            indicators[nextInd].children[0].focus();
-        },
-        onTransitionEnd(e) {
-            if (this.$refs.itemsContainer && e.propertyName === 'transform') {
-                document.body.setAttribute('data-p-items-hidden', 'true');
-                !this.isUnstyled && addClass(this.$refs.itemsContainer, 'rs-items-hidden');
-                this.$refs.itemsContainer.style.transition = '';
+            if (active instanceof HTMLElement && highlighted instanceof HTMLElement) {
+                active.tabIndex = -1;
+                highlighted.tabIndex = 0;
             }
         },
-        onTouchStart(e) {
-            let touchobj = e.changedTouches[0];
+        getIndicators() {
+            return find(this.$refs.itemsContainer as HTMLElement, '[data-pc-section="thumbnailitem"]');
+        },
+        findFocusedIndicatorIndex() {
+            const active = findSingle(this.$refs.itemsContainer as HTMLElement, '[data-pc-section="thumbnailitem"] > [tabindex="0"]');
+
+            return this.getIndicators().findIndex((item) => item === active?.parentElement);
+        },
+        changedFocusedIndicator(prevInd: number, nextInd: number) {
+            const indicators = this.getIndicators();
+            const previous = indicators[prevInd]?.firstElementChild;
+            const next = indicators[nextInd]?.firstElementChild;
+
+            if (previous instanceof HTMLElement && next instanceof HTMLElement) {
+                previous.tabIndex = -1;
+                next.tabIndex = 0;
+                next.focus();
+            }
+        },
+        onTransitionEnd(e: TransitionEvent) {
+            const itemsContainer = this.$refs.itemsContainer as HTMLElement | undefined;
+
+            if (itemsContainer && e.propertyName === 'transform') {
+                document.body.setAttribute('data-p-items-hidden', 'true');
+                !this.isUnstyled && addClass(itemsContainer, 'rs-items-hidden');
+                itemsContainer.style.transition = '';
+            }
+        },
+        onTouchStart(e: TouchEvent) {
+            const touchobj = e.changedTouches[0];
+
+            if (!touchobj) return;
 
             this.startPos = {
                 x: touchobj.pageX,
                 y: touchobj.pageY
             };
         },
-        onTouchMove(e) {
+        onTouchMove(e: TouchEvent) {
             if (e.cancelable) {
                 e.preventDefault();
             }
         },
-        onTouchEnd(e) {
-            let touchobj = e.changedTouches[0];
+        onTouchEnd(e: TouchEvent) {
+            const touchobj = e.changedTouches[0];
+
+            if (!touchobj || !this.startPos) return;
 
             if (this.isVertical) {
                 this.changePageOnTouch(e, touchobj.pageY - this.startPos.y);
@@ -435,7 +448,7 @@ export default {
                 this.changePageOnTouch(e, touchobj.pageX - this.startPos.x);
             }
         },
-        changePageOnTouch(e, diff) {
+        changePageOnTouch(e: TouchEvent, diff: number) {
             const touchThreshold = 10;
 
             if (Math.abs(diff) < touchThreshold) {
@@ -513,41 +526,25 @@ export default {
                 }
             }
         },
-        bindDocumentListeners() {
-            if (!this.documentResizeListener) {
-                this.documentResizeListener = () => {
-                    this.calculatePosition();
-                };
-
-                window.addEventListener('resize', this.documentResizeListener);
-            }
-        },
-        unbindDocumentListeners() {
-            if (this.documentResizeListener) {
-                window.removeEventListener('resize', this.documentResizeListener);
-                this.documentResizeListener = null;
-            }
-        },
-
         firstItemAciveIndex() {
             return this.totalShiftedItems * -1;
         },
         lastItemActiveIndex() {
             return this.firstItemAciveIndex() + this.d_numVisible - 1;
         },
-        isItemActive(index) {
+        isItemActive(index: number) {
             return this.firstItemAciveIndex() <= index && this.lastItemActiveIndex() >= index;
         },
-        ariaPageLabel(value) {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.pageLabel.replace(/{page}/g, value) : undefined;
+        ariaPageLabel(value: number) {
+            return this.$primevue?.config.locale?.aria?.pageLabel?.replace(/{page}/g, String(value));
         }
     },
     computed: {
         ariaPrevButtonLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.prevPageLabel : undefined;
+            return this.$primevue?.config.locale?.aria?.prevPageLabel;
         },
         ariaNextButtonLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.nextPageLabel : undefined;
+            return this.$primevue?.config.locale?.aria?.nextPageLabel;
         },
         isNavBackwardDisabled() {
             return (!this.circular && this.d_activeIndex === 0) || this.value.length <= this.d_numVisible;
@@ -565,5 +562,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

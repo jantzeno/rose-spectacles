@@ -35,7 +35,8 @@
     <GalleriaContent v-else :templates="$slots" @activeitem-change="onActiveItemChange" :pt="pt" :unstyled="unstyled" v-bind="$props" />
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { addClass, focus } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import FocusTrap from '../focustrap/FocusTrap';
@@ -44,18 +45,18 @@ import { blockBodyScroll, unblockBodyScroll } from '../utils/Utils';
 import BaseGalleria from './BaseGalleria.vue';
 import GalleriaContent from './GalleriaContent.vue';
 
-export default {
+export default defineComponent({
     name: 'Galleria',
     extends: BaseGalleria,
     inheritAttrs: false,
     emits: ['update:activeIndex', 'update:visible'],
-    container: null,
-    mask: null,
-    documentKeydownListener: null,
     data() {
         return {
             containerVisible: this.visible,
-            target: null
+            target: null as HTMLElement | null,
+            container: null as HTMLElement | null,
+            mask: null as HTMLElement | null,
+            documentKeydownListener: null as ((event: KeyboardEvent) => void) | null
         };
     },
     updated() {
@@ -71,35 +72,36 @@ export default {
         this.mask = null;
 
         if (this.container) {
-            ZIndex.clear(this.container.$el || this.container);
+            ZIndex.clear(this.container);
             this.container = null;
         }
     },
     methods: {
-        onBeforeEnter(el) {
-            ZIndex.set('modal', el, this.baseZIndex || this.$primevue.config.zIndex.modal);
+        onBeforeEnter(el: Element) {
+            if (el instanceof HTMLElement) ZIndex.set('modal', el, this.baseZIndex || this.$primevue?.config.zIndex?.modal);
         },
-        onEnter(el) {
-            this.target = document.activeElement;
-            this.mask.style.zIndex = String(parseInt(el.style.zIndex, 10) - 1);
+        onEnter(el: Element) {
+            if (document.activeElement instanceof HTMLElement) this.target = document.activeElement;
+            if (this.mask && el instanceof HTMLElement) this.mask.style.zIndex = String(parseInt(el.style.zIndex, 10) - 1);
+
             blockBodyScroll();
             this.focus();
             this.bindGlobalListeners();
         },
         onBeforeLeave() {
-            !this.isUnstyled && addClass(this.mask, 'rs-overlay-mask-leave-active');
+            if (!this.isUnstyled && this.mask) addClass(this.mask, 'rs-overlay-mask-leave-active');
         },
         onLeave() {
-            focus(this.target);
+            if (this.target) focus(this.target);
             this.target = null;
         },
-        onAfterLeave(el) {
-            ZIndex.clear(el);
+        onAfterLeave(el: Element) {
+            if (el instanceof HTMLElement) ZIndex.clear(el);
             this.containerVisible = false;
             unblockBodyScroll();
             this.unbindGlobalListeners();
         },
-        onActiveItemChange(index) {
+        onActiveItemChange(index: number) {
             if (this.activeIndex !== index) {
                 this.$emit('update:activeIndex', index);
             }
@@ -107,13 +109,15 @@ export default {
         maskHide() {
             this.$emit('update:visible', false);
         },
-        containerRef(el) {
-            this.container = el;
+        containerRef(el: Element | ComponentPublicInstance | null) {
+            const root = el && !(el instanceof Element) ? el.$el : el;
+
+            this.container = root instanceof HTMLElement ? root : null;
         },
-        maskRef(el) {
-            this.mask = el;
+        maskRef(el: Element | ComponentPublicInstance | null) {
+            this.mask = el instanceof HTMLElement ? el : null;
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (event.code === 'Escape') {
                 this.maskHide();
             }
@@ -141,7 +145,7 @@ export default {
             }
         },
         focus() {
-            let focusTarget = this.container.$el.querySelector('[autofocus]');
+            const focusTarget = this.container?.querySelector<HTMLElement>('[autofocus]');
 
             if (focusTarget) {
                 focusTarget.focus();
@@ -155,5 +159,5 @@ export default {
     directives: {
         focustrap: FocusTrap
     }
-};
+});
 </script>

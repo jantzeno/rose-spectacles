@@ -72,14 +72,15 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType, type Slots } from 'vue';
 import { find, findSingle, getAttribute } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import ChevronLeftIcon from '../icons/chevronleft/ChevronLeftIcon.vue';
 import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
 import Ripple from '../ripple/Ripple';
 
-export default {
+export default defineComponent({
     name: 'GalleriaItem',
     hostName: 'Galleria',
     extends: BaseComponent,
@@ -94,7 +95,7 @@ export default {
             default: 0
         },
         value: {
-            type: Array,
+            type: Array as PropType<unknown[]>,
             default: null
         },
         showItemNavigators: {
@@ -118,8 +119,8 @@ export default {
             default: false
         },
         templates: {
-            type: null,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         id: {
             type: String,
@@ -132,7 +133,7 @@ export default {
         }
     },
     methods: {
-        getIndicatorPTOptions(index) {
+        getIndicatorPTOptions(index: number) {
             return {
                 context: {
                     highlighted: this.activeIndex === index
@@ -141,22 +142,22 @@ export default {
         },
         next() {
             let nextItemIndex = this.activeIndex + 1;
-            let activeIndex = this.circular && this.value.length - 1 === this.activeIndex ? 0 : nextItemIndex;
+            let activeIndex = this.circular && (this.value?.length ?? 0) - 1 === this.activeIndex ? 0 : nextItemIndex;
 
             this.$emit('update:activeIndex', activeIndex);
         },
         prev() {
             let prevItemIndex = this.activeIndex !== 0 ? this.activeIndex - 1 : 0;
-            let activeIndex = this.circular && this.activeIndex === 0 ? this.value.length - 1 : prevItemIndex;
+            let activeIndex = this.circular && this.activeIndex === 0 ? (this.value?.length ?? 0) - 1 : prevItemIndex;
 
             this.$emit('update:activeIndex', activeIndex);
         },
         stopSlideShow() {
-            if (this.slideShowActive && this.stopSlideShow) {
+            if (this.slideShowActive) {
                 this.$emit('stop-slideshow');
             }
         },
-        navBackward(e) {
+        navBackward(e?: Event) {
             this.stopSlideShow();
             this.prev();
 
@@ -164,7 +165,7 @@ export default {
                 e.preventDefault();
             }
         },
-        navForward(e) {
+        navForward(e?: Event) {
             this.stopSlideShow();
             this.next();
 
@@ -172,18 +173,18 @@ export default {
                 e.preventDefault();
             }
         },
-        onIndicatorClick(index) {
+        onIndicatorClick(index: number) {
             this.stopSlideShow();
             this.$emit('update:activeIndex', index);
         },
-        onIndicatorMouseEnter(index) {
+        onIndicatorMouseEnter(index: number) {
             if (this.changeItemOnIndicatorHover) {
                 this.stopSlideShow();
 
                 this.$emit('update:activeIndex', index);
             }
         },
-        onIndicatorKeyDown(event, index) {
+        onIndicatorKeyDown(event: KeyboardEvent, index: number) {
             switch (event.code) {
                 case 'Enter':
                 case 'NumpadEnter':
@@ -228,7 +229,7 @@ export default {
             }
         },
         onRightKey() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
+            const indicators = this.getIndicators();
             const activeIndex = this.findFocusedIndicatorIndex();
 
             this.changedFocusedIndicator(activeIndex, activeIndex + 1 === indicators.length ? indicators.length - 1 : activeIndex + 1);
@@ -244,56 +245,64 @@ export default {
             this.changedFocusedIndicator(activeIndex, 0);
         },
         onEndKey() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
+            const indicators = this.getIndicators();
             const activeIndex = this.findFocusedIndicatorIndex();
 
             this.changedFocusedIndicator(activeIndex, indicators.length - 1);
         },
         onTabKey() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
-            const highlightedIndex = indicators.findIndex((ind) => getAttribute(ind, 'data-p-active') === true);
+            const indicators = this.getIndicators();
+            const highlightedIndex = indicators.findIndex((item) => getAttribute(item, 'data-p-active') === true);
+            const activeIndex = this.findFocusedIndicatorIndex();
+            const active = indicators[activeIndex]?.firstElementChild;
+            const highlighted = indicators[highlightedIndex]?.firstElementChild;
 
-            const activeIndicator = findSingle(this.$refs.indicatorContent, '[data-pc-section="indicator"] > [tabindex="0"]');
-            const activeIndex = indicators.findIndex((ind) => ind === activeIndicator.parentElement);
-
-            indicators[activeIndex].children[0].tabIndex = '-1';
-            indicators[highlightedIndex].children[0].tabIndex = '0';
+            if (active instanceof HTMLElement && highlighted instanceof HTMLElement) {
+                active.tabIndex = -1;
+                highlighted.tabIndex = 0;
+            }
+        },
+        getIndicators() {
+            return find(this.$refs.indicatorContent as HTMLElement, '[data-pc-section="indicator"]');
         },
         findFocusedIndicatorIndex() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
-            const activeIndicator = findSingle(this.$refs.indicatorContent, '[data-pc-section="indicator"] > [tabindex="0"]');
+            const active = findSingle(this.$refs.indicatorContent as HTMLElement, '[data-pc-section="indicator"] > [tabindex="0"]');
 
-            return indicators.findIndex((ind) => ind === activeIndicator.parentElement);
+            return this.getIndicators().findIndex((item) => item === active?.parentElement);
         },
-        changedFocusedIndicator(prevInd, nextInd) {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
+        changedFocusedIndicator(prevInd: number, nextInd: number) {
+            const indicators = this.getIndicators();
+            const previous = indicators[prevInd]?.firstElementChild;
+            const next = indicators[nextInd]?.firstElementChild;
 
-            indicators[prevInd].children[0].tabIndex = '-1';
-            indicators[nextInd].children[0].tabIndex = '0';
-            indicators[nextInd].children[0].focus();
+            if (previous instanceof HTMLElement && next instanceof HTMLElement) {
+                previous.tabIndex = -1;
+                next.tabIndex = 0;
+                next.focus();
+            }
         },
-        isIndicatorItemActive(index) {
+        isIndicatorItemActive(index: number) {
             return this.activeIndex === index;
         },
-        ariaSlideNumber(value) {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.slideNumber.replace(/{slideNumber}/g, value) : undefined;
+        ariaSlideNumber(value: number) {
+            return this.$primevue?.config.locale?.aria?.slideNumber?.replace(/{slideNumber}/g, String(value));
         },
-        ariaPageLabel(value) {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.pageLabel.replace(/{page}/g, value) : undefined;
+        ariaPageLabel(value: number) {
+            return this.$primevue?.config.locale?.aria?.pageLabel?.replace(/{page}/g, String(value));
         }
     },
     computed: {
         activeItem() {
-            return this.value[this.activeIndex];
+            return this.value?.[this.activeIndex];
         },
         ariaSlideLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.slide : undefined;
+            return this.$primevue?.config.locale?.aria?.slide;
         },
         isNavBackwardDisabled() {
             return !this.circular && this.activeIndex === 0;
         },
         isNavForwardDisabled() {
-            return !this.circular && this.activeIndex === this.value.length - 1;
+            return !this.circular && this.activeIndex === (this.value?.length ?? 0) - 1;
         }
     },
     components: {
@@ -303,5 +312,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
