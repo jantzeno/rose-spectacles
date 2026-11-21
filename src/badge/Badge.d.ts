@@ -2,7 +2,6 @@
  *
  * Badge represents people using icons, labels and images.
  *
- * [Live Demo](https://openvue.dev/badge)
  *
  * @module badge
  *
@@ -119,13 +118,10 @@ export interface BadgeEmitsOptions {}
 export declare type BadgeEmits = EmitFn<BadgeEmitsOptions>;
 
 /**
- * **PrimeVue - Badge**
+ * **Rose Spectacles - Badge**
  *
  * _Badge represents people using icons, labels and images._
  *
- * [Live Demo](https://openvue.dev/badge/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

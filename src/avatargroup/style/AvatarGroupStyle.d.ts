@@ -2,7 +2,6 @@
  *
  * A set of Avatars can be displayed together using the AvatarGroup component.
  *
- * [Live Demo](https://openvue.dev/avatar/)
  *
  * @module avatargroupstyle
  *

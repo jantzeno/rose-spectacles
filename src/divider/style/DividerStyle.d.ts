@@ -2,7 +2,6 @@
  *
  * Divider is used to separate contents.
  *
- * [Live Demo](https://openvue.dev/divider)
  *
  * @module dividerstyle
  *

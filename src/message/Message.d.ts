@@ -2,7 +2,6 @@
  *
  * Message groups a collection of contents in tabs.
  *
- * [Live Demo](https://openvue.dev/message/)
  *
  * @module message
  *
@@ -237,13 +236,10 @@ export interface MessageEmitsOptions {
 export declare type MessageEmits = EmitFn<MessageEmitsOptions>;
 
 /**
- * **PrimeVue - Message**
+ * **Rose Spectacles - Message**
  *
  * _Messages is used to display inline messages with various severities._
  *
- * [Live Demo](https://openvue.dev/message/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

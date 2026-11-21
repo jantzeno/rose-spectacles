@@ -2,7 +2,6 @@
  *
  * Carousel is a content slider featuring various customization options.
  *
- * [Live Demo](https://openvue.dev/carousel/)
  *
  * @module carousel
  *
@@ -405,13 +404,10 @@ export interface CarouselEmitsOptions {
 export declare type CarouselEmits = EmitFn<CarouselEmitsOptions>;
 
 /**
- * **PrimeVue - Carousel**
+ * **Rose Spectacles - Carousel**
  *
  * _Carousel is a content slider featuring various customization options._
  *
- * [Live Demo](https://openvue.dev/carousel/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

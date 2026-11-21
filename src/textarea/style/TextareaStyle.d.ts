@@ -2,7 +2,6 @@
  *
  * Textarea is a multi-line text input element.
  *
- * [Live Demo](https://openvue.dev/textarea/)
  *
  * @module textareastyle
  *

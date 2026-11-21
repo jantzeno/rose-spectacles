@@ -2,7 +2,6 @@
  *
  * IftaLabel visually integrates a label within its form element.
  *
- * [Live Demo](https://openvue.dev/iftalabel/)
  *
  * @module iftalabel
  *
@@ -113,13 +112,10 @@ export interface IftaLabelEmitsOptions {}
 export declare type IftaLabelEmits = EmitFn<IftaLabelEmitsOptions>;
 
 /**
- * **PrimeVue - IftaLabel**
+ * **Rose Spectacles - IftaLabel**
  *
  * _IftaLabel visually integrates a label within its form element._
  *
- * [Live Demo](https://openvue.dev/inputtext/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

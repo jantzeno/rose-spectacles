@@ -2,7 +2,6 @@
  *
  * Focus Trap keeps focus within a certain DOM element while tabbing.
  *
- * [Live Demo](https://openvue.dev/focustrap)
  *
  * @module focustrapstyle
  *

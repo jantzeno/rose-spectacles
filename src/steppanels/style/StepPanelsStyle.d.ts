@@ -2,7 +2,6 @@
  *
  * StepPanels
  *
- * [Live Demo](https://openvue.dev/stepper/)
  *
  * @module steppanelsstyle
  *

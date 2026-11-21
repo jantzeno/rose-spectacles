@@ -2,7 +2,6 @@
  *
  * StepPanel is a helper component for Stepper component.
  *
- * [Live Demo](https://openvue.dev/stepper/)
  *
  * @module steppanelstyle
  *

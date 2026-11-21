@@ -2,7 +2,6 @@
  *
  * DataTable displays data in tabular format.
  *
- * [Live Demo](https://openvue.dev/datatable/)
  *
  * @module datatable
  *
@@ -1728,13 +1727,10 @@ export interface DataTableMethods {
 }
 
 /**
- * **PrimeVue - DataTable**
+ * **Rose Spectacles - DataTable**
  *
  *  * _DataTable displays data in tabular format._
  *
- * [Live Demo](https://openvue.dev/datatable/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

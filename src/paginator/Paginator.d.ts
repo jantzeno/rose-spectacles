@@ -2,7 +2,6 @@
  *
  * Paginator is a generic component to display content in paged format.
  *
- * [Live Demo](https://openvue.dev/paginator)
  *
  * @module paginator
  *
@@ -509,13 +508,10 @@ export interface PaginatorEmitsOptions {
 export declare type PaginatorEmits = EmitFn<PaginatorEmitsOptions>;
 
 /**
- * **PrimeVue - Paginator**
+ * **Rose Spectacles - Paginator**
  *
  * _Paginator is a generic widget to display content in paged format._
  *
- * [Live Demo](https://openvue.dev/paginator/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

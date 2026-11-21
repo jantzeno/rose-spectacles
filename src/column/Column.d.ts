@@ -3,7 +3,6 @@
  * Column component defines various options to specify corresponding features.
  * It is a helper component for DataTable and TreeTable.
  *
- * [Live Demo](https://openvue.dev/datatable/)
  *
  * @module column
  *
@@ -1039,13 +1038,10 @@ export interface ColumnEmitsOptions {}
 export declare type ColumnEmits = EmitFn<ColumnEmitsOptions>;
 
 /**
- * **PrimeVue - Column**
+ * **Rose Spectacles - Column**
  *
  * _Column is a helper component for DataTable and TreeTable._
  *
- * [Live Demo](https://openvue.dev/datatable/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

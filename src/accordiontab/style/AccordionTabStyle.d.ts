@@ -3,7 +3,6 @@
  *
  * AccordionTab is a helper component for Accordion.
  *
- * [Live Demo](https://openvue.dev/accordion/)
  *
  * @module accordiontabstyle
  *

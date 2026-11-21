@@ -2,7 +2,6 @@
  *
  * Menu is a navigation / command component that supports dynamic and static positioning.
  *
- * [Live Demo](https://openvue.dev/menu/)
  *
  * @module menu
  *
@@ -375,13 +374,10 @@ export interface MenuMethods {
 }
 
 /**
- * **PrimeVue - Menu**
+ * **Rose Spectacles - Menu**
  *
  * _Menu is a navigation / command component that supports dynamic and static positioning._
  *
- * [Live Demo](https://openvue.dev/menu/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

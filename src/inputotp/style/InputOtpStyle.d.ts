@@ -2,7 +2,6 @@
  *
  * InputOtp is used to enter one time passwords.
  *
- * [Live Demo](https://openvue.dev/inputotp/)
  *
  * @module inputotpstyle
  *

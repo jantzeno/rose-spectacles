@@ -2,7 +2,6 @@
  *
  * TieredMenu displays submenus in nested overlays.
  *
- * [Live Demo](https://openvue.dev/menu/)
  *
  * @module tieredmenustyle
  *

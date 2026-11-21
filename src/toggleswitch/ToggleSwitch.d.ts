@@ -2,7 +2,6 @@
  *
  * ToggleSwitch is used to select a boolean value.
  *
- * [Live Demo](https://openvue.dev/toggleswitch/)
  *
  * @module toggleswitch
  *
@@ -238,13 +237,10 @@ export interface ToggleSwitchEmitsOptions {
 export declare type ToggleSwitchEmits = EmitFn<ToggleSwitchEmitsOptions>;
 
 /**
- * **PrimeVue - ToggleSwitch**
+ * **Rose Spectacles - ToggleSwitch**
  *
  * _ToggleSwitch is used to select a boolean value._
  *
- * [Live Demo](https://openvue.dev/toggleswitch/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

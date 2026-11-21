@@ -2,7 +2,6 @@
  *
  * PickList is used to reorder items between different lists.
  *
- * [Live Demo](https://openvue.dev/picklist)
  *
  * @module pickliststyle
  *

@@ -2,7 +2,6 @@
  *
  * Button is an extension to standard button element with icons and theming.
  *
- * [Live Demo](https://openvue.dev/button/)
  *
  * @module button
  *
@@ -273,13 +272,10 @@ export interface ButtonEmitsOptions {}
 export declare type ButtonEmits = EmitFn<ButtonEmitsOptions>;
 
 /**
- * **PrimeVue - Button**
+ * **Rose Spectacles - Button**
  *
  * _Button is an extension to standard button element with icons and theming._
  *
- * [Live Demo](https://openvue.dev/button/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

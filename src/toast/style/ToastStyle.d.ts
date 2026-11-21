@@ -2,7 +2,6 @@
  *
  * Toast is used to display messages in an overlay.
  *
- * [Live Demo](https://openvue.dev/toast/)
  *
  * @module toaststyle
  *

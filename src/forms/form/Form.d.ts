@@ -2,7 +2,6 @@
  *
  * Form provides validation functionality and manages form state.
  *
- * [Live Demo](https://openvue.dev/forms/)
  *
  * @module form
  *
@@ -322,13 +321,10 @@ export interface FormInstance {
 }
 
 /**
- * **PrimeVue - Form**
+ * **Rose Spectacles - Form**
  *
  * _Form provides validation functionality and manages form state._
  *
- * [Live Demo](https://openvue.dev/forms/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

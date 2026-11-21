@@ -2,7 +2,6 @@
  *
  * Row component is a helper component used to create grouping structures in DataTable.
  *
- * [Live Demo](https://openvue.dev/datatable/)
  *
  * @module rowstyle
  *

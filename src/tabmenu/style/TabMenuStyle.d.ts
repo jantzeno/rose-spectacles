@@ -2,7 +2,6 @@
  *
  * TabMenu is a navigation component that displays items as tab headers. Example below uses nested routes with TabMenu.
  *
- * [Live Demo](https://openvue.dev/tabmenu/)
  *
  * @module tabmenustyle
  *

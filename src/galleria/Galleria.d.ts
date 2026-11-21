@@ -2,7 +2,6 @@
  *
  * Galleria is an advanced content gallery component.
  *
- * [Live Demo](https://openvue.dev/galleria/)
  *
  * @module galleria
  *
@@ -532,13 +531,10 @@ export interface GalleriaEmitsOptions {
 export declare type GalleriaEmits = EmitFn<GalleriaEmitsOptions>;
 
 /**
- * **PrimeVue - Galleria**
+ * **Rose Spectacles - Galleria**
  *
  * _Galleria is an advanced content gallery component._
  *
- * [Live Demo](https://openvue.dev/galleria/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

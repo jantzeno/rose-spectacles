@@ -2,7 +2,6 @@
  *
  * Toolbar is a grouping component for buttons and other content.
  *
- * [Live Demo](https://openvue.dev/toolbar/)
  *
  * @module toolbarstyle
  *

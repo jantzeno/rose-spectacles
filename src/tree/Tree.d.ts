@@ -2,7 +2,6 @@
  *
  * Tree is used to display hierarchical data.
  *
- * [Live Demo](https://openvue.dev/tree/)
  *
  * @module tree
  *
@@ -708,13 +707,10 @@ export interface TreeEmitsOptions {
 export declare type TreeEmits = EmitFn<TreeEmitsOptions>;
 
 /**
- * **PrimeVue - Tree**
+ * **Rose Spectacles - Tree**
  *
  * _Tree is used to display hierarchical data._
  *
- * [Live Demo](https://openvue.dev/tree/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

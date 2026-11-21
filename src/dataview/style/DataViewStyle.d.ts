@@ -2,7 +2,6 @@
  *
  * DataView displays data in grid or list layout with pagination and sorting features.
  *
- * [Live Demo](https://openvue.dev/dataview/)
  *
  * @module dataviewstyle
  *

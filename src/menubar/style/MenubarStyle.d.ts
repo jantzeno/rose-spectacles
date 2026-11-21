@@ -2,7 +2,6 @@
  *
  * Menubar is a horizontal menu component.
  *
- * [Live Demo](https://openvue.dev/menubar/)
  *
  * @module menubarstyle
  *

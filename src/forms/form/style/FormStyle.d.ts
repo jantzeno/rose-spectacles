@@ -1,6 +1,5 @@
 /**
  *
- * [Live Demo](https://openvue.dev/forms/)
  *
  * @module formstyle
  *

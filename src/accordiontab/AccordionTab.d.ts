@@ -3,7 +3,6 @@
  *
  * AccordionTab is a helper component for Accordion.
  *
- * [Live Demo](https://openvue.dev/accordion/)
  *
  * @module accordiontab
  *
@@ -219,13 +218,10 @@ export declare type AccordionTabEmits = EmitFn<AccordionTabEmitsOptions>;
 /**
  * @deprecated since v4. Use the new structure of Accordion instead.
  *
- * **PrimeVue - AccordionTab**
+ * **Rose Spectacles - AccordionTab**
  *
  * _AccordionTab is a helper component for Accordion.._
  *
- * [Live Demo](https://openvue.dev/accordion/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

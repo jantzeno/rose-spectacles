@@ -2,7 +2,6 @@
  *
  * DataTable displays data in tabular format.
  *
- * [Live Demo](https://openvue.dev/datatable/)
  *
  * @module datatablestyle
  *

@@ -2,7 +2,6 @@
  *
  * StepItem is a helper component for Stepper component.
  *
- * [Live Demo](https://openvue.dev/stepper/)
  *
  * @module stepitem
  *
@@ -104,13 +103,10 @@ export interface StepItemEmitsOptions {}
 export declare type StepItemEmits = EmitFn<StepItemEmitsOptions>;
 
 /**
- * **PrimeVue - StepItem**
+ * **Rose Spectacles - StepItem**
  *
  * _StepItem is a helper component for Stepper component._
  *
- * [Live Demo](https://openvue.dev/stepper/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

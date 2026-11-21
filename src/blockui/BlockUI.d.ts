@@ -2,7 +2,6 @@
  *
  * BlockUI represents people using icons, labels and images.
  *
- * [Live Demo](https://openvue.dev/blockui)
  *
  * @module blockui
  *
@@ -159,13 +158,10 @@ export interface BlockUIEmitsOptions {
 export declare type BlockUIEmits = EmitFn<BlockUIEmitsOptions>;
 
 /**
- * **PrimeVue - BlockUI**
+ * **Rose Spectacles - BlockUI**
  *
  * _BlockUI represents people using icons, labels and images._
  *
- * [Live Demo](https://openvue.dev/blockui/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

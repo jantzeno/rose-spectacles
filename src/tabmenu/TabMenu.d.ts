@@ -2,7 +2,6 @@
  *
  * TabMenu is a navigation component that displays items as tab headers. Example below uses nested routes with TabMenu.
  *
- * [Live Demo](https://openvue.dev/tabmenu/)
  *
  * @module tabmenu
  *
@@ -261,13 +260,10 @@ export interface TabMenuEmitsOptions {
 export declare type TabMenuEmits = EmitFn<TabMenuEmitsOptions>;
 
 /**
- * **PrimeVue - TabMenu**
+ * **Rose Spectacles - TabMenu**
  *
  * _TabMenu is a navigation component that displays items as tab headers. Example below uses nested routes with TabMenu._
  *
- * [Live Demo](https://openvue.dev/tabmenu/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

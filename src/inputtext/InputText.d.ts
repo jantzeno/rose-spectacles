@@ -2,7 +2,6 @@
  *
  * InputText renders a text field to enter data.
  *
- * [Live Demo](https://openvue.dev/inputtext/)
  *
  * @module inputtext
  *
@@ -168,13 +167,10 @@ export interface InputTextEmitsOptions {
 export declare type InputTextEmits = EmitFn<InputTextEmitsOptions>;
 
 /**
- * **PrimeVue - InputText**
+ * **Rose Spectacles - InputText**
  *
  * _InputText renders a text field to enter data._
  *
- * [Live Demo](https://openvue.dev/inputtext/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

@@ -1,6 +1,5 @@
 /**
  *
- * [Live Demo](https://openvue.dev/dynamicdialog/)
  *
  * @module dialogservice-usedialog
  */

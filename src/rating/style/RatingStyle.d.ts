@@ -2,7 +2,6 @@
  *
  * Rating component is a star based selection input.
  *
- * [Live Demo](https://openvue.dev/rating/)
  *
  * @module ratingstyle
  *

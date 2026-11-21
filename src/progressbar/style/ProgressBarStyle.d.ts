@@ -2,7 +2,6 @@
  *
  * ProgressBar is a process status indicator.
  *
- * [Live Demo](https://openvue.dev/progressbar)
  *
  * @module progressbarstyle
  *

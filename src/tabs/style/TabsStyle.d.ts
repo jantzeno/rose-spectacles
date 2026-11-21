@@ -2,7 +2,6 @@
  *
  * Tabs facilitates seamless switching between different views.
  *
- * [Live Demo](https://openvue.dev/tabs/)
  *
  * @module tabsstyle
  *

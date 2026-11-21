@@ -2,7 +2,6 @@
  *
  * Tree is used to display hierarchical data.
  *
- * [Live Demo](https://openvue.dev/tree/)
  *
  * @module treestyle
  *

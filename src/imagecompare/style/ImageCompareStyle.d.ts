@@ -2,7 +2,6 @@
  *
  * ImageCompare compares two images side by side with a slider.
  *
- * [Live Demo](https://openvue.dev/imagecompare/)
  *
  * @module imagecomparestyle
  *

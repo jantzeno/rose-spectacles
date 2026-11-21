@@ -2,7 +2,6 @@
  *
  * InputGroup displays text, icon, buttons and other content can be grouped next to an input.
  *
- * [Live Demo](https://openvue.dev/inputgroup/)
  *
  * @module inputgroupstyle
  *

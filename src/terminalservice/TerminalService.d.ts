@@ -1,5 +1,4 @@
 /**
- * [Live Demo](https://openvue.dev/terminal/)
  *
  * @module terminalservice
  *

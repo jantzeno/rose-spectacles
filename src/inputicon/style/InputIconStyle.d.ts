@@ -2,7 +2,6 @@
  *
  * InputIcon displays an icon.
  *
- * [Live Demo](https://openvue.dev/inputgroup/)
  *
  * @module inputiconstyle
  *

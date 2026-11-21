@@ -2,7 +2,6 @@
  *
  * Checkbox is an extension to standard checkbox element with theming.
  *
- * [Live Demo](https://openvue.dev/checkbox/)
  *
  * @module checkboxstyle
  *

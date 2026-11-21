@@ -2,7 +2,6 @@
  *
  * Splitter is utilized to separate and resize panels.
  *
- * [Live Demo](https://openvue.dev/splitter/)
  *
  * @module splitterstyle
  *

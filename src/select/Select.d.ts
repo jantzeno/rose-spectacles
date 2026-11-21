@@ -2,7 +2,6 @@
  *
  * Select is used to choose an item from a collection of options.
  *
- * [Live Demo](https://openvue.dev/select/)
  *
  * @module select
  *
@@ -816,13 +815,10 @@ export interface SelectMethods {
 }
 
 /**
- * **PrimeVue - Select**
+ * **Rose Spectacles - Select**
  *
  * _Select is used to choose an item from a collection of options._
  *
- * [Live Demo](https://openvue.dev/select/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

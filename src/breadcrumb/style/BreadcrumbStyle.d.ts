@@ -2,7 +2,6 @@
  *
  * Breadcrumb provides contextual information about page hierarchy.
  *
- * [Live Demo](https://openvue.dev/breadcrumb/)
  *
  * @module breadcrumbstyle
  *

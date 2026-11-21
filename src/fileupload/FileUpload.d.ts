@@ -2,7 +2,6 @@
  *
  * FileUpload is an advanced uploader with dragdrop support, multi file uploads, auto uploading, progress tracking and validations.
  *
- * [Live Demo](https://openvue.dev/fileupload/)
  *
  * @module fileupload
  *
@@ -652,13 +651,10 @@ export interface FileUploadMethods {
 }
 
 /**
- * **PrimeVue - FileUpload**
+ * **Rose Spectacles - FileUpload**
  *
  * _FileUpload is an advanced uploader with dragdrop support, multi file uploads, auto uploading, progress tracking and validations._
  *
- * [Live Demo](https://openvue.dev/fileupload/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

@@ -2,7 +2,6 @@
  *
  * Skeleton is a placeholder to display instead of the actual content.
  *
- * [Live Demo](https://openvue.dev/skeleton/)
  *
  * @module skeleton
  *
@@ -133,13 +132,10 @@ export interface SkeletonEmitsOptions {}
 export declare type SkeletonEmits = EmitFn<SkeletonEmitsOptions>;
 
 /**
- * **PrimeVue - Skeleton**
+ * **Rose Spectacles - Skeleton**
  *
  * _Skeleton is a placeholder to display instead of the actual content._
  *
- * [Live Demo](https://openvue.dev/skeleton/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

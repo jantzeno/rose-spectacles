@@ -2,7 +2,6 @@
  *
  * DatePicker is a form component to work with dates.
  *
- * [Live Demo](https://openvue.dev/datepicker/)
  *
  * @module datepicker
  *
@@ -1253,13 +1252,10 @@ export interface DatePickerEmitsOptions {
 export declare type DatePickerEmits = EmitFn<DatePickerEmitsOptions>;
 
 /**
- * **PrimeVue - DatePicker**
+ * **Rose Spectacles - DatePicker**
  *
  * _DatePicker  is a form component to work with dates._
  *
- * [Live Demo](https://openvue.dev/calendar/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

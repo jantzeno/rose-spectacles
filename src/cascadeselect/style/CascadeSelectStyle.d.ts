@@ -2,7 +2,6 @@
  *
  * CascadeSelect is a form component to select a value from a nested structure of options.
  *
- * [Live Demo](https://openvue.dev/cascadeselect/)
  *
  * @module cascadeselectstyle
  *

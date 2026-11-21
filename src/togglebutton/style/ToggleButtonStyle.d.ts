@@ -2,7 +2,6 @@
  *
  * ToggleButton is used to select a boolean value using a button.
  *
- * [Live Demo](https://openvue.dev/togglebutton/)
  *
  * @module togglebuttonstyle
  *

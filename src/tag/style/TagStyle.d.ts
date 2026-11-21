@@ -2,7 +2,6 @@
  *
  * Tag component is used to categorize content.
  *
- * [Live Demo](https://openvue.dev/tag)
  *
  * @module tagstyle
  *

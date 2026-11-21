@@ -3,7 +3,6 @@
  *
  * TabView is a container component to group content with tabs.
  *
- * [Live Demo](https://openvue.dev/tabview/)
  *
  * @module tabview
  *

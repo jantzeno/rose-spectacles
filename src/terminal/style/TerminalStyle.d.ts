@@ -2,7 +2,6 @@
  *
  * Terminal is a text based user interface.
  *
- * [Live Demo](https://openvue.dev/terminal)
  *
  * @module terminalstyle
  *

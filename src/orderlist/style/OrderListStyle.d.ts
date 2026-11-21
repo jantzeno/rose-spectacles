@@ -2,7 +2,6 @@
  *
  * OrderList is used to managed the order of a collection.
  *
- * [Live Demo](https://openvue.dev/orderlist)
  *
  * @module orderliststyle
  *

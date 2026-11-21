@@ -1,6 +1,5 @@
 /**
  *
- * [Live Demo](https://openvue.dev/toast/)
  *
  * @module toastservice-usetoast
  * @todo 'use' is not a valid name for a module. Next release will change.

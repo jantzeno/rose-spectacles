@@ -2,7 +2,6 @@
  *
  * A keyfilter is a directive used to block individual keystrokes based on a pattern.
  *
- * [Live Demo](https://openvue.dev/keyfilter)
  *
  * @module keyfilter
  *
@@ -139,13 +138,10 @@ export interface KeyFilterDirectiveBinding extends Omit<DirectiveBinding, 'modif
 }
 
 /**
- * **PrimeVue - KeyFilter**
+ * **Rose Spectacles - KeyFilter**
  *
  * _A keyfilter is a directive used to block individual keystrokes based on a pattern._
  *
- * [Live Demo](https://openvue.dev/keyfilter/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  */
 declare const KeyFilter: ObjectDirective;

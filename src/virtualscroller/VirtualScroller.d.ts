@@ -2,7 +2,6 @@
  *
  * VirtualScroller is a performant approach to handle huge data efficiently.
  *
- * [Live Demo](https://openvue.dev/virtualscroller/)
  *
  * @module virtualscroller
  *
@@ -524,13 +523,10 @@ export interface VirtualScrollerMethods {
 }
 
 /**
- * **PrimeVue - VirtualScroller**
+ * **Rose Spectacles - VirtualScroller**
  *
  * _VirtualScroller is a performant approach to handle huge data efficiently._
  *
- * [Live Demo](https://openvue.dev/virtualscroller/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

@@ -2,7 +2,6 @@
  *
  * Chips groups a collection of contents in tabs.
  *
- * [Live Demo](https://openvue.dev/inputchips/)
  *
  * @module chipsstyle
  *

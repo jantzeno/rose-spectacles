@@ -2,7 +2,6 @@
  *
  * Slider is a component to provide input with a drag handle.
  *
- * [Live Demo](https://openvue.dev/slider/)
  *
  * @module slider
  *
@@ -220,13 +219,10 @@ export interface SliderEmitsOptions {
 export declare type SliderEmits = EmitFn<SliderEmitsOptions>;
 
 /**
- * **PrimeVue - Slider**
+ * **Rose Spectacles - Slider**
  *
  * _Slider is a component to provide input with a drag handle._
  *
- * [Live Demo](https://openvue.dev/slider/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

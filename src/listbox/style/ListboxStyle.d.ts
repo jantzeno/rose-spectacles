@@ -2,7 +2,6 @@
  *
  * ListBox is used to select one or more values from a list of items.
  *
- * [Live Demo](https://openvue.dev/listbox/)
  *
  * @module listboxstyle
  *

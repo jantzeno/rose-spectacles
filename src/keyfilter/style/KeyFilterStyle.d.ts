@@ -2,7 +2,6 @@
  *
  * A keyfilter is a directive used to block individual keystrokes based on a pattern.
  *
- * [Live Demo](https://openvue.dev/keyfilter)
  *
  * @module keyfilterstyle
  *

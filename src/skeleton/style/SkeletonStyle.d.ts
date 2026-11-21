@@ -2,7 +2,6 @@
  *
  * Skeleton is a placeholder to display instead of the actual content.
  *
- * [Live Demo](https://openvue.dev/skeleton/)
  *
  * @module skeletonstyle
  *

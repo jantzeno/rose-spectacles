@@ -2,7 +2,6 @@
  *
  * TreeSelect is a form component to choose from hierarchical data.
  *
- * [Live Demo](https://openvue.dev/treeselect/)
  *
  * @module treeselectstyle
  *

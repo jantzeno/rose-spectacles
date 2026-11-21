@@ -2,7 +2,6 @@
  *
  * InputGroupAddon displays text, icon, buttons and other content can be grouped next to an input.
  *
- * [Live Demo](https://openvue.dev/inputgroup/)
  *
  * @module inputgroupaddon
  *
@@ -112,13 +111,10 @@ export interface InputGroupAddonEmitsOptions {}
 export declare type InputGroupAddonEmits = EmitFn<InputGroupAddonEmitsOptions>;
 
 /**
- * **PrimeVue - InputGroupAddon**
+ * **Rose Spectacles - InputGroupAddon**
  *
  * _InputGroupAddon displays text, icon, buttons and other content can be grouped next to an input._
  *
- * [Live Demo](https://openvue.dev/inputgroupaddon/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

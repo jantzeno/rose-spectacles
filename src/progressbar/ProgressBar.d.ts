@@ -2,7 +2,6 @@
  *
  * ProgressBar is a process status indicator.
  *
- * [Live Demo](https://openvue.dev/progressbar)
  *
  * @module progressbar
  *
@@ -129,13 +128,10 @@ export interface ProgressBarEmitsOptions {}
 export declare type ProgressBarEmits = EmitFn<ProgressBarEmitsOptions>;
 
 /**
- * **PrimeVue - ProgressBar**
+ * **Rose Spectacles - ProgressBar**
  *
  * ProgressBar is a process status indicator._
  *
- * [Live Demo](https://openvue.dev/progressbar/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

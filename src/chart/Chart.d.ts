@@ -2,7 +2,6 @@
  *
  * Chart is a wrapper around Chart.js, rendering data driven charts on a canvas element.
  *
- * [Live Demo](https://openvue.dev/chart/)
  *
  * @module chart
  *
@@ -161,9 +160,6 @@ export interface ChartMethods {
  *
  * _Chart is a wrapper around Chart.js, rendering data driven charts on a canvas element._
  *
- * [Live Demo](https://openvue.dev/chart/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

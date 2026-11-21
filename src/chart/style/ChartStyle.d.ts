@@ -2,7 +2,6 @@
  *
  * Chart groups a collection of contents in tabs.
  *
- * [Live Demo](https://openvue.dev/chart/)
  *
  * @module chartstyle
  *

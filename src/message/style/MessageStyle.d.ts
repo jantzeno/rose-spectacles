@@ -2,7 +2,6 @@
  *
  * Message groups a collection of contents in tabs.
  *
- * [Live Demo](https://openvue.dev/message/)
  *
  * @module messagestyle
  *

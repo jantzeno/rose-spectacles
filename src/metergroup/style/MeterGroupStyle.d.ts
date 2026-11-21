@@ -2,7 +2,6 @@
  *
  * MeterGroup is a group of process status indicators.
  *
- * [Live Demo](https://openvue.dev/metergroup)
  *
  * @module metergroupstyle
  *

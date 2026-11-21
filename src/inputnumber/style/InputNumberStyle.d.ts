@@ -2,7 +2,6 @@
  *
  * InputNumber is an input component to provide numerical input.
  *
- * [Live Demo](https://openvue.dev/inputnumber/)
  *
  * @module inputnumberstyle
  *

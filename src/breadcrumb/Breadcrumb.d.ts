@@ -2,7 +2,6 @@
  *
  * Breadcrumb provides contextual information about page hierarchy.
  *
- * [Live Demo](https://openvue.dev/breadcrumb/)
  *
  * @module breadcrumb
  *
@@ -224,13 +223,10 @@ export interface BreadcrumbEmitsOptions {}
 export declare type BreadcrumbEmits = EmitFn<BreadcrumbEmitsOptions>;
 
 /**
- * **PrimeVue - Breadcrumb**
+ * **Rose Spectacles - Breadcrumb**
  *
  * _Breadcrumb provides contextual information about page hierarchy._
  *
- * [Live Demo](https://openvue.dev/breadcrumb/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

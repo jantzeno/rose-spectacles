@@ -2,7 +2,6 @@
  *
  * Rating component is a star based selection input.
  *
- * [Live Demo](https://openvue.dev/rating/)
  *
  * @module rating
  *
@@ -288,13 +287,10 @@ export interface RatingEmitsOptions {
 export declare type RatingEmits = EmitFn<RatingEmitsOptions>;
 
 /**
- * **PrimeVue - Rating**
+ * **Rose Spectacles - Rating**
  *
  * _Rating component is a star based selection input._
  *
- * [Live Demo](https://openvue.dev/rating/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

@@ -2,7 +2,6 @@
  *
  * Knob is a form component to define number inputs with a dial.
  *
- * [Live Demo](https://openvue.dev/knob/)
  *
  * @module knobstyle
  *

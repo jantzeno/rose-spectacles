@@ -2,7 +2,6 @@
  *
  * Carousel is a content slider featuring various customization options.
  *
- * [Live Demo](https://openvue.dev/carousel/)
  *
  * @module carouselstyle
  *

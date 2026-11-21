@@ -2,7 +2,6 @@
  *
  * AnimateOnScroll manages CSS classes declaratively to during enter/leave animations on scroll or on page load.
  *
- * [Live Demo](https://openvue.dev/animateonscroll)
  *
  * @module animateonscroll
  */
@@ -73,13 +72,10 @@ export interface AnimateOnScrollDirectiveBinding extends Omit<DirectiveBinding, 
 }
 
 /**
- * **PrimeVue - AnimateOnScroll**
+ * **Rose Spectacles - AnimateOnScroll**
  *
  * _AnimateOnScroll manages CSS classes declaratively to during enter/leave animations on scroll or on page load._
  *
- * [Live Demo](https://openvue.dev/animateonscroll/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  */
 declare const AnimateOnScroll: ObjectDirective;

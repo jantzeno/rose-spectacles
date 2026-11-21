@@ -2,7 +2,6 @@
  *
  * ScrollTop gets displayed after a certain scroll position and used to navigates to the top of the page quickly.
  *
- * [Live Demo](https://openvue.dev/scrolltop/)
  *
  * @module scrolltop
  *
@@ -173,13 +172,10 @@ export interface ScrollTopEmitsOptions {}
 export declare type ScrollTopEmits = EmitFn<ScrollTopEmitsOptions>;
 
 /**
- * **PrimeVue - ScrollTop**
+ * **Rose Spectacles - ScrollTop**
  *
  * _ScrollTop gets displayed after a certain scroll position and used to navigates to the top of the page quickly._
  *
- * [Live Demo](https://openvue.dev/scrolltop/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

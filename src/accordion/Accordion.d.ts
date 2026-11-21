@@ -2,7 +2,6 @@
  *
  * Accordion groups a collection of contents in tabs.
  *
- * [Live Demo](https://openvue.dev/accordion/)
  *
  * @module accordion
  *
@@ -235,13 +234,10 @@ export interface AccordionEmitsOptions {
 export declare type AccordionEmits = EmitFn<AccordionEmitsOptions>;
 
 /**
- * **PrimeVue - Accordion**
+ * **Rose Spectacles - Accordion**
  *
  * _Accordion groups a collection of contents in tabs._
  *
- * [Live Demo](https://openvue.dev/accordion/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

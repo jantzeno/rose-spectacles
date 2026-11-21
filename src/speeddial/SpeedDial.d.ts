@@ -2,7 +2,6 @@
  *
  * When pressed, a floating action button can display multiple primary actions that can be performed on a page.
  *
- * [Live Demo](https://openvue.dev/speeddial/)
  *
  * @module speeddial
  *
@@ -410,13 +409,10 @@ export interface SpeedDialEmitsOptions {
 export declare type SpeedDialEmits = EmitFn<SpeedDialEmitsOptions>;
 
 /**
- * **PrimeVue - SpeedDial**
+ * **Rose Spectacles - SpeedDial**
  *
  * _When pressed, a floating action button can display multiple primary actions that can be performed on a page._
  *
- * [Live Demo](https://openvue.dev/speeddial/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

@@ -2,7 +2,6 @@
  *
  * CascadeSelect is a form component to select a value from a nested structure of options.
  *
- * [Live Demo](https://openvue.dev/cascadeselect/)
  *
  * @module cascadeselect
  *
@@ -647,13 +646,10 @@ export interface CascadeSelectEmitsOptions {
 export declare type CascadeSelectEmits = EmitFn<CascadeSelectEmitsOptions>;
 
 /**
- * **PrimeVue - CascadeSelect**
+ * **Rose Spectacles - CascadeSelect**
  *
  * _CascadeSelect is a form component to select a value from a nested structure of options._
  *
- * [Live Demo](https://openvue.dev/cascadeselect/)
- * --- ---
- * ![PrimeVue(https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

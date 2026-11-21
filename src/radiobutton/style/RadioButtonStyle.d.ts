@@ -2,7 +2,6 @@
  *
  * RadioButton is an extension to standard radio button element with theming.
  *
- * [Live Demo](https://openvue.dev/radiobutton/)
  *
  * @module radiobuttonstyle
  *

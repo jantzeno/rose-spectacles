@@ -2,7 +2,6 @@
  *
  * MeterGroup is a group of process status indicators.
  *
- * [Live Demo](https://openvue.dev/metergroup)
  *
  * @module metergroup
  *
@@ -295,13 +294,10 @@ export interface MeterGroupEmitsOptions {}
 export declare type MeterGroupEmits = EmitFn<MeterGroupEmitsOptions>;
 
 /**
- * **PrimeVue - MeterGroup**
+ * **Rose Spectacles - MeterGroup**
  *
  * _MeterGroup is a group of process status indicators._
  *
- * [Live Demo](https://openvue.dev/metergroup/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

@@ -2,7 +2,6 @@
  *
  * TreeSelect is a form component to choose from hierarchical data.
  *
- * [Live Demo](https://openvue.dev/treeselect/)
  *
  * @module treeselect
  *
@@ -598,13 +597,10 @@ export interface TreeSelectMethods {
 }
 
 /**
- * **PrimeVue - TreeSelect**
+ * **Rose Spectacles - TreeSelect**
  *
  * _TreeSelect is a form component to choose from hierarchical data._
  *
- * [Live Demo](https://openvue.dev/treeselect/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

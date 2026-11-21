@@ -2,7 +2,6 @@
  *
  * Steps components is an indicator for the steps in a wizard workflow. Example below uses nested routes with Steps.
  *
- * [Live Demo](https://openvue.dev/steps/)
  *
  * @module steps
  *
@@ -218,13 +217,10 @@ export interface StepsEmitsOptions {}
 export declare type StepsEmits = EmitFn<StepsEmitsOptions>;
 
 /**
- * **PrimeVue - Steps**
+ * **Rose Spectacles - Steps**
  *
  * _Steps components is an indicator for the steps in a wizard workflow. Example below uses nested routes with Steps._
  *
- * [Live Demo](https://openvue.dev/steps/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

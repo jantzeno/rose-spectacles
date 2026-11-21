@@ -2,7 +2,6 @@
  *
  * AccordionHeader is a helper component for Accordion component.
  *
- * [Live Demo](https://openvue.dev/accordion/)
  *
  * @module accordionheaderstyle
  *

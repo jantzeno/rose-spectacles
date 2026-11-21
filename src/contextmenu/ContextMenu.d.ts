@@ -3,7 +3,6 @@
  * ContextMenu displays an overlay menu on right click of its target. Note that components like DataTable has special integration with ContextMenu.
  * Refer to documentation of the individual documentation of the with context menu support.
  *
- * [Live Demo](https://openvue.dev/contextmenu/)
  *
  * @module contextmenu
  *
@@ -400,14 +399,11 @@ export interface ContextMenuMethods {
 }
 
 /**
- * **PrimeVue - ContextMenu**
+ * **Rose Spectacles - ContextMenu**
  *
  * _ContextMenu displays an overlay menu on right click of its target. Note that components like DataTable has special integration with ContextMenu.
  * Refer to documentation of the individual documentation of the with context menu support._
  *
- * [Live Demo](https://openvue.dev/contextmenu/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

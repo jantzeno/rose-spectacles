@@ -2,7 +2,6 @@
  *
  * Timeline visualizes a series of chained events.
  *
- * [Live Demo](https://openvue.dev/timeline)
  *
  * @module timelinestyle
  *

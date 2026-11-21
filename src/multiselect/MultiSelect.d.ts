@@ -2,7 +2,6 @@
  *
  * MultiSelect is used to select multiple items from a collection.
  *
- * [Live Demo](https://openvue.dev/multiselect/)
  *
  * @module multiselect
  *
@@ -932,13 +931,10 @@ export interface MultiSelectMethods {
 }
 
 /**
- * **PrimeVue - MultiSelect**
+ * **Rose Spectacles - MultiSelect**
  *
  * _MultiSelect is used to select multiple items from a collection._
  *
- * [Live Demo](https://openvue.dev/multiselect/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

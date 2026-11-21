@@ -2,7 +2,6 @@
  *
  * CheckboxGroup is a component that groups multiple checkboxes, allowing users to select one or more options.
  *
- * [Live Demo](https://openvue.dev/checkbox/)
  *
  * @module checkboxgroup
  *
@@ -143,13 +142,10 @@ export interface CheckboxGroupEmitsOptions {
 export declare type CheckboxGroupEmits = EmitFn<CheckboxGroupEmitsOptions>;
 
 /**
- * **PrimeVue - CheckboxGroup**
+ * **Rose Spectacles - CheckboxGroup**
  *
  * _CheckboxGroup is a component that groups multiple checkboxes, allowing users to select one or more options._
  *
- * [Live Demo](https://openvue.dev/checkbox/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

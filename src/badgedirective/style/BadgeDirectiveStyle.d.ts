@@ -2,7 +2,6 @@
  *
  * Badge directive is a small status indicator for another element.
  *
- * [Live Demo](https://openvue.dev/badge)
  *
  * @module badgedirectivestyle
  *

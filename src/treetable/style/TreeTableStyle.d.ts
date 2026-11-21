@@ -2,7 +2,6 @@
  *
  * TreeTable is used to display hierarchical data in tabular format.
  *
- * [Live Demo](https://openvue.dev/treetable/)
  *
  * @module treetablestyle
  *

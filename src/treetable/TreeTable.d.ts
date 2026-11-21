@@ -2,7 +2,6 @@
  *
  * TreeTable is used to display hierarchical data in tabular format.
  *
- * [Live Demo](https://openvue.dev/treetable/)
  *
  * @module treetable
  *
@@ -1051,13 +1050,10 @@ export interface TreeTableEmitsOptions {
 export declare type TreeTableEmits = EmitFn<TreeTableEmitsOptions>;
 
 /**
- * **PrimeVue - TreeTable**
+ * **Rose Spectacles - TreeTable**
  *
  * _TreeTable is used to display hierarchical data in tabular format._
  *
- * [Live Demo](https://openvue.dev/treetable/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

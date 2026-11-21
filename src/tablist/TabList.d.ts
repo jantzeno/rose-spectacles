@@ -2,7 +2,6 @@
  *
  * TabList is a helper component for Tabs component.
  *
- * [Live Demo](https://openvue.dev/tabs/)
  *
  * @module tablist
  *
@@ -131,13 +130,10 @@ export interface TabListEmitsOptions {}
 export declare type TabListEmits = EmitFn<TabListEmitsOptions>;
 
 /**
- * **PrimeVue - TabList**
+ * **Rose Spectacles - TabList**
  *
  * _TabList is a helper component for Tabs component._
  *
- * [Live Demo](https://openvue.dev/tabs/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

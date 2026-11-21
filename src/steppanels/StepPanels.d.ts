@@ -2,7 +2,6 @@
  *
  * StepPanels is a helper component for Stepper component.
  *
- * [Live Demo](https://openvue.dev/stepper/)
  *
  * @module steppanels
  *
@@ -100,13 +99,10 @@ export interface StepPanelsEmitsOptions {}
 export declare type StepPanelsEmits = EmitFn<StepPanelsEmitsOptions>;
 
 /**
- * **PrimeVue - StepPanels**
+ * **Rose Spectacles - StepPanels**
  *
  * _StepPanels is a helper component for Stepper component._
  *
- * [Live Demo](https://openvue.dev/stepper/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

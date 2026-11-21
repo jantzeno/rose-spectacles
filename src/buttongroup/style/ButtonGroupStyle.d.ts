@@ -2,7 +2,6 @@
  *
  * A set of Buttons can be displayed together using the ButtonGroup component.
  *
- * [Live Demo](https://openvue.dev/button/)
  *
  * @module buttongroupstyle
  *

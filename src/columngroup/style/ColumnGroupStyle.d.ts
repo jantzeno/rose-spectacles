@@ -3,7 +3,6 @@
  * Columns can be grouped at header and footer sections by defining a ColumnGroup component.
  * It is a helper component for DataTable.
  *
- * [Live Demo](https://openvue.dev/datatable/)
  *
  * @module columngroupstyle
  *

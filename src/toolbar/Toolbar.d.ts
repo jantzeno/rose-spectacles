@@ -2,7 +2,6 @@
  *
  * Toolbar is a grouping component for buttons and other content.
  *
- * [Live Demo](https://openvue.dev/toolbar/)
  *
  * @module toolbar
  *
@@ -136,13 +135,10 @@ export interface ToolbarEmitsOptions {}
 export declare type ToolbarEmits = EmitFn<ToolbarEmitsOptions>;
 
 /**
- * **PrimeVue - Toolbar**
+ * **Rose Spectacles - Toolbar**
  *
  * _Toolbar is a grouping component for buttons and other content._
  *
- * [Live Demo](https://openvue.dev/toolbar/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

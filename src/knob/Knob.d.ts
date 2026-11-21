@@ -2,7 +2,6 @@
  *
  * Knob is a form component to define number inputs with a dial.
  *
- * [Live Demo](https://openvue.dev/knob/)
  *
  * @module knob
  *
@@ -264,13 +263,10 @@ export interface KnobEmitsOptions {
 export declare type KnobEmits = EmitFn<KnobEmitsOptions>;
 
 /**
- * **PrimeVue - Knob**
+ * **Rose Spectacles - Knob**
  *
  * _Knob groups a collection of contents in tabs._
  *
- * [Live Demo](https://openvue.dev/knob/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

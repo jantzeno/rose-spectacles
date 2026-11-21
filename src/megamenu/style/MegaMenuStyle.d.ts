@@ -2,7 +2,6 @@
  *
  * MegaMenu is navigation component that displays submenus together.
  *
- * [Live Demo](https://openvue.dev/megamenu/)
  *
  * @module megamenustyle
  *

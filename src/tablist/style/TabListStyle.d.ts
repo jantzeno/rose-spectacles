@@ -2,7 +2,6 @@
  *
  * TabList is a helper component for Tabs component.
  *
- * [Live Demo](https://openvue.dev/tabs/)
  *
  * @module tabliststyle
  *

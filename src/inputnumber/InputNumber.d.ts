@@ -2,7 +2,6 @@
  *
  * InputNumber is an input component to provide numerical input.
  *
- * [Live Demo](https://openvue.dev/inputnumber/)
  *
  * @module inputnumber
  *
@@ -523,13 +522,10 @@ export interface InputNumberMethods {
 }
 
 /**
- * **PrimeVue - InputNumber**
+ * **Rose Spectacles - InputNumber**
  *
  * _InputNumber is an input component to provide numerical input._
  *
- * [Live Demo](https://openvue.dev/inputnumber/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

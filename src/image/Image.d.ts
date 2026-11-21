@@ -2,7 +2,6 @@
  *
  * Displays an image with preview and tranformation options. For multiple image, see Galleria.
  *
- * [Live Demo](https://openvue.dev/image/)
  *
  * @module image
  *
@@ -343,13 +342,10 @@ export declare type ImageEmits = EmitFn<ImageEmitsOptions>;
 export interface ImageMethods {}
 
 /**
- * **PrimeVue - Image**
+ * **Rose Spectacles - Image**
  *
  * _Displays an image with preview and tranformation options. For multiple image, see Galleria._
  *
- * [Live Demo](https://openvue.dev/image/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

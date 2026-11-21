@@ -2,7 +2,6 @@
  *
  * ScrollPanel is a cross browser, lightweight and themable alternative to native browser scrollbar.
  *
- * [Live Demo](https://openvue.dev/scrollpanel/)
  *
  * @module scrollpanelstyle
  *

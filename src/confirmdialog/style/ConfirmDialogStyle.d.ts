@@ -2,7 +2,6 @@
  *
  * ConfirmDialog uses a Dialog UI with confirmDialog method or <ConfirmDialog> tag.
  *
- * [Live Demo](https://openvue.dev/confirmdialog)
  *
  * @module confirmdialogstyle
  *

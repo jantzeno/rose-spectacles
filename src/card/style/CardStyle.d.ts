@@ -2,7 +2,6 @@
  *
  * Card is a flexible container component.
  *
- * [Live Demo](https://openvue.dev/card/)
  *
  * @module cardstyle
  *

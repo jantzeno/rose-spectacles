@@ -2,7 +2,6 @@
  *
  * AutoComplete is an input component that provides real-time suggestions while being typed.
  *
- * [Live Demo](https://openvue.dev/autocomplete/)
  *
  * @module autocomplete
  *
@@ -892,13 +891,10 @@ export interface AutoCompleteEmitsOptions {
 export declare type AutoCompleteEmits = EmitFn<AutoCompleteEmitsOptions>;
 
 /**
- * **PrimeVue - AutoComplete**
+ * **Rose Spectacles - AutoComplete**
  *
  * _AutoComplete is an input component that provides real-time suggestions while being typed._
  *
- * [Live Demo](https://openvue.dev/autocomplete/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

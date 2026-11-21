@@ -2,7 +2,6 @@
  *
  * StepList is a helper component for Stepper component.
  *
- * [Live Demo](https://openvue.dev/stepper/)
  *
  * @module steplist
  *
@@ -100,13 +99,10 @@ export interface StepListEmitsOptions {}
 export declare type StepListEmits = EmitFn<StepListEmitsOptions>;
 
 /**
- * **PrimeVue - StepList**
+ * **Rose Spectacles - StepList**
  *
  * _StepList is a helper component for Stepper component._
  *
- * [Live Demo](https://openvue.dev/stepper/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

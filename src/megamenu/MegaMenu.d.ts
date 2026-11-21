@@ -2,7 +2,6 @@
  *
  * MegaMenu is navigation component that displays submenus together.
  *
- * [Live Demo](https://openvue.dev/megamenu/)
  *
  * @module megamenu
  *
@@ -401,13 +400,10 @@ export interface MegaMenuEmitsOptions {
 export declare type MegaMenuEmits = EmitFn<MegaMenuEmitsOptions>;
 
 /**
- * **PrimeVue - MegaMenu**
+ * **Rose Spectacles - MegaMenu**
  *
  * _MegaMenu is navigation component that displays submenus together._
  *
- * [Live Demo](https://openvue.dev/megamenu/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

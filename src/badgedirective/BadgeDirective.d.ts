@@ -2,7 +2,6 @@
  *
  * Badge directive is a small status indicator for another element.
  *
- * [Live Demo](https://openvue.dev/badge)
  *
  * @module badgedirective
  */
@@ -160,13 +159,10 @@ export interface BadgeDirectiveBinding extends Omit<DirectiveBinding, 'modifiers
 }
 
 /**
- * **PrimeVue - Badge**
+ * **Rose Spectacles - Badge**
  *
  * _Badge directive provides advisory information for a component._
  *
- * [Live Demo](https://openvue.dev/badge/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  */
 declare const BadgeDirective: ObjectDirective;

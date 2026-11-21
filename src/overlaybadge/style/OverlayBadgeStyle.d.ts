@@ -2,7 +2,6 @@
  *
  * OverlayBadge wraps an input and an icon.
  *
- * [Live Demo](https://openvue.dev/badge/)
  *
  * @module overlaybadgestyle
  *

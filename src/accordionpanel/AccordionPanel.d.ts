@@ -2,7 +2,6 @@
  *
  * AccordionPanel is a helper component for Accordion component.
  *
- * [Live Demo](https://openvue.dev/accordion/)
  *
  * @module accordionpanel
  *
@@ -130,13 +129,10 @@ export interface AccordionPanelEmitsOptions {}
 export declare type AccordionPanelEmits = EmitFn<AccordionPanelEmitsOptions>;
 
 /**
- * **PrimeVue - AccordionPanel**
+ * **Rose Spectacles - AccordionPanel**
  *
  * _AccordionPanel is a helper component for Accordion component._
  *
- * [Live Demo](https://openvue.dev/accordion/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

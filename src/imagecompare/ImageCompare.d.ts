@@ -2,7 +2,6 @@
  *
  * ImageCompare compares two images side by side with a slider.
  *
- * [Live Demo](https://openvue.dev/imagecompare)
  *
  * @module imagecompare
  *
@@ -132,13 +131,10 @@ export interface ImageCompareEmitsOptions {}
 export declare type ImageCompareEmits = EmitFn<ImageCompareEmitsOptions>;
 
 /**
- * **PrimeVue - ImageCompare**
+ * **Rose Spectacles - ImageCompare**
  *
  * _ImageCompare compares two images side by side with a slider._
  *
- * [Live Demo](https://openvue.dev/imagecompare/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

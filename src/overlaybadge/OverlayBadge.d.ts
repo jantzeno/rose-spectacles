@@ -2,7 +2,6 @@
  *
  * OverlayBadge represents people using icon, label, image and badge.
  *
- * [Live Demo](https://openvue.dev/badge)
  *
  * @module overlaybadge
  *
@@ -135,13 +134,10 @@ export interface OverlayBadgeEmitsOptions {}
 export declare type OverlayBadgeEmits = EmitFn<OverlayBadgeEmitsOptions>;
 
 /**
- * **PrimeVue - OverlayBadge**
+ * **Rose Spectacles - OverlayBadge**
  *
  * _OverlayBadge represents people using icon, label, image and badge._
  *
- * [Live Demo](https://openvue.dev/badge/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

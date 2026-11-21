@@ -2,7 +2,6 @@
  *
  * ScrollTop gets displayed after a certain scroll position and used to navigates to the top of the page quickly.
  *
- * [Live Demo](https://openvue.dev/scrolltop/)
  *
  * @module scrolltopstyle
  *

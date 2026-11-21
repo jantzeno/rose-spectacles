@@ -2,7 +2,6 @@
  *
  * CheckboxGroup is a component that groups multiple checkboxes, allowing users to select one or more options.
  *
- * [Live Demo](https://openvue.dev/checkbox/)
  *
  * @module checkboxgroupstyle
  *

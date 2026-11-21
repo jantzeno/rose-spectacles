@@ -2,7 +2,6 @@
  *
  * Password displays strength indicator for password fields.
  *
- * [Live Demo](https://openvue.dev/password/)
  *
  * @module password
  *
@@ -487,13 +486,10 @@ export interface PasswordEmitsOptions {
 export declare type PasswordEmits = EmitFn<PasswordEmitsOptions>;
 
 /**
- * **PrimeVue - Password**
+ * **Rose Spectacles - Password**
  *
  * _Password displays strength indicator for password fields._
  *
- * [Live Demo](https://openvue.dev/password/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

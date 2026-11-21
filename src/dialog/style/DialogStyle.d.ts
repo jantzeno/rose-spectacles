@@ -2,7 +2,6 @@
  *
  * Dialog is a container to display content in an overlay window.
  *
- * [Live Demo](https://openvue.dev/dialog)
  *
  * @module dialogstyle
  *

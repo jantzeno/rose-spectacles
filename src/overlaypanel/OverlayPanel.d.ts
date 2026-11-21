@@ -2,7 +2,6 @@
  *
  * OverlayPanel is a container component positioned as connected to its target.
  *
- * [Live Demo](https://openvue.dev/popover)
  *
  * @module overlaypanel
  *
@@ -88,13 +87,10 @@ export interface OverlayPanelMethods {
 /**
  * @deprecated since v4. Use Popover component instead.
  *
- * **PrimeVue - OverlayPanel**
+ * **Rose Spectacles - OverlayPanel**
  *
  * _OverlayPanel, also known as Popover, is a container component that can overlay other components on page._
  *
- * [Live Demo](https://openvue.dev/popover/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

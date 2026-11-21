@@ -2,7 +2,6 @@
  *
  * Ripple directive adds ripple effect to the host element.
  *
- * [Live Demo](https://openvue.dev/ripple)
  *
  * @module ripplestyle
  *

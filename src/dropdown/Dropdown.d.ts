@@ -2,7 +2,6 @@
  *
  * Dropdown also known as Select, is used to choose an item from a collection of options.
  *
- * [Live Demo](https://openvue.dev/select/)
  *
  * @module dropdown
  *
@@ -86,13 +85,10 @@ export interface DropdownMethods {
 /**
  * @deprecated since v4. Use Select component instead.
  *
- * **PrimeVue - Dropdown**
+ * **Rose Spectacles - Dropdown**
  *
  * _Dropdown also known as Select, is used to choose an item from a collection of options._
  *
- * [Live Demo](https://openvue.dev/select/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

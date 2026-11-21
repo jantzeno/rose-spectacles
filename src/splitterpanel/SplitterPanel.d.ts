@@ -2,7 +2,6 @@
  *
  * SplitterPanel is a helper component for Splitter component.
  *
- * [Live Demo](https://openvue.dev/splitter/)
  *
  * @module splitterpanel
  *
@@ -130,13 +129,10 @@ export interface SplitterPanelEmitsOptions {}
 export declare type SplitterPanelEmits = EmitFn<SplitterPanelEmitsOptions>;
 
 /**
- * **PrimeVue - SplitterPanel**
+ * **Rose Spectacles - SplitterPanel**
  *
  * _SplitterPanel is a helper component for Splitter component._
  *
- * [Live Demo](https://openvue.dev/splitterpanel/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

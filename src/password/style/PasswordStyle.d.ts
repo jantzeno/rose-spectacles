@@ -2,7 +2,6 @@
  *
  * Password displays strength indicator for password fields.
  *
- * [Live Demo](https://openvue.dev/password/)
  *
  * @module passwordstyle
  *

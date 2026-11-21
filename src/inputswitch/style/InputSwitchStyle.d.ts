@@ -2,7 +2,6 @@
  *
  * InputSwitch is used to select a boolean value.
  *
- * [Live Demo](https://openvue.dev/toggleswitch/)
  *
  * @module inputswitchstyle
  *

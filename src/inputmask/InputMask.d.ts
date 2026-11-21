@@ -2,7 +2,6 @@
  *
  * InputMask component is used to enter input in a certain format such as numeric, date, currency, email and phone.
  *
- * [Live Demo](https://openvue.dev/inputmask/)
  *
  * @module inputmask
  *
@@ -249,13 +248,10 @@ export interface InputMaskEmitsOptions {
 export declare type InputMaskEmits = EmitFn<InputMaskEmitsOptions>;
 
 /**
- * **PrimeVue - InputMask**
+ * **Rose Spectacles - InputMask**
  *
  * _InputMask component is used to enter input in a certain format such as numeric, date, currency, email and phone._
  *
- * [Live Demo](https://openvue.dev/inputmask/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

@@ -2,7 +2,6 @@
  *
  * Divider is used to separate contents.
  *
- * [Live Demo](https://openvue.dev/divider)
  *
  * @module divider
  *
@@ -126,13 +125,10 @@ export interface DividerEmitsOptions {}
 export declare type DividerEmits = EmitFn<DividerEmitsOptions>;
 
 /**
- * **PrimeVue - Divider**
+ * **Rose Spectacles - Divider**
  *
  * _Divider is used to separate contents._
  *
- * [Live Demo](https://openvue.dev/divider)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

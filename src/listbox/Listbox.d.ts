@@ -2,7 +2,6 @@
  *
  * ListBox is used to select one or more values from a list of items.
  *
- * [Live Demo](https://openvue.dev/listbox/)
  *
  * @module listbox
  *
@@ -630,13 +629,10 @@ export interface ListboxEmitsOptions {
 export declare type ListboxEmits = EmitFn<ListboxEmitsOptions>;
 
 /**
- * **PrimeVue - Listbox**
+ * **Rose Spectacles - Listbox**
  *
  * _ListBox is used to select one or more values from a list of items._
  *
- * [Live Demo](https://openvue.dev/listbox/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *

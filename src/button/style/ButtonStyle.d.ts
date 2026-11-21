@@ -2,7 +2,6 @@
  *
  * Button is an extension to standard button element with icons and theming.
  *
- * [Live Demo](https://openvue.dev/button/)
  *
  * @module buttonstyle
  *

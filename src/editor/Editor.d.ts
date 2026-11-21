@@ -2,7 +2,6 @@
  *
  * Editor groups a collection of contents in tabs.
  *
- * [Live Demo](https://openvue.dev/editor/)
  *
  * @module editor
  *
@@ -310,13 +309,10 @@ export interface EditorEmitsOptions {
 export declare type EditorEmits = EmitFn<EditorEmitsOptions>;
 
 /**
- * **PrimeVue - Editor**
+ * **Rose Spectacles - Editor**
  *
  * _Editor groups a collection of contents in tabs._
  *
- * [Live Demo](https://openvue.dev/editor/)
- * --- ---
- * ![Rose Spectacles](https://primefaces.org/cdn/primevue/images/logo-100.png)
  *
  * @group Component
  *
