@@ -23,13 +23,30 @@
     />
 </template>
 
-<script>
+<script lang="ts">
 import { getUserAgent } from '../internal/utils/dom/index';
 import InputText from '../inputtext/InputText.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 import BaseInputMask from './BaseInputMask.vue';
 
-export default {
+interface LegacyTextRange {
+    collapse(toStart: boolean): void;
+    duplicate(): LegacyTextRange;
+    moveStart(unit: string, count: number): number;
+    moveEnd(unit: string, count: number): number;
+    select(): void;
+    text: string;
+}
+
+type MaskInput = Omit<HTMLInputElement, 'setSelectionRange'> & {
+    setSelectionRange?: HTMLInputElement['setSelectionRange'];
+    createTextRange?: () => LegacyTextRange;
+};
+type SelectionDocument = Document & { selection?: { createRange(): LegacyTextRange } };
+
+const maskDefinitions: Readonly<Record<string, string>> = { '9': '[0-9]', a: '[A-Za-z]', '*': '[A-Za-z0-9]' };
+
+export default defineComponent({
     name: 'InputMask',
     extends: BaseInputMask,
     inheritAttrs: false,
@@ -39,7 +56,17 @@ export default {
     },
     data() {
         return {
-            currentVal: ''
+            currentVal: '',
+            focusText: '',
+            oldVal: '',
+            androidChrome: false,
+            tests: [] as (RegExp | null)[],
+            buffer: [] as string[],
+            partialPosition: 0,
+            len: 0,
+            firstNonMaskPos: null as number | null,
+            lastRequiredNonMaskPos: -1,
+            defaultBuffer: ''
         };
     },
     watch: {
@@ -63,35 +90,34 @@ export default {
         }
     },
     methods: {
-        onInput(event) {
+        onInput(event: Event) {
             // Check if the event is part of a text composition process (e.g., for Asian languages).
             // If event.isComposing is true, it means the user is still composing text and the input is not finalized.
-            if (!event.isComposing) {
+            if (!('isComposing' in event) || !event.isComposing) {
                 if (this.androidChrome) this.handleAndroidInput(event);
                 else this.handleInputChange(event);
 
-                this.updateModelValue(event.target.value);
+                this.updateModelValue(this.inputElement.value);
             }
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             if (this.readonly) {
                 return;
             }
 
-            this.focus = true;
-            this.focusText = this.$el.value;
+            this.focusText = this.inputElement.value;
 
-            if (!this.$el.value || this.$el.value === this.defaultBuffer) {
+            if (!this.inputElement.value || this.inputElement.value === this.defaultBuffer) {
                 requestAnimationFrame(() => {
-                    if (this.$el === document.activeElement) {
+                    if (this.inputElement === document.activeElement) {
                         this.caret(0, 0);
                     }
                 });
             } else {
                 let pos = this.checkVal();
 
-                this.caretTimeoutId = setTimeout(() => {
-                    if (this.$el !== document.activeElement) {
+                setTimeout(() => {
+                    if (this.inputElement !== document.activeElement) {
                         return;
                     }
 
@@ -107,22 +133,21 @@ export default {
 
             this.$emit('focus', event);
         },
-        onBlur(event) {
-            this.focus = false;
+        onBlur(event: FocusEvent) {
             this.checkVal();
-            this.updateModelValue(event.target.value);
+            this.updateModelValue(this.inputElement.value);
 
-            if (this.$el.value !== this.focusText) {
+            if (this.inputElement.value !== this.focusText) {
                 let e = document.createEvent('HTMLEvents');
 
                 e.initEvent('change', true, false);
-                this.$el.dispatchEvent(e);
+                this.inputElement.dispatchEvent(e);
             }
 
             this.$emit('blur', event);
             this.formField.onBlur?.(event);
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (this.readonly) {
                 return;
             }
@@ -133,11 +158,13 @@ export default {
                 end;
             let iPhone = /iphone/i.test(getUserAgent());
 
-            this.oldVal = this.$el.value;
+            this.oldVal = this.inputElement.value;
 
             //backspace, delete, and escape get special treatment
             if (k === 'Backspace' || k === 'Delete' || (iPhone && k === 'Escape')) {
                 pos = this.caret();
+                if (!pos) return;
+
                 begin = pos.begin;
                 end = pos.end;
 
@@ -148,24 +175,24 @@ export default {
 
                 this.clearBuffer(begin, end);
                 this.shiftL(begin, end - 1);
-                this.updateModelValue(event.target.value);
+                this.updateModelValue(this.inputElement.value);
 
                 event.preventDefault();
             } else if (k === 'Enter') {
                 // enter
-                this.$el.blur();
-                this.updateModelValue(event.target.value);
+                this.inputElement.blur();
+                this.updateModelValue(this.inputElement.value);
             } else if (k === 'Escape') {
                 // escape
-                this.$el.value = this.focusText;
+                this.inputElement.value = this.focusText;
                 this.caret(0, this.checkVal());
-                this.updateModelValue(event.target.value);
+                this.updateModelValue(this.inputElement.value);
                 event.preventDefault();
             }
 
             this.$emit('keydown', event);
         },
-        onKeyPress(event) {
+        onKeyPress(event: KeyboardEvent) {
             if (this.readonly) {
                 return;
             }
@@ -174,13 +201,12 @@ export default {
                 pos = this.caret(),
                 p,
                 c,
-                next,
                 completed;
 
             if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey || event.key === 'CapsLock' || event.key === 'Escape' || event.key === 'Tab') {
                 //Ignore
                 return;
-            } else if (k && k !== 'Enter') {
+            } else if (pos && k && k !== 'Enter') {
                 if (pos.end - pos.begin !== 0) {
                     this.clearBuffer(pos.begin, pos.end);
                     this.shiftL(pos.begin, pos.end - 1);
@@ -191,12 +217,12 @@ export default {
                 if (p < this.len) {
                     c = event.key;
 
-                    if (this.tests[p].test(c)) {
+                    if (this.tests[p]?.test(c)) {
                         this.shiftR(p);
 
                         this.buffer[p] = c;
                         this.writeBuffer();
-                        next = this.seekNext(p);
+                        const next = this.seekNext(p);
 
                         if (/android/i.test(getUserAgent())) {
                             //Path for CSP Violation on FireFox OS 1.1
@@ -218,7 +244,7 @@ export default {
                 event.preventDefault();
             }
 
-            this.updateModelValue(event.target.value);
+            this.updateModelValue(this.inputElement.value);
 
             if (completed) {
                 this.$emit('complete', event);
@@ -226,15 +252,15 @@ export default {
 
             this.$emit('keypress', event);
         },
-        onPaste(event) {
+        onPaste(event: ClipboardEvent) {
             this.handleInputChange(event);
 
             this.$emit('paste', event);
         },
-        caret(first, last) {
+        caret(first?: number, last?: number) {
             let range, begin, end;
 
-            if (!this.$el.offsetParent || this.$el !== document.activeElement) {
+            if (!this.inputElement.offsetParent || this.inputElement !== document.activeElement) {
                 return;
             }
 
@@ -242,21 +268,23 @@ export default {
                 begin = first;
                 end = typeof last === 'number' ? last : begin;
 
-                if (this.$el.setSelectionRange) {
-                    this.$el.setSelectionRange(begin, end);
-                } else if (this.$el['createTextRange']) {
-                    range = this.$el['createTextRange']();
+                if (this.inputElement.setSelectionRange) {
+                    this.inputElement.setSelectionRange(begin, end);
+                } else if (this.inputElement.createTextRange) {
+                    range = this.inputElement.createTextRange();
                     range.collapse(true);
                     range.moveEnd('character', end);
                     range.moveStart('character', begin);
                     range.select();
                 }
             } else {
-                if (this.$el.setSelectionRange) {
-                    begin = this.$el.selectionStart;
-                    end = this.$el.selectionEnd;
-                } else if (document['selection'] && document['selection'].createRange) {
-                    range = document['selection'].createRange();
+                if (this.inputElement.setSelectionRange) {
+                    begin = this.inputElement.selectionStart ?? 0;
+                    end = this.inputElement.selectionEnd ?? begin;
+                } else {
+                    range = (document as SelectionDocument).selection?.createRange();
+                    if (!range) return;
+
                     begin = 0 - range.duplicate().moveStart('character', -100000);
                     end = begin + range.text.length;
                 }
@@ -265,7 +293,7 @@ export default {
             }
         },
         isCompleted() {
-            for (let i = this.firstNonMaskPos; i <= this.lastRequiredNonMaskPos; i++) {
+            for (let i = this.firstNonMaskPos ?? 0; i <= this.lastRequiredNonMaskPos; i++) {
                 if (this.tests[i] && this.buffer[i] === this.getPlaceholder(i)) {
                     return false;
                 }
@@ -273,24 +301,24 @@ export default {
 
             return true;
         },
-        getPlaceholder(i) {
+        getPlaceholder(i: number) {
             if (i < this.slotChar.length) {
                 return this.slotChar.charAt(i);
             }
 
             return this.slotChar.charAt(0);
         },
-        seekNext(pos) {
+        seekNext(pos: number) {
             while (++pos < this.len && !this.tests[pos]);
 
             return pos;
         },
-        seekPrev(pos) {
+        seekPrev(pos: number) {
             while (--pos >= 0 && !this.tests[pos]);
 
             return pos;
         },
-        shiftL(begin, end) {
+        shiftL(begin: number, end: number) {
             let i, j;
 
             if (begin < 0) {
@@ -299,7 +327,7 @@ export default {
 
             for (i = begin, j = this.seekNext(end); i < this.len; i++) {
                 if (this.tests[i]) {
-                    if (j < this.len && this.tests[i].test(this.buffer[j])) {
+                    if (j < this.len && this.tests[i]?.test(this.buffer[j])) {
                         this.buffer[i] = this.buffer[j];
                         this.buffer[j] = this.getPlaceholder(j);
                     } else {
@@ -311,9 +339,9 @@ export default {
             }
 
             this.writeBuffer();
-            this.caret(Math.max(this.firstNonMaskPos, begin));
+            this.caret(Math.max(this.firstNonMaskPos ?? 0, begin));
         },
-        shiftR(pos) {
+        shiftR(pos: number) {
             let i, c, j, t;
 
             for (i = pos, c = this.getPlaceholder(pos); i < this.len; i++) {
@@ -322,7 +350,7 @@ export default {
                     t = this.buffer[i];
                     this.buffer[i] = c;
 
-                    if (j < this.len && this.tests[j].test(t)) {
+                    if (j < this.len && this.tests[j]?.test(t)) {
                         c = t;
                     } else {
                         break;
@@ -330,9 +358,9 @@ export default {
                 }
             }
         },
-        handleAndroidInput(event) {
-            var curVal = this.$el.value;
-            var pos = this.caret();
+        handleAndroidInput(event: Event) {
+            var curVal = this.inputElement.value;
+            var pos = this.caret() ?? { begin: 0, end: 0 };
 
             if (this.oldVal && this.oldVal.length && this.oldVal.length > curVal.length) {
                 // a deletion or backspace happened
@@ -340,7 +368,7 @@ export default {
                 while (pos.begin > 0 && !this.tests[pos.begin - 1]) pos.begin--;
 
                 if (pos.begin === 0) {
-                    while (pos.begin < this.firstNonMaskPos && !this.tests[pos.begin]) pos.begin++;
+                    while (pos.begin < (this.firstNonMaskPos ?? 0) && !this.tests[pos.begin]) pos.begin++;
                 }
 
                 this.caret(pos.begin, pos.begin);
@@ -355,7 +383,7 @@ export default {
                 this.$emit('complete', event);
             }
         },
-        clearBuffer(start, end) {
+        clearBuffer(start: number, end: number) {
             let i;
 
             for (i = start; i < end && i < this.len; i++) {
@@ -365,12 +393,11 @@ export default {
             }
         },
         writeBuffer() {
-            this.$el.value = this.buffer.join('');
+            this.inputElement.value = this.buffer.join('');
         },
-        checkVal(allow) {
-            this.isValueChecked = true;
+        checkVal(allow = false) {
             //try to place characters where they belong
-            let test = this.$el.value,
+            let test = this.inputElement.value,
                 lastMatch = -1,
                 i,
                 c,
@@ -383,7 +410,7 @@ export default {
                     while (pos++ < test.length) {
                         c = test.charAt(pos - 1);
 
-                        if (this.tests[i].test(c)) {
+                        if (this.tests[i]?.test(c)) {
                             this.buffer[i] = c;
                             lastMatch = i;
                             break;
@@ -411,7 +438,7 @@ export default {
                 if (this.autoClear || this.buffer.join('') === this.defaultBuffer) {
                     // Invalid value. Remove it and replace it with the
                     // mask, which is the default behavior.
-                    if (this.$el.value) this.$el.value = '';
+                    if (this.inputElement.value) this.inputElement.value = '';
                     this.clearBuffer(0, this.len);
                 } else {
                     // Invalid value, but we opt to show the value to the
@@ -420,12 +447,12 @@ export default {
                 }
             } else {
                 this.writeBuffer();
-                this.$el.value = this.$el.value.substring(0, lastMatch + 1);
+                this.inputElement.value = this.inputElement.value.substring(0, lastMatch + 1);
             }
 
-            return this.partialPosition ? i : this.firstNonMaskPos;
+            return this.partialPosition ? i : (this.firstNonMaskPos ?? 0);
         },
-        handleInputChange(event) {
+        handleInputChange(event: Event) {
             const isPasteEvent = event.type === 'paste';
 
             if (this.readonly || isPasteEvent) {
@@ -435,7 +462,7 @@ export default {
             var pos = this.checkVal(true);
 
             this.caret(pos);
-            this.updateModelValue(event.target.value);
+            this.updateModelValue(this.inputElement.value);
 
             if (this.isCompleted()) {
                 this.$emit('complete', event);
@@ -454,7 +481,7 @@ export default {
 
             return unmaskedBuffer.join('');
         },
-        unmaskValue(value) {
+        unmaskValue(value: string) {
             let unmaskedBuffer = [];
             let thisbuffer = value.split('');
 
@@ -468,7 +495,7 @@ export default {
 
             return unmaskedBuffer.join('');
         },
-        updateModelValue(value) {
+        updateModelValue(value: string) {
             if (this.currentVal === value) return;
             const val = this.unmask ? this.getUnmaskedValue() : value;
 
@@ -477,26 +504,26 @@ export default {
             this.writeValue(this.defaultBuffer !== val ? val : '');
         },
         updateValue(updateModel = true) {
-            if (this.$el) {
+            if (this.inputElement) {
                 if (this.d_value == null) {
-                    this.$el.value = '';
+                    this.inputElement.value = '';
                     this.clearBuffer(0, this.len);
                     updateModel && this.updateModelValue('');
                 } else {
-                    this.$el.value = this.d_value;
+                    this.inputElement.value = String(this.d_value);
                     this.checkVal();
 
                     setTimeout(() => {
-                        if (this.$el) {
+                        if (this.inputElement) {
                             this.writeBuffer();
                             this.checkVal();
 
-                            if (updateModel) this.updateModelValue(this.$el.value);
+                            if (updateModel) this.updateModelValue(this.inputElement.value);
                         }
                     }, 10);
                 }
 
-                this.focusText = this.$el.value;
+                this.focusText = this.inputElement.value;
             }
         },
         initMask() {
@@ -504,11 +531,6 @@ export default {
             this.partialPosition = this.mask ? this.mask.length : 0;
             this.len = this.mask ? this.mask.length : 0;
             this.firstNonMaskPos = null;
-            this.defs = {
-                9: '[0-9]',
-                a: '[A-Za-z]',
-                '*': '[A-Za-z0-9]'
-            };
 
             let ua = getUserAgent();
 
@@ -522,8 +544,8 @@ export default {
                 if (c === '?') {
                     this.len--;
                     this.partialPosition = i;
-                } else if (this.defs[c]) {
-                    this.tests.push(new RegExp(this.defs[c]));
+                } else if (maskDefinitions[c]) {
+                    this.tests.push(new RegExp(maskDefinitions[c]));
 
                     if (this.firstNonMaskPos === null) {
                         this.firstNonMaskPos = this.tests.length - 1;
@@ -543,7 +565,7 @@ export default {
                 let c = maskTokens[i];
 
                 if (c !== '?') {
-                    if (this.defs[c]) this.buffer.push(this.getPlaceholder(i));
+                    if (maskDefinitions[c]) this.buffer.push(this.getPlaceholder(i));
                     else this.buffer.push(c);
                 }
             }
@@ -552,10 +574,15 @@ export default {
             this.updateValue(false);
         },
         isValueUpdated() {
-            return this.unmask ? this.d_value != this.getUnmaskedValue() : this.defaultBuffer !== this.$el.value && this.$el.value !== this.d_value;
+            return this.unmask
+                ? this.d_value != this.getUnmaskedValue()
+                : this.defaultBuffer !== this.inputElement.value && this.inputElement.value !== this.d_value;
         }
     },
     computed: {
+        inputElement(): MaskInput {
+            return this.$el as MaskInput;
+        },
         inputClass() {
             return [this.cx('root'), this.class];
         },
@@ -575,5 +602,5 @@ export default {
     components: {
         InputText
     }
-};
+});
 </script>
