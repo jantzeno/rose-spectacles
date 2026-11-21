@@ -78,6 +78,11 @@ export default {
         }
     },
     beforeUnmount() {
+        if (this.isXBarClicked || this.isYBarClicked) {
+            this.onDocumentMouseUp();
+        }
+
+        this.clearTimer();
         this.unbindDocumentResizeListener();
 
         if (this.frame) {

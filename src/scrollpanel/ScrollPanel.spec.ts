@@ -29,6 +29,10 @@ describe('ScrollPanel.vue', () => {
         wrapper.element.setAttribute('height', '200px');
     });
 
+    afterEach(() => {
+        if (wrapper.exists()) wrapper.unmount();
+    });
+
     it('should exist', () => {
         expect(wrapper.find('.rs-scrollpanel.rs-component').exists()).toBe(true);
     });
@@ -47,5 +51,18 @@ describe('ScrollPanel.vue', () => {
         await wrapper.vm.onXBarMouseDown(event);
 
         expect(wrapper.find('.rs-scrollpanel-bar-x').classes()).toContain('rs-scrollpanel-grabbed');
+    });
+
+    it('releases the vertical scrollbar drag if the panel unmounts before mouseup', async () => {
+        const move = vi.spyOn(wrapper.vm, 'onDocumentMouseMove');
+
+        await wrapper.get('.rs-scrollpanel-bar-y').trigger('mousedown');
+        expect(document.body.getAttribute('data-p-scrollpanel-grabbed')).toBe('true');
+
+        wrapper.unmount();
+        document.dispatchEvent(new MouseEvent('mousemove'));
+
+        expect(move).not.toHaveBeenCalled();
+        expect(document.body.getAttribute('data-p-scrollpanel-grabbed')).toBe('false');
     });
 });
