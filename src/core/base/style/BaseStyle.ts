@@ -59,7 +59,15 @@ const baseStyle = {
     load(style?: CssValue, options: StyleOptions = {}, transform: (css?: string) => string | undefined = (css) => css): Partial<ReturnType<typeof useStyle>> {
         const computedStyle = transform(Css`${style}`);
 
-        return isNotEmpty(computedStyle) ? useStyle(minifyCSS(computedStyle) ?? '', { name: this.name, ...options }) : {};
+        if (!isNotEmpty(computedStyle)) return {};
+
+        const styleTag = useStyle(minifyCSS(computedStyle) ?? '', { name: this.name, ...options, manual: true });
+        const { immediate = true, manual } = options;
+
+        // A component can unmount before its mounted hooks run, but the shared stylesheet is still needed.
+        if (immediate && !manual) styleTag.load();
+
+        return styleTag;
     },
     loadCSS(options: StyleOptions = {}) {
         return this.load(this.css, options);
