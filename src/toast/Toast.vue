@@ -49,7 +49,8 @@ export default defineComponent({
     data() {
         return {
             messages: [] as ToastMessageOptions[],
-            styleElement: null as HTMLStyleElement | null
+            styleElement: null as HTMLStyleElement | null,
+            zIndexClearTimer: undefined as ReturnType<typeof setTimeout> | undefined
         };
     },
     mounted() {
@@ -64,6 +65,7 @@ export default defineComponent({
     },
     beforeUnmount() {
         this.destroyStyle();
+        this.cancelZIndexClear();
 
         if (this.$refs.container && this.autoZIndex) {
             ZIndex.clear(this.$refs.container as HTMLElement);
@@ -76,6 +78,8 @@ export default defineComponent({
     },
     methods: {
         add(message: ToastMessageOptions) {
+            this.cancelZIndexClear();
+
             if (message.id == null) {
                 message.id = messageIdx++;
             }
@@ -110,15 +114,26 @@ export default defineComponent({
         },
         onEnter() {
             if (this.autoZIndex) {
-                ZIndex.set('modal', this.$refs.container as HTMLElement, this.baseZIndex || this.$primevue.config.zIndex!.modal);
+                const container = this.$refs.container as HTMLElement;
+
+                if (ZIndex.get(container)) ZIndex.clear(container);
+                ZIndex.set('modal', container, this.baseZIndex || this.$primevue.config.zIndex!.modal);
             }
         },
         onLeave() {
-            if (this.$refs.container && this.autoZIndex && isEmpty(this.messages)) {
-                setTimeout(() => {
-                    ZIndex.clear(this.$refs.container as HTMLElement);
+            const container = this.$refs.container as HTMLElement | undefined;
+
+            if (container && this.autoZIndex && isEmpty(this.messages)) {
+                this.cancelZIndexClear();
+                this.zIndexClearTimer = setTimeout(() => {
+                    this.zIndexClearTimer = undefined;
+                    if (isEmpty(this.messages)) ZIndex.clear(container);
                 }, 200);
             }
+        },
+        cancelZIndexClear() {
+            clearTimeout(this.zIndexClearTimer);
+            this.zIndexClearTimer = undefined;
         },
         createStyle() {
             if (!this.styleElement && !this.isUnstyled) {
