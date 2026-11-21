@@ -61,7 +61,7 @@ try {
     );
     const slotTypes = `
         <script setup lang="ts">
-        import { AutoComplete, Carousel, CascadeSelect, DataView, Galleria, Timeline } from 'rose-spectacles';
+        import { AutoComplete, Carousel, CascadeSelect, DataView, Galleria, InputChips, OrderList, PickList, SelectButton, Timeline, VirtualScroller } from 'rose-spectacles';
 
         const entries: { title: string }[] = [{ title: 'First entry' }];
         </script>
@@ -91,6 +91,21 @@ try {
                 <template #list="{ items }">{{ items[0].title }}</template>
                 <template #grid="{ items }">{{ items[0].title }}</template>
             </DataView>
+            <OrderList :model-value="entries">
+                <template #option="{ option }">{{ option.title }}</template>
+            </OrderList>
+            <PickList :model-value="[entries, []]">
+                <template #option="{ option }">{{ option.title }}</template>
+            </PickList>
+            <InputChips :model-value="entries">
+                <template #chip="{ value }">{{ value.title }}</template>
+            </InputChips>
+            <SelectButton :options="entries">
+                <template #option="{ option }">{{ option.title }}</template>
+            </SelectButton>
+            <VirtualScroller :items="entries" :item-size="24">
+                <template #item="{ item }">{{ item.title }}</template>
+            </VirtualScroller>
         </template>
     `;
     await write('SlotTypes.vue', slotTypes);
@@ -161,10 +176,12 @@ try {
     const diagnostics = invalidSlots.stdout + invalidSlots.stderr;
     assert.equal(invalidSlots.status, 2, diagnostics);
     const slotErrors = diagnostics.match(/SlotTypes\.vue\(\d+,\d+\): error TS2339: Property 'missingField' does not exist on type/g);
-    assert.equal(slotErrors?.length, 9, diagnostics);
-    assert.equal(diagnostics.match(/error TS\d+:/g)?.length, 9, diagnostics);
+    assert.equal(slotErrors?.length, 14, diagnostics);
+    assert.equal(diagnostics.match(/error TS\d+:/g)?.length, 14, diagnostics);
     console.log('Carousel, Galleria, and Timeline slots reject unknown item properties');
     console.log('AutoComplete, CascadeSelect, and DataView reject unknown option and item properties');
+    console.log('OrderList and PickList slots reject unknown properties on model items');
+    console.log('InputChips, SelectButton, and VirtualScroller slots reject unknown properties on their items');
 
     run(['x', '--no-install', 'vite', 'build']);
 

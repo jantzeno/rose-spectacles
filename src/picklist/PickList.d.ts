@@ -294,15 +294,15 @@ export interface PickListContext {
 /**
  * Defines valid properties in PickList component.
  */
-export interface PickListProps {
+export interface PickListProps<T = any> {
     /**
      * Value of the component as a multidimensional array.
      */
-    modelValue?: any[][] | undefined;
+    modelValue?: T[][] | undefined;
     /**
      * Selected items in the list as a multidimensional array.
      */
-    selection?: any[][] | undefined;
+    selection?: T[][] | undefined;
     /**
      * Name of the field that uniquely identifies the a record in the data.
      */
@@ -424,7 +424,7 @@ export interface PickListProps {
 /**
  * Defines valid slots in PickList component.
  */
-export interface PickListSlots {
+export interface PickListSlots<T = any> {
     /**
      * Custom header template.
      */
@@ -438,7 +438,7 @@ export interface PickListSlots {
         /**
          * Item of the component
          */
-        item: any;
+        item: T;
         /**
          * Selection state
          */
@@ -456,7 +456,7 @@ export interface PickListSlots {
         /**
          * Option of the component
          */
-        option: any;
+        option: T;
         /**
          * Selection state
          */
@@ -613,11 +613,13 @@ export declare type PickListEmits = EmitFn<PickListEmitsOptions>;
  * @group Component
  *
  */
-declare const PickList: DefineComponent<PickListProps, PickListSlots, PickListEmits>;
+declare const PickList: {
+    new <T = any>(props?: PickListProps<T>): InstanceType<DefineComponent<PickListProps<T>, PickListSlots<T>, PickListEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        PickList: DefineComponent<PickListProps, PickListSlots, PickListEmits>;
+        PickList: typeof PickList;
     }
 }
 

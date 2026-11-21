@@ -159,11 +159,11 @@ export interface InputChipsState {
 /**
  * Defines valid properties in InputChips component.
  */
-export interface InputChipsProps {
+export interface InputChipsProps<T = any> {
     /**
      * Value of the component.
      */
-    modelValue?: any[];
+    modelValue?: T[];
     /**
      * Maximum number of entries allowed.
      */
@@ -256,7 +256,7 @@ export interface InputChipsProps {
 /**
  * Defines valid slots in InputChips slots.
  */
-export interface InputChipsSlots {
+export interface InputChipsSlots<T = any> {
     /**
      * Custom chip template.
      * @param {Object} scope - chip slot's params.
@@ -265,7 +265,7 @@ export interface InputChipsSlots {
         /**
          * Value of the component
          */
-        value: any;
+        value: T;
     }): VNode[];
     /**
      * @deprecated since v4.0. Use 'chipicon' slot.
@@ -339,11 +339,13 @@ export declare type InputChipsEmits = EmitFn<InputChipsEmitsOptions>;
  * @group Component
  *
  */
-declare const InputChips: DefineComponent<InputChipsProps, InputChipsSlots, InputChipsEmits>;
+declare const InputChips: {
+    new <T = any>(props?: InputChipsProps<T>): InstanceType<DefineComponent<InputChipsProps<T>, InputChipsSlots<T>, InputChipsEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        InputChips: DefineComponent<InputChipsProps, InputChipsSlots, InputChipsEmits>;
+        InputChips: typeof InputChips;
     }
 }
 
