@@ -118,6 +118,7 @@ export default {
         }
     },
     beforeUnmount() {
+        this.unbindDocumentKeyDownListener();
         this.disableDocumentSettings();
 
         if (this.mask && this.autoZIndex) {

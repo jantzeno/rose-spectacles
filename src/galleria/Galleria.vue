@@ -65,6 +65,8 @@ export default defineComponent({
         }
     },
     beforeUnmount() {
+        this.unbindDocumentKeyDownListener();
+
         if (this.fullScreen) {
             unblockBodyScroll();
         }

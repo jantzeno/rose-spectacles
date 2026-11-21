@@ -77,6 +77,19 @@ describe('Drawer.vue', () => {
         expect(wrapper.emitted()['update:visible'].length).toBe(1);
     });
 
+    it('stops handling Escape when an open drawer unmounts', () => {
+        const hide = vi.spyOn(wrapper.vm, 'hide');
+        const pressEscape = () => document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
+
+        wrapper.vm.onEnter();
+        pressEscape();
+        expect(hide).toHaveBeenCalledTimes(1);
+
+        wrapper.unmount();
+        pressEscape();
+        expect(hide).toHaveBeenCalledTimes(1);
+    });
+
     it('When keydown is triggered , hide method should be triggered', async () => {
         const closeBtn = wrapper.find('.rs-drawer-close-button');
 

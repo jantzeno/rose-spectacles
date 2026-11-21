@@ -2,6 +2,24 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import Galleria from './Galleria.vue';
 
+it('stops handling Escape when a fullscreen galleria unmounts', async () => {
+    const wrapper = mount(Galleria, {
+        global: { plugins: [PrimeVue], stubs: { teleport: true } },
+        props: { fullScreen: true, visible: true, value: ['Photo'] }
+    });
+    const close = vi.spyOn(wrapper.vm, 'maskHide');
+    const pressEscape = () => document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
+
+    await wrapper.vm.$nextTick();
+    wrapper.vm.onEnter(wrapper.get('[role="region"]').element);
+    pressEscape();
+    expect(close).toHaveBeenCalledTimes(1);
+
+    wrapper.unmount();
+    pressEscape();
+    expect(close).toHaveBeenCalledTimes(1);
+});
+
 describe('Gallleria.vue', () => {
     let wrapper: VueWrapper<any>;
 
