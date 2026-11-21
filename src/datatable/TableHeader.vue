@@ -120,7 +120,7 @@
 </template>
 
 <script lang="ts">
-import type { DataTableSortMeta } from 'rose-spectacles/datatable';
+import type { TableSortMeta } from './BaseDataTable.vue';
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { HelperSet, getVNodeProp } from '../core/utils/Utils';
@@ -196,7 +196,7 @@ export default defineComponent({
             default: null
         },
         multiSortMeta: {
-            type: Array as PropType<DataTableSortMeta[]>,
+            type: Array as PropType<TableSortMeta[]>,
             default: null
         },
         filterDisplay: {

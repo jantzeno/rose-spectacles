@@ -1,18 +1,32 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType, type StyleValue } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DataTableStyle from './style/DataTableStyle';
+import type { DataTableExportFunctionOptions, DataTableFilterMeta, DataTableSortMeta } from './DataTable';
+
+export type TableRow = Record<string, unknown>;
+export type TableField = NonNullable<DataTableSortMeta['field']>;
+export interface TableSortMeta {
+    field: DataTableSortMeta['field'];
+    order: number | null | undefined;
+}
+
+type TableVirtualScrollerOptions = Record<string, unknown> & {
+    itemSize?: number;
+    getItemSize?: (index: number) => number;
+    lazy?: boolean;
+};
 
 export default defineComponent({
     name: 'BaseDataTable',
     extends: BaseComponent,
     props: {
         value: {
-            type: Array,
+            type: Array as PropType<TableRow[]>,
             default: null
         },
         dataKey: {
-            type: [String, Function],
+            type: [String, Function] as PropType<TableField>,
             default: null
         },
         rows: {
@@ -40,7 +54,7 @@ export default defineComponent({
             default: true
         },
         paginatorTemplate: {
-            type: [Object, String],
+            type: [Object, String] as PropType<string | Record<string, string>>,
             default: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'
         },
         pageLinkSize: {
@@ -48,7 +62,7 @@ export default defineComponent({
             default: 5
         },
         rowsPerPageOptions: {
-            type: Array,
+            type: Array as PropType<number[]>,
             default: null
         },
         currentPageReportTemplate: {
@@ -68,11 +82,11 @@ export default defineComponent({
             default: undefined
         },
         sortField: {
-            type: [String, Function],
+            type: [String, Function] as PropType<TableField | null>,
             default: null
         },
         sortOrder: {
-            type: Number,
+            type: Number as PropType<number | null>,
             default: null
         },
         defaultSortOrder: {
@@ -84,7 +98,7 @@ export default defineComponent({
             default: 1
         },
         multiSortMeta: {
-            type: Array,
+            type: Array as PropType<DataTableSortMeta[] | null>,
             default: null
         },
         sortMode: {
@@ -96,7 +110,7 @@ export default defineComponent({
             default: false
         },
         filters: {
-            type: Object,
+            type: Object as PropType<DataTableFilterMeta>,
             default: null
         },
         filterDisplay: {
@@ -104,7 +118,7 @@ export default defineComponent({
             default: null
         },
         globalFilterFields: {
-            type: Array,
+            type: Array as PropType<TableField[]>,
             default: null
         },
         filterLocale: {
@@ -112,7 +126,7 @@ export default defineComponent({
             default: undefined
         },
         selection: {
-            type: [Array, Object],
+            type: [Array, Object] as PropType<TableRow | TableRow[]>,
             default: null
         },
         selectionMode: {
@@ -136,7 +150,7 @@ export default defineComponent({
             default: null
         },
         selectAll: {
-            type: Boolean,
+            type: Boolean as PropType<boolean | null>,
             default: null
         },
         rowHover: {
@@ -152,7 +166,7 @@ export default defineComponent({
             default: 'download'
         },
         exportFunction: {
-            type: Function,
+            type: Function as PropType<(options: DataTableExportFunctionOptions<unknown>) => string>,
             default: null
         },
         resizableColumns: {
@@ -168,7 +182,7 @@ export default defineComponent({
             default: false
         },
         expandedRows: {
-            type: [Array, Object],
+            type: [Array, Object] as PropType<TableRow[] | Record<string, boolean>>,
             default: null
         },
         expandedRowIcon: {
@@ -184,7 +198,7 @@ export default defineComponent({
             default: null
         },
         groupRowsBy: {
-            type: [Array, String, Function],
+            type: [Array, String, Function] as PropType<TableField | TableField[]>,
             default: null
         },
         expandableRowGroups: {
@@ -192,7 +206,7 @@ export default defineComponent({
             default: false
         },
         expandedRowGroups: {
-            type: Array,
+            type: Array as PropType<unknown[]>,
             default: null
         },
         stateStorage: {
@@ -208,15 +222,15 @@ export default defineComponent({
             default: null
         },
         editingRows: {
-            type: Array,
+            type: Array as PropType<TableRow[]>,
             default: null
         },
         rowClass: {
-            type: Function,
+            type: Function as PropType<(row: unknown) => unknown>,
             default: null
         },
         rowStyle: {
-            type: Function,
+            type: Function as PropType<(row: unknown) => StyleValue>,
             default: null
         },
         scrollable: {
@@ -224,7 +238,7 @@ export default defineComponent({
             default: false
         },
         virtualScrollerOptions: {
-            type: Object,
+            type: Object as PropType<TableVirtualScrollerOptions>,
             default: null
         },
         scrollHeight: {
@@ -232,7 +246,7 @@ export default defineComponent({
             default: null
         },
         frozenValue: {
-            type: Array,
+            type: Array as PropType<TableRow[]>,
             default: null
         },
         breakpoint: {

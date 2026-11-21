@@ -108,14 +108,14 @@
                             :columns="slotProps.columns"
                             :rowGroupMode="rowGroupMode"
                             :groupRowsBy="groupRowsBy"
-                            :groupRowSortField="groupRowSortField"
+                            :groupRowSortField="groupRowSortField ?? undefined"
                             :reorderableColumns="reorderableColumns"
                             :resizableColumns="resizableColumns"
                             :allRowsSelected="allRowsSelected"
                             :empty="empty"
                             :sortMode="sortMode"
-                            :sortField="d_sortField"
-                            :sortOrder="d_sortOrder"
+                            :sortField="d_sortField ?? undefined"
+                            :sortOrder="d_sortOrder ?? undefined"
                             :multiSortMeta="d_multiSortMeta"
                             :filters="d_filters"
                             :filtersStore="filters"
@@ -196,7 +196,7 @@
                         <DTTableBody
                             ref="bodyRef"
                             :value="dataToRender(slotProps.rows)"
-                            :groupRowsValue="virtualScrollerDisabled ? null : processedData"
+                            :groupRowsValue="virtualScrollerDisabled ? undefined : processedData"
                             :class="slotProps.styleClass"
                             :columns="slotProps.columns"
                             :empty="empty"
@@ -347,7 +347,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type VNode } from 'vue';
 import { cn } from '../internal/utils/index';
 import {
     addClass,
@@ -376,13 +377,82 @@ import ArrowDownIcon from '../icons/arrowdown/ArrowDownIcon.vue';
 import ArrowUpIcon from '../icons/arrowup/ArrowUpIcon.vue';
 import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
 import Paginator from '../paginator/Paginator.vue';
+import type { PageState } from '../paginator/Paginator';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
-import BaseDataTable from './BaseDataTable.vue';
+import BaseDataTable, { type TableField, type TableRow, type TableSortMeta } from './BaseDataTable.vue';
 import TableBody from './TableBody.vue';
 import TableFooter from './TableFooter.vue';
 import TableHeader from './TableHeader.vue';
+import type {
+    DataTableCellEditCancelEvent,
+    DataTableCellEditCompleteEvent,
+    DataTableCellEditInitEvent,
+    DataTableExportCSVOptions,
+    DataTableFilterMeta,
+    DataTableFilterMetaData,
+    DataTableOperatorFilterMetaData,
+    DataTableRowEditInitEvent,
+    DataTableSortMeta
+} from './DataTable';
 
-export default {
+type ColumnKey = NonNullable<VNode['key']>;
+type FilterValue = DataTableFilterMeta[string];
+type KeyFlags = Record<string, number>;
+type ColumnWidth = string | number | undefined;
+
+interface ColumnEvent<T extends Event> {
+    originalEvent: T;
+    column: VNode;
+}
+
+interface RowEvent<T extends Event = Event> {
+    originalEvent: T;
+    index: number;
+    data: TableRow;
+}
+
+interface RowDragEvent {
+    originalEvent: DragEvent;
+    index: number;
+}
+
+interface RenderWindow {
+    rows?: TableRow[];
+    itemSize?: number;
+    getItemOptions?: (index: number) => { index: number };
+}
+
+interface LazyLoadEvent {
+    originalEvent?: Event | PageState;
+    first: number;
+    rows: number;
+    sortField: TableField | null;
+    sortOrder: number | null;
+    multiSortMeta: TableSortMeta[];
+    filters: DataTableFilterMeta;
+    page?: number;
+    pageCount?: number;
+    filteredValue?: TableRow[];
+}
+
+interface PersistedState {
+    first?: number;
+    rows?: number;
+    sortField?: string;
+    sortOrder?: number | null;
+    multiSortMeta?: TableSortMeta[];
+    filters?: DataTableFilterMeta;
+    columnWidths?: string;
+    columnWidthsByKey?: Record<string, string | number>;
+    tableWidth?: string;
+    columnOrder?: ColumnKey[] | null;
+    expandedRows?: TableRow[] | Record<string, boolean>;
+    expandedRowGroups?: unknown[];
+    selection?: TableRow | TableRow[];
+    selectionKeys?: KeyFlags | null;
+}
+
+export default defineComponent({
     name: 'DataTable',
     extends: BaseDataTable,
     inheritAttrs: false,
@@ -440,62 +510,64 @@ export default {
             d_sortField: this.sortField,
             d_sortOrder: this.sortOrder,
             d_nullSortOrder: this.nullSortOrder,
-            d_multiSortMeta: this.multiSortMeta ? [...this.multiSortMeta] : [],
-            d_groupRowsSortMeta: null,
-            d_selectionKeys: null,
-            d_columnOrder: null,
-            d_editingRowKeys: null,
-            d_editingMeta: {},
+            d_multiSortMeta: (this.multiSortMeta ? [...this.multiSortMeta] : []) as TableSortMeta[],
+            d_groupRowsSortMeta: null as TableSortMeta | null,
+            d_selectionKeys: null as KeyFlags | null,
+            d_columnOrder: null as ColumnKey[] | null,
+            d_editingRowKeys: null as KeyFlags | null,
+            d_editingMeta: {} as Record<number, { data: TableRow; fields: string[] }>,
             d_filters: this.cloneFilters(this.filters),
             d_columns: new HelperSet({ type: 'Column' }),
             d_columnGroups: new HelperSet({ type: 'ColumnGroup' }),
             d_rowGroupHeaderHeight: (this.virtualScrollerOptions && this.virtualScrollerOptions.itemSize) || 0,
-            d_rowGroupFooterHeight: (this.virtualScrollerOptions && this.virtualScrollerOptions.itemSize) || 0
+            d_rowGroupFooterHeight: (this.virtualScrollerOptions && this.virtualScrollerOptions.itemSize) || 0,
+            rowTouched: false,
+            anchorRowIndex: null as number | null,
+            rangeRowIndex: null as number | null,
+            documentColumnResizeListener: null as ((event: MouseEvent) => void) | null,
+            documentColumnResizeEndListener: null as (() => void) | null,
+            lastResizeHelperX: 0,
+            resizeColumnElement: null as HTMLElement | null,
+            columnResizing: false,
+            colReorderIconWidth: 0,
+            colReorderIconHeight: 0,
+            draggedColumn: null as VNode | null,
+            draggedColumnElement: null as HTMLTableCellElement | null,
+            dropPosition: null as number | null,
+            draggedRowIndex: null as number | null,
+            droppedRowIndex: null as number | null,
+            rowDragging: false,
+            columnWidthsState: null as string | null,
+            columnWidthsByKeyState: null as PersistedState['columnWidthsByKey'] | null,
+            columnWidthsByKey: null as Map<ColumnKey, number> | null,
+            columnWidthsKeys: null as ColumnKey[] | null,
+            tableWidthState: null as string | null,
+            styleElement: null as HTMLStyleElement | null,
+            lastSavedState: null as string | null
         };
     },
-    rowTouched: false,
-    anchorRowIndex: null,
-    rangeRowIndex: null,
-    documentColumnResizeListener: null,
-    documentColumnResizeEndListener: null,
-    lastResizeHelperX: null,
-    resizeColumnElement: null,
-    columnResizing: false,
-    colReorderIconWidth: null,
-    colReorderIconHeight: null,
-    draggedColumn: null,
-    draggedColumnElement: null,
-    draggedRowIndex: null,
-    droppedRowIndex: null,
-    rowDragging: null,
-    columnWidthsState: null,
-    columnWidthsByKeyState: null,
-    columnWidthsByKey: null,
-    columnWidthsKeys: null,
-    tableWidthState: null,
-    columnWidthsRestored: false,
     watch: {
-        first(newValue) {
+        first(newValue: number) {
             this.d_first = newValue;
         },
-        rows(newValue) {
+        rows(newValue: number) {
             this.d_rows = newValue;
         },
-        sortField(newValue) {
+        sortField(newValue: TableField | null) {
             this.d_sortField = newValue;
         },
-        sortOrder(newValue) {
+        sortOrder(newValue: number | null) {
             this.d_sortOrder = newValue;
         },
-        nullSortOrder(newValue) {
+        nullSortOrder(newValue: number) {
             this.d_nullSortOrder = newValue;
         },
-        multiSortMeta(newValue) {
-            this.d_multiSortMeta = newValue;
+        multiSortMeta(newValue: DataTableSortMeta[] | null) {
+            this.d_multiSortMeta = newValue ?? [];
         },
         selection: {
             immediate: true,
-            handler(newValue) {
+            handler(newValue: TableRow | TableRow[] | null) {
                 if (this.dataKey) {
                     this.updateSelectionKeys(newValue);
                 }
@@ -503,7 +575,7 @@ export default {
         },
         editingRows: {
             immediate: true,
-            handler(newValue) {
+            handler(newValue: TableRow[] | null) {
                 if (this.dataKey) {
                     this.updateEditingRowKeys(newValue);
                 }
@@ -511,11 +583,11 @@ export default {
         },
         filters: {
             deep: true,
-            handler: function (newValue) {
+            handler(newValue: DataTableFilterMeta | null) {
                 this.d_filters = this.cloneFilters(newValue);
             }
         },
-        totalRecordsLength(newValue) {
+        totalRecordsLength(newValue: number) {
             this.$emit('update:totalRecords', newValue);
         }
     },
@@ -553,10 +625,10 @@ export default {
         this.updateRowGroupHeights();
     },
     methods: {
-        columnProp(col, prop) {
+        columnProp(col: VNode | null, prop: string) {
             return getVNodeProp(col, prop);
         },
-        onPage(event) {
+        onPage(event: PageState) {
             this.clearEditingMetaData();
 
             this.d_first = event.first;
@@ -574,12 +646,15 @@ export default {
                 this.$emit('value-change', this.processedData);
             });
         },
-        onColumnHeaderClick(e) {
+        onColumnHeaderClick(e: ColumnEvent<MouseEvent | KeyboardEvent>) {
             const event = e.originalEvent;
             const column = e.column;
 
             if (this.columnProp(column, 'sortable')) {
                 const targetNode = event.target;
+
+                if (!(targetNode instanceof Element)) return;
+
                 const columnField = this.columnProp(column, 'sortField') || this.columnProp(column, 'field');
 
                 if (
@@ -587,21 +662,21 @@ export default {
                     getAttribute(targetNode, 'data-pc-section') === 'columntitle' ||
                     getAttribute(targetNode, 'data-pc-section') === 'columnheadercontent' ||
                     getAttribute(targetNode, 'data-pc-section') === 'sorticon' ||
-                    getAttribute(targetNode.parentElement, 'data-pc-section') === 'sorticon' ||
-                    getAttribute(targetNode.parentElement.parentElement, 'data-pc-section') === 'sorticon' ||
+                    (targetNode.parentElement && getAttribute(targetNode.parentElement, 'data-pc-section') === 'sorticon') ||
+                    (targetNode.parentElement?.parentElement && getAttribute(targetNode.parentElement.parentElement, 'data-pc-section') === 'sorticon') ||
                     (targetNode.closest('[data-p-sortable-column="true"]') &&
                         !targetNode.closest('[data-pc-section="columnfilterbutton"]') &&
-                        !isClickable(event.target))
+                        !isClickable(targetNode))
                 ) {
                     clearSelection();
 
                     if (this.sortMode === 'single') {
                         if (this.d_sortField === columnField) {
-                            if (this.removableSort && this.d_sortOrder * -1 === this.defaultSortOrder) {
+                            if (this.removableSort && -Number(this.d_sortOrder) === this.defaultSortOrder) {
                                 this.d_sortOrder = null;
                                 this.d_sortField = null;
                             } else {
-                                this.d_sortOrder = this.d_sortOrder * -1;
+                                this.d_sortOrder = -Number(this.d_sortOrder);
                             }
                         } else {
                             this.d_sortOrder = this.defaultSortOrder;
@@ -629,13 +704,13 @@ export default {
                 }
             }
         },
-        sortSingle(value) {
+        sortSingle(value: TableRow[]): TableRow[] {
             this.clearEditingMetaData();
 
             if (this.groupRowsBy && this.groupRowsBy === this.sortField) {
                 this.d_multiSortMeta = [
                     { field: this.sortField, order: this.sortOrder || this.defaultSortOrder },
-                    { field: this.d_sortField, order: this.d_sortOrder }
+                    { field: this.d_sortField ?? undefined, order: this.d_sortOrder }
                 ];
 
                 return this.sortMultiple(value);
@@ -654,12 +729,12 @@ export default {
                 let value1 = resolvedFieldData.get(data1);
                 let value2 = resolvedFieldData.get(data2);
 
-                return sort(value1, value2, this.d_sortOrder, comparer, this.d_nullSortOrder);
+                return sort(value1, value2, this.d_sortOrder === null ? 0 : this.d_sortOrder, comparer, this.d_nullSortOrder);
             });
 
             return data;
         },
-        sortMultiple(value) {
+        sortMultiple(value: TableRow[]): TableRow[] {
             this.clearEditingMetaData();
 
             if (this.groupRowsBy && (this.d_groupRowsSortMeta || (this.d_multiSortMeta.length && this.groupRowsBy === this.d_multiSortMeta[0].field))) {
@@ -667,7 +742,7 @@ export default {
 
                 !this.d_groupRowsSortMeta && (this.d_groupRowsSortMeta = firstSortMeta);
 
-                if (firstSortMeta.field !== this.d_groupRowsSortMeta.field) {
+                if (this.d_groupRowsSortMeta && firstSortMeta?.field !== this.d_groupRowsSortMeta.field) {
                     this.d_multiSortMeta = [this.d_groupRowsSortMeta, ...this.d_multiSortMeta];
                 }
             }
@@ -680,7 +755,7 @@ export default {
 
             return data;
         },
-        multisortField(data1, data2, index) {
+        multisortField(data1: TableRow, data2: TableRow, index: number): number {
             const value1 = resolveFieldData(data1, this.d_multiSortMeta[index].field);
             const value2 = resolveFieldData(data2, this.d_multiSortMeta[index].field);
             const comparer = localeComparator();
@@ -689,49 +764,51 @@ export default {
                 return this.d_multiSortMeta.length - 1 > index ? this.multisortField(data1, data2, index + 1) : 0;
             }
 
-            return sort(value1, value2, this.d_multiSortMeta[index].order, comparer, this.d_nullSortOrder);
+            const order = this.d_multiSortMeta[index].order;
+
+            return sort(value1, value2, order === null ? 0 : order, comparer, this.d_nullSortOrder);
         },
-        addMultiSortField(field) {
+        addMultiSortField(field: DataTableSortMeta['field']) {
             let index = this.d_multiSortMeta.findIndex((meta) => meta.field === field);
 
             if (index >= 0) {
-                if (this.removableSort && this.d_multiSortMeta[index].order * -1 === this.defaultSortOrder) this.d_multiSortMeta.splice(index, 1);
-                else this.d_multiSortMeta[index] = { field: field, order: this.d_multiSortMeta[index].order * -1 };
+                if (this.removableSort && -Number(this.d_multiSortMeta[index].order) === this.defaultSortOrder) this.d_multiSortMeta.splice(index, 1);
+                else this.d_multiSortMeta[index] = { field: field, order: -Number(this.d_multiSortMeta[index].order) };
             } else {
                 this.d_multiSortMeta.push({ field: field, order: this.defaultSortOrder });
             }
 
             this.d_multiSortMeta = [...this.d_multiSortMeta];
         },
-        getActiveFilters(filters) {
-            const removeEmptyFilters = ([key, value]) => {
-                if (value.constraints) {
+        getActiveFilters(filters: DataTableFilterMeta): DataTableFilterMeta {
+            const removeEmptyFilters = ([key, value]: [string, FilterValue]): [string, FilterValue] | undefined => {
+                if (typeof value === 'object' && value !== null && 'constraints' in value) {
                     const filteredConstraints = value.constraints.filter((constraint) => constraint.value !== null);
 
                     if (filteredConstraints.length > 0) {
                         return [key, { ...value, constraints: filteredConstraints }];
                     }
-                } else if (value.value !== null) {
+                } else if ((value as DataTableFilterMetaData).value !== null) {
                     return [key, value];
                 }
 
                 return undefined;
             };
 
-            const filterValidEntries = (entry) => entry !== undefined;
-            const entries = Object.entries(filters).map(removeEmptyFilters).filter(filterValidEntries);
+            const entries = Object.entries(filters)
+                .map(removeEmptyFilters)
+                .filter((entry) => entry !== undefined);
 
             return Object.fromEntries(entries);
         },
-        filter(data) {
-            if (!data) {
-                return;
-            }
+        filter(data: TableRow[]): TableRow[] {
+            if (!data) return [];
 
             this.clearEditingMetaData();
 
-            let activeFilters = this.getActiveFilters(this.filters);
-            let globalFilterFieldsArray;
+            const activeFilters = this.getActiveFilters(this.filters);
+            const globalFilter = activeFilters.global as DataTableFilterMetaData | undefined;
+            let globalFilterFieldsArray: TableField[] | undefined;
 
             if (activeFilters['global']) {
                 globalFilterFieldsArray =
@@ -751,7 +828,7 @@ export default {
                         let filterField = prop;
                         let filterMeta = activeFilters[filterField];
 
-                        if (filterMeta.operator) {
+                        if (typeof filterMeta === 'object' && filterMeta !== null && 'operator' in filterMeta && filterMeta.operator) {
                             for (let filterConstraint of filterMeta.constraints) {
                                 localMatch = this.executeLocalFilter(filterField, data[i], filterConstraint);
 
@@ -773,9 +850,9 @@ export default {
                     for (let j = 0; j < globalFilterFieldsArray.length; j++) {
                         let globalFilterField = globalFilterFieldsArray[j];
 
-                        globalMatch = FilterService.filters[activeFilters['global'].matchMode || FilterMatchMode.CONTAINS](
+                        globalMatch = FilterService.filters[globalFilter?.matchMode || FilterMatchMode.CONTAINS](
                             resolveFieldData(data[i], globalFilterField),
-                            activeFilters['global'].value,
+                            globalFilter?.value,
                             this.filterLocale
                         );
 
@@ -810,20 +887,20 @@ export default {
 
             return filteredValue;
         },
-        executeLocalFilter(field, rowData, filterMeta) {
-            let filterValue = filterMeta.value;
-            let filterMatchMode = filterMeta.matchMode || FilterMatchMode.STARTS_WITH;
+        executeLocalFilter(field: string, rowData: TableRow, filterMeta: FilterValue) {
+            const { value: filterValue, matchMode } = filterMeta as DataTableFilterMetaData;
+            const filterMatchMode = matchMode || FilterMatchMode.STARTS_WITH;
             let dataFieldValue = resolveFieldData(rowData, field);
             let filterConstraint = FilterService.filters[filterMatchMode];
 
             return filterConstraint(dataFieldValue, filterValue, this.filterLocale);
         },
-        onRowClick(e) {
+        onRowClick(e: RowEvent<MouseEvent | KeyboardEvent>) {
             const event = e.originalEvent;
-            const body = this.$refs.bodyRef && this.$refs.bodyRef.$el;
+            const body = (this.$refs.bodyRef as { $el: HTMLTableSectionElement } | undefined)?.$el;
             const focusedItem = findSingle(body, 'tr[data-p-selectable-row="true"][tabindex="0"]');
 
-            if (isClickable(event.target)) {
+            if (event.target instanceof Element && isClickable(event.target)) {
                 return;
             }
 
@@ -852,7 +929,7 @@ export default {
                                 this.$emit('update:selection', null);
                             } else {
                                 const selectionIndex = this.findIndexInSelection(rowData);
-                                const _selection = this.selection.filter((val, i) => i != selectionIndex);
+                                const _selection = this.selectionArray.filter((_, i) => i !== selectionIndex);
 
                                 this.$emit('update:selection', _selection);
                             }
@@ -862,7 +939,7 @@ export default {
                             if (this.isSingleSelectionMode()) {
                                 this.$emit('update:selection', rowData);
                             } else if (this.isMultipleSelectionMode()) {
-                                let _selection = metaKey ? this.selection || [] : [];
+                                let _selection = metaKey ? this.selectionArray : [];
 
                                 _selection = [..._selection, rowData];
                                 this.$emit('update:selection', _selection);
@@ -882,12 +959,12 @@ export default {
                         } else if (this.selectionMode === 'multiple') {
                             if (selected) {
                                 const selectionIndex = this.findIndexInSelection(rowData);
-                                const _selection = this.selection.filter((val, i) => i != selectionIndex);
+                                const _selection = this.selectionArray.filter((_, i) => i !== selectionIndex);
 
                                 this.$emit('update:selection', _selection);
                                 this.$emit('row-unselect', { originalEvent: event, data: rowData, index: rowIndex, type: 'row' });
                             } else {
-                                const _selection = this.selection ? [...this.selection, rowData] : [rowData];
+                                const _selection = [...this.selectionArray, rowData];
 
                                 this.$emit('update:selection', _selection);
                                 this.$emit('row-select', { originalEvent: event, data: rowData, index: rowIndex, type: 'row' });
@@ -900,27 +977,28 @@ export default {
             this.rowTouched = false;
 
             if (focusedItem) {
-                if (event.target?.getAttribute('data-pc-section') === 'rowtoggleicon') return;
+                if (event.target instanceof Element && event.target.getAttribute('data-pc-section') === 'rowtoggleicon') return;
 
-                const targetRow = event.currentTarget?.closest('tr[data-p-selectable-row="true"]');
+                const targetRow =
+                    event.currentTarget instanceof Element ? event.currentTarget.closest<HTMLTableRowElement>('tr[data-p-selectable-row="true"]') : null;
 
-                focusedItem.tabIndex = '-1';
-                if (targetRow) targetRow.tabIndex = '0';
+                if (focusedItem instanceof HTMLElement) focusedItem.tabIndex = -1;
+                if (targetRow) targetRow.tabIndex = 0;
             }
         },
-        onRowDblClick(e) {
+        onRowDblClick(e: RowEvent<MouseEvent>) {
             const event = e.originalEvent;
 
-            if (isClickable(event.target)) {
+            if (event.target instanceof Element && isClickable(event.target)) {
                 return;
             }
 
             this.$emit('row-dblclick', e);
         },
-        onRowRightClick(event) {
+        onRowRightClick(event: RowEvent<MouseEvent>) {
             if (this.contextMenu) {
                 clearSelection();
-                event.originalEvent.target.focus();
+                if (event.originalEvent.target instanceof HTMLElement) focus(event.originalEvent.target);
             }
 
             this.$emit('update:contextMenuSelection', event.data);
@@ -929,7 +1007,7 @@ export default {
         onRowTouchEnd() {
             this.rowTouched = true;
         },
-        onRowKeyDown(e, slotProps) {
+        onRowKeyDown(e: RowEvent<KeyboardEvent>, slotProps: RenderWindow = {}) {
             const event = e.originalEvent;
             const rowData = e.data;
             const rowIndex = e.index;
@@ -937,6 +1015,8 @@ export default {
 
             if (this.selectionMode) {
                 const row = event.target;
+
+                if (!(row instanceof HTMLElement)) return;
 
                 switch (event.code) {
                     case 'ArrowDown':
@@ -983,7 +1063,7 @@ export default {
                 }
             }
         },
-        onArrowDownKey(event, row, rowIndex, slotProps) {
+        onArrowDownKey(event: KeyboardEvent, row: HTMLElement, rowIndex: number, slotProps: RenderWindow) {
             const nextRow = this.findNextSelectableRow(row);
 
             nextRow && this.focusRowChange(row, nextRow);
@@ -997,7 +1077,7 @@ export default {
 
             event.preventDefault();
         },
-        onArrowUpKey(event, row, rowIndex, slotProps) {
+        onArrowUpKey(event: KeyboardEvent, row: HTMLElement, rowIndex: number, slotProps: RenderWindow) {
             const prevRow = this.findPrevSelectableRow(row);
 
             prevRow && this.focusRowChange(row, prevRow);
@@ -1011,7 +1091,7 @@ export default {
 
             event.preventDefault();
         },
-        onHomeKey(event, row, rowIndex, slotProps) {
+        onHomeKey(event: KeyboardEvent, row: HTMLElement, rowIndex: number, slotProps: RenderWindow) {
             const firstRow = this.findFirstSelectableRow();
 
             firstRow && this.focusRowChange(row, firstRow);
@@ -1024,7 +1104,7 @@ export default {
 
             event.preventDefault();
         },
-        onEndKey(event, row, rowIndex, slotProps) {
+        onEndKey(event: KeyboardEvent, row: HTMLElement, rowIndex: number, slotProps: RenderWindow) {
             const lastRow = this.findLastSelectableRow();
 
             lastRow && this.focusRowChange(row, lastRow);
@@ -1037,22 +1117,22 @@ export default {
 
             event.preventDefault();
         },
-        onEnterKey(event, rowData, rowIndex) {
+        onEnterKey(event: KeyboardEvent, rowData: TableRow, rowIndex: number) {
             this.onRowClick({ originalEvent: event, data: rowData, index: rowIndex });
             event.preventDefault();
         },
-        onSpaceKey(event, rowData, rowIndex, slotProps) {
+        onSpaceKey(event: KeyboardEvent, rowData: TableRow, rowIndex: number, slotProps: RenderWindow) {
             this.onEnterKey(event, rowData, rowIndex);
 
             if (event.shiftKey && this.selection !== null) {
                 const data = this.dataToRender(slotProps.rows);
                 let index;
 
-                if (this.selection.length > 0) {
+                if (this.selectionArray.length > 0) {
                     let firstSelectedRowIndex, lastSelectedRowIndex;
 
-                    firstSelectedRowIndex = findIndexInList(this.selection[0], data);
-                    lastSelectedRowIndex = findIndexInList(this.selection[this.selection.length - 1], data);
+                    firstSelectedRowIndex = findIndexInList(this.selectionArray[0], data);
+                    lastSelectedRowIndex = findIndexInList(this.selectionArray[this.selectionArray.length - 1], data);
 
                     index = rowIndex <= firstSelectedRowIndex ? lastSelectedRowIndex : firstSelectedRowIndex;
                 } else {
@@ -1064,24 +1144,24 @@ export default {
                 this.$emit('update:selection', _selection);
             }
         },
-        onTabKey(event, rowIndex) {
-            const body = this.$refs.bodyRef && this.$refs.bodyRef.$el;
-            const rows = find(body, 'tr[data-p-selectable-row="true"]');
+        onTabKey(event: KeyboardEvent, rowIndex: number) {
+            const body = (this.$refs.bodyRef as { $el: HTMLTableSectionElement } | undefined)?.$el;
+            const rows = body?.querySelectorAll<HTMLTableRowElement>('tr[data-p-selectable-row="true"]');
 
             if (event.code === 'Tab' && rows && rows.length > 0) {
                 const firstSelectedRow = findSingle(body, 'tr[data-p-selected="true"]');
                 const focusedItem = findSingle(body, 'tr[data-p-selectable-row="true"][tabindex="0"]');
 
-                if (firstSelectedRow) {
-                    firstSelectedRow.tabIndex = '0';
-                    focusedItem && focusedItem !== firstSelectedRow && (focusedItem.tabIndex = '-1');
+                if (firstSelectedRow instanceof HTMLElement) {
+                    firstSelectedRow.tabIndex = 0;
+                    if (focusedItem instanceof HTMLElement && focusedItem !== firstSelectedRow) focusedItem.tabIndex = -1;
                 } else {
-                    rows[0].tabIndex = '0';
-                    focusedItem !== rows[0] && rows[rowIndex] && (rows[rowIndex].tabIndex = '-1');
+                    rows[0].tabIndex = 0;
+                    if (focusedItem !== rows[0] && rows[rowIndex]) rows[rowIndex].tabIndex = -1;
                 }
             }
         },
-        findNextSelectableRow(row) {
+        findNextSelectableRow(row: Element): Element | null {
             let nextRow = row.nextElementSibling;
 
             if (nextRow) {
@@ -1091,7 +1171,7 @@ export default {
                 return null;
             }
         },
-        findPrevSelectableRow(row) {
+        findPrevSelectableRow(row: Element): Element | null {
             let prevRow = row.previousElementSibling;
 
             if (prevRow) {
@@ -1102,21 +1182,23 @@ export default {
             }
         },
         findFirstSelectableRow() {
-            const firstRow = findSingle(this.$refs.table, 'tr[data-p-selectable-row="true"]');
+            const firstRow = findSingle(this.$refs.table as HTMLTableElement | undefined, 'tr[data-p-selectable-row="true"]');
 
             return firstRow;
         },
         findLastSelectableRow() {
-            const rows = find(this.$refs.table, 'tr[data-p-selectable-row="true"]');
+            const rows = (this.$refs.table as HTMLTableElement | undefined)?.querySelectorAll('tr[data-p-selectable-row="true"]');
 
             return rows ? rows[rows.length - 1] : null;
         },
-        focusRowChange(firstFocusableRow, currentFocusedRow) {
-            firstFocusableRow.tabIndex = '-1';
-            currentFocusedRow.tabIndex = '0';
+        focusRowChange(firstFocusableRow: HTMLElement, currentFocusedRow: Element) {
+            if (!(currentFocusedRow instanceof HTMLElement)) return;
+
+            firstFocusableRow.tabIndex = -1;
+            currentFocusedRow.tabIndex = 0;
             focus(currentFocusedRow);
         },
-        toggleRowWithRadio(event) {
+        toggleRowWithRadio(event: RowEvent) {
             const rowData = event.data;
 
             if (this.isSelected(rowData)) {
@@ -1127,29 +1209,29 @@ export default {
                 this.$emit('row-select', { originalEvent: event.originalEvent, data: rowData, index: event.index, type: 'radiobutton' });
             }
         },
-        toggleRowWithCheckbox(event) {
+        toggleRowWithCheckbox(event: RowEvent) {
             const rowData = event.data;
 
             if (this.isSelected(rowData)) {
                 const selectionIndex = this.findIndexInSelection(rowData);
-                const _selection = this.selection.filter((val, i) => i != selectionIndex);
+                const _selection = this.selectionArray.filter((_, i) => i !== selectionIndex);
 
                 this.$emit('update:selection', _selection);
                 this.$emit('row-unselect', { originalEvent: event.originalEvent, data: rowData, index: event.index, type: 'checkbox' });
             } else {
-                let _selection = this.selection ? [...this.selection] : [];
+                let _selection = [...this.selectionArray];
 
                 _selection = [..._selection, rowData];
                 this.$emit('update:selection', _selection);
                 this.$emit('row-select', { originalEvent: event.originalEvent, data: rowData, index: event.index, type: 'checkbox' });
             }
         },
-        toggleRowsWithCheckbox(event) {
+        toggleRowsWithCheckbox(event: { originalEvent: Event; checked: boolean }) {
             if (this.selectAll !== null) {
                 this.$emit('select-all-change', event);
             } else {
                 const { originalEvent, checked } = event;
-                let _selection = [];
+                let _selection: TableRow[] = [];
 
                 if (checked) {
                     _selection = this.frozenValue ? [...this.frozenValue, ...this.processedData] : this.processedData;
@@ -1167,7 +1249,7 @@ export default {
         isMultipleSelectionMode() {
             return this.selectionMode === 'multiple';
         },
-        isSelected(rowData) {
+        isSelected(rowData: TableRow) {
             if (rowData && this.selection) {
                 if (this.dataKey) {
                     return this.d_selectionKeys ? this.d_selectionKeys[resolveFieldData(rowData, this.dataKey)] !== undefined : false;
@@ -1179,13 +1261,13 @@ export default {
 
             return false;
         },
-        findIndexInSelection(rowData) {
+        findIndexInSelection(rowData: TableRow) {
             return this.findIndex(rowData, this.selection);
         },
-        findIndex(rowData, collection) {
+        findIndex(rowData: TableRow, collection: TableRow | TableRow[] | null) {
             let index = -1;
 
-            if (collection && collection.length) {
+            if (Array.isArray(collection) && collection.length) {
                 for (let i = 0; i < collection.length; i++) {
                     if (this.equals(rowData, collection[i])) {
                         index = i;
@@ -1196,7 +1278,7 @@ export default {
 
             return index;
         },
-        updateSelectionKeys(selection) {
+        updateSelectionKeys(selection: TableRow | TableRow[] | null) {
             this.d_selectionKeys = {};
 
             if (Array.isArray(selection)) {
@@ -1207,7 +1289,7 @@ export default {
                 this.d_selectionKeys[String(resolveFieldData(selection, this.dataKey))] = 1;
             }
         },
-        updateEditingRowKeys(editingRows) {
+        updateEditingRowKeys(editingRows: TableRow[] | null) {
             if (editingRows && editingRows.length) {
                 this.d_editingRowKeys = {};
 
@@ -1218,10 +1300,12 @@ export default {
                 this.d_editingRowKeys = null;
             }
         },
-        equals(data1, data2) {
+        equals(data1: TableRow, data2: TableRow) {
             return this.compareSelectionBy === 'equals' ? data1 === data2 : equals(data1, data2, this.dataKey);
         },
-        selectRange(event) {
+        selectRange(event: Event) {
+            if (this.rangeRowIndex === null || this.anchorRowIndex === null) return;
+
             let rangeStart, rangeEnd;
 
             if (this.rangeRowIndex > this.anchorRowIndex) {
@@ -1252,7 +1336,7 @@ export default {
 
             this.$emit('update:selection', _selection);
         },
-        generateCSV(options, data) {
+        generateCSV(options?: DataTableExportCSVOptions, data?: TableRow[]) {
             let csv = '\ufeff';
 
             if (!data) {
@@ -1324,7 +1408,7 @@ export default {
 
             return csv;
         },
-        exportCSV(options, data) {
+        exportCSV(options?: DataTableExportCSVOptions, data?: TableRow[]) {
             const csv = this.generateCSV(options, data);
             exportCSV(csv, this.exportFilename);
         },
@@ -1332,8 +1416,10 @@ export default {
             this.d_first = 0;
             this.$emit('update:first', this.d_first);
         },
-        onColumnResizeStart(event) {
+        onColumnResizeStart(event: MouseEvent) {
             let containerLeft = getOffset(this.$el).left;
+
+            if (!(event.target instanceof Element) || !event.target.parentElement) return;
 
             this.resizeColumnElement = event.target.parentElement;
             this.columnResizing = true;
@@ -1341,35 +1427,39 @@ export default {
 
             this.bindColumnResizeEvents();
         },
-        onColumnResize(event) {
+        onColumnResize(event: MouseEvent) {
+            const resizeHelper = this.$refs.resizeHelper as HTMLElement;
             let containerLeft = getOffset(this.$el).left;
 
             this.$el.setAttribute('data-p-unselectable-text', 'true');
             !this.isUnstyled && addStyle(this.$el, { 'user-select': 'none' });
-            this.$refs.resizeHelper.style.height = this.$el.offsetHeight + 'px';
-            this.$refs.resizeHelper.style.top = 0 + 'px';
-            this.$refs.resizeHelper.style.left = event.pageX - containerLeft + this.$el.scrollLeft + 'px';
+            resizeHelper.style.height = this.$el.offsetHeight + 'px';
+            resizeHelper.style.top = 0 + 'px';
+            resizeHelper.style.left = event.pageX - containerLeft + this.$el.scrollLeft + 'px';
 
-            this.$refs.resizeHelper.style.display = 'block';
+            resizeHelper.style.display = 'block';
         },
         onColumnResizeEnd() {
-            let delta = isRTL(this.$el)
-                ? this.lastResizeHelperX - this.$refs.resizeHelper.offsetLeft
-                : this.$refs.resizeHelper.offsetLeft - this.lastResizeHelperX;
-            let columnWidth = this.resizeColumnElement.offsetWidth;
-            let newColumnWidth = columnWidth + delta;
-            let minWidth = this.resizeColumnElement.style.minWidth || 15;
+            const resizeHelper = this.$refs.resizeHelper as HTMLElement;
+            const resizeColumn = this.resizeColumnElement;
 
-            if (columnWidth + delta > parseInt(minWidth, 10)) {
+            if (!resizeColumn) return;
+
+            let delta = isRTL(this.$el) ? this.lastResizeHelperX - resizeHelper.offsetLeft : resizeHelper.offsetLeft - this.lastResizeHelperX;
+            let columnWidth = resizeColumn.offsetWidth;
+            let newColumnWidth = columnWidth + delta;
+            let minWidth = resizeColumn.style.minWidth || 15;
+
+            if (columnWidth + delta > parseInt(String(minWidth), 10)) {
                 if (this.columnResizeMode === 'fit') {
-                    let nextColumn = this.resizeColumnElement.nextElementSibling;
-                    let nextColumnWidth = nextColumn.offsetWidth - delta;
+                    let nextColumn = resizeColumn.nextElementSibling;
+                    const nextColumnWidth = nextColumn instanceof HTMLElement ? nextColumn.offsetWidth - delta : 0;
 
                     if (newColumnWidth > 15 && nextColumnWidth > 15) {
                         this.resizeTableCells(newColumnWidth, nextColumnWidth);
                     }
                 } else if (this.columnResizeMode === 'expand') {
-                    const tableWidth = this.$refs.table.offsetWidth + delta + 'px';
+                    const tableWidth = (this.$refs.table as HTMLTableElement).offsetWidth + delta + 'px';
 
                     // Reasoning: resize table cells before updating the table width so that it can use existing computed cell widths and adjust only the one column.
                     this.resizeTableCells(newColumnWidth);
@@ -1382,8 +1472,8 @@ export default {
                 });
             }
 
-            this.$refs.resizeHelper.style.display = 'none';
-            this.resizeColumn = null;
+            resizeHelper.style.display = 'none';
+            this.resizeColumnElement = null;
             this.$el.removeAttribute('data-p-unselectable-text');
             !this.isUnstyled && (this.$el.style['user-select'] = '');
 
@@ -1393,11 +1483,15 @@ export default {
                 this.saveState();
             }
         },
-        resizeTableCells(newColumnWidth, nextColumnWidth) {
-            let colIndex = getIndex(this.resizeColumnElement);
-            let widths = [];
-            let headers = find(this.$refs.table, 'thead[data-pc-section="thead"] > tr > th');
-            let columnCount = this.resizeColumnElement.parentElement.children.length;
+        resizeTableCells(newColumnWidth: number, nextColumnWidth?: number) {
+            const resizeColumn = this.resizeColumnElement;
+
+            if (!resizeColumn) return;
+
+            const colIndex = getIndex(resizeColumn);
+            const widths: number[] = [];
+            const headers = find(this.$refs.table as HTMLTableElement, 'thead[data-pc-section="thead"] > tr > th');
+            const columnCount = resizeColumn.parentElement?.children.length ?? 0;
 
             headers.forEach((header) => widths.push(getOuterWidth(header)));
 
@@ -1407,12 +1501,12 @@ export default {
             this.cacheColumnWidthsByKey(widths.slice(0, columnCount));
             this.addColumnWidthStyles(widths);
         },
-        getVisibleColumnKeys() {
+        getVisibleColumnKeys(): ColumnKey[] | null {
             if (this.headerColumnGroup) {
                 return null;
             }
 
-            const keys = [];
+            const keys: ColumnKey[] = [];
 
             (this.columns || []).forEach((column, index) => {
                 if (this.columnProp(column, 'hidden') || (this.rowGroupMode === 'subheader' && this.groupRowsBy === this.columnProp(column, 'field'))) {
@@ -1424,52 +1518,54 @@ export default {
 
             return keys.length > 0 && new Set(keys).size === keys.length ? keys : null;
         },
-        cacheColumnWidthsByKey(widths) {
+        cacheColumnWidthsByKey(widths: ColumnWidth[]) {
             const keys = this.getVisibleColumnKeys();
-            const values = (keys || []).map((key, index) => parseFloat(widths[index]));
+            const values = (keys || []).map((_, index) => parseFloat(String(widths[index])));
 
             if (!keys || widths.length !== keys.length || values.some((value) => !isFinite(value) || value <= 0)) {
                 return;
             }
 
-            this.columnWidthsByKey ||= new Map();
-            keys.forEach((key, index) => this.columnWidthsByKey.set(key, values[index]));
+            const columnWidths = (this.columnWidthsByKey ??= new Map());
+            keys.forEach((key, index) => columnWidths.set(key, values[index]));
             this.columnWidthsKeys = keys;
         },
         restoreColumnWidthsByKey() {
-            if (!this.resizableColumns || !this.columnWidthsByKey) {
+            const columnWidths = this.columnWidthsByKey;
+
+            if (!this.resizableColumns || !columnWidths) {
                 return;
             }
 
             const keys = this.getVisibleColumnKeys();
 
-            if (!keys || this.isSameColumnWidthKeys(keys) || !keys.some((key) => this.columnWidthsByKey.has(key))) {
+            if (!keys || this.isSameColumnWidthKeys(keys) || !keys.some((key) => columnWidths.has(key))) {
                 return;
             }
 
-            const widths = keys.map((key) => this.columnWidthsByKey.get(key));
+            const widths = keys.map((key) => columnWidths.get(key));
 
             this.addColumnWidthStyles(widths);
 
             if (this.columnResizeMode === 'expand' && widths.every((width) => width !== undefined)) {
-                this.updateTableWidth(widths.reduce((total, width) => total + width, 0) + 'px');
+                this.updateTableWidth(widths.reduce((total, width) => total + (width ?? 0), 0) + 'px');
             }
 
             this.columnWidthsKeys = keys;
         },
-        isSameColumnWidthKeys(keys) {
+        isSameColumnWidthKeys(keys: ColumnKey[]) {
             return !!this.columnWidthsKeys && this.columnWidthsKeys.length === keys.length && this.columnWidthsKeys.every((key, index) => key === keys[index]);
         },
-        updateTableWidth(width) {
-            const applyWidth = (el) => {
+        updateTableWidth(width: string) {
+            const applyWidth = (el?: HTMLElement) => {
                 !!el && (el.style.width = el.style.minWidth = width);
             };
 
-            applyWidth(this.$refs.table);
+            applyWidth(this.$refs.table as HTMLTableElement | undefined);
 
             if (!this.virtualScrollerDisabled) {
-                applyWidth(this.$refs.bodyRef && this.$refs.bodyRef.$el);
-                applyWidth(this.$refs.frozenBodyRef && this.$refs.frozenBodyRef.$el);
+                applyWidth((this.$refs.bodyRef as { $el: HTMLTableSectionElement } | undefined)?.$el);
+                applyWidth((this.$refs.frozenBodyRef as { $el: HTMLTableSectionElement } | undefined)?.$el);
             }
         },
         bindColumnResizeEvents() {
@@ -1505,21 +1601,26 @@ export default {
                 this.documentColumnResizeEndListener = null;
             }
         },
-        onColumnHeaderMouseDown(e) {
+        onColumnHeaderMouseDown(e: ColumnEvent<MouseEvent>) {
             const event = e.originalEvent;
             const column = e.column;
 
-            if (this.reorderableColumns && this.columnProp(column, 'reorderableColumn') !== false) {
-                if (
-                    event.target.nodeName === 'INPUT' ||
-                    event.target.nodeName === 'TEXTAREA' ||
-                    getAttribute(event.target, '[data-pc-section="columnresizer"]')
-                )
-                    event.currentTarget.draggable = false;
-                else event.currentTarget.draggable = true;
+            const { target, currentTarget } = event;
+
+            if (
+                this.reorderableColumns &&
+                this.columnProp(column, 'reorderableColumn') !== false &&
+                target instanceof Element &&
+                currentTarget instanceof HTMLElement
+            ) {
+                currentTarget.draggable = !(
+                    target.nodeName === 'INPUT' ||
+                    target.nodeName === 'TEXTAREA' ||
+                    getAttribute(target, '[data-pc-section="columnresizer"]')
+                );
             }
         },
-        onColumnHeaderDragStart(e) {
+        onColumnHeaderDragStart(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event, column } = e;
 
             if (this.columnResizing) {
@@ -1528,15 +1629,17 @@ export default {
                 return;
             }
 
-            this.colReorderIconWidth = getHiddenElementOuterWidth(this.$refs.reorderIndicatorUp);
-            this.colReorderIconHeight = getHiddenElementOuterHeight(this.$refs.reorderIndicatorUp);
+            this.colReorderIconWidth = getHiddenElementOuterWidth(this.$refs.reorderIndicatorUp as HTMLElement);
+            this.colReorderIconHeight = getHiddenElementOuterHeight(this.$refs.reorderIndicatorUp as HTMLElement);
 
             this.draggedColumn = column;
             this.draggedColumnElement = this.findParentHeader(event.target);
-            event.dataTransfer.setData('text', 'b'); // Firefox requires this to make dragging possible
+            event.dataTransfer?.setData('text', 'b'); // Firefox requires this to make dragging possible
         },
-        onColumnHeaderDragOver(e) {
+        onColumnHeaderDragOver(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event, column } = e;
+            const upIndicator = this.$refs.reorderIndicatorUp as HTMLElement;
+            const downIndicator = this.$refs.reorderIndicatorDown as HTMLElement;
             let dropHeader = this.findParentHeader(event.target);
 
             if (this.reorderableColumns && this.draggedColumnElement && dropHeader && !this.columnProp(column, 'frozen')) {
@@ -1548,41 +1651,47 @@ export default {
                     let targetLeft = dropHeaderOffset.left - containerOffset.left;
                     let columnCenter = dropHeaderOffset.left + dropHeader.offsetWidth / 2;
 
-                    this.$refs.reorderIndicatorUp.style.top = dropHeaderOffset.top - containerOffset.top - (this.colReorderIconHeight - 1) + 'px';
-                    this.$refs.reorderIndicatorDown.style.top = dropHeaderOffset.top - containerOffset.top + dropHeader.offsetHeight + 'px';
+                    upIndicator.style.top = dropHeaderOffset.top - containerOffset.top - (this.colReorderIconHeight - 1) + 'px';
+                    downIndicator.style.top = dropHeaderOffset.top - containerOffset.top + dropHeader.offsetHeight + 'px';
 
                     if (event.pageX > columnCenter) {
-                        this.$refs.reorderIndicatorUp.style.left = targetLeft + dropHeader.offsetWidth - Math.ceil(this.colReorderIconWidth / 2) + 'px';
-                        this.$refs.reorderIndicatorDown.style.left = targetLeft + dropHeader.offsetWidth - Math.ceil(this.colReorderIconWidth / 2) + 'px';
+                        upIndicator.style.left = targetLeft + dropHeader.offsetWidth - Math.ceil(this.colReorderIconWidth / 2) + 'px';
+                        downIndicator.style.left = targetLeft + dropHeader.offsetWidth - Math.ceil(this.colReorderIconWidth / 2) + 'px';
                         this.dropPosition = 1;
                     } else {
-                        this.$refs.reorderIndicatorUp.style.left = targetLeft - Math.ceil(this.colReorderIconWidth / 2) + 'px';
-                        this.$refs.reorderIndicatorDown.style.left = targetLeft - Math.ceil(this.colReorderIconWidth / 2) + 'px';
+                        upIndicator.style.left = targetLeft - Math.ceil(this.colReorderIconWidth / 2) + 'px';
+                        downIndicator.style.left = targetLeft - Math.ceil(this.colReorderIconWidth / 2) + 'px';
                         this.dropPosition = -1;
                     }
 
-                    this.$refs.reorderIndicatorUp.style.display = 'block';
-                    this.$refs.reorderIndicatorDown.style.display = 'block';
+                    upIndicator.style.display = 'block';
+                    downIndicator.style.display = 'block';
                 }
             }
         },
-        onColumnHeaderDragLeave(e) {
+        onColumnHeaderDragLeave(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event } = e;
+            const upIndicator = this.$refs.reorderIndicatorUp as HTMLElement;
+            const downIndicator = this.$refs.reorderIndicatorDown as HTMLElement;
 
             if (this.reorderableColumns && this.draggedColumnElement) {
                 event.preventDefault();
-                this.$refs.reorderIndicatorUp.style.display = 'none';
-                this.$refs.reorderIndicatorDown.style.display = 'none';
+                upIndicator.style.display = 'none';
+                downIndicator.style.display = 'none';
             }
         },
-        onColumnHeaderDrop(e) {
+        onColumnHeaderDrop(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event, column } = e;
+            const upIndicator = this.$refs.reorderIndicatorUp as HTMLElement;
+            const downIndicator = this.$refs.reorderIndicatorDown as HTMLElement;
 
             event.preventDefault();
 
-            if (this.draggedColumnElement) {
+            const dropHeader = this.findParentHeader(event.target);
+
+            if (this.draggedColumnElement && dropHeader) {
                 let dragIndex = getIndex(this.draggedColumnElement);
-                let dropIndex = getIndex(this.findParentHeader(event.target));
+                let dropIndex = getIndex(dropHeader);
                 let allowDrop = dragIndex !== dropIndex;
 
                 if (allowDrop && ((dropIndex - dragIndex === 1 && this.dropPosition === -1) || (dropIndex - dragIndex === -1 && this.dropPosition === 1))) {
@@ -1590,13 +1699,13 @@ export default {
                 }
 
                 if (allowDrop) {
-                    let isSameColumn = (col1, col2) =>
+                    const isSameColumn = (col1: VNode, col2: VNode | null) =>
                         this.columnProp(col1, 'columnKey') || this.columnProp(col2, 'columnKey')
                             ? this.columnProp(col1, 'columnKey') === this.columnProp(col2, 'columnKey')
                             : this.columnProp(col1, 'field') === this.columnProp(col2, 'field');
                     let dragColIndex = this.columns.findIndex((child) => isSameColumn(child, this.draggedColumn));
                     let dropColIndex = this.columns.findIndex((child) => isSameColumn(child, column));
-                    let widths = [];
+                    const widths: number[] = [];
                     let headers = find(this.$el, 'thead[data-pc-section="thead"] > tr > th');
 
                     headers.forEach((header) => widths.push(getOuterWidth(header)));
@@ -1624,29 +1733,18 @@ export default {
                     });
                 }
 
-                this.$refs.reorderIndicatorUp.style.display = 'none';
-                this.$refs.reorderIndicatorDown.style.display = 'none';
+                upIndicator.style.display = 'none';
+                downIndicator.style.display = 'none';
                 this.draggedColumnElement.draggable = false;
                 this.draggedColumnElement = null;
                 this.draggedColumn = null;
                 this.dropPosition = null;
             }
         },
-        findParentHeader(element) {
-            if (element.nodeName === 'TH') {
-                return element;
-            } else {
-                let parent = element.parentElement;
-
-                while (parent.nodeName !== 'TH') {
-                    parent = parent.parentElement;
-                    if (!parent) break;
-                }
-
-                return parent;
-            }
+        findParentHeader(element: EventTarget | null): HTMLTableCellElement | null {
+            return element instanceof Element ? element.closest<HTMLTableCellElement>('th') : null;
         },
-        findColumnByKey(columns, key) {
+        findColumnByKey(columns: VNode[] | null, key: ColumnKey) {
             if (columns && columns.length) {
                 for (let i = 0; i < columns.length; i++) {
                     let column = columns[i];
@@ -1659,28 +1757,32 @@ export default {
 
             return null;
         },
-        onRowMouseDown(event) {
-            if (
-                getAttribute(event.target, 'data-pc-section') === 'reorderablerowhandle' ||
-                getAttribute(event.target.parentElement, 'data-pc-section') === 'reorderablerowhandle'
-            )
-                event.currentTarget.draggable = true;
-            else event.currentTarget.draggable = false;
+        onRowMouseDown(event: MouseEvent) {
+            const { target, currentTarget } = event;
+
+            if (!(target instanceof Element) || !(currentTarget instanceof HTMLElement)) return;
+
+            currentTarget.draggable =
+                getAttribute(target, 'data-pc-section') === 'reorderablerowhandle' ||
+                (target.parentElement !== null && getAttribute(target.parentElement, 'data-pc-section') === 'reorderablerowhandle');
         },
-        onRowDragStart(e) {
+        onRowDragStart(e: RowDragEvent) {
             const event = e.originalEvent;
             const index = e.index;
 
             this.rowDragging = true;
             this.draggedRowIndex = index;
-            event.dataTransfer.setData('text', 'b'); // For firefox
+            event.dataTransfer?.setData('text', 'b'); // For firefox
         },
-        onRowDragOver(e) {
+        onRowDragOver(e: RowDragEvent) {
             const event = e.originalEvent;
             const index = e.index;
 
             if (this.rowDragging && this.draggedRowIndex !== index) {
-                let rowElement = event.currentTarget;
+                const rowElement = event.currentTarget;
+
+                if (!(rowElement instanceof HTMLElement)) return;
+
                 let rowY = getOffset(rowElement).top;
                 let pageY = event.pageY;
                 let rowMidY = rowY + getOuterHeight(rowElement) / 2;
@@ -1716,8 +1818,11 @@ export default {
                 event.preventDefault();
             }
         },
-        onRowDragLeave(event) {
-            let rowElement = event.currentTarget;
+        onRowDragLeave(event: DragEvent) {
+            const rowElement = event.currentTarget;
+
+            if (!(rowElement instanceof HTMLElement)) return;
+
             let prevRowElement = rowElement.previousElementSibling;
 
             if (prevRowElement) {
@@ -1730,14 +1835,14 @@ export default {
             rowElement.setAttribute('data-p-datatable-dragpoint-top', 'false');
             !this.isUnstyled && removeClass(rowElement, 'rs-datatable-dragpoint-top');
         },
-        onRowDragEnd(event) {
+        onRowDragEnd(event: DragEvent) {
             this.rowDragging = false;
             this.draggedRowIndex = null;
             this.droppedRowIndex = null;
-            event.currentTarget.draggable = false;
+            if (event.currentTarget instanceof HTMLElement) event.currentTarget.draggable = false;
         },
-        onRowDrop(event) {
-            if (this.droppedRowIndex != null) {
+        onRowDrop(event: DragEvent) {
+            if (this.droppedRowIndex != null && this.draggedRowIndex != null) {
                 let dropIndex = this.draggedRowIndex > this.droppedRowIndex ? this.droppedRowIndex : this.droppedRowIndex === 0 ? 0 : this.droppedRowIndex - 1;
                 let processedData = [...this.processedData];
 
@@ -1756,25 +1861,27 @@ export default {
             this.onRowDragEnd(event);
             event.preventDefault();
         },
-        toggleRow(event) {
+        toggleRow(event: RowEvent & { expanded: boolean }) {
             const { expanded, ...rest } = event;
             const rowData = event.data;
-            let expandedRows;
+            let expandedRows: TableRow[] | Record<string, boolean>;
 
             if (this.dataKey) {
-                const value = resolveFieldData(rowData, this.dataKey);
+                const value = String(resolveFieldData(rowData, this.dataKey));
+                const keys = { ...(this.expandedRows as Record<string, boolean> | undefined) };
 
-                expandedRows = this.expandedRows ? { ...this.expandedRows } : {};
-                expanded ? (expandedRows[value] = true) : delete expandedRows[value];
+                expanded ? (keys[value] = true) : delete keys[value];
+                expandedRows = keys;
             } else {
-                expandedRows = this.expandedRows ? [...this.expandedRows] : [];
-                expanded ? expandedRows.push(rowData) : (expandedRows = expandedRows.filter((d) => !this.equals(rowData, d)));
+                const rows = Array.isArray(this.expandedRows) ? this.expandedRows : [];
+
+                expandedRows = expanded ? [...rows, rowData] : rows.filter((row) => !this.equals(rowData, row));
             }
 
             this.$emit('update:expandedRows', expandedRows);
             expanded ? this.$emit('row-expand', rest) : this.$emit('row-collapse', rest);
         },
-        toggleRowGroup(e) {
+        toggleRowGroup(e: Omit<RowEvent, 'index'>) {
             const event = e.originalEvent;
             const data = e.data;
             const groupFieldValue = resolveFieldData(data, this.groupRowsBy);
@@ -1790,7 +1897,7 @@ export default {
                 this.$emit('rowgroup-expand', { originalEvent: event, data: groupFieldValue });
             }
         },
-        isRowGroupExpanded(rowData) {
+        isRowGroupExpanded(rowData: TableRow) {
             if (this.expandableRowGroups && this.expandedRowGroups) {
                 let groupFieldValue = resolveFieldData(rowData, this.groupRowsBy);
 
@@ -1816,7 +1923,7 @@ export default {
         },
         saveState() {
             const storage = this.getStorage();
-            let state = {};
+            const state: PersistedState = {};
 
             if (this.paginator) {
                 state.first = this.d_first;
@@ -1861,9 +1968,9 @@ export default {
             if (Object.keys(state).length) {
                 const serializedState = JSON.stringify(state);
 
-                if (serializedState !== this._lastSavedState) {
+                if (serializedState !== this.lastSavedState) {
                     storage.setItem(this.stateKey, serializedState);
-                    this._lastSavedState = serializedState;
+                    this.lastSavedState = serializedState;
                     this.$emit('state-save', state);
                 }
             }
@@ -1871,9 +1978,10 @@ export default {
         restoreState() {
             const storage = this.getStorage();
             const stateString = storage.getItem(this.stateKey);
+            if (stateString === null) return;
             const dateFormat = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/;
 
-            const reviver = function (key, value) {
+            const reviver = (_key: string, value: unknown) => {
                 if (typeof value === 'string' && dateFormat.test(value)) {
                     return new Date(value);
                 }
@@ -1881,16 +1989,18 @@ export default {
                 return value;
             };
 
-            let parsedState;
+            let parsedState: PersistedState | null = null;
             try {
-                parsedState = JSON.parse(stateString, reviver);
-            } catch (error) {}
+                parsedState = JSON.parse(stateString, reviver) as PersistedState;
+            } catch {
+                // An invalid stored value is removed below.
+            }
             if (!parsedState || typeof parsedState !== 'object') {
                 storage.removeItem(this.stateKey);
                 return;
             }
 
-            const restoredState = {};
+            const restoredState: PersistedState = {};
 
             if (this.paginator) {
                 if (typeof parsedState.first === 'number') {
@@ -1970,8 +2080,8 @@ export default {
 
             this.$emit('state-restore', restoredState);
         },
-        saveColumnWidths(state) {
-            let widths = [];
+        saveColumnWidths(state: PersistedState) {
+            const widths: number[] = [];
             let headers = find(this.$el, 'thead[data-pc-section="thead"] > tr > th');
 
             headers.forEach((header) => widths.push(getOuterWidth(header)));
@@ -1985,8 +2095,8 @@ export default {
                 state.tableWidth = getOuterWidth(this.$refs.table) + 'px';
             }
         },
-        getPersistableColumnWidths() {
-            const widths = {};
+        getPersistableColumnWidths(): Record<string, number> | null {
+            const widths: Record<string, number> = {};
 
             this.columnWidthsByKey &&
                 this.columnWidthsByKey.forEach((width, key) => {
@@ -1995,7 +2105,7 @@ export default {
 
             return Object.keys(widths).length ? widths : null;
         },
-        addColumnWidthStyles(widths) {
+        addColumnWidthStyles(widths: ColumnWidth[]) {
             this.createStyleElement();
 
             let innerHTML = '';
@@ -2017,16 +2127,18 @@ export default {
     `;
             });
 
-            this.styleElement.innerHTML = innerHTML;
+            if (this.styleElement) this.styleElement.innerHTML = innerHTML;
         },
         restoreColumnWidths() {
             if (this.columnResizeMode === 'expand' && this.tableWidthState) {
-                this.$refs.table.style.width = this.tableWidthState;
-                this.$refs.table.style.minWidth = this.tableWidthState;
+                const table = this.$refs.table as HTMLTableElement;
+
+                table.style.width = this.tableWidthState;
+                table.style.minWidth = this.tableWidthState;
             }
 
             const entries = Object.entries(this.columnWidthsByKeyState || {})
-                .map(([key, width]) => [key, parseFloat(width)])
+                .map(([key, width]) => [key, parseFloat(String(width))] as const)
                 .filter(([, width]) => isFinite(width) && width > 0);
 
             if (entries.length) {
@@ -2046,37 +2158,37 @@ export default {
                 }
             }
         },
-        onCellEditInit(event) {
+        onCellEditInit(event: DataTableCellEditInitEvent<TableRow>) {
             this.$emit('cell-edit-init', event);
         },
-        onCellEditComplete(event) {
+        onCellEditComplete(event: DataTableCellEditCompleteEvent<TableRow>) {
             this.$emit('cell-edit-complete', event);
         },
-        onCellEditCancel(event) {
+        onCellEditCancel(event: DataTableCellEditCancelEvent) {
             this.$emit('cell-edit-cancel', event);
         },
-        onRowEditInit(event) {
+        onRowEditInit(event: DataTableRowEditInitEvent<TableRow>) {
             let _editingRows = this.editingRows ? [...this.editingRows] : [];
 
             _editingRows.push(event.data);
             this.$emit('update:editingRows', _editingRows);
             this.$emit('row-edit-init', event);
         },
-        onRowEditSave(event) {
-            let _editingRows = [...this.editingRows];
+        onRowEditSave(event: DataTableRowEditInitEvent<TableRow>) {
+            const _editingRows = [...(this.editingRows ?? [])];
 
             _editingRows.splice(this.findIndex(event.data, _editingRows), 1);
             this.$emit('update:editingRows', _editingRows);
             this.$emit('row-edit-save', event);
         },
-        onRowEditCancel(event) {
-            let _editingRows = [...this.editingRows];
+        onRowEditCancel(event: DataTableRowEditInitEvent<TableRow>) {
+            const _editingRows = [...(this.editingRows ?? [])];
 
             _editingRows.splice(this.findIndex(event.data, _editingRows), 1);
             this.$emit('update:editingRows', _editingRows);
             this.$emit('row-edit-cancel', event);
         },
-        onEditingMetaChange(event) {
+        onEditingMetaChange(event: { data: TableRow; field: string; index: number; editing: boolean }) {
             let { data, field, index, editing } = event;
             let editingMeta = { ...this.d_editingMeta };
             let meta = editingMeta[index];
@@ -2097,7 +2209,7 @@ export default {
                 this.d_editingMeta = {};
             }
         },
-        createLazyLoadEvent(event) {
+        createLazyLoadEvent(event?: Event | PageState): LazyLoadEvent {
             return {
                 originalEvent: event,
                 first: this.d_first,
@@ -2111,7 +2223,7 @@ export default {
         hasGlobalFilter() {
             return this.filters && Object.prototype.hasOwnProperty.call(this.filters, 'global');
         },
-        onFilterChange(filters) {
+        onFilterChange(filters: DataTableFilterMeta) {
             this.d_filters = filters;
         },
         onFilterApply() {
@@ -2123,26 +2235,23 @@ export default {
                 this.$emit('filter', this.createLazyLoadEvent());
             }
         },
-        cloneFilters(filters) {
-            let cloned = {};
+        cloneFilters(filters: DataTableFilterMeta | null): DataTableFilterMeta {
+            const cloned: DataTableFilterMeta = {};
 
             if (filters) {
                 Object.entries(filters).forEach(([prop, value]) => {
-                    cloned[prop] = value.operator
-                        ? {
-                              operator: value.operator,
-                              constraints: value.constraints.map((constraint) => {
-                                  return { ...constraint };
-                              })
-                          }
-                        : { ...value };
+                    if (typeof value === 'object' && value !== null && 'operator' in value && value.operator) {
+                        cloned[prop] = { operator: value.operator, constraints: value.constraints.map((constraint) => ({ ...constraint })) };
+                    } else {
+                        cloned[prop] = { ...(value as DataTableFilterMetaData) };
+                    }
                 });
             }
 
             return cloned;
         },
         updateReorderableColumns() {
-            let columnOrder = [];
+            const columnOrder: ColumnKey[] = [];
 
             this.columns.forEach((col) => columnOrder.push(this.columnProp(col, 'columnKey') || this.columnProp(col, 'field')));
             this.d_columnOrder = columnOrder;
@@ -2163,7 +2272,7 @@ export default {
                 this.styleElement = null;
             }
         },
-        dataToRender(data) {
+        dataToRender(data?: TableRow[]): TableRow[] {
             const _data = data || this.processedData;
 
             if (_data && this.paginator) {
@@ -2177,7 +2286,7 @@ export default {
         getVirtualScrollerRef() {
             return this.$refs.virtualScroller;
         },
-        hasSpacerStyle(style) {
+        hasSpacerStyle(style: unknown) {
             return isNotEmpty(style);
         },
         updateRowGroupHeights() {
@@ -2185,10 +2294,11 @@ export default {
                 return;
             }
 
-            const header = this.$refs.table && findSingle(this.$refs.table, '[data-pc-section="rowgroupheader"]');
-            const footer = this.$refs.table && findSingle(this.$refs.table, '[data-pc-section="rowgroupfooter"]');
+            const table = this.$refs.table as HTMLTableElement | undefined;
+            const header = findSingle(table, '[data-pc-section="rowgroupheader"]');
+            const footer = findSingle(table, '[data-pc-section="rowgroupfooter"]');
 
-            if (header) {
+            if (header instanceof HTMLElement) {
                 const height = getOuterHeight(header);
 
                 if (height && height !== this.d_rowGroupHeaderHeight) {
@@ -2196,7 +2306,7 @@ export default {
                 }
             }
 
-            if (footer) {
+            if (footer instanceof HTMLElement) {
                 const height = getOuterHeight(footer);
 
                 if (height && height !== this.d_rowGroupFooterHeight) {
@@ -2204,7 +2314,7 @@ export default {
                 }
             }
         },
-        getRenderedWindowSize(slotProps) {
+        getRenderedWindowSize(slotProps?: RenderWindow) {
             if (!slotProps || !slotProps.rows || !slotProps.rows.length) {
                 return 0;
             }
@@ -2219,18 +2329,18 @@ export default {
             let total = 0;
 
             for (let i = 0; i < rows.length; i++) {
-                total += fn(slotProps.getItemOptions(i).index);
+                total += fn(slotProps.getItemOptions?.(i).index ?? i);
             }
 
             return total;
         }
     },
     computed: {
-        columns() {
+        columns(): VNode[] {
             const cols = this.d_columns.get(this);
 
             if (cols && this.reorderableColumns && this.d_columnOrder) {
-                let orderedColumns = [];
+                const orderedColumns: VNode[] = [];
 
                 for (let columnKey of this.d_columnOrder) {
                     let column = this.findColumnByKey(cols, columnKey);
@@ -2243,7 +2353,7 @@ export default {
                 return [...orderedColumns, ...cols.filter((item) => orderedColumns.indexOf(item) < 0)];
             }
 
-            return cols;
+            return cols ?? [];
         },
         columnGroups() {
             return this.d_columnGroups.get(this);
@@ -2257,7 +2367,7 @@ export default {
         hasFilters() {
             return this.filters && Object.keys(this.filters).length > 0 && this.filters.constructor === Object;
         },
-        processedData() {
+        processedData(): TableRow[] {
             let data = this.value || [];
 
             if (!this.lazy && !this.virtualScrollerOptions?.lazy) {
@@ -2289,7 +2399,7 @@ export default {
 
             return !data || data.length === 0;
         },
-        getItemSize() {
+        getItemSize(): ((index: number) => number) | null {
             const itemSize = (this.virtualScrollerOptions && this.virtualScrollerOptions.itemSize) || 0;
             const customItemSize = this.virtualScrollerOptions && this.virtualScrollerOptions.getItemSize;
             const groupRowsBy = this.groupRowsBy;
@@ -2307,7 +2417,7 @@ export default {
             const hasGroupHeader = !!this.$slots.groupheader;
             const hasGroupFooter = !!this.$slots.groupfooter;
 
-            return (index) => {
+            return (index: number) => {
                 if (!items || index < 0 || index >= items.length) {
                     return itemSize;
                 }
@@ -2324,13 +2434,16 @@ export default {
             };
         },
         paginatorTop() {
-            return this.paginator && (this.paginatorPosition !== 'bottom' || this.paginatorPosition === 'both');
+            return this.paginator && this.paginatorPosition !== 'bottom';
         },
         paginatorBottom() {
-            return this.paginator && (this.paginatorPosition !== 'top' || this.paginatorPosition === 'both');
+            return this.paginator && this.paginatorPosition !== 'top';
         },
         sorted() {
             return this.d_sortField || (this.d_multiSortMeta && this.d_multiSortMeta.length > 0);
+        },
+        selectionArray(): TableRow[] {
+            return Array.isArray(this.selection) ? this.selection : [];
         },
         allRowsSelected() {
             if (this.selectAll !== null) {
@@ -2338,7 +2451,7 @@ export default {
             } else {
                 const val = this.frozenValue ? [...this.frozenValue, ...this.processedData] : this.processedData;
 
-                return isNotEmpty(val) && this.selection && Array.isArray(this.selection) && val.every((v) => this.selection.some((s) => this.equals(s, v)));
+                return isNotEmpty(val) && this.selectionArray.length > 0 && val.every((v) => this.selectionArray.some((s) => this.equals(s, v)));
             }
         },
         groupRowSortField() {
@@ -2394,5 +2507,5 @@ export default {
         ArrowUpIcon: ArrowUpIcon,
         SpinnerIcon: SpinnerIcon
     }
-};
+});
 </script>

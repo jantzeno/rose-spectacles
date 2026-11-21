@@ -95,7 +95,7 @@
 </template>
 
 <script lang="ts">
-import type { DataTableSortMeta } from 'rose-spectacles/datatable';
+import type { TableSortMeta } from './BaseDataTable.vue';
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/frozen-column-layout';
 import { getAttribute } from '../internal/utils/dom/index';
@@ -165,7 +165,7 @@ export default defineComponent({
             default: null
         },
         multiSortMeta: {
-            type: Array as PropType<DataTableSortMeta[]>,
+            type: Array as PropType<TableSortMeta[]>,
             default: null
         },
         allRowsSelected: {
