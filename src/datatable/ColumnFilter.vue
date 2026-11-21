@@ -1,7 +1,7 @@
 <template>
     <div :class="cx('filter')" v-bind="getColumnPT('filter')">
         <div v-if="display === 'row'" :class="cx('filterElementContainer')" v-bind="{ ...filterInputProps, ...getColumnPT('filterElementContainer') }">
-            <component :is="filterElement" :field="field" :filterModel="filters[field]" :filterCallback="filterCallback" />
+            <component :is="filterElement" :field="field" :filterModel="fieldFilter" :filterCallback="filterCallback" />
         </div>
         <Button
             v-if="showMenuButton"
@@ -14,7 +14,7 @@
             :unstyled="unstyled"
             @click="toggleMenu($event)"
             @keydown="onToggleButtonKeyDown($event)"
-            v-bind="{ ...getColumnPT('pcColumnFilterButton', ptmFilterMenuParams), ...filterButtonProps.filter }"
+            v-bind="{ ...getColumnPT('pcColumnFilterButton', ptmFilterMenuParams), ...filterButtonProps?.filter }"
         >
             <template #icon="slotProps">
                 <component
@@ -46,7 +46,7 @@
                     @mousedown="onContentMouseDown"
                     v-bind="getColumnPT('filterOverlay')"
                 >
-                    <component :is="filterHeaderTemplate" :field="field" :filterModel="filters[field]" :filterCallback="filterCallback" />
+                    <component :is="filterHeaderTemplate" :field="field" :filterModel="fieldFilter" :filterCallback="filterCallback" />
                     <template v-if="display === 'row'">
                         <ul :class="cx('filterConstraintList')" v-bind="getColumnPT('filterConstraintList')">
                             <li
@@ -56,7 +56,7 @@
                                 @click="onRowMatchModeChange(matchMode.value)"
                                 @keydown="onRowMatchModeKeyDown($event)"
                                 @keydown.enter.prevent="onRowMatchModeChange(matchMode.value)"
-                                :tabindex="i === 0 ? '0' : null"
+                                :tabindex="i === 0 ? 0 : undefined"
                                 v-bind="getColumnPT('filterConstraint', ptmFilterConstraintOptions(matchMode))"
                             >
                                 {{ matchMode.label }}
@@ -116,14 +116,14 @@
                                         @click="removeConstraint(i)"
                                         :label="removeRuleButtonLabel"
                                         :unstyled="unstyled"
-                                        v-bind="filterButtonProps.popover.removeRule"
+                                        v-bind="filterButtonProps?.popover?.removeRule"
                                         :pt="getColumnPT('pcFilterRemoveRuleButton')"
                                     >
                                         <template #icon="iconProps">
                                             <component
                                                 :is="filterRemoveIconTemplate || 'TrashIcon'"
                                                 :class="iconProps.class"
-                                                v-bind="getColumnPT('pcFilterRemoveRuleButton')['icon']"
+                                                v-bind="getColumnIconPT('pcFilterRemoveRuleButton')"
                                             />
                                         </template>
                                     </Button>
@@ -138,14 +138,14 @@
                                 :class="cx('pcFilterAddRuleButton')"
                                 @click="addConstraint()"
                                 :unstyled="unstyled"
-                                v-bind="filterButtonProps.popover.addRule"
+                                v-bind="filterButtonProps?.popover?.addRule"
                                 :pt="getColumnPT('pcFilterAddRuleButton')"
                             >
                                 <template #icon="iconProps">
                                     <component
                                         :is="filterAddIconTemplate || 'PlusIcon'"
                                         :class="iconProps.class"
-                                        v-bind="getColumnPT('pcFilterAddRuleButton')['icon']"
+                                        v-bind="getColumnIconPT('pcFilterAddRuleButton')"
                                     />
                                 </template>
                             </Button>
@@ -158,10 +158,10 @@
                                 :label="clearButtonLabel"
                                 @click="clearFilter()"
                                 :unstyled="unstyled"
-                                v-bind="filterButtonProps.popover.clear"
+                                v-bind="filterButtonProps?.popover?.clear"
                                 :pt="getColumnPT('pcFilterClearButton')"
                             ></Button>
-                            <component v-else :is="filterClearTemplate" :field="field" :filterModel="filters[field]" :filterCallback="clearFilter" />
+                            <component v-else :is="filterClearTemplate" :field="field" :filterModel="fieldFilter" :filterCallback="clearFilter" />
                             <template v-if="showApplyButton">
                                 <Button
                                     v-if="!filterApplyTemplate"
@@ -170,21 +170,21 @@
                                     :label="applyButtonLabel"
                                     @click="applyFilter()"
                                     :unstyled="unstyled"
-                                    v-bind="filterButtonProps.popover.apply"
+                                    v-bind="filterButtonProps?.popover?.apply"
                                     :pt="getColumnPT('pcFilterApplyButton')"
                                 ></Button>
-                                <component v-else :is="filterApplyTemplate" :field="field" :filterModel="filters[field]" :filterCallback="applyFilter" />
+                                <component v-else :is="filterApplyTemplate" :field="field" :filterModel="fieldFilter" :filterCallback="applyFilter" />
                             </template>
                         </div>
                     </template>
-                    <component :is="filterFooterTemplate" :field="field" :filterModel="filters[field]" :filterCallback="filterCallback" />
+                    <component :is="filterFooterTemplate" :field="field" :filterModel="fieldFilter" :filterCallback="filterCallback" />
                 </div>
             </transition>
         </Portal>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { absolutePosition, addStyle, focus, getAttribute, isTouchDevice } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
@@ -201,9 +201,29 @@ import FocusTrap from '../focustrap/FocusTrap';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import Portal from '../portal/Portal.vue';
 import Select from '../select/Select.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type ComponentPublicInstance, type PropType, type VNode } from 'vue';
+import type { PrimeVueLocaleOptions } from 'rose-spectacles/core/config';
 
-export default {
+interface FilterConstraint {
+    value?: unknown;
+    matchMode?: string | null;
+}
+
+interface FieldFilter extends FilterConstraint {
+    operator?: string | null;
+    constraints?: FilterConstraint[];
+}
+
+type FilterMap = Record<string, FieldFilter>;
+
+type FilterOption = { label?: string; value: string };
+type FilterOverlay = HTMLElement & { $focustrap?: { autoFocus(): void } };
+type FilterButtons = {
+    filter?: Record<string, unknown>;
+    popover?: Partial<Record<'clear' | 'apply' | 'addRule' | 'removeRule', Record<string, unknown>>>;
+};
+
+export default defineComponent({
     name: 'ColumnFilter',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -250,7 +270,7 @@ export default {
             default: true
         },
         matchModeOptions: {
-            type: Array,
+            type: Array as PropType<FilterOption[]>,
             default: null
         },
         maxConstraints: {
@@ -294,11 +314,11 @@ export default {
             default: null
         },
         filters: {
-            type: Object,
+            type: Object as PropType<FilterMap>,
             default: null
         },
         filtersStore: {
-            type: Object,
+            type: Object as PropType<FilterMap>,
             default: null
         },
         filterMenuClass: {
@@ -306,7 +326,7 @@ export default {
             default: null
         },
         filterMenuStyle: {
-            type: null,
+            type: [String, Object] as PropType<string | object>,
             default: null
         },
         filterInputProps: {
@@ -314,46 +334,44 @@ export default {
             default: null
         },
         filterButtonProps: {
-            type: null,
+            type: Object as PropType<FilterButtons>,
             default: null
         },
-        column: null
+        column: {
+            type: Object as PropType<VNode>,
+            required: true
+        }
     },
     data() {
         return {
             overlayVisible: false,
-            defaultMatchMode: null,
-            defaultOperator: null
+            defaultMatchMode: null as string | null,
+            defaultOperator: null as string | null,
+            overlay: null as FilterOverlay | null,
+            selfClick: false,
+            overlayEventListener: null as ((event: unknown) => void) | null,
+            outsideClickListener: null as ((event: MouseEvent) => void) | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            resizeListener: null as (() => void) | null
         };
     },
-    overlay: null,
-    selfClick: false,
-    overlayEventListener: null,
     beforeUnmount() {
-        if (this.overlayEventListener) {
-            OverlayEventBus.off('overlay-click', this.overlayEventListener);
-            this.overlayEventListener = null;
-        }
-
-        if (this.overlay) {
-            ZIndex.clear(this.overlay);
-            this.onOverlayHide();
-        }
+        if (this.overlay) ZIndex.clear(this.overlay);
+        this.onOverlayHide();
+        this.scrollHandler?.destroy();
     },
     mounted() {
-        if (this.filters && this.filters[this.field]) {
-            let fieldFilters = this.filters[this.field];
+        const filter = this.fieldFilter;
 
-            if (fieldFilters.operator) {
-                this.defaultMatchMode = fieldFilters.constraints[0].matchMode;
-                this.defaultOperator = fieldFilters.operator;
-            } else {
-                this.defaultMatchMode = this.filters[this.field].matchMode;
-            }
+        if (filter?.operator) {
+            this.defaultMatchMode = filter.constraints?.[0]?.matchMode ?? null;
+            this.defaultOperator = filter.operator;
+        } else {
+            this.defaultMatchMode = filter?.matchMode ?? null;
         }
     },
     methods: {
-        getColumnPT(key, params) {
+        getColumnPT(key: string, params?: Record<string, unknown>) {
             const columnMetaData = {
                 props: getColumnPassThroughProps(this.column),
                 parent: {
@@ -373,7 +391,11 @@ export default {
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined;
         },
-        ptmFilterConstraintOptions(matchMode) {
+        getColumnIconPT(key: string) {
+            const icon = this.getColumnPT(key).icon;
+            return icon && typeof icon === 'object' ? icon : undefined;
+        },
+        ptmFilterConstraintOptions(matchMode: FilterOption) {
             return {
                 context: {
                     highlighted: matchMode && this.isRowMatchModeSelected(matchMode.value)
@@ -381,15 +403,17 @@ export default {
             };
         },
         clearFilter() {
-            let _filters = { ...this.filters };
+            const _filters = { ...this.filters };
+            const filter = _filters[this.field];
+            if (!filter) return;
 
-            if (_filters[this.field].operator) {
-                _filters[this.field].constraints.splice(1);
-                _filters[this.field].operator = this.defaultOperator;
-                _filters[this.field].constraints[0] = { value: null, matchMode: this.defaultMatchMode };
+            if (filter.operator && filter.constraints) {
+                filter.constraints.splice(1);
+                filter.operator = this.defaultOperator;
+                filter.constraints[0] = { value: null, matchMode: this.defaultMatchMode };
             } else {
-                _filters[this.field].value = null;
-                _filters[this.field].matchMode = this.defaultMatchMode;
+                filter.value = null;
+                filter.matchMode = this.defaultMatchMode;
             }
 
             this.$emit('filter-clear');
@@ -398,7 +422,7 @@ export default {
             this.hide();
         },
         applyFilter() {
-            this.$emit('apply-click', { field: this.field, constraints: this.filters[this.field] });
+            this.$emit('apply-click', { field: this.field, constraints: this.fieldFilter });
             this.$emit('filter-apply');
             this.hide();
         },
@@ -407,7 +431,7 @@ export default {
                 let fieldFilter = this.filtersStore[this.field];
 
                 if (fieldFilter) {
-                    if (fieldFilter.operator) return !this.isFilterBlank(fieldFilter.constraints[0].value);
+                    if (fieldFilter.operator) return !this.isFilterBlank(fieldFilter.constraints?.[0]?.value);
                     else return !this.isFilterBlank(fieldFilter.value);
                 }
             }
@@ -415,9 +439,9 @@ export default {
             return false;
         },
         hasRowFilter() {
-            return this.filters[this.field] && !this.isFilterBlank(this.filters[this.field].value);
+            return this.fieldFilter != null && !this.isFilterBlank(this.fieldFilter.value);
         },
-        isFilterBlank(filter) {
+        isFilterBlank(filter: unknown) {
             if (filter !== null && filter !== undefined) {
                 if ((typeof filter === 'string' && filter.trim().length == 0) || (filter instanceof Array && filter.length == 0)) return true;
                 else return false;
@@ -425,12 +449,12 @@ export default {
 
             return true;
         },
-        toggleMenu(event) {
+        toggleMenu(event: MouseEvent | KeyboardEvent) {
             this.overlayVisible = !this.overlayVisible;
 
             event.preventDefault();
         },
-        onToggleButtonKeyDown(event) {
+        onToggleButtonKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'Enter':
                 case 'NumpadEnter':
@@ -444,17 +468,20 @@ export default {
                     break;
             }
         },
-        onRowMatchModeChange(matchMode) {
-            let _filters = { ...this.filters };
+        onRowMatchModeChange(matchMode: string) {
+            const _filters = { ...this.filters };
+            const filter = _filters[this.field];
+            if (!filter) return;
 
-            _filters[this.field].matchMode = matchMode;
+            filter.matchMode = matchMode;
             this.$emit('matchmode-change', { field: this.field, matchMode: matchMode });
             this.$emit('filter-change', _filters);
             this.$emit('filter-apply');
             this.hide();
         },
-        onRowMatchModeKeyDown(event) {
-            let item = event.target;
+        onRowMatchModeKeyDown(event: KeyboardEvent) {
+            const item = event.target;
+            if (!(item instanceof HTMLElement)) return;
 
             switch (event.code) {
                 case 'ArrowDown':
@@ -462,7 +489,7 @@ export default {
 
                     if (nextItem) {
                         item.removeAttribute('tabindex');
-                        nextItem.tabIndex = '0';
+                        nextItem.tabIndex = 0;
                         nextItem.focus();
                     }
 
@@ -474,7 +501,7 @@ export default {
 
                     if (prevItem) {
                         item.removeAttribute('tabindex');
-                        prevItem.tabIndex = '0';
+                        prevItem.tabIndex = 0;
                         prevItem.focus();
                     }
 
@@ -482,13 +509,15 @@ export default {
                     break;
             }
         },
-        isRowMatchModeSelected(matchMode) {
-            return this.filters[this.field].matchMode === matchMode;
+        isRowMatchModeSelected(matchMode: string) {
+            return this.fieldFilter?.matchMode === matchMode;
         },
-        onOperatorChange(value) {
-            let _filters = { ...this.filters };
+        onOperatorChange(value: string) {
+            const _filters = { ...this.filters };
+            const filter = _filters[this.field];
+            if (!filter) return;
 
-            _filters[this.field].operator = value;
+            filter.operator = value;
             this.$emit('filter-change', _filters);
 
             this.$emit('operator-change', { field: this.field, operator: value });
@@ -497,10 +526,11 @@ export default {
                 this.$emit('filter-apply');
             }
         },
-        onMenuMatchModeChange(value, index) {
-            let _filters = { ...this.filters };
+        onMenuMatchModeChange(value: string, index: number) {
+            const constraint = this.fieldFilter?.constraints?.[index];
+            if (!constraint) return;
 
-            _filters[this.field].constraints[index].matchMode = value;
+            constraint.matchMode = value;
             this.$emit('matchmode-change', { field: this.field, matchMode: value, index: index });
 
             if (!this.showApplyButton) {
@@ -509,9 +539,11 @@ export default {
         },
         addConstraint() {
             let _filters = { ...this.filters };
-            let newConstraint = { value: null, matchMode: this.defaultMatchMode };
+            const constraints = _filters[this.field]?.constraints;
+            if (!constraints) return;
 
-            _filters[this.field].constraints.push(newConstraint);
+            const newConstraint = { value: null, matchMode: this.defaultMatchMode };
+            constraints.push(newConstraint);
             this.$emit('constraint-add', { field: this.field, constraint: newConstraint });
             this.$emit('filter-change', _filters);
 
@@ -519,9 +551,10 @@ export default {
                 this.$emit('filter-apply');
             }
         },
-        removeConstraint(index) {
-            let _filters = { ...this.filters };
-            let removedConstraint = _filters[this.field].constraints.splice(index, 1);
+        removeConstraint(index: number) {
+            const _filters = { ...this.filters };
+            const removedConstraint = _filters[this.field]?.constraints?.splice(index, 1);
+            if (!removedConstraint) return;
 
             this.$emit('constraint-remove', { field: this.field, constraint: removedConstraint });
             this.$emit('filter-change', _filters);
@@ -533,24 +566,24 @@ export default {
         filterCallback() {
             this.$emit('filter-apply');
         },
-        findNextItem(item) {
-            let nextItem = item.nextElementSibling;
+        findNextItem(item: HTMLElement): HTMLElement | null {
+            const nextItem = item.nextElementSibling ?? item.parentElement?.firstElementChild;
 
-            if (nextItem) return getAttribute(nextItem, 'data-pc-section') === 'filterconstraintseparator' ? this.findNextItem(nextItem) : nextItem;
-            else return item.parentElement.firstElementChild;
+            if (!(nextItem instanceof HTMLElement)) return null;
+            return getAttribute(nextItem, 'data-pc-section') === 'filterconstraintseparator' ? this.findNextItem(nextItem) : nextItem;
         },
-        findPrevItem(item) {
-            let prevItem = item.previousElementSibling;
+        findPrevItem(item: HTMLElement): HTMLElement | null {
+            const prevItem = item.previousElementSibling ?? item.parentElement?.lastElementChild;
 
-            if (prevItem) return getAttribute(prevItem, 'data-pc-section') === 'filterconstraintseparator' ? this.findPrevItem(prevItem) : prevItem;
-            else return item.parentElement.lastElementChild;
+            if (!(prevItem instanceof HTMLElement)) return null;
+            return getAttribute(prevItem, 'data-pc-section') === 'filterconstraintseparator' ? this.findPrevItem(prevItem) : prevItem;
         },
         hide() {
             this.overlayVisible = false;
 
-            this.showMenuButton && focus(this.$refs.icon.$el);
+            if (this.showMenuButton) focus(this.getIconElement());
         },
-        onContentClick(event) {
+        onContentClick(event: MouseEvent) {
             this.selfClick = true;
 
             OverlayEventBus.emit('overlay-click', {
@@ -563,20 +596,20 @@ export default {
         onContentMouseDown() {
             this.selfClick = true;
         },
-        onOverlayEnter(el) {
-            if (this.filterMenuStyle) {
-                addStyle(this.overlay, this.filterMenuStyle);
-            }
+        onOverlayEnter(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+            if (this.filterMenuStyle) addStyle(el, this.filterMenuStyle);
 
-            ZIndex.set('overlay', el, this.$primevue.config.zIndex.overlay);
+            ZIndex.set('overlay', el, this.$primevue?.config.zIndex?.overlay);
             addStyle(el, { position: 'absolute', top: '0' });
-            absolutePosition(this.overlay, this.$refs.icon.$el);
+            const icon = this.getIconElement();
+            if (icon) absolutePosition(el, icon);
             this.bindOutsideClickListener();
             this.bindScrollListener();
             this.bindResizeListener();
 
             this.overlayEventListener = (e) => {
-                if (!this.isOutsideClicked(e.target)) {
+                if (e && typeof e === 'object' && 'target' in e && e.target instanceof Element && !this.isOutsideClicked(e.target)) {
                     this.selfClick = true;
                 }
             };
@@ -589,42 +622,47 @@ export default {
         onOverlayLeave() {
             this.onOverlayHide();
         },
-        onOverlayAfterLeave(el) {
-            ZIndex.clear(el);
+        onOverlayAfterLeave(el: Element) {
+            if (el instanceof HTMLElement) ZIndex.clear(el);
         },
         onOverlayHide() {
             this.unbindOutsideClickListener();
             this.unbindResizeListener();
             this.unbindScrollListener();
             this.overlay = null;
-            OverlayEventBus.off('overlay-click', this.overlayEventListener);
+            if (this.overlayEventListener) OverlayEventBus.off('overlay-click', this.overlayEventListener);
             this.overlayEventListener = null;
         },
-        overlayRef(el) {
-            this.overlay = el;
+        overlayRef(el: Element | ComponentPublicInstance | null) {
+            this.overlay = el instanceof HTMLElement ? el : null;
         },
-        isOutsideClicked(target) {
+        isOutsideClicked(target: EventTarget | null) {
+            if (!(target instanceof Element)) return false;
+
             return (
                 !this.isTargetClicked(target) &&
                 this.overlay &&
                 !(this.overlay.isSameNode(target) || this.overlay.contains(target) || this.isNestedOverlayClicked(target))
             );
         },
-        isNestedOverlayClicked(target) {
-            let node = target;
+        isNestedOverlayClicked(target: Element) {
+            let node: Element | null = target;
 
             while (node && node !== document.body) {
                 const attrSelectors = [...(node.attributes || [])].filter((attr) => attr.value === '' && /^pc\w+$/.test(attr.name)).map((attr) => attr.name);
 
-                if (attrSelectors.some((attrSelector) => this.overlay.querySelector(`[${attrSelector}]`))) return true;
+                if (attrSelectors.some((attrSelector) => this.overlay?.querySelector(`[${attrSelector}]`))) return true;
 
                 node = node.parentElement;
             }
 
             return false;
         },
-        isTargetClicked(target) {
-            return this.$refs.icon && (this.$refs.icon.$el.isSameNode(target) || this.$refs.icon.$el.contains(target));
+        getIconElement(): HTMLElement | undefined {
+            return (this.$refs.icon as ComponentPublicInstance | undefined)?.$el as HTMLElement | undefined;
+        },
+        isTargetClicked(target: Element) {
+            return this.getIconElement()?.contains(target);
         },
         bindOutsideClickListener() {
             if (!this.outsideClickListener) {
@@ -647,15 +685,17 @@ export default {
             }
         },
         bindScrollListener() {
-            if (!this.scrollHandler) {
-                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.icon.$el, () => {
+            const icon = this.getIconElement();
+
+            if (!this.scrollHandler && icon) {
+                this.scrollHandler = new ConnectedOverlayScrollHandler(icon, () => {
                     if (this.overlayVisible) {
                         this.hide();
                     }
                 });
             }
 
-            this.scrollHandler.bindScrollListener();
+            this.scrollHandler?.bindScrollListener();
         },
         unbindScrollListener() {
             if (this.scrollHandler) {
@@ -687,65 +727,67 @@ export default {
         overlayId() {
             return this.$id + '_overlay';
         },
-        matchModes() {
-            return (
-                this.matchModeOptions ||
-                this.$primevue.config.filterMatchModeOptions[this.type].map((key) => {
-                    return { label: this.$primevue.config.locale[key], value: key };
-                })
-            );
+        fieldFilter() {
+            return this.filters?.[this.field];
+        },
+        matchModes(): FilterOption[] {
+            if (this.matchModeOptions) return this.matchModeOptions;
+
+            const modes: string[] = this.$primevue?.config.filterMatchModeOptions?.[this.type] ?? [];
+            return modes.map((value) => {
+                const label = this.$primevue?.config.locale?.[value as keyof PrimeVueLocaleOptions];
+
+                return { label: typeof label === 'string' ? label : value, value };
+            });
         },
         isShowMatchModes() {
             return this.type !== 'boolean' && this.showMatchModes && this.matchModes;
         },
         operatorOptions() {
             return [
-                { label: this.$primevue.config.locale.matchAll, value: FilterOperator.AND },
-                { label: this.$primevue.config.locale.matchAny, value: FilterOperator.OR }
+                { label: this.$primevue?.config.locale?.matchAll, value: FilterOperator.AND },
+                { label: this.$primevue?.config.locale?.matchAny, value: FilterOperator.OR }
             ];
         },
         noFilterLabel() {
-            return this.$primevue.config.locale ? this.$primevue.config.locale.noFilter : undefined;
+            return this.$primevue?.config.locale?.noFilter;
         },
         isShowOperator() {
-            return this.showOperator && this.filters[this.field].operator;
+            return this.showOperator && this.fieldFilter?.operator;
         },
         operator() {
-            return this.filters[this.field].operator;
+            return this.fieldFilter?.operator;
         },
         fieldConstraints() {
-            return this.filters[this.field].constraints || [this.filters[this.field]];
+            return this.fieldFilter?.constraints ?? (this.fieldFilter ? [this.fieldFilter] : []);
         },
         showRemoveIcon() {
             return this.fieldConstraints.length > 1;
         },
         removeRuleButtonLabel() {
-            return this.$primevue.config.locale ? this.$primevue.config.locale.removeRule : undefined;
+            return this.$primevue?.config.locale?.removeRule;
         },
         addRuleButtonLabel() {
-            return this.$primevue.config.locale ? this.$primevue.config.locale.addRule : undefined;
+            return this.$primevue?.config.locale?.addRule;
         },
         isShowAddConstraint() {
-            return this.showAddButton && this.filters[this.field].operator && this.fieldConstraints && this.fieldConstraints.length < this.maxConstraints;
+            return this.showAddButton && this.fieldFilter?.operator && this.fieldConstraints && this.fieldConstraints.length < this.maxConstraints;
         },
         clearButtonLabel() {
-            return this.$primevue.config.locale ? this.$primevue.config.locale.clear : undefined;
+            return this.$primevue?.config.locale?.clear;
         },
         applyButtonLabel() {
-            return this.$primevue.config.locale ? this.$primevue.config.locale.apply : undefined;
+            return this.$primevue?.config.locale?.apply;
         },
         columnFilterButtonAriaLabel() {
-            return this.$primevue.config.locale?.aria
-                ? this.overlayVisible
-                    ? this.$primevue.config.locale.aria.hideFilterMenu
-                    : this.$primevue.config.locale.aria.showFilterMenu
-                : undefined;
+            const aria = this.$primevue?.config.locale?.aria;
+            return this.overlayVisible ? aria?.hideFilterMenu : aria?.showFilterMenu;
         },
         filterOperatorAriaLabel() {
-            return this.$primevue.config.locale ? this.$primevue.config.locale.filterOperator : undefined;
+            return this.$primevue?.config.locale?.filterOperator;
         },
         filterRuleAriaLabel() {
-            return this.$primevue.config.locale ? this.$primevue.config.locale.filterConstraint : undefined;
+            return this.$primevue?.config.locale?.filterConstraint;
         },
         ptmHeaderFilterClearParams() {
             return {
@@ -776,5 +818,5 @@ export default {
     directives: {
         focustrap: FocusTrap
     }
-};
+});
 </script>

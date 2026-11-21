@@ -106,6 +106,8 @@ export interface PrimeVueLocaleOptions {
     matchAny?: string;
     addRule?: string;
     removeRule?: string;
+    filterOperator?: string;
+    filterConstraint?: string;
     accept?: string;
     reject?: string;
     choose?: string;
