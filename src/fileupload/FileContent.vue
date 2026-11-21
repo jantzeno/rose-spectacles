@@ -25,20 +25,21 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TimesIcon from '../icons/times/TimesIcon.vue';
 import Badge from '../badge/Badge.vue';
 import Button from '../button/Button.vue';
 
-export default {
+export default defineComponent({
     name: 'FileContent',
     hostName: 'FileUpload',
     extends: BaseComponent,
     emits: ['remove'],
     props: {
         files: {
-            type: Array,
+            type: Array as PropType<(File & { objectURL?: string })[]>,
             default: () => []
         },
         badgeSeverity: {
@@ -59,7 +60,7 @@ export default {
         }
     },
     methods: {
-        formatSize(bytes) {
+        formatSize(bytes: number) {
             const k = 1024;
             const dm = 3;
             const sizes = this.$primevue.config.locale?.fileSizeTypes || ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -79,5 +80,5 @@ export default {
         Badge,
         TimesIcon
     }
-};
+});
 </script>

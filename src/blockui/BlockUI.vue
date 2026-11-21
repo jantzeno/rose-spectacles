@@ -4,21 +4,22 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { addClass, createElement, hasCSSAnimation, remove } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { blockBodyScroll, unblockBodyScroll } from '../utils/Utils';
 import BaseBlockUI from './BaseBlockUI.vue';
 
-export default {
+export default defineComponent({
     name: 'BlockUI',
     extends: BaseBlockUI,
     inheritAttrs: false,
     emits: ['block', 'unblock'],
-    mask: null,
     data() {
         return {
-            isBlocked: false
+            isBlocked: false,
+            mask: null as HTMLDivElement | null
         };
     },
     watch: {
@@ -71,7 +72,7 @@ export default {
 
                 document.body.appendChild(this.mask);
                 blockBodyScroll();
-                document.activeElement.blur();
+                (document.activeElement as HTMLElement).blur();
             } else {
                 this.mask = createElement('div', {
                     style: {
@@ -84,11 +85,11 @@ export default {
                     class: !this.isUnstyled && styleClass,
                     'rs-bind': this.ptm('mask')
                 });
-                this.$refs.container.appendChild(this.mask);
+                (this.$refs.container as HTMLElement).appendChild(this.mask);
             }
 
             if (this.autoZIndex) {
-                ZIndex.set('modal', this.mask, this.baseZIndex || this.$primevue.config.zIndex.modal);
+                ZIndex.set('modal', this.mask, this.baseZIndex || this.$primevue.config.zIndex!.modal);
             }
 
             this.isBlocked = true;
@@ -114,7 +115,7 @@ export default {
                     this.removeMask(mask);
                 }, 300);
 
-                if (hasCSSAnimation(mask) > 0) {
+                if (hasCSSAnimation(mask)) {
                     mask.addEventListener('animationend', handleAnimationEnd);
                     mask.addEventListener('webkitAnimationEnd', handleAnimationEnd);
                 }
@@ -122,12 +123,13 @@ export default {
                 this.removeMask();
             }
         },
-        removeMask(mask = this.mask) {
-            if (mask && mask !== this.mask) return;
+        removeMask(mask?: HTMLDivElement | null) {
+            const target = mask === undefined ? this.mask : mask;
+            if (target && target !== this.mask) return;
 
-            if (mask) {
-                ZIndex.clear(mask);
-                remove(mask);
+            if (target) {
+                ZIndex.clear(target);
+                remove(target);
 
                 if (this.fullScreen) {
                     unblockBodyScroll();
@@ -140,5 +142,5 @@ export default {
             this.$emit('unblock');
         }
     }
-};
+});
 </script>

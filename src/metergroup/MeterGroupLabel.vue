@@ -5,16 +5,18 @@
                 <i v-if="val.icon" :class="[val.icon, cx('labelIcon')]" :style="{ color: val.color }" v-bind="ptm('labelIcon')" />
                 <span v-else :class="cx('labelMarker')" :style="{ backgroundColor: val.color }" v-bind="ptm('labelMarker')" />
             </slot>
-            <span :class="cx('labelText')" v-bind="ptm('labelText')">{{ val.label }} ({{ $parentInstance.percentValue(val.value) }})</span>
+            <span :class="cx('labelText')" v-bind="ptm('labelText')">{{ val.label }} ({{ meterGroup.percentValue(val.value) }})</span>
         </li>
     </ol>
 </template>
 
-<script>
+<script lang="ts">
+import type { MeterItem } from 'rose-spectacles/metergroup';
+import { defineComponent, type PropType } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 
-export default {
+export default defineComponent({
     name: 'MeterGroupLabel',
     hostName: 'MeterGroup',
     extends: BaseComponent,
@@ -22,7 +24,7 @@ export default {
     inject: ['$pcMeterGroup'],
     props: {
         value: {
-            type: Array,
+            type: Array as PropType<MeterItem[]>,
             default: null
         },
         labelPosition: {
@@ -35,11 +37,14 @@ export default {
         }
     },
     computed: {
+        meterGroup() {
+            return this.$pcMeterGroup as { percentValue: (value: number) => number; labelOrientation: string };
+        },
         dataP() {
             return cn({
-                [this.$pcMeterGroup.labelOrientation]: this.$pcMeterGroup.labelOrientation
+                [this.meterGroup.labelOrientation]: this.meterGroup.labelOrientation
             });
         }
     }
-};
+});
 </script>

@@ -9,14 +9,15 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import CheckIcon from '../icons/check/CheckIcon.vue';
 import ExclamationTriangleIcon from '../icons/exclamationtriangle/ExclamationTriangleIcon.vue';
 import InfoCircleIcon from '../icons/infocircle/InfoCircleIcon.vue';
 import TimesCircleIcon from '../icons/timescircle/TimesCircleIcon.vue';
 import BaseInlineMessage from './BaseInlineMessage.vue';
 
-export default {
+export default defineComponent({
     name: 'InlineMessage',
     extends: BaseInlineMessage,
     inheritAttrs: false,
@@ -27,21 +28,23 @@ export default {
         };
     },
     mounted() {
-        if (!this.sticky) {
+        const options = this as typeof this & { sticky?: boolean; life?: number };
+        if (!options.sticky) {
             setTimeout(() => {
                 this.visible = false;
-            }, this.life);
+            }, options.life);
         }
     },
     computed: {
         iconComponent() {
-            return {
+            const icons = {
                 info: InfoCircleIcon,
                 success: CheckIcon,
                 warn: ExclamationTriangleIcon,
                 error: TimesCircleIcon
-            }[this.severity];
+            };
+            return icons[this.severity as keyof typeof icons];
         }
     }
-};
+});
 </script>

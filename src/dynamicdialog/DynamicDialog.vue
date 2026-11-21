@@ -28,67 +28,66 @@
     </template>
 </template>
 
-<script>
+<script lang="ts">
+import type { DynamicDialogInstance } from 'rose-spectacles/dynamicdialogoptions';
+import { defineComponent } from 'vue';
 import { uuid } from '../internal/utils/index';
 import Dialog from '../dialog/Dialog.vue';
 import DynamicDialogEventBus from '../dynamicdialogeventbus/DynamicDialogEventBus';
 import BaseDynamicDialog from './BaseDynamicDialog.vue';
 
-export default {
+type LiveDialog = DynamicDialogInstance & { key: string; visible: boolean };
+
+export default defineComponent({
     name: 'DynamicDialog',
     extends: BaseDynamicDialog,
     inheritAttrs: false,
     data() {
         return {
-            instanceMap: {}
+            instanceMap: {} as Record<string, LiveDialog>,
+            currentInstanceKey: null as string | null
         };
     },
-    openListener: null,
-    closeListener: null,
-    currentInstance: null,
     mounted() {
-        this.openListener = ({ instance }) => {
+        DynamicDialogEventBus.on('open', this.onOpen);
+        DynamicDialogEventBus.on('close', this.onClose);
+    },
+    beforeUnmount() {
+        DynamicDialogEventBus.off('open', this.onOpen);
+        DynamicDialogEventBus.off('close', this.onClose);
+    },
+    methods: {
+        onOpen(event: unknown) {
+            const { instance } = event as { instance: LiveDialog };
             const key = uuid() + '_dynamic_dialog';
 
             instance.visible = true;
             instance.key = key;
             this.instanceMap[key] = instance;
-        };
-
-        this.closeListener = ({ instance, params }) => {
-            const key = instance.key;
-            const currentInstance = this.instanceMap[key];
+        },
+        onClose(event: unknown) {
+            const { instance, params } = event as { instance: LiveDialog; params?: unknown };
+            const currentInstance = this.instanceMap[instance.key];
 
             if (currentInstance) {
                 currentInstance.visible = false;
-                currentInstance.options.onClose && currentInstance.options.onClose({ data: params, type: 'config-close' });
-
-                this.currentInstance = currentInstance;
+                currentInstance.options.onClose?.({ data: params, type: 'config-close' });
+                this.currentInstanceKey = currentInstance.key;
             }
-        };
-
-        DynamicDialogEventBus.on('open', this.openListener);
-        DynamicDialogEventBus.on('close', this.closeListener);
-    },
-    beforeUnmount() {
-        DynamicDialogEventBus.off('open', this.openListener);
-        DynamicDialogEventBus.off('close', this.closeListener);
-    },
-    methods: {
-        onDialogHide(instance) {
-            !this.currentInstance && instance.options.onClose && instance.options.onClose({ type: 'dialog-close' });
         },
-        onDialogAfterHide(instance) {
-            this.currentInstance && delete this.currentInstance;
-            this.currentInstance = null;
+        onDialogHide(instance: LiveDialog) {
+            if (!this.currentInstanceKey) instance.options.onClose?.({ type: 'dialog-close' });
+        },
+        onDialogAfterHide(instance: LiveDialog) {
+            this.currentInstanceKey = null;
             delete this.instanceMap[instance.key];
         },
-        getTemplateItems(template) {
+        getTemplateItems<T>(template: T | T[]) {
             return Array.isArray(template) ? template : [template];
         }
     },
     components: {
         DDialog: Dialog
     }
-};
+});
 </script>

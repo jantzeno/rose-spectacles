@@ -24,22 +24,23 @@
     </transition>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { getWindowScrollTop } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import ChevronUpIcon from '../icons/chevronup/ChevronUpIcon.vue';
 import Button from '../button/Button.vue';
 import BaseScrollTop from './BaseScrollTop.vue';
 
-export default {
+export default defineComponent({
     name: 'ScrollTop',
     extends: BaseScrollTop,
     inheritAttrs: false,
-    scrollListener: null,
-    container: null,
     data() {
         return {
-            visible: false
+            visible: false,
+            scrollListener: null as (() => void) | null,
+            container: undefined as HTMLElement | undefined
         };
     },
     mounted() {
@@ -52,7 +53,7 @@ export default {
 
         if (this.container) {
             ZIndex.clear(this.container);
-            this.overlay = null;
+            this.container = undefined;
         }
     },
     methods: {
@@ -64,7 +65,7 @@ export default {
                 behavior: this.behavior
             });
         },
-        checkVisibility(scrollY) {
+        checkVisibility(scrollY: number) {
             if (scrollY > this.threshold) this.visible = true;
             else this.visible = false;
         },
@@ -94,24 +95,24 @@ export default {
                 this.scrollListener = null;
             }
         },
-        onEnter(el) {
-            ZIndex.set('overlay', el, this.$primevue.config.zIndex.overlay);
+        onEnter(el: Element) {
+            ZIndex.set('overlay', el as HTMLElement, this.$primevue.config.zIndex!.overlay);
         },
-        onAfterLeave(el) {
-            ZIndex.clear(el);
+        onAfterLeave(el: Element) {
+            ZIndex.clear(el as HTMLElement);
         },
-        containerRef(el) {
-            this.container = el ? el.$el : undefined;
+        containerRef(el: Element | ComponentPublicInstance | null) {
+            this.container = el ? (el as ComponentPublicInstance).$el : undefined;
         }
     },
     computed: {
         scrollTopAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.scrollTop : undefined;
+            return this.$primevue.config.locale?.aria?.scrollTop;
         }
     },
     components: {
         ChevronUpIcon,
         Button
     }
-};
+});
 </script>

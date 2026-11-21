@@ -11,7 +11,7 @@
                 :class="cx('root')"
                 v-bind="ptmi('root')"
             >
-                <slot v-if="$slots.container" name="container" :closeCallback="hide" :keydownCallback="(event) => onButtonKeydown(event)"></slot>
+                <slot v-if="$slots.container" name="container" :closeCallback="hide" :keydownCallback="onButtonKeydown"></slot>
                 <template v-else>
                     <div :class="cx('content')" @click="onContentClick" @mousedown="onContentClick" @keydown="onContentKeydown" v-bind="ptm('content')">
                         <slot></slot>
@@ -22,7 +22,8 @@
     </Portal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, markRaw, type ComponentPublicInstance } from 'vue';
 import { $dt } from '../internal/styled/index';
 import { absolutePosition, addClass, addStyle, focus, getOffset, isClient, isTouchDevice, setAttribute } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
@@ -33,14 +34,25 @@ import Portal from '../portal/Portal.vue';
 import Ripple from '../ripple/Ripple';
 import BasePopover from './BasePopover.vue';
 
-export default {
+export default defineComponent({
     name: 'Popover',
     extends: BasePopover,
     inheritAttrs: false,
     emits: ['show', 'hide'],
     data() {
         return {
-            visible: false
+            visible: false,
+            selfClick: false,
+            target: null as HTMLElement | null,
+            eventTarget: null as EventTarget | null,
+            outsideClickListener: null as ((event: MouseEvent) => void) | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            resizeListener: null as (() => void) | null,
+            container: null as HTMLElement | null,
+            styleElement: null as HTMLStyleElement | null,
+            overlayEventListener: null as ((event: unknown) => void) | null,
+            documentKeydownListener: null as ((event: KeyboardEvent) => void) | null,
+            contentResizeObserver: null as ResizeObserver | null
         };
     },
     watch: {
@@ -55,17 +67,6 @@ export default {
             }
         }
     },
-    selfClick: false,
-    target: null,
-    eventTarget: null,
-    outsideClickListener: null,
-    scrollHandler: null,
-    resizeListener: null,
-    container: null,
-    styleElement: null,
-    overlayEventListener: null,
-    documentKeydownListener: null,
-    contentResizeObserver: null,
     beforeUnmount() {
         if (this.dismissable) {
             this.unbindOutsideClickListener();
@@ -98,14 +99,14 @@ export default {
         }
     },
     methods: {
-        toggle(event, target) {
+        toggle(event: Event, target?: HTMLElement) {
             if (this.visible) this.hide();
             else this.show(event, target);
         },
-        show(event, target) {
+        show(event: Event, target?: HTMLElement) {
             this.visible = true;
             this.eventTarget = event.currentTarget;
-            this.target = target || event.currentTarget;
+            this.target = target || (event.currentTarget as HTMLElement | null);
         },
         hide() {
             this.visible = false;
@@ -113,7 +114,8 @@ export default {
         onContentClick() {
             this.selfClick = true;
         },
-        onEnter(el) {
+        onEnter(element: Element) {
+            const el = element as HTMLElement;
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
 
@@ -125,11 +127,11 @@ export default {
             this.bindResizeListener();
 
             if (this.autoZIndex) {
-                ZIndex.set('overlay', el, this.baseZIndex || this.$primevue.config.zIndex.overlay);
+                ZIndex.set('overlay', el, this.baseZIndex || this.$primevue.config.zIndex!.overlay);
             }
 
             this.overlayEventListener = (e) => {
-                if (this.container.contains(e.target)) {
+                if (this.container!.contains((e as { target: Node | null }).target)) {
                     this.selfClick = true;
                 }
             };
@@ -149,40 +151,44 @@ export default {
             this.unbindResizeListener();
             this.unbindDocumentKeyDownListener();
             this.unbindContentResizeListener();
-            OverlayEventBus.off('overlay-click', this.overlayEventListener);
-            this.overlayEventListener = null;
+            if (this.overlayEventListener) {
+                OverlayEventBus.off('overlay-click', this.overlayEventListener);
+                this.overlayEventListener = null;
+            }
             this.$emit('hide');
         },
-        onAfterLeave(el) {
+        onAfterLeave(el: Element) {
             if (this.autoZIndex) {
-                ZIndex.clear(el);
+                ZIndex.clear(el as HTMLElement);
             }
         },
         alignOverlay() {
-            absolutePosition(this.container, this.target, false);
+            const container = this.container!;
+            const target = this.target!;
+            absolutePosition(container, target, false);
 
-            const containerOffset = getOffset(this.container);
-            const targetOffset = getOffset(this.target);
+            const containerOffset = getOffset(container);
+            const targetOffset = getOffset(target);
             let arrowLeft = 0;
 
             if (containerOffset.left < targetOffset.left) {
                 arrowLeft = targetOffset.left - containerOffset.left;
             }
 
-            this.container.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
+            container.style.setProperty($dt('popover.arrow.left').name, `${arrowLeft}px`);
 
             if (containerOffset.top < targetOffset.top) {
-                this.container.setAttribute('data-p-popover-flipped', 'true');
-                !this.isUnstyled && addClass(this.container, 'rs-popover-flipped');
+                container.setAttribute('data-p-popover-flipped', 'true');
+                !this.isUnstyled && addClass(container, 'rs-popover-flipped');
             }
         },
-        onContentKeydown(event) {
+        onContentKeydown(event: KeyboardEvent) {
             if (event.code === 'Escape' && this.closeOnEscape) {
                 this.hide();
-                focus(this.target);
+                focus(this.target!);
             }
         },
-        onButtonKeydown(event) {
+        onButtonKeydown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown':
                 case 'ArrowUp':
@@ -195,13 +201,13 @@ export default {
             }
         },
         focus() {
-            let focusTarget = this.container.querySelector('[autofocus]');
+            let focusTarget = this.container!.querySelector<HTMLElement>('[autofocus]');
 
             if (focusTarget) {
                 focusTarget.focus();
             }
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (event.code === 'Escape' && this.closeOnEscape) {
                 this.visible = false;
             }
@@ -240,11 +246,13 @@ export default {
         },
         bindScrollListener() {
             if (!this.scrollHandler) {
-                this.scrollHandler = new ConnectedOverlayScrollHandler(this.target, () => {
-                    if (this.visible) {
-                        this.visible = false;
-                    }
-                });
+                this.scrollHandler = markRaw(
+                    new ConnectedOverlayScrollHandler(this.target!, () => {
+                        if (this.visible) {
+                            this.visible = false;
+                        }
+                    })
+                );
             }
 
             this.scrollHandler.bindScrollListener();
@@ -279,7 +287,7 @@ export default {
                     }
                 });
 
-                this.contentResizeObserver.observe(this.container);
+                this.contentResizeObserver.observe(this.container!);
             }
         },
         unbindContentResizeListener() {
@@ -288,11 +296,13 @@ export default {
                 this.contentResizeObserver = null;
             }
         },
-        isTargetClicked(event) {
-            return this.eventTarget && (this.eventTarget === event.target || this.eventTarget.contains(event.target));
+        isTargetClicked(event: MouseEvent) {
+            const origin = this.eventTarget as Node | null;
+            const clicked = event.target as Node | null;
+            return origin && (origin === clicked || origin.contains(clicked));
         },
-        containerRef(el) {
-            this.container = el;
+        containerRef(el: Element | ComponentPublicInstance | null) {
+            this.container = el as HTMLElement | null;
         },
         createStyle() {
             if (!this.styleElement && !this.isUnstyled) {
@@ -322,7 +332,7 @@ export default {
                 this.styleElement = null;
             }
         },
-        onOverlayClick(event) {
+        onOverlayClick(event: MouseEvent) {
             OverlayEventBus.emit('overlay-click', {
                 originalEvent: event,
                 target: this.target
@@ -336,5 +346,5 @@ export default {
     components: {
         Portal
     }
-};
+});
 </script>

@@ -4,11 +4,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DeferredContentStyle from './style/DeferredContentStyle';
 
-export default {
+export default defineComponent({
     name: 'DeferredContent',
     extends: BaseComponent,
     inheritAttrs: false,
@@ -16,7 +17,8 @@ export default {
     style: DeferredContentStyle,
     data() {
         return {
-            loaded: false
+            loaded: false,
+            documentScrollListener: null as (() => void) | null
         };
     },
     mounted() {
@@ -49,17 +51,17 @@ export default {
             if (this.loaded) {
                 return false;
             } else {
-                const rect = this.$refs.container.getBoundingClientRect();
+                const rect = (this.$refs.container as HTMLElement).getBoundingClientRect();
                 const docElement = document.documentElement;
                 const winHeight = docElement.clientHeight;
 
                 return winHeight >= rect.top;
             }
         },
-        load(event) {
+        load(event?: Event) {
             this.loaded = true;
             this.$emit('load', event);
         }
     }
-};
+});
 </script>
