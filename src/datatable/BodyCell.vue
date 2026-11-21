@@ -191,14 +191,8 @@
 
 <script>
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
-import {
-    getAttribute,
-    getFirstFocusableElement,
-    getNextElementSibling,
-    getOuterWidth,
-    getPreviousElementSibling,
-    invokeElementMethod
-} from '../internal/utils/dom/index';
+import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/frozen-column-layout';
+import { getAttribute, getFirstFocusableElement, invokeElementMethod } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
@@ -309,6 +303,7 @@ export default {
     data() {
         return {
             d_editing: this.editing,
+            stopFrozenLayout: null,
             styleObject: {}
         };
     },
@@ -321,14 +316,10 @@ export default {
         }
     },
     mounted() {
-        if (this.columnProp('frozen')) {
-            this.updateStickyPosition();
-        }
+        this.syncFrozenLayout();
     },
     updated() {
-        if (this.columnProp('frozen')) {
-            this.updateStickyPosition();
-        }
+        this.syncFrozenLayout();
 
         if (this.d_editing && (this.editMode === 'cell' || (this.editMode === 'row' && this.columnProp('rowEditor')))) {
             setTimeout(() => {
@@ -339,6 +330,8 @@ export default {
         }
     },
     beforeUnmount() {
+        this.stopFrozenLayout?.();
+
         if (this.overlayEventListener) {
             OverlayEventBus.off('overlay-click', this.overlayEventListener);
             this.overlayEventListener = null;
@@ -601,30 +594,18 @@ export default {
                 this.$emit('cell-edit-cancel', { originalEvent: event, data: this.rowData, field: this.field, index: this.rowIndex });
             }
         },
-        updateStickyPosition() {
-            if (this.columnProp('frozen')) {
-                let align = this.columnProp('alignFrozen');
-
-                if (align === 'right') {
-                    let pos = 0;
-                    let next = getNextElementSibling(this.$el, '[data-p-frozen-column="true"]');
-
-                    if (next) {
-                        pos = getOuterWidth(next) + parseFloat(next.style['inset-inline-end'] || 0);
-                    }
-
-                    this.styleObject.insetInlineEnd = pos + 'px';
-                } else {
-                    let pos = 0;
-                    let prev = getPreviousElementSibling(this.$el, '[data-p-frozen-column="true"]');
-
-                    if (prev) {
-                        pos = getOuterWidth(prev) + parseFloat(prev.style['inset-inline-start'] || 0);
-                    }
-
-                    this.styleObject.insetInlineStart = pos + 'px';
-                }
+        syncFrozenLayout() {
+            if (!this.columnProp('frozen')) {
+                this.stopFrozenLayout?.();
+                this.stopFrozenLayout = null;
+                return;
             }
+
+            this.stopFrozenLayout ??= observeFrozenColumn(this.$el, this.updateStickyPosition);
+            this.updateStickyPosition();
+        },
+        updateStickyPosition() {
+            updateFrozenColumnOffset(this.$el, this.columnProp('alignFrozen'), this.styleObject);
         },
         getVirtualScrollerProp(option) {
             return this.virtualScrollerContentProps ? this.virtualScrollerContentProps[option] : null;

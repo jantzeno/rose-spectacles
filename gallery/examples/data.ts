@@ -27,6 +27,18 @@ export const data: Example[] = [
             ])
     ),
     example(
+        'Frozen table columns',
+        ['DataTable'],
+        () => () =>
+            h('div', { 'data-testid': 'frozen-table-width', style: { width: '24rem', maxWidth: '100%' } }, [
+                demo('DataTable', { value: locations, dataKey: 'name', scrollable: true, tableStyle: 'table-layout: fixed; width: 100%' }, () => [
+                    demo('Column', { field: 'name', header: 'Location', frozen: true, style: { width: '30%' } }),
+                    demo('Column', { field: 'country', header: 'Country', frozen: true, style: { width: '25%' } }),
+                    demo('Column', { field: 'category', header: 'Category' })
+                ])
+            ])
+    ),
+    example(
         'Data view',
         ['DataView'],
         () => () => demo('DataView', { value: locations, paginator: true, rows: 2 }, { list: ({ items }: { items: typeof locations }) => items.map(details) })

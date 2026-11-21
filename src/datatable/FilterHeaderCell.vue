@@ -59,7 +59,7 @@
 
 <script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
-import { getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
+import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/frozen-column-layout';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
 import { defineComponent, mergeProps, type CSSProperties, type VNode } from 'vue';
@@ -119,18 +119,18 @@ export default defineComponent({
     },
     data() {
         return {
+            stopFrozenLayout: null as (() => void) | null,
             styleObject: {} as CSSProperties
         };
     },
     mounted() {
-        if (this.columnProp('frozen')) {
-            this.updateStickyPosition();
-        }
+        this.syncFrozenLayout();
     },
     updated() {
-        if (this.columnProp('frozen')) {
-            this.updateStickyPosition();
-        }
+        this.syncFrozenLayout();
+    },
+    beforeUnmount() {
+        this.stopFrozenLayout?.();
     },
     methods: {
         columnProp(prop: string) {
@@ -160,30 +160,18 @@ export default defineComponent({
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo
         },
-        updateStickyPosition() {
-            if (this.columnProp('frozen')) {
-                let align = this.columnProp('alignFrozen');
-
-                if (align === 'right') {
-                    let pos = 0;
-                    let next = getNextElementSibling(this.$el, '[data-p-frozen-column="true"]');
-
-                    if (next) {
-                        pos = getOuterWidth(next) + parseFloat((next as HTMLElement).style.insetInlineEnd || '0');
-                    }
-
-                    this.styleObject.insetInlineEnd = pos + 'px';
-                } else {
-                    let pos = 0;
-                    let prev = getPreviousElementSibling(this.$el, '[data-p-frozen-column="true"]');
-
-                    if (prev) {
-                        pos = getOuterWidth(prev) + parseFloat((prev as HTMLElement).style.insetInlineStart || '0');
-                    }
-
-                    this.styleObject.insetInlineStart = pos + 'px';
-                }
+        syncFrozenLayout() {
+            if (!this.columnProp('frozen')) {
+                this.stopFrozenLayout?.();
+                this.stopFrozenLayout = null;
+                return;
             }
+
+            this.stopFrozenLayout ??= observeFrozenColumn(this.$el, this.updateStickyPosition);
+            this.updateStickyPosition();
+        },
+        updateStickyPosition() {
+            updateFrozenColumnOffset(this.$el, this.columnProp('alignFrozen'), this.styleObject);
         }
     },
     computed: {

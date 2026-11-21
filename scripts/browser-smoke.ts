@@ -65,6 +65,25 @@ try {
         await wait(`!document.querySelector(${JSON.stringify(longChip)})`, 'The long chip can be removed');
         console.log('Long chips keep their remove controls inside the input');
 
+        await show('#frozen-table-columns');
+        const frozenHeader = '[data-example="frozen-table-columns"] th[data-p-frozen-column="true"]';
+        const firstWidth = await browser.evaluate<number>(`document.querySelector(${JSON.stringify(frozenHeader)}).offsetWidth`);
+        await browser.evaluate(`document.querySelector('[data-testid="frozen-table-width"]').style.width = '48rem'`);
+        await wait(
+            `document.querySelector(${JSON.stringify(frozenHeader)}).offsetWidth > ${firstWidth} + 40`,
+            'Resizing the container changes the first frozen column width'
+        );
+        await wait(
+            `(() => {
+                const [first, second] = document.querySelectorAll(${JSON.stringify(frozenHeader)});
+                const bodyCell = document.querySelector('[data-example="frozen-table-columns"] tr td:nth-child(2)');
+                return Math.abs(parseFloat(second.style.insetInlineStart) - first.offsetWidth) <= 1 &&
+                    Math.abs(parseFloat(bodyCell.style.insetInlineStart) - first.offsetWidth) <= 1;
+            })()`,
+            'Frozen table columns update their offsets after a container resize'
+        );
+        console.log('Frozen table columns update their offsets after a container resize');
+
         await show('#chart');
         await wait(
             `(() => {
