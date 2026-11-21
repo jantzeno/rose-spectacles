@@ -3357,10 +3357,16 @@
             "title": "Dialog: The body class p-overflow-hidden is removed when a nested dialog is closed",
             "labels": ["bug", "styling"],
             "component": "Dialog",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The outer modal was still open when closing the inner modal removed the body scroll lock. The regression passed after the Dialog acquired a separate lock for each instance."
+            ],
             "reproducer": "https://primevue.org/dynamicdialog/",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome 131.0.6778.108. Verify the reported behavior: Dialog: The body class p-overflow-hidden is removed when a nested dialog is closed."
+            "resolvingCommit": "34bb92c099c636311107d169c8b4ee474da39680",
+            "test": {
+                "path": "src/dialog/Dialog.spec.ts",
+                "name": "keeps the body locked when an inner modal closes"
+            }
         },
         {
             "number": 344,
@@ -3878,10 +3884,16 @@
             "title": "Dialog: Nested dialogs are closed together when they are closed with the ESC key",
             "labels": ["bug"],
             "component": "Dialog",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "One Escape key event caused both nested dialogs to emit a close request. The regression passed when the document handler dismissed only the latest active dialog."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-vdtvrs?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Dialog: Nested dialogs are closed together when they are closed with the ESC key."
+            "resolvingCommit": "34bb92c099c636311107d169c8b4ee474da39680",
+            "test": {
+                "path": "src/dialog/Dialog.spec.ts",
+                "name": "dismisses only the most recently opened dialog on Escape"
+            }
         },
         {
             "number": 393,
