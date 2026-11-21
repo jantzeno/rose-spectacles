@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import { FilterMatchMode, FilterOperator } from '../core/api/Api';
 import { mount } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
-import { nextTick } from 'vue';
+import { h, nextTick } from 'vue';
 import Column from '../column/Column.vue';
 import DataTable from './DataTable.vue';
+import ColumnFilter from './ColumnFilter.vue';
 
 function elementWithin(root: ParentNode, selector: string) {
     const element = root.querySelector(selector);
@@ -43,6 +44,32 @@ const mountTable = () =>
     );
 
 describe('ColumnFilter', () => {
+    it('clears a row filter when Enter activates the last menu item', async () => {
+        const wrapper = mount(ColumnFilter, {
+            props: {
+                field: 'name',
+                display: 'row',
+                column: h(Column),
+                filters: { name: { value: 'Copper', matchMode: FilterMatchMode.CONTAINS } },
+                filterButtonProps: { filter: {} }
+            },
+            global: { plugins: [PrimeVue], stubs: { teleport: true } }
+        });
+
+        try {
+            await wrapper.get('button').trigger('click');
+            const clearItem = wrapper.findAll('li').at(-1);
+            assert(clearItem);
+
+            await clearItem.trigger('keydown', { code: 'Enter', key: 'Enter' });
+
+            expect(wrapper.emitted('filter-clear')).toEqual([[]]);
+            expect(wrapper.emitted('filter-change')?.[0]?.[0]).toEqual({ name: { value: null, matchMode: FilterMatchMode.CONTAINS } });
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('should keep the filter overlay open when an option of a nested Select is clicked', async () => {
         const wrapper = mountTable();
 

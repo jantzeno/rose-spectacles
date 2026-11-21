@@ -66,7 +66,7 @@
                                 :class="cx('filterConstraint')"
                                 @click="clearFilter()"
                                 @keydown="onRowMatchModeKeyDown($event)"
-                                @keydown.enter="onRowClearItemClick()"
+                                @keydown.enter.prevent="clearFilter()"
                                 v-bind="getColumnPT('filterConstraint')"
                             >
                                 {{ noFilterLabel }}
