@@ -265,7 +265,7 @@ export interface DataViewProps<T = unknown> {
 /**
  * Defines valid slots in DataView component.
  */
-export interface DataViewSlots {
+export interface DataViewSlots<T = unknown> {
     /**
      * Custom header template.
      */
@@ -361,7 +361,7 @@ export interface DataViewSlots {
         /**
          * Value of the component
          */
-        items: any;
+        items: T[];
     }): VNode[];
     /**
      * Custom list template.
@@ -371,7 +371,7 @@ export interface DataViewSlots {
         /**
          * Value of the component
          */
-        items: any;
+        items: T[];
     }): VNode[];
 }
 
@@ -407,11 +407,13 @@ export declare type DataViewEmits = EmitFn<DataViewEmitsOptions>;
  * @group Component
  *
  */
-declare const DataView: DefineComponent<DataViewProps, DataViewSlots, DataViewEmits>;
+declare const DataView: {
+    new <T = unknown>(props?: DataViewProps<T>): InstanceType<DefineComponent<DataViewProps<T>, DataViewSlots<T>, DataViewEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        DataView: DefineComponent<DataViewProps, DataViewSlots, DataViewEmits>;
+        DataView: typeof DataView;
     }
 }
 

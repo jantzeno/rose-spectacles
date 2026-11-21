@@ -61,7 +61,7 @@ try {
     );
     const slotTypes = `
         <script setup lang="ts">
-        import { Carousel, Galleria, Timeline } from 'rose-spectacles';
+        import { AutoComplete, Carousel, CascadeSelect, DataView, Galleria, Timeline } from 'rose-spectacles';
 
         const entries: { title: string }[] = [{ title: 'First entry' }];
         </script>
@@ -81,6 +81,16 @@ try {
                     {{ item.title }}
                 </template>
             </Timeline>
+            <AutoComplete :suggestions="entries" :option-label="(option) => option.title">
+                <template #option="{ option }">{{ option.title }}</template>
+            </AutoComplete>
+            <CascadeSelect :options="entries" :option-label="(option) => option.title">
+                <template #option="{ option }">{{ option.title }}</template>
+            </CascadeSelect>
+            <DataView :value="entries">
+                <template #list="{ items }">{{ items[0].title }}</template>
+                <template #grid="{ items }">{{ items[0].title }}</template>
+            </DataView>
         </template>
     `;
     await write('SlotTypes.vue', slotTypes);
@@ -140,9 +150,10 @@ try {
     const diagnostics = invalidSlots.stdout + invalidSlots.stderr;
     assert.equal(invalidSlots.status, 2, diagnostics);
     const slotErrors = diagnostics.match(/SlotTypes\.vue\(\d+,\d+\): error TS2339: Property 'missingField' does not exist on type/g);
-    assert.equal(slotErrors?.length, 3, diagnostics);
-    assert.equal(diagnostics.match(/error TS\d+:/g)?.length, 3, diagnostics);
+    assert.equal(slotErrors?.length, 9, diagnostics);
+    assert.equal(diagnostics.match(/error TS\d+:/g)?.length, 9, diagnostics);
     console.log('Carousel, Galleria, and Timeline slots reject unknown item properties');
+    console.log('AutoComplete, CascadeSelect, and DataView reject unknown option and item properties');
 
     run(['x', '--no-install', 'vite', 'build']);
 

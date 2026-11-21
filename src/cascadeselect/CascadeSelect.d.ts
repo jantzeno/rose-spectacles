@@ -269,7 +269,7 @@ export interface CascadeSelectContext {
 /**
  * Defines valid properties in CascadeSelect component.
  */
-export interface CascadeSelectProps {
+export interface CascadeSelectProps<T = any> {
     /**
      * Value of the component.
      */
@@ -285,27 +285,27 @@ export interface CascadeSelectProps {
     /**
      * An array of selectitems to display as the available options.
      */
-    options?: any[] | undefined;
+    options?: T[] | undefined;
     /**
      * Property name or getter function to use as the label of an option.
      */
-    optionLabel?: string | ((data: any) => string) | undefined;
+    optionLabel?: string | ((data: T) => string) | undefined;
     /**
      * Property name or getter function to use as the value of an option, defaults to the option itself when not defined.
      */
-    optionValue?: string | ((data: any) => any) | undefined;
+    optionValue?: string | ((data: T) => any) | undefined;
     /**
      * Property name or getter function to use as the disabled flag of an option, defaults to false when not defined.
      */
-    optionDisabled?: string | ((data: any) => boolean) | undefined;
+    optionDisabled?: string | ((data: T) => boolean) | undefined;
     /**
      * Property name or getter function to use as the label of an option group.
      */
-    optionGroupLabel?: string | ((data: any) => string) | undefined;
+    optionGroupLabel?: string | ((data: T) => string) | undefined;
     /**
      * Property name or getter function to retrieve the items of a group.
      */
-    optionGroupChildren?: string[] | string | ((data: any) => any[]) | undefined;
+    optionGroupChildren?: string[] | string | ((data: T) => any[]) | undefined;
     /**
      * Default text to display when no option is selected.
      */
@@ -501,7 +501,7 @@ export interface CascadeSelectProps {
 /**
  * Defines valid slots in CascadeSelect component.
  */
-export interface CascadeSelectSlots {
+export interface CascadeSelectSlots<T = any> {
     /**
      * Custom content for each option.
      * @param {Object} scope - option slot's params.
@@ -510,7 +510,7 @@ export interface CascadeSelectSlots {
         /**
          * Option instance
          */
-        option: any;
+        option: T;
         /**
          * Selection state
          */
@@ -558,7 +558,7 @@ export interface CascadeSelectSlots {
         /**
          * Options of the component
          */
-        options: any[];
+        options: T[];
     }): VNode[];
     /**
      * Custom footer template.
@@ -571,7 +571,7 @@ export interface CascadeSelectSlots {
         /**
          * Options of the component
          */
-        options: any[];
+        options: T[];
     }): VNode[];
     /**
      * Custom clear icon template.
@@ -654,11 +654,13 @@ export declare type CascadeSelectEmits = EmitFn<CascadeSelectEmitsOptions>;
  * @group Component
  *
  */
-declare const CascadeSelect: DefineComponent<CascadeSelectProps, CascadeSelectSlots, CascadeSelectEmits>;
+declare const CascadeSelect: {
+    new <T = any>(props?: CascadeSelectProps<T>): InstanceType<DefineComponent<CascadeSelectProps<T>, CascadeSelectSlots<T>, CascadeSelectEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        CascadeSelect: DefineComponent<CascadeSelectProps, CascadeSelectSlots, CascadeSelectEmits>;
+        CascadeSelect: typeof CascadeSelect;
     }
 }
 
