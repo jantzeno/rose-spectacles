@@ -1,18 +1,20 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import SelectStyle from './style/SelectStyle';
+
+type OptionResolver = string | ((option: unknown) => unknown);
 
 export default defineComponent({
     name: 'BaseSelect',
     extends: BaseInput,
     props: {
         options: Array,
-        optionLabel: [String, Function],
-        optionValue: [String, Function],
-        optionDisabled: [String, Function],
-        optionGroupLabel: [String, Function],
-        optionGroupChildren: [String, Function],
+        optionLabel: [String, Function] as PropType<OptionResolver>,
+        optionValue: [String, Function] as PropType<OptionResolver>,
+        optionDisabled: [String, Function] as PropType<OptionResolver>,
+        optionGroupLabel: [String, Function] as PropType<OptionResolver>,
+        optionGroupChildren: [String, Function] as PropType<OptionResolver>,
         scrollHeight: {
             type: String,
             default: '14rem'
@@ -25,7 +27,7 @@ export default defineComponent({
             default: 'contains'
         },
         filterFields: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: null
         },
         editable: Boolean,
@@ -33,7 +35,7 @@ export default defineComponent({
             type: String,
             default: null
         },
-        dataKey: null,
+        dataKey: null as unknown as PropType<string>,
         showClear: {
             type: Boolean,
             default: false

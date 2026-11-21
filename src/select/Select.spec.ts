@@ -410,15 +410,9 @@ describe('filter checks', () => {
         expect(filterInput.exists()).toBe(true);
         expect(filterIcon.classes()).toContain('pi-discord');
 
-        const event = { target: { value: 'c' } };
-        const onFilterChange = vi.spyOn(wrapper.vm, 'onFilterChange');
+        await filterInput.setValue('c');
 
-        wrapper.vm.onFilterChange(event);
-        await wrapper.vm.$nextTick();
-
-        expect(onFilterChange).toHaveBeenCalled();
-
-        await wrapper.setData({ filterValue: 'c' });
+        expect(wrapper.emitted('filter')?.at(-1)?.[0]).toMatchObject({ value: 'c' });
 
         expect(wrapper.findAll('.rs-select-option').length).toBe(2);
     });
