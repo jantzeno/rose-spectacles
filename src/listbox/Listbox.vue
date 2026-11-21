@@ -91,7 +91,7 @@
                                 :style="{ height: itemSize ? itemSize + 'px' : undefined }"
                                 :class="cx('option', { option, index: i, getItemOptions })"
                                 role="option"
-                                :aria-label="getOptionLabel(option)"
+                                :aria-label="getOptionLabel(option)?.toString()"
                                 :aria-selected="isSelected(option)"
                                 :aria-disabled="isOptionDisabled(option)"
                                 :aria-setsize="ariaSetSize"
@@ -161,9 +161,9 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { cn } from '../internal/utils/index';
-import { findSingle, focus, getFirstFocusableElement, isElement } from '../internal/utils/dom/index';
+import { findSingle, focus, getFirstFocusableElement } from '../internal/utils/dom/index';
 import { equals, findLastIndex, isNotEmpty, isPrintableCharacter, resolveFieldData } from '../internal/utils/object/index';
 import { FilterService } from '../core/api/Api';
 import BlankIcon from '../icons/blank/BlankIcon.vue';
@@ -174,28 +174,34 @@ import InputIcon from '../inputicon/InputIcon.vue';
 import InputText from '../inputtext/InputText.vue';
 import Ripple from '../ripple/Ripple';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
-import { toRaw } from 'vue';
+import type { VirtualScrollerItemOptions, VirtualScrollerMethods } from '../virtualscroller/VirtualScroller';
+import type { ChoiceOptionGroup } from '../internal/choice-options';
+import { defineComponent, toRaw, type ComponentPublicInstance } from 'vue';
 import BaseListbox from './BaseListbox.vue';
 
+type ElementRef = Element | ComponentPublicInstance | null;
+type ItemOptionsGetter = (index: number) => VirtualScrollerItemOptions;
+type OptionEvent = MouseEvent | KeyboardEvent;
+
 // Named so usesCustomEquality can tell whether a component that extends Listbox replaced it.
-function isEquals(value1, value2) {
+function isEquals(this: { equalityKey?: string }, value1: unknown, value2: unknown) {
     return equals(value1, value2, this.equalityKey);
 }
 
-export default {
+export default defineComponent({
     name: 'Listbox',
     extends: BaseListbox,
     inheritAttrs: false,
     emits: ['change', 'focus', 'blur', 'filter', 'item-dblclick', 'option-dblclick'],
-    list: null,
-    virtualScroller: null,
-    optionTouched: false,
-    startRangeIndex: -1,
-    searchTimeout: null,
-    searchValue: '',
     data() {
         return {
-            filterValue: null,
+            list: null as HTMLUListElement | null,
+            virtualScroller: null as VirtualScrollerMethods | null,
+            optionTouched: false,
+            startRangeIndex: -1,
+            searchTimeout: null as ReturnType<typeof setTimeout> | null,
+            searchValue: '',
+            filterValue: null as string | null,
             focused: false,
             focusedOptionIndex: -1
         };
@@ -208,24 +214,27 @@ export default {
     mounted() {
         this.autoUpdateModel();
     },
+    beforeUnmount() {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    },
     methods: {
-        getOptionIndex(index, fn) {
-            return this.virtualScrollerDisabled ? index : fn && fn(index)['index'];
+        getOptionIndex(index: number, getItemOptions?: ItemOptionsGetter) {
+            return this.virtualScrollerDisabled ? index : (getItemOptions?.(index).index ?? index);
         },
-        getOptionLabel(option) {
+        getOptionLabel(option: unknown): string | number | boolean | null {
             return this.optionLabel
                 ? resolveFieldData(option, this.optionLabel)
                 : typeof option === 'string' || typeof option === 'number' || typeof option === 'boolean'
                   ? option
                   : null;
         },
-        getOptionValue(option) {
+        getOptionValue(option: unknown) {
             return this.optionValue ? resolveFieldData(option, this.optionValue) : option;
         },
-        getOptionRenderKey(option, index) {
+        getOptionRenderKey(option: unknown, index: number) {
             return (this.dataKey ? resolveFieldData(option, this.dataKey) : this.getOptionLabel(option)) + '_' + index;
         },
-        getPTOptions(option, itemOptions, index, key) {
+        getPTOptions(option: unknown, itemOptions: ItemOptionsGetter | undefined, index: number, key: string) {
             return this.ptm(key, {
                 context: {
                     selected: this.isSelected(option),
@@ -234,19 +243,27 @@ export default {
                 }
             });
         },
-        isOptionDisabled(option) {
+        isOptionDisabled(option: unknown) {
             return this.optionDisabled ? resolveFieldData(option, this.optionDisabled) : false;
         },
-        isOptionGroup(option) {
-            return this.optionGroupLabel && option.optionGroup && option.group;
+        isOptionGroup(option: unknown): option is ChoiceOptionGroup<unknown> {
+            return !!(
+                this.optionGroupLabel &&
+                option &&
+                typeof option === 'object' &&
+                'optionGroup' in option &&
+                option.optionGroup &&
+                'group' in option &&
+                option.group
+            );
         },
-        getOptionGroupLabel(optionGroup) {
+        getOptionGroupLabel(optionGroup: unknown) {
             return resolveFieldData(optionGroup, this.optionGroupLabel);
         },
-        getOptionGroupChildren(optionGroup) {
+        getOptionGroupChildren(optionGroup: unknown): unknown[] | undefined {
             return resolveFieldData(optionGroup, this.optionGroupChildren);
         },
-        getAriaPosInset(index) {
+        getAriaPosInset(index: number) {
             return (this.optionGroupLabel ? index - this.visibleOptions.slice(0, index).filter((option) => this.isOptionGroup(option)).length : index) + 1;
         },
         onFirstHiddenFocus() {
@@ -254,29 +271,37 @@ export default {
 
             const firstFocusableEl = getFirstFocusableElement(this.$el, ':not([data-p-hidden-focusable="true"])');
 
-            this.$refs.lastHiddenFocusableElement.tabIndex = isElement(firstFocusableEl) ? undefined : -1;
-            this.$refs.firstHiddenFocusableElement.tabIndex = -1;
+            const last = this.$refs.lastHiddenFocusableElement as HTMLElement;
+            const first = this.$refs.firstHiddenFocusableElement as HTMLElement;
+
+            last.tabIndex = firstFocusableEl ? 0 : -1;
+            first.tabIndex = -1;
         },
-        onLastHiddenFocus(event) {
+        onLastHiddenFocus(event: FocusEvent) {
             const relatedTarget = event.relatedTarget;
+            const first = this.$refs.firstHiddenFocusableElement as HTMLElement;
+            const last = this.$refs.lastHiddenFocusableElement as HTMLElement;
 
             if (relatedTarget === this.list) {
                 const firstFocusableEl = getFirstFocusableElement(this.$el, ':not([data-p-hidden-focusable="true"])');
 
-                focus(firstFocusableEl);
-                this.$refs.firstHiddenFocusableElement.tabIndex = undefined;
+                if (firstFocusableEl instanceof HTMLElement) focus(firstFocusableEl);
+                first.tabIndex = 0;
             } else {
-                focus(this.$refs.firstHiddenFocusableElement);
+                focus(first);
             }
 
-            this.$refs.lastHiddenFocusableElement.tabIndex = -1;
+            last.tabIndex = -1;
         },
-        onFocusout(event) {
-            if (!this.$el.contains(event.relatedTarget) && this.$refs.lastHiddenFocusableElement && this.$refs.firstHiddenFocusableElement) {
-                this.$refs.lastHiddenFocusableElement.tabIndex = this.$refs.firstHiddenFocusableElement.tabIndex = undefined;
+        onFocusout(event: FocusEvent) {
+            const first = this.$refs.firstHiddenFocusableElement as HTMLElement | undefined;
+            const last = this.$refs.lastHiddenFocusableElement as HTMLElement | undefined;
+
+            if (first && last && !(event.relatedTarget instanceof Node && this.$el.contains(event.relatedTarget))) {
+                last.tabIndex = first.tabIndex = 0;
             }
         },
-        onListFocus(event) {
+        onListFocus(event: FocusEvent) {
             this.focused = true;
             this.focusedOptionIndex =
                 this.focusedOptionIndex !== -1
@@ -288,13 +313,13 @@ export default {
             this.scrollInView(this.focusedOptionIndex);
             this.$emit('focus', event);
         },
-        onListBlur(event) {
+        onListBlur(event: FocusEvent) {
             this.focused = false;
             this.focusedOptionIndex = this.startRangeIndex = -1;
             this.searchValue = '';
             this.$emit('blur', event);
         },
-        onListKeyDown(event) {
+        onListKeyDown(event: KeyboardEvent) {
             const metaKey = event.metaKey || event.ctrlKey;
 
             switch (event.code) {
@@ -334,7 +359,7 @@ export default {
 
                 case 'ShiftLeft':
                 case 'ShiftRight':
-                    this.onShiftKey(event);
+                    this.onShiftKey();
                     break;
 
                 default:
@@ -355,7 +380,7 @@ export default {
                     break;
             }
         },
-        onOptionSelect(event, option, index = -1) {
+        onOptionSelect(event: OptionEvent | null, option: unknown, index = -1) {
             if (this.disabled || this.isOptionDisabled(option)) {
                 return;
             }
@@ -364,10 +389,10 @@ export default {
             this.optionTouched = false;
             index !== -1 && (this.focusedOptionIndex = index);
         },
-        onOptionMouseDown(event, index) {
+        onOptionMouseDown(event: MouseEvent, index: number) {
             this.changeFocusedOptionIndex(event, index);
         },
-        onOptionMouseMove(event, index) {
+        onOptionMouseMove(event: MouseEvent, index: number) {
             if (this.focusOnHover && this.focused) {
                 this.changeFocusedOptionIndex(event, index);
             }
@@ -379,7 +404,7 @@ export default {
 
             this.optionTouched = true;
         },
-        onOptionDblClick(event, item) {
+        onOptionDblClick(event: MouseEvent, item: unknown) {
             this.$emit('item-dblclick', {
                 originalEvent: event,
                 value: item
@@ -389,10 +414,10 @@ export default {
                 value: item
             });
         },
-        onOptionSelectSingle(event, option) {
+        onOptionSelectSingle(event: OptionEvent | null, option: unknown) {
             let selected = this.isSelected(option);
             let valueChanged = false;
-            let value = null;
+            let value: unknown = null;
             let metaSelection = this.optionTouched ? false : this.metaKeySelection;
 
             if (metaSelection) {
@@ -416,27 +441,28 @@ export default {
                 this.updateModel(event, value);
             }
         },
-        onOptionSelectMultiple(event, option) {
+        onOptionSelectMultiple(event: OptionEvent | null, option: unknown) {
             let selected = this.isSelected(option);
-            let value = null;
+            let value: unknown[];
             let metaSelection = this.optionTouched ? false : this.metaKeySelection;
 
             if (metaSelection) {
-                let metaKey = event.metaKey || event.ctrlKey;
+                const metaKey = event?.metaKey || event?.ctrlKey;
 
                 if (selected) {
                     value = metaKey ? this.removeOption(option) : [this.getOptionValue(option)];
                 } else {
-                    value = metaKey ? this.d_value || [] : [];
-                    value = [...value, this.getOptionValue(option)];
+                    const selection = metaKey ? this.selectedValues : [];
+
+                    value = [...selection, this.getOptionValue(option)];
                 }
             } else {
-                value = selected ? this.removeOption(option) : [...(this.d_value || []), this.getOptionValue(option)];
+                value = selected ? this.removeOption(option) : [...this.selectedValues, this.getOptionValue(option)];
             }
 
             this.updateModel(event, value);
         },
-        onOptionSelectRange(event, start = -1, end = -1) {
+        onOptionSelectRange(event: OptionEvent, start = -1, end = -1) {
             start === -1 && (start = this.findNearestSelectedOptionIndex(end, true));
             end === -1 && (end = this.findNearestSelectedOptionIndex(start));
 
@@ -451,11 +477,13 @@ export default {
                 this.updateModel(event, value);
             }
         },
-        onFilterChange(event) {
+        onFilterChange(event: Event) {
+            if (!(event.target instanceof HTMLInputElement)) return;
+
             this.$emit('filter', { originalEvent: event, value: event.target.value, filterValue: this.visibleOptions });
             this.focusedOptionIndex = this.startRangeIndex = -1;
         },
-        onFilterKeyDown(event) {
+        onFilterKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown':
                     this.onArrowDownKey(event);
@@ -485,14 +513,14 @@ export default {
 
                 case 'ShiftLeft':
                 case 'ShiftRight':
-                    this.onShiftKey(event);
+                    this.onShiftKey();
                     break;
 
                 default:
                     break;
             }
         },
-        onArrowDownKey(event) {
+        onArrowDownKey(event: KeyboardEvent) {
             const optionIndex = this.focusedOptionIndex !== -1 ? this.findNextOptionIndex(this.focusedOptionIndex) : this.findFirstFocusedOptionIndex();
 
             if (this.multiple && event.shiftKey) {
@@ -502,7 +530,7 @@ export default {
             this.changeFocusedOptionIndex(event, optionIndex);
             event.preventDefault();
         },
-        onArrowUpKey(event) {
+        onArrowUpKey(event: KeyboardEvent) {
             const optionIndex = this.focusedOptionIndex !== -1 ? this.findPrevOptionIndex(this.focusedOptionIndex) : this.findLastFocusedOptionIndex();
 
             if (this.multiple && event.shiftKey) {
@@ -512,15 +540,17 @@ export default {
             this.changeFocusedOptionIndex(event, optionIndex);
             event.preventDefault();
         },
-        onArrowLeftKey(event, pressedInInputText = false) {
+        onArrowLeftKey(_event: KeyboardEvent, pressedInInputText = false) {
             pressedInInputText && (this.focusedOptionIndex = -1);
         },
-        onHomeKey(event, pressedInInputText = false) {
+        onHomeKey(event: KeyboardEvent, pressedInInputText = false) {
             if (pressedInInputText) {
                 const target = event.currentTarget;
 
+                if (!(target instanceof HTMLInputElement)) return;
+
                 if (event.shiftKey) {
-                    target.setSelectionRange(0, event.target.selectionStart);
+                    target.setSelectionRange(0, target.selectionStart ?? 0);
                 } else {
                     target.setSelectionRange(0, 0);
                     this.focusedOptionIndex = -1;
@@ -538,12 +568,14 @@ export default {
 
             event.preventDefault();
         },
-        onEndKey(event, pressedInInputText = false) {
+        onEndKey(event: KeyboardEvent, pressedInInputText = false) {
             if (pressedInInputText) {
                 const target = event.currentTarget;
 
+                if (!(target instanceof HTMLInputElement)) return;
+
                 if (event.shiftKey) {
-                    target.setSelectionRange(event.target.selectionStart, target.value.length);
+                    target.setSelectionRange(target.selectionStart ?? 0, target.value.length);
                 } else {
                     const len = target.value.length;
 
@@ -563,47 +595,49 @@ export default {
 
             event.preventDefault();
         },
-        onPageUpKey(event) {
+        onPageUpKey(event: KeyboardEvent) {
             this.scrollInView(0);
             event.preventDefault();
         },
-        onPageDownKey(event) {
+        onPageDownKey(event: KeyboardEvent) {
             this.scrollInView(this.visibleOptions.length - 1);
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEnterKey(event: KeyboardEvent) {
             if (this.focusedOptionIndex !== -1) {
                 if (this.multiple && event.shiftKey) this.onOptionSelectRange(event, this.focusedOptionIndex);
                 else this.onOptionSelect(event, this.visibleOptions[this.focusedOptionIndex]);
             }
         },
-        onSpaceKey(event) {
+        onSpaceKey(event: KeyboardEvent) {
             event.preventDefault();
             this.onEnterKey(event);
         },
         onShiftKey() {
             this.startRangeIndex = this.focusedOptionIndex;
         },
-        isOptionMatched(option) {
+        isOptionMatched(option: unknown) {
+            const label = this.getOptionLabel(option);
+
             return (
                 this.isValidOption(option) &&
-                typeof this.getOptionLabel(option) === 'string' &&
-                this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale))
+                typeof label === 'string' &&
+                label.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale))
             );
         },
-        isValidOption(option) {
+        isValidOption(option: unknown) {
             return isNotEmpty(option) && !(this.isOptionDisabled(option) || this.isOptionGroup(option));
         },
-        isValidSelectedOption(option) {
+        isValidSelectedOption(option: unknown) {
             return this.isValidOption(option) && this.isSelected(option);
         },
         isEquals,
         // Values with the same key are always equal for isEquals: same dataKey field, or the same value or object.
         // toRaw gives a reactive proxy the same key as its original object.
-        getSelectionKey(value) {
+        getSelectionKey(value: unknown): unknown {
             return this.equalityKey ? resolveFieldData(value, this.equalityKey) : toRaw(value);
         },
-        isSelected(option) {
+        isSelected(option: unknown) {
             const optionValue = this.getOptionValue(option);
 
             if (!this.multiple) return this.isEquals(this.d_value, optionValue);
@@ -615,7 +649,7 @@ export default {
             // a component extending Listbox overrides isEquals with its own rule.
             const mayMatchEqualCopy = this.usesCustomEquality || (!this.equalityKey && typeof optionValue === 'object' && optionValue !== null);
 
-            return mayMatchEqualCopy && (this.d_value || []).some((value) => this.isEquals(value, optionValue));
+            return mayMatchEqualCopy && this.selectedValues.some((value) => this.isEquals(value, optionValue));
         },
         findFirstOptionIndex() {
             return this.visibleOptions.findIndex((option) => this.isValidOption(option));
@@ -623,13 +657,13 @@ export default {
         findLastOptionIndex() {
             return findLastIndex(this.visibleOptions, (option) => this.isValidOption(option));
         },
-        findNextOptionIndex(index) {
+        findNextOptionIndex(index: number) {
             const matchedOptionIndex =
                 index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : index;
         },
-        findPrevOptionIndex(index) {
+        findPrevOptionIndex(index: number) {
             const matchedOptionIndex = index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex : index;
@@ -639,7 +673,7 @@ export default {
                 if (this.multiple) {
                     // Index the options by selection key once, so each selected value is found without scanning every option.
                     // The first option wins for a repeated key, the same option findIndex would return.
-                    const optionIndexes = new Map();
+                    const optionIndexes = new Map<unknown, number>();
 
                     this.visibleOptions.forEach((option, index) => {
                         if (!this.isValidOption(option)) return;
@@ -650,8 +684,8 @@ export default {
                     });
 
                     // Newest selected value first.
-                    for (let index = this.d_value.length - 1; index >= 0; index--) {
-                        const value = this.d_value[index];
+                    for (let index = this.selectedValues.length - 1; index >= 0; index--) {
+                        const value = this.selectedValues[index];
                         const matchedOptionIndex = optionIndexes.get(this.getSelectionKey(value));
 
                         if (matchedOptionIndex !== undefined) return matchedOptionIndex;
@@ -679,7 +713,7 @@ export default {
         findLastSelectedOptionIndex() {
             return this.$filled ? findLastIndex(this.visibleOptions, (option) => this.isValidSelectedOption(option)) : -1;
         },
-        findNextSelectedOptionIndex(index) {
+        findNextSelectedOptionIndex(index: number) {
             const matchedOptionIndex =
                 this.$filled && index < this.visibleOptions.length - 1
                     ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidSelectedOption(option))
@@ -687,13 +721,13 @@ export default {
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : -1;
         },
-        findPrevSelectedOptionIndex(index) {
+        findPrevSelectedOptionIndex(index: number) {
             const matchedOptionIndex =
                 this.$filled && index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidSelectedOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex : -1;
         },
-        findNearestSelectedOptionIndex(index, firstCheckUp = false) {
+        findNearestSelectedOptionIndex(index: number, firstCheckUp = false) {
             let matchedOptionIndex = -1;
 
             if (this.$filled) {
@@ -718,7 +752,7 @@ export default {
 
             return selectedIndex < 0 ? this.findLastOptionIndex() : selectedIndex;
         },
-        searchOptions(event, char) {
+        searchOptions(event: KeyboardEvent, char: string) {
             this.searchValue = (this.searchValue || '') + char;
 
             let optionIndex = -1;
@@ -752,10 +786,10 @@ export default {
                 this.searchTimeout = null;
             }, 500);
         },
-        removeOption(option) {
-            return this.d_value.filter((val) => !equals(val, this.getOptionValue(option), this.equalityKey));
+        removeOption(option: unknown) {
+            return this.selectedValues.filter((val) => !equals(val, this.getOptionValue(option), this.equalityKey));
         },
-        changeFocusedOptionIndex(event, index) {
+        changeFocusedOptionIndex(event: OptionEvent, index: number) {
             if (this.focusedOptionIndex !== index) {
                 this.focusedOptionIndex = index;
                 this.scrollInView();
@@ -783,26 +817,26 @@ export default {
                 this.onOptionSelect(null, this.visibleOptions[this.focusedOptionIndex]);
             }
         },
-        updateModel(event, value) {
-            this.writeValue(value, event);
+        updateModel(event: OptionEvent | null, value: unknown) {
+            this.writeValue(value, event ?? undefined);
             this.$emit('change', { originalEvent: event, value });
         },
-        listRef(el, contentRef) {
-            this.list = el;
-            contentRef && contentRef(el); // For VirtualScroller
+        listRef(el: ElementRef, contentRef?: (el: ElementRef) => void) {
+            this.list = el instanceof HTMLUListElement ? el : null;
+            contentRef?.(el);
         },
-        virtualScrollerRef(el) {
-            this.virtualScroller = el;
+        virtualScrollerRef(el: ElementRef) {
+            this.virtualScroller = el as VirtualScrollerMethods | null;
         }
     },
     computed: {
-        optionsListFlat() {
+        optionsListFlat(): unknown[] {
             return this.filterValue
                 ? FilterService.filter(this.options, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale)
                 : (this.options ?? []);
         },
-        optionsListGroup() {
-            const filteredOptions = [];
+        optionsListGroup(): unknown[] {
+            const filteredOptions: unknown[] = [];
 
             (this.options || []).forEach((optionGroup) => {
                 const optionGroupChildren = this.getOptionGroupChildren(optionGroup) || [];
@@ -817,7 +851,7 @@ export default {
 
             return filteredOptions;
         },
-        visibleOptions() {
+        visibleOptions(): unknown[] {
             return this.optionGroupLabel ? this.optionsListGroup : this.optionsListFlat;
         },
         // @deprecated use $filled instead
@@ -825,7 +859,7 @@ export default {
             return isNotEmpty(this.d_value);
         },
         equalityKey() {
-            return this.optionValue ? null : this.dataKey;
+            return this.optionValue ? undefined : this.dataKey;
         },
         // True when a component extending Listbox overrides isEquals. Selection keys can't follow its rule, so lookups
         // that miss the keys fall back to calling isEquals.
@@ -836,34 +870,39 @@ export default {
         // against every selected value. Reading d_value through its reactive proxy makes in-place changes to the array
         // (push, splice) rebuild the set.
         selectedKeys() {
-            return new Set((this.d_value || []).map((value) => this.getSelectionKey(value)));
+            return new Set(this.selectedValues.map((value) => this.getSelectionKey(value)));
+        },
+        selectedValues(): unknown[] {
+            return Array.isArray(this.d_value) ? this.d_value : [];
         },
         searchFields() {
             return this.filterFields || [this.optionLabel];
         },
         filterResultMessageText() {
-            return isNotEmpty(this.visibleOptions) ? this.filterMessageText.replaceAll('{0}', this.visibleOptions.length) : this.emptyFilterMessageText;
+            return isNotEmpty(this.visibleOptions) ? this.filterMessageText.replaceAll('{0}', String(this.visibleOptions.length)) : this.emptyFilterMessageText;
         },
         filterMessageText() {
-            return this.filterMessage || this.$primevue.config.locale.searchMessage || '';
+            return this.filterMessage || this.$primevue?.config.locale?.searchMessage || '';
         },
         emptyFilterMessageText() {
-            return this.emptyFilterMessage || this.$primevue.config.locale.emptySearchMessage || this.$primevue.config.locale.emptyFilterMessage || '';
+            return this.emptyFilterMessage || this.$primevue?.config.locale?.emptySearchMessage || this.$primevue?.config.locale?.emptyFilterMessage || '';
         },
         emptyMessageText() {
-            return this.emptyMessage || this.$primevue.config.locale.emptyMessage || '';
+            return this.emptyMessage || this.$primevue?.config.locale?.emptyMessage || '';
         },
         selectionMessageText() {
-            return this.selectionMessage || this.$primevue.config.locale.selectionMessage || '';
+            return this.selectionMessage || this.$primevue?.config.locale?.selectionMessage || '';
         },
         emptySelectionMessageText() {
-            return this.emptySelectionMessage || this.$primevue.config.locale.emptySelectionMessage || '';
+            return this.emptySelectionMessage || this.$primevue?.config.locale?.emptySelectionMessage || '';
         },
         selectedMessageText() {
-            return this.$filled ? this.selectionMessageText.replaceAll('{0}', this.multiple ? this.d_value.length : '1') : this.emptySelectionMessageText;
+            return this.$filled
+                ? this.selectionMessageText.replaceAll('{0}', this.multiple ? String(this.selectedValues.length) : '1')
+                : this.emptySelectionMessageText;
         },
         focusedOptionId() {
-            return this.focusedOptionIndex !== -1 ? `${this.$id}_${this.focusedOptionIndex}` : null;
+            return this.focusedOptionIndex !== -1 ? `${this.$id}_${this.focusedOptionIndex}` : undefined;
         },
         ariaSetSize() {
             return this.visibleOptions.filter((option) => !this.isOptionGroup(option)).length;
@@ -890,5 +929,5 @@ export default {
         CheckIcon,
         BlankIcon
     }
-};
+});
 </script>

@@ -92,7 +92,7 @@ describe('Listbox.vue', () => {
     });
 
     it('should select a list item', async () => {
-        await wrapper.vm.onOptionSelect({}, wrapper.vm.options![0]);
+        await wrapper.vm.onOptionSelect(new MouseEvent('click'), wrapper.vm.options![0]);
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([wrapper.vm.options![0]]);
 
@@ -503,14 +503,14 @@ describe('Listbox.vue', () => {
         it('should select a range up to the nearest selected option', () => {
             const wrapper = mountListbox({ multiple: true, optionValue: 'code', modelValue: ['RM'] });
 
-            wrapper.vm.onOptionSelectRange({}, -1, 3);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), -1, 3);
             expect(lastEmittedValue(wrapper)).toEqual(['RM', 'LDN', 'IST']);
         });
 
         it('should select a range down to the nearest selected option', () => {
             const wrapper = mountListbox({ multiple: true, optionValue: 'code', modelValue: ['IST'] });
 
-            wrapper.vm.onOptionSelectRange({}, 0, -1);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), 0, -1);
             expect(lastEmittedValue(wrapper)).toEqual(['NY', 'RM', 'LDN', 'IST']);
         });
     });

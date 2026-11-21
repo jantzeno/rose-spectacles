@@ -4,7 +4,13 @@ import { equals, removeAccents, resolveFieldData } from '../../internal/utils/ob
 type FilterRule = (value: any, filter: any, filterLocale?: string) => boolean;
 
 const FilterService = {
-    filter<T>(value: T[] | null | undefined, fields: string[], filterValue: unknown, filterMatchMode: string, filterLocale?: string) {
+    filter<T>(
+        value: T[] | null | undefined,
+        fields: readonly (string | ((item: T) => unknown) | undefined)[],
+        filterValue: unknown,
+        filterMatchMode: string,
+        filterLocale?: string
+    ) {
         const filteredItems: T[] = [];
 
         if (!value) {

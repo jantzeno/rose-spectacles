@@ -1,24 +1,26 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import ListboxStyle from './style/ListboxStyle';
+
+type OptionResolver = string | ((option: unknown) => unknown);
 
 export default defineComponent({
     name: 'BaseListbox',
     extends: BaseEditableHolder,
     props: {
         options: Array,
-        optionLabel: null,
-        optionValue: null,
-        optionDisabled: null,
-        optionGroupLabel: null,
-        optionGroupChildren: null,
+        optionLabel: null as unknown as PropType<OptionResolver>,
+        optionValue: null as unknown as PropType<OptionResolver>,
+        optionDisabled: null as unknown as PropType<OptionResolver>,
+        optionGroupLabel: null as unknown as PropType<OptionResolver>,
+        optionGroupChildren: null as unknown as PropType<OptionResolver>,
         listStyle: null,
         scrollHeight: {
             type: String,
             default: '14rem'
         },
-        dataKey: null,
+        dataKey: null as unknown as PropType<string>,
         multiple: {
             type: Boolean,
             default: false
@@ -35,7 +37,7 @@ export default defineComponent({
             default: 'contains'
         },
         filterFields: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: null
         },
         virtualScrollerOptions: {
