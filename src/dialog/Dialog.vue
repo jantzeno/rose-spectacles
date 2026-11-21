@@ -32,20 +32,14 @@
                     :data-p="dataP"
                     v-bind="ptmi('root')"
                 >
-                    <slot
-                        v-if="$slots.container"
-                        name="container"
-                        :closeCallback="close"
-                        :maximizeCallback="(event) => maximize(event)"
-                        :initDragCallback="initDrag"
-                    ></slot>
+                    <slot v-if="$slots.container" name="container" :closeCallback="close" :maximizeCallback="maximize" :initDragCallback="initDrag"></slot>
                     <template v-else>
                         <div v-if="showHeader" :ref="headerContainerRef" :class="cx('header')" @mousedown="initDrag" v-bind="ptm('header')">
                             <slot name="header" :class="cx('title')">
                                 <span v-if="header" :id="ariaLabelledById" :class="cx('title')" v-bind="ptm('title')">{{ header }}</span>
                             </slot>
                             <div :class="cx('headerActions')" v-bind="ptm('headerActions')">
-                                <slot v-if="maximizable" name="maximizebutton" :maximized="maximized" :maximizeCallback="(event) => maximize(event)">
+                                <slot v-if="maximizable" name="maximizebutton" :maximized="maximized" :maximizeCallback="maximize">
                                     <Button
                                         :ref="maximizableRef"
                                         :autofocus="focusableMax"
@@ -112,7 +106,7 @@
     </Portal>
 </template>
 
-<script>
+<script lang="ts">
 import { cn } from '../internal/utils/index';
 import { addClass, addStyle, focus, getOuterHeight, getOuterWidth, getViewport, setAttribute } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
@@ -124,18 +118,20 @@ import FocusTrap from '../focustrap/FocusTrap';
 import Portal from '../portal/Portal.vue';
 import Ripple from '../ripple/Ripple';
 import { lockBodyScroll } from '../utils/BodyScrollLock';
-import { computed } from 'vue';
+import { computed, defineComponent, type ComponentPublicInstance } from 'vue';
 import BaseDialog from './BaseDialog.vue';
 
-const activeDialogs = new Set();
+type DialogRef = Element | ComponentPublicInstance | null;
 
-function onDocumentKeyDown(event) {
+const activeDialogs = new Set<() => void>();
+
+function onDocumentKeyDown(event: KeyboardEvent) {
     if (event.code === 'Escape' && !event.defaultPrevented && !event.isComposing) {
-        Array.from(activeDialogs).at(-1)?.(event);
+        Array.from(activeDialogs).at(-1)?.();
     }
 }
 
-export default {
+export default defineComponent({
     name: 'Dialog',
     extends: BaseDialog,
     inheritAttrs: false,
@@ -149,26 +145,26 @@ export default {
         return {
             containerVisible: this.visible,
             maximized: false,
-            focusableMax: null,
-            focusableClose: null,
-            target: null
+            focusableMax: undefined as boolean | undefined,
+            focusableClose: undefined as boolean | undefined,
+            target: null as HTMLElement | null,
+            releaseBodyScroll: null as (() => void) | null,
+            container: null as HTMLElement | null,
+            mask: null as HTMLElement | null,
+            content: null as HTMLElement | null,
+            headerContainer: null as HTMLElement | null,
+            footerContainer: null as HTMLElement | null,
+            maximizableButton: null as HTMLElement | null,
+            closeButton: null as HTMLElement | null,
+            styleElement: null as HTMLStyleElement | null,
+            dragging: false,
+            documentDragListener: null as ((event: MouseEvent) => void) | null,
+            documentDragEndListener: null as ((event: MouseEvent) => void) | null,
+            lastPageX: 0,
+            lastPageY: 0,
+            maskMouseDownTarget: null as EventTarget | null
         };
     },
-    releaseBodyScroll: null,
-    container: null,
-    mask: null,
-    content: null,
-    headerContainer: null,
-    footerContainer: null,
-    maximizableButton: null,
-    closeButton: null,
-    styleElement: null,
-    dragging: null,
-    documentDragListener: null,
-    documentDragEndListener: null,
-    lastPageX: null,
-    lastPageY: null,
-    maskMouseDownTarget: null,
     updated() {
         if (this.visible) {
             this.containerVisible = this.visible;
@@ -198,19 +194,19 @@ export default {
         },
         onEnter() {
             this.$emit('show');
-            this.target = document.activeElement;
+            this.target = document.activeElement instanceof HTMLElement ? document.activeElement : null;
             this.enableDocumentSettings();
             this.bindGlobalListeners();
 
-            if (this.autoZIndex) {
-                ZIndex.set('modal', this.mask, this.baseZIndex || this.$primevue.config.zIndex.modal);
+            if (this.autoZIndex && this.mask) {
+                ZIndex.set('modal', this.mask, this.baseZIndex || this.$primevue.config.zIndex?.modal);
             }
         },
         onAfterEnter() {
             this.focus();
         },
         onBeforeLeave() {
-            if (this.modal) {
+            if (this.modal && this.mask) {
                 !this.isUnstyled && addClass(this.mask, 'rs-overlay-mask-leave-active');
             }
 
@@ -218,13 +214,13 @@ export default {
         },
         onLeave() {
             this.$emit('hide');
-            focus(this.target);
+            if (this.target) focus(this.target);
             this.target = null;
-            this.focusableClose = null;
-            this.focusableMax = null;
+            this.focusableClose = undefined;
+            this.focusableMax = undefined;
         },
         onAfterLeave() {
-            if (this.autoZIndex) {
+            if (this.autoZIndex && this.mask) {
                 ZIndex.clear(this.mask);
             }
 
@@ -233,7 +229,7 @@ export default {
             this.unbindGlobalListeners();
             this.$emit('after-hide');
         },
-        onMaskMouseDown(event) {
+        onMaskMouseDown(event: MouseEvent) {
             this.maskMouseDownTarget = event.target;
         },
         onMaskMouseUp() {
@@ -242,9 +238,7 @@ export default {
             }
         },
         focus() {
-            const findFocusableElement = (container) => {
-                return container && container.querySelector('[autofocus]');
-            };
+            const findFocusableElement = (container: HTMLElement | null) => container?.querySelector<HTMLElement>('[autofocus]');
 
             let focusTarget = this.$slots.footer && findFocusableElement(this.footerContainer);
 
@@ -267,10 +261,10 @@ export default {
             }
 
             if (focusTarget) {
-                focus(focusTarget, { focusVisible: true });
+                focus(focusTarget, { focusVisible: true } as FocusOptions);
             }
         },
-        maximize(event) {
+        maximize(event?: MouseEvent) {
             if (this.maximized) {
                 this.maximized = false;
                 this.$emit('unmaximize', event);
@@ -311,26 +305,28 @@ export default {
                 document.removeEventListener('keydown', onDocumentKeyDown);
             }
         },
-        containerRef(el) {
-            this.container = el;
+        containerRef(el: DialogRef) {
+            this.container = el instanceof HTMLElement ? el : null;
         },
-        maskRef(el) {
-            this.mask = el;
+        maskRef(el: DialogRef) {
+            this.mask = el instanceof HTMLElement ? el : null;
         },
-        contentRef(el) {
-            this.content = el;
+        contentRef(el: DialogRef) {
+            this.content = el instanceof HTMLElement ? el : null;
         },
-        headerContainerRef(el) {
-            this.headerContainer = el;
+        headerContainerRef(el: DialogRef) {
+            this.headerContainer = el instanceof HTMLElement ? el : null;
         },
-        footerContainerRef(el) {
-            this.footerContainer = el;
+        footerContainerRef(el: DialogRef) {
+            this.footerContainer = el instanceof HTMLElement ? el : null;
         },
-        maximizableRef(el) {
-            this.maximizableButton = el ? el.$el : undefined;
+        maximizableRef(el: DialogRef) {
+            const root = el && !(el instanceof Element) ? el.$el : el;
+            this.maximizableButton = root instanceof HTMLElement ? root : null;
         },
-        closeButtonRef(el) {
-            this.closeButton = el ? el.$el : undefined;
+        closeButtonRef(el: DialogRef) {
+            const root = el && !(el instanceof Element) ? el.$el : el;
+            this.closeButton = root instanceof HTMLElement ? root : null;
         },
         createStyle() {
             if (!this.styleElement && !this.isUnstyled) {
@@ -360,12 +356,12 @@ export default {
                 this.styleElement = null;
             }
         },
-        initDrag(event) {
-            if (event.target.closest('div').getAttribute('data-pc-section') === 'headeractions') {
+        initDrag(event: MouseEvent) {
+            if (event.target instanceof Element && event.target.closest('div')?.getAttribute('data-pc-section') === 'headeractions') {
                 return;
             }
 
-            if (this.draggable) {
+            if (this.draggable && this.container) {
                 this.dragging = true;
                 this.lastPageX = event.pageX;
                 this.lastPageY = event.pageY;
@@ -392,7 +388,7 @@ export default {
         },
         bindDocumentDragListener() {
             this.documentDragListener = (event) => {
-                if (this.dragging) {
+                if (this.dragging && this.container) {
                     let width = getOuterWidth(this.container);
                     let height = getOuterHeight(this.container);
                     let deltaX = event.pageX - this.lastPageX;
@@ -438,11 +434,11 @@ export default {
             this.documentDragEndListener = this.endDrag;
             window.document.addEventListener('mouseup', this.documentDragEndListener);
         },
-        endDrag(event) {
+        endDrag(event?: MouseEvent) {
             if (this.dragging) {
                 this.dragging = false;
                 document.body.removeAttribute('data-p-unselectable-text');
-                !this.isUnstyled && (document.body.style['user-select'] = '');
+                if (!this.isUnstyled) document.body.style.userSelect = '';
 
                 this.$emit('dragend', event);
             }
@@ -459,10 +455,10 @@ export default {
             return this.maximized ? (this.minimizeIcon ? 'span' : 'WindowMinimizeIcon') : this.maximizeIcon ? 'span' : 'WindowMaximizeIcon';
         },
         ariaLabelledById() {
-            return this.header != null || this.$attrs['aria-labelledby'] !== null ? this.$id + '_header' : null;
+            return this.header != null || this.$attrs['aria-labelledby'] !== null ? this.$id + '_header' : undefined;
         },
         closeAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.close : undefined;
+            return this.$primevue?.config.locale?.aria?.close;
         },
         dataP() {
             return cn({
@@ -482,5 +478,5 @@ export default {
         WindowMaximizeIcon,
         TimesIcon
     }
-};
+});
 </script>
