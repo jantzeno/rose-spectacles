@@ -70,41 +70,62 @@
     </template>
 </template>
 
-<script>
-import { find, findSingle, focus, getAttribute, isClickable } from '../internal/utils/dom/index';
+<script lang="ts">
+import { focus, getAttribute, isClickable } from '../internal/utils/dom/index';
 import { equals, resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
+import { defineComponent, inject, type PropType, type Slots, type VNode } from 'vue';
+import type { TreeNode } from '../treenode/TreeNode';
 import BodyCell from './BodyCell.vue';
 
-export default {
+interface CheckboxState {
+    checked: boolean;
+    partialChecked: boolean;
+}
+
+type RowSelection = Record<string, boolean | CheckboxState>;
+
+interface CheckboxChange {
+    node: TreeNode;
+    check: boolean;
+    selectionKeys: RowSelection;
+}
+
+interface TreeTableParent {
+    rowHover?: boolean;
+    rowSelectionMode?: boolean;
+    scrollable?: boolean;
+}
+
+export default defineComponent({
     name: 'TreeTableRow',
     hostName: 'TreeTable',
     extends: BaseComponent,
     emits: ['node-click', 'node-toggle', 'checkbox-change', 'nodeClick', 'nodeToggle', 'checkboxChange', 'row-rightclick', 'rowRightclick'],
     props: {
         node: {
-            type: null,
-            default: null
+            type: Object as PropType<TreeNode>,
+            required: true
         },
         dataKey: {
-            type: [String, Function],
+            type: [String, Function] as PropType<string | ((node: TreeNode) => string)>,
             default: 'key'
         },
         parentNode: {
-            type: null,
+            type: Object as PropType<TreeNode>,
             default: null
         },
         columns: {
-            type: null,
+            type: Array as PropType<VNode[]>,
             default: null
         },
         expandedKeys: {
-            type: null,
+            type: Object as PropType<Record<string, boolean>>,
             default: null
         },
         selectionKeys: {
-            type: null,
+            type: Object as PropType<RowSelection>,
             default: null
         },
         selectionMode: {
@@ -136,32 +157,41 @@ export default {
             default: 'mask'
         },
         templates: {
-            type: Object,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         contextMenu: {
             type: Boolean,
             default: false
         },
         contextMenuSelection: {
-            type: Object,
+            type: Object as PropType<TreeNode>,
             default: null
         }
     },
-    nodeTouched: false,
+    setup() {
+        return { treeTable: inject<TreeTableParent>('$parentInstance', {}) };
+    },
+    data() {
+        return { nodeTouched: false };
+    },
     methods: {
-        columnProp(col, prop) {
+        columnProp(col: VNode, prop: string) {
             return getVNodeProp(col, prop);
         },
         toggle() {
             this.$emit('node-toggle', this.node);
         },
-        onClick(event) {
+        onClick(event: MouseEvent) {
+            const target = event.target;
+
+            if (!(target instanceof Element)) return;
+
             if (
-                isClickable(event.target) ||
-                getAttribute(event.target, 'data-pc-section') === 'nodetogglebutton' ||
-                getAttribute(event.target, 'data-pc-section') === 'nodetoggleicon' ||
-                event.target.tagName === 'path'
+                isClickable(target) ||
+                getAttribute(target, 'data-pc-section') === 'nodetogglebutton' ||
+                getAttribute(target, 'data-pc-section') === 'nodetoggleicon' ||
+                target.tagName === 'path'
             ) {
                 return;
             }
@@ -175,7 +205,7 @@ export default {
             });
             this.nodeTouched = false;
         },
-        onRowRightClick(event) {
+        onRowRightClick(event: MouseEvent) {
             this.$emit('row-rightclick', {
                 originalEvent: event,
                 node: this.node
@@ -184,10 +214,10 @@ export default {
         onTouchEnd() {
             this.nodeTouched = true;
         },
-        nodeKey(node) {
+        nodeKey(node: TreeNode): string {
             return resolveFieldData(node, this.dataKey);
         },
-        onKeyDown(event, item) {
+        onKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown':
                     this.onArrowDownKey(event);
@@ -216,37 +246,46 @@ export default {
                 case 'Enter':
                 case 'NumpadEnter':
                 case 'Space':
-                    if (!isClickable(event.target)) {
-                        this.onEnterKey(event, item);
+                    if (!(event.target instanceof Element) || !isClickable(event.target)) {
+                        this.onEnterKey(event);
                     }
 
                     break;
 
                 case 'Tab':
-                    this.onTabKey(event);
+                    this.onTabKey();
                     break;
 
                 default:
                     break;
             }
         },
-        onArrowDownKey(event) {
-            const nextElementSibling = event.currentTarget.nextElementSibling;
-
-            nextElementSibling && this.focusRowChange(event.currentTarget, nextElementSibling);
-
-            event.preventDefault();
-        },
-        onArrowUpKey(event) {
-            const previousElementSibling = event.currentTarget.previousElementSibling;
-
-            previousElementSibling && this.focusRowChange(event.currentTarget, previousElementSibling);
-
-            event.preventDefault();
-        },
-        onArrowRightKey(event) {
+        onArrowDownKey(event: KeyboardEvent) {
             const row = event.currentTarget;
-            const togglerElement = findSingle(row, '[data-pc-section="nodetogglebutton"]');
+
+            if (!(row instanceof HTMLElement)) return;
+
+            const next = row.nextElementSibling;
+            if (next instanceof HTMLElement) this.focusRowChange(row, next);
+
+            event.preventDefault();
+        },
+        onArrowUpKey(event: KeyboardEvent) {
+            const row = event.currentTarget;
+
+            if (!(row instanceof HTMLElement)) return;
+
+            const previous = row.previousElementSibling;
+            if (previous instanceof HTMLElement) this.focusRowChange(row, previous);
+
+            event.preventDefault();
+        },
+        onArrowRightKey(event: KeyboardEvent) {
+            const row = event.currentTarget;
+
+            if (!(row instanceof HTMLElement)) return;
+
+            const togglerElement = row.querySelector<HTMLButtonElement>('[data-pc-section="nodetogglebutton"]');
 
             if (!togglerElement || togglerElement.style.visibility === 'hidden') return;
 
@@ -255,23 +294,25 @@ export default {
             this.$nextTick(() => {
                 const child = row.nextElementSibling;
 
-                if (child && Number(child.getAttribute('aria-level')) > this.level + 1) {
+                if (child instanceof HTMLElement && Number(child.getAttribute('aria-level')) > this.level + 1) {
                     this.focusRowChange(row, child);
                 }
             });
 
             event.preventDefault();
         },
-        onArrowLeftKey(event) {
+        onArrowLeftKey(event: KeyboardEvent) {
             if (this.level === 0 && !this.expanded) {
                 return;
             }
 
             const currentTarget = event.currentTarget;
-            const ishiddenIcon = findSingle(currentTarget, 'button').style.visibility === 'hidden';
-            const togglerElement = findSingle(currentTarget, '[data-pc-section="nodetogglebutton"]');
 
-            if (this.expanded && !ishiddenIcon) {
+            if (!(currentTarget instanceof HTMLElement)) return;
+
+            const togglerElement = currentTarget.querySelector<HTMLButtonElement>('[data-pc-section="nodetogglebutton"]');
+
+            if (this.expanded && togglerElement && togglerElement.style.visibility !== 'hidden') {
                 togglerElement.click();
 
                 return;
@@ -281,22 +322,24 @@ export default {
 
             target && this.focusRowChange(currentTarget, target);
         },
-        onHomeKey(event) {
-            const findFirstElement = findSingle(event.currentTarget.parentElement, `tr[aria-level="${this.level + 1}"]`);
+        onHomeKey(event: KeyboardEvent) {
+            const row = event.currentTarget as HTMLElement;
+            const firstRow = row.parentElement?.querySelector<HTMLTableRowElement>(`tr[aria-level="${this.level + 1}"]`);
 
-            findFirstElement && focus(findFirstElement);
-
-            event.preventDefault();
-        },
-        onEndKey(event) {
-            const nodes = find(event.currentTarget.parentElement, `tr[aria-level="${this.level + 1}"]`);
-            const findFirstElement = nodes[nodes.length - 1];
-
-            focus(findFirstElement);
+            if (firstRow) focus(firstRow);
 
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEndKey(event: KeyboardEvent) {
+            const row = event.currentTarget as HTMLElement;
+            const rows = row.parentElement?.querySelectorAll<HTMLTableRowElement>(`tr[aria-level="${this.level + 1}"]`);
+            const lastRow = rows?.[rows.length - 1];
+
+            if (lastRow) focus(lastRow);
+
+            event.preventDefault();
+        },
+        onEnterKey(event: KeyboardEvent) {
             event.preventDefault();
             this.setTabIndexForSelectionMode(event, this.nodeTouched);
 
@@ -315,7 +358,8 @@ export default {
             this.nodeTouched = false;
         },
         onTabKey() {
-            const rows = [...find(this.$refs.node.parentElement, 'tr')];
+            const row = this.$refs.node as HTMLTableRowElement;
+            const rows = [...(row.parentElement?.querySelectorAll('tr') ?? [])];
             const hasSelectedRow = rows.some((row) => getAttribute(row, 'data-p-selected') || row.getAttribute('aria-checked') === 'true');
 
             rows.forEach((row) => {
@@ -330,17 +374,17 @@ export default {
                 return;
             }
 
-            rows[0].tabIndex = 0;
+            if (rows[0]) rows[0].tabIndex = 0;
         },
-        focusRowChange(firstFocusableRow, currentFocusedRow) {
-            firstFocusableRow.tabIndex = '-1';
-            currentFocusedRow.tabIndex = '0';
+        focusRowChange(firstFocusableRow: HTMLElement, currentFocusedRow: HTMLElement) {
+            firstFocusableRow.tabIndex = -1;
+            currentFocusedRow.tabIndex = 0;
             focus(currentFocusedRow);
         },
-        findBeforeClickableNode(node) {
+        findBeforeClickableNode(node: HTMLElement): HTMLElement | null {
             const prevNode = node.previousElementSibling;
 
-            if (prevNode) {
+            if (prevNode instanceof HTMLElement) {
                 const prevNodeButton = prevNode.querySelector('button');
 
                 if (prevNodeButton && prevNodeButton.style.visibility !== 'hidden') {
@@ -364,7 +408,7 @@ export default {
                 selectionKeys: _selectionKeys
             });
         },
-        propagateDown(node, check, selectionKeys) {
+        propagateDown(node: TreeNode, check: boolean, selectionKeys: RowSelection) {
             if (check) selectionKeys[this.nodeKey(node)] = { checked: true, partialChecked: false };
             else delete selectionKeys[this.nodeKey(node)];
 
@@ -374,25 +418,29 @@ export default {
                 }
             }
         },
-        propagateUp(event) {
+        onCheckboxChange(event: CheckboxChange) {
             let check = event.check;
             let _selectionKeys = { ...event.selectionKeys };
             let checkedChildCount = 0;
             let childPartialSelected = false;
 
-            for (let child of this.node.children) {
-                if (_selectionKeys[this.nodeKey(child)] && _selectionKeys[this.nodeKey(child)].checked) checkedChildCount++;
-                else if (_selectionKeys[this.nodeKey(child)] && _selectionKeys[this.nodeKey(child)].partialChecked) childPartialSelected = true;
+            const children = this.node.children ?? [];
+
+            for (const child of children) {
+                const state = _selectionKeys[this.nodeKey(child)];
+
+                if (typeof state === 'object' && state?.checked) checkedChildCount++;
+                else if (typeof state === 'object' && state?.partialChecked) childPartialSelected = true;
             }
 
-            if (check && checkedChildCount === this.node.children.length) {
+            if (check && checkedChildCount === children.length) {
                 _selectionKeys[this.nodeKey(this.node)] = { checked: true, partialChecked: false };
             } else {
                 if (!check) {
                     delete _selectionKeys[this.nodeKey(this.node)];
                 }
 
-                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length))
+                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== children.length))
                     _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: true };
                 else _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: false };
             }
@@ -403,42 +451,14 @@ export default {
                 selectionKeys: _selectionKeys
             });
         },
-        onCheckboxChange(event) {
-            let check = event.check;
-            let _selectionKeys = { ...event.selectionKeys };
-            let checkedChildCount = 0;
-            let childPartialSelected = false;
-
-            for (let child of this.node.children) {
-                if (_selectionKeys[this.nodeKey(child)] && _selectionKeys[this.nodeKey(child)].checked) checkedChildCount++;
-                else if (_selectionKeys[this.nodeKey(child)] && _selectionKeys[this.nodeKey(child)].partialChecked) childPartialSelected = true;
-            }
-
-            if (check && checkedChildCount === this.node.children.length) {
-                _selectionKeys[this.nodeKey(this.node)] = { checked: true, partialChecked: false };
-            } else {
-                if (!check) {
-                    delete _selectionKeys[this.nodeKey(this.node)];
-                }
-
-                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length))
-                    _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: true };
-                else _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: false };
-            }
-
-            this.$emit('checkbox-change', {
-                node: event.node,
-                check: event.check,
-                selectionKeys: _selectionKeys
-            });
-        },
-        setTabIndexForSelectionMode(event, nodeTouched) {
-            if (this.selectionMode !== null) {
-                const elements = [...find(this.$refs.node.parentElement, 'tr')];
+        setTabIndexForSelectionMode(event: MouseEvent | KeyboardEvent, nodeTouched: boolean) {
+            if (this.selectionMode !== null && event.currentTarget instanceof HTMLElement) {
+                const row = this.$refs.node as HTMLTableRowElement;
+                const elements = [...(row.parentElement?.querySelectorAll('tr') ?? [])];
 
                 event.currentTarget.tabIndex = nodeTouched === false ? -1 : 0;
 
-                if (elements.every((element) => element.tabIndex === -1)) {
+                if (elements[0] && elements.every((element) => element.tabIndex === -1)) {
                     elements[0].tabIndex = 0;
                 }
             }
@@ -449,7 +469,7 @@ export default {
             return [this.node.styleClass, this.cx('row')];
         },
         expanded() {
-            return this.expandedKeys && this.expandedKeys[this.nodeKey(this.node)] === true;
+            return this.expandedKeys?.[this.nodeKey(this.node)] === true;
         },
         leaf() {
             return this.node.leaf === false ? false : !(this.node.children && this.node.children.length);
@@ -459,26 +479,32 @@ export default {
         },
         isSelectedWithContextMenu() {
             if (this.node && this.contextMenuSelection) {
-                return equals(this.node, this.contextMenuSelection, this.dataKey);
+                return typeof this.dataKey === 'function'
+                    ? this.nodeKey(this.node) === this.nodeKey(this.contextMenuSelection)
+                    : equals(this.node, this.contextMenuSelection, this.dataKey);
             }
 
             return false;
         },
         checked() {
-            return this.selectionKeys ? this.selectionKeys[this.nodeKey(this.node)] && this.selectionKeys[this.nodeKey(this.node)].checked : false;
+            const selection = this.selectionKeys?.[this.nodeKey(this.node)];
+
+            return typeof selection === 'object' && selection?.checked;
         },
         partialChecked() {
-            return this.selectionKeys ? this.selectionKeys[this.nodeKey(this.node)] && this.selectionKeys[this.nodeKey(this.node)].partialChecked : false;
+            const selection = this.selectionKeys?.[this.nodeKey(this.node)];
+
+            return typeof selection === 'object' && selection?.partialChecked;
         },
         getAriaSelected() {
-            return this.selectionMode === 'single' || this.selectionMode === 'multiple' ? this.selected : null;
+            return this.selectionMode === 'single' || this.selectionMode === 'multiple' ? this.selected : undefined;
         },
         ptmOptions() {
             return {
                 context: {
-                    selectable: this.$parentInstance.rowHover || this.$parentInstance.rowSelectionMode,
+                    selectable: this.treeTable.rowHover || this.treeTable.rowSelectionMode,
                     selected: this.selected,
-                    scrollable: this.$parentInstance.scrollable
+                    scrollable: this.treeTable.scrollable
                 }
             };
         }
@@ -486,5 +512,5 @@ export default {
     components: {
         TTBodyCell: BodyCell
     }
-};
+});
 </script>
