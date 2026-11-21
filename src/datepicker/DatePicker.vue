@@ -2006,6 +2006,8 @@ export default defineComponent({
             setTimeout(this.updateFocus, 0);
         },
         onYearSelect(event: Event, year: DatePickerYearOptions) {
+            if (!year.selectable) return;
+
             if (this.view === 'year') {
                 this.onDateSelect(event, { year: year.value, month: 0, day: 1, selectable: true });
             } else {
@@ -2612,197 +2614,82 @@ export default defineComponent({
                 }
             }
         },
-        onMonthCellKeydown(event: KeyboardEvent, monthOption: MonthChoice) {
-            const cell = event.currentTarget;
-
-            if (!(cell instanceof HTMLElement) || !cell.parentElement) return;
-
+        onMonthCellKeydown(event: KeyboardEvent, option: MonthChoice) {
+            this.onPeriodCellKeydown(event, 3, () => this.onMonthSelect(event, option));
+        },
+        onYearCellKeydown(event: KeyboardEvent, option: DatePickerYearOptions) {
+            this.onPeriodCellKeydown(event, 2, () => this.onYearSelect(event, option));
+        },
+        onPeriodCellKeydown(event: KeyboardEvent, columns: number, select: () => void) {
             switch (event.code) {
+                case 'ArrowLeft':
+                    this.movePeriodFocus(event, -1);
+                    break;
+                case 'ArrowRight':
+                    this.movePeriodFocus(event, 1);
+                    break;
                 case 'ArrowUp':
-
-                case 'ArrowDown': {
-                    cell.tabIndex = -1;
-                    var cells = cell.parentElement.children;
-                    var cellIndex = getIndex(cell);
-                    let nextCell = cells[event.code === 'ArrowDown' ? cellIndex + 3 : cellIndex - 3];
-
-                    if (nextCell instanceof HTMLElement) {
-                        nextCell.tabIndex = 0;
-                        nextCell.focus();
-                    }
-
-                    event.preventDefault();
+                    this.movePeriodFocus(event, -columns);
                     break;
-                }
-
-                case 'ArrowLeft': {
-                    cell.tabIndex = -1;
-                    let prevCell = cell.previousElementSibling;
-
-                    if (prevCell instanceof HTMLElement) {
-                        prevCell.tabIndex = 0;
-                        prevCell.focus();
-                    } else {
-                        this.navigationState = { backward: true };
-                        this.navBackward(event);
-                    }
-
-                    event.preventDefault();
+                case 'ArrowDown':
+                    this.movePeriodFocus(event, columns);
                     break;
-                }
-
-                case 'ArrowRight': {
-                    cell.tabIndex = -1;
-                    let nextCell = cell.nextElementSibling;
-
-                    if (nextCell instanceof HTMLElement) {
-                        nextCell.tabIndex = 0;
-                        nextCell.focus();
-                    } else {
-                        this.navigationState = { backward: false };
-                        this.navForward(event);
-                    }
-
-                    event.preventDefault();
+                case 'PageUp':
+                case 'PageDown':
+                    if (!event.shiftKey) this.navigatePeriod(event, event.code === 'PageUp' ? -1 : 1);
                     break;
-                }
-
-                case 'PageUp': {
-                    if (event.shiftKey) return;
-                    this.navigationState = { backward: true };
-                    this.navBackward(event);
-
-                    break;
-                }
-
-                case 'PageDown': {
-                    if (event.shiftKey) return;
-                    this.navigationState = { backward: false };
-                    this.navForward(event);
-
-                    break;
-                }
-
                 case 'Enter':
                 case 'NumpadEnter':
-
-                case 'Space': {
-                    this.onMonthSelect(event, monthOption);
+                case 'Space':
+                    select();
                     event.preventDefault();
                     break;
-                }
-
-                case 'Escape': {
+                case 'Escape':
                     this.overlayVisible = false;
                     event.preventDefault();
                     break;
-                }
-
-                case 'Tab': {
-                    this.trapFocus(event);
-                    break;
-                }
-
-                default:
-                    //no op
+                case 'Tab':
+                    if (!this.inline) this.trapFocus(event);
                     break;
             }
         },
-        onYearCellKeydown(event: KeyboardEvent, index: DatePickerYearOptions) {
+        movePeriodFocus(event: KeyboardEvent, step: number) {
             const cell = event.currentTarget;
 
             if (!(cell instanceof HTMLElement) || !cell.parentElement) return;
 
-            switch (event.code) {
-                case 'ArrowUp':
+            const cells = cell.parentElement.children;
 
-                case 'ArrowDown': {
+            for (let index = getIndex(cell) + step; index >= 0 && index < cells.length; index += step) {
+                const candidate = cells[index];
+
+                if (candidate instanceof HTMLElement && candidate.getAttribute('data-p-disabled') !== 'true') {
                     cell.tabIndex = -1;
-                    var cells = cell.parentElement.children;
-                    var cellIndex = getIndex(cell);
-                    let nextCell = cells[event.code === 'ArrowDown' ? cellIndex + 2 : cellIndex - 2];
-
-                    if (nextCell instanceof HTMLElement) {
-                        nextCell.tabIndex = 0;
-                        nextCell.focus();
-                    }
-
+                    candidate.tabIndex = 0;
+                    candidate.focus();
                     event.preventDefault();
-                    break;
+                    return;
                 }
-
-                case 'ArrowLeft': {
-                    cell.tabIndex = -1;
-                    let prevCell = cell.previousElementSibling;
-
-                    if (prevCell instanceof HTMLElement) {
-                        prevCell.tabIndex = 0;
-                        prevCell.focus();
-                    } else {
-                        this.navigationState = { backward: true };
-                        this.navBackward(event);
-                    }
-
-                    event.preventDefault();
-                    break;
-                }
-
-                case 'ArrowRight': {
-                    cell.tabIndex = -1;
-                    let nextCell = cell.nextElementSibling;
-
-                    if (nextCell instanceof HTMLElement) {
-                        nextCell.tabIndex = 0;
-                        nextCell.focus();
-                    } else {
-                        this.navigationState = { backward: false };
-                        this.navForward(event);
-                    }
-
-                    event.preventDefault();
-                    break;
-                }
-
-                case 'PageUp': {
-                    if (event.shiftKey) return;
-                    this.navigationState = { backward: true };
-                    this.navBackward(event);
-
-                    break;
-                }
-
-                case 'PageDown': {
-                    if (event.shiftKey) return;
-                    this.navigationState = { backward: false };
-                    this.navForward(event);
-
-                    break;
-                }
-
-                case 'Enter':
-                case 'NumpadEnter':
-
-                case 'Space': {
-                    this.onYearSelect(event, index);
-                    event.preventDefault();
-                    break;
-                }
-
-                case 'Escape': {
-                    this.overlayVisible = false;
-                    event.preventDefault();
-                    break;
-                }
-
-                case 'Tab': {
-                    this.trapFocus(event);
-                    break;
-                }
-
-                default:
-                    //no op
-                    break;
             }
+
+            if (step === 1 || step === -1) this.navigatePeriod(event, step);
+            else event.preventDefault();
+        },
+        navigatePeriod(event: KeyboardEvent, direction: -1 | 1) {
+            const decade = this.currentView === 'year';
+            const first = decade ? this.currentYear - (this.currentYear % 10) + 10 * direction : this.currentYear + direction;
+            const last = decade ? first + 9 : first;
+
+            event.preventDefault();
+            if ((this.minDate && last < this.minDate.getFullYear()) || (this.maxDate && first > this.maxDate.getFullYear())) return;
+
+            const cell = event.currentTarget;
+
+            if (cell instanceof HTMLElement) cell.tabIndex = -1;
+            this.navigationState = { backward: direction < 0 };
+
+            if (direction < 0) this.navBackward(event);
+            else this.navForward(event);
         },
         updateFocus() {
             let cell;
@@ -2860,13 +2747,19 @@ export default defineComponent({
                 let selectedCell = findSingle(this.overlay, '[data-pc-section="monthview"] [data-pc-section="month"][data-p-selected="true"]');
 
                 cells.forEach((cell) => (cell.tabIndex = -1));
-                cell = selectedCell || cells[0];
+                cell =
+                    selectedCell?.getAttribute('data-p-disabled') === 'false'
+                        ? selectedCell
+                        : cells.find((candidate) => candidate.getAttribute('data-p-disabled') !== 'true');
             } else if (this.currentView === 'year') {
                 let cells = find(this.overlay, '[data-pc-section="yearview"] [data-pc-section="year"]');
                 let selectedCell = findSingle(this.overlay, '[data-pc-section="yearview"] [data-pc-section="year"][data-p-selected="true"]');
 
                 cells.forEach((cell) => (cell.tabIndex = -1));
-                cell = selectedCell || cells[0];
+                cell =
+                    selectedCell?.getAttribute('data-p-disabled') === 'false'
+                        ? selectedCell
+                        : cells.find((candidate) => candidate.getAttribute('data-p-disabled') !== 'true');
             } else {
                 cell = findSingle(this.overlay, 'span[data-p-selected="true"]');
 

@@ -4,6 +4,49 @@ import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
 it.each([
+    { view: 'month', current: 5, next: 6, minDate: new Date(2026, 5, 1), maxDate: new Date(2026, 6, 31) },
+    { view: 'year', current: 6, next: 7, minDate: new Date(2026, 0, 1), maxDate: new Date(2027, 11, 31) }
+])('keeps keyboard focus on selectable $view cells at the date bounds', async ({ view, current, next, minDate, maxDate }) => {
+    const wrapper = mount(DatePicker, {
+        props: { inline: true, view, modelValue: new Date(2026, 5, 10), minDate, maxDate },
+        global: { plugins: [PrimeVue] },
+        attachTo: document.body
+    });
+
+    try {
+        const cells = wrapper.findAll<HTMLElement>(`[data-pc-section="${view}"]`);
+
+        cells[current].element.focus();
+        await cells[current].trigger('keydown', { code: 'ArrowLeft' });
+        expect(document.activeElement).toBe(cells[current].element);
+
+        await cells[current].trigger('keydown', { code: 'ArrowRight' });
+        expect(document.activeElement).toBe(cells[next].element);
+
+        await cells[next].trigger('keydown', { code: 'ArrowRight' });
+        expect(document.activeElement).toBe(cells[next].element);
+
+        await cells[next + 1].trigger('keydown', { code: 'Enter' });
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it.each(['month', 'year'])('lets Tab leave the inline %s picker', (view) => {
+    const wrapper = mount(DatePicker, { props: { inline: true, view }, global: { plugins: [PrimeVue] } });
+
+    try {
+        const cell = wrapper.get(`[data-pc-section="${view}"]`);
+        const event = new KeyboardEvent('keydown', { code: 'Tab', bubbles: true, cancelable: true });
+
+        expect(cell.element.dispatchEvent(event)).toBe(true);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it.each([
     ['date', '2026-06-10', [new Date(2026, 5, 10), null]],
     ['string', '2026-06-10 - 2026-06-15', ['2026-06-10', '2026-06-15']]
 ] as const)('keeps manually entered ranges after blur with %s model values', async (updateModelType, typed, expected) => {
