@@ -266,7 +266,9 @@ export default defineComponent({
             return hex;
         },
         HEXtoRGB(hex: string): RGB {
-            let hexValue = parseInt(hex.indexOf('#') > -1 ? hex.substring(1) : hex, 16);
+            const digits = hex.startsWith('#') ? hex.slice(1) : hex;
+            const expanded = digits.length === 3 ? [...digits].map((digit) => digit.repeat(2)).join('') : digits;
+            const hexValue = parseInt(expanded, 16);
 
             return { r: hexValue >> 16, g: (hexValue & 0x00ff00) >> 8, b: hexValue & 0x0000ff };
         },

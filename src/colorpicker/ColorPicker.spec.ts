@@ -106,3 +106,13 @@ it('selects a color at the left edge of the viewport', async () => {
         wrapper.unmount();
     }
 });
+
+it.each(['f0c', '#f0c'])('displays the matching color for shorthand hex %s', (modelValue) => {
+    const wrapper = mount(ColorPicker, { props: { modelValue } });
+
+    try {
+        expect(wrapper.get('input').element.style.backgroundColor).toBe('rgb(255, 0, 204)');
+    } finally {
+        wrapper.unmount();
+    }
+});
