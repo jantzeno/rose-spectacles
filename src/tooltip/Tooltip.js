@@ -21,7 +21,7 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             target.$_ptooltipIdAttr = uuid('pv_id') + '_tooltip';
             target.$_ptooltipShowDelay = 0;
             target.$_ptooltipHideDelay = 0;
-            target.$_ptooltipAutoHide = true;
+            target.$_ptooltipAutoHide = false;
         } else if (typeof options.value === 'object' && options.value) {
             if (isEmpty(options.value.value) || options.value.value.trim() === '') return;
             else {
@@ -33,7 +33,7 @@ const Tooltip = BaseTooltip.extend('tooltip', {
                 target.$_ptooltipIdAttr = options.value.id || uuid('pv_id') + '_tooltip';
                 target.$_ptooltipShowDelay = options.value.showDelay || 0;
                 target.$_ptooltipHideDelay = options.value.hideDelay || 0;
-                target.$_ptooltipAutoHide = !!options.value.autoHide === options.value.autoHide ? options.value.autoHide : true;
+                target.$_ptooltipAutoHide = !!options.value.autoHide === options.value.autoHide ? options.value.autoHide : false;
             }
         }
 
@@ -46,8 +46,9 @@ const Tooltip = BaseTooltip.extend('tooltip', {
     updated(el, options) {
         let target = this.getTarget(el);
 
-        target.$_ptooltipModifiers = this.getModifiers(options);
+        this.hide(target);
         this.unbindEvents(target);
+        target.$_ptooltipModifiers = this.getModifiers(options);
 
         if (!options.value) {
             return;
@@ -61,7 +62,7 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             target.$_ptooltipIdAttr = target.$_ptooltipIdAttr || uuid('pv_id') + '_tooltip';
             target.$_ptooltipShowDelay = 0;
             target.$_ptooltipHideDelay = 0;
-            target.$_ptooltipAutoHide = true;
+            target.$_ptooltipAutoHide = false;
 
             this.bindEvents(target, options);
         } else if (typeof options.value === 'object' && options.value) {
@@ -78,7 +79,7 @@ const Tooltip = BaseTooltip.extend('tooltip', {
                 target.$_ptooltipIdAttr = options.value.id || target.$_ptooltipIdAttr || uuid('pv_id') + '_tooltip';
                 target.$_ptooltipShowDelay = options.value.showDelay || 0;
                 target.$_ptooltipHideDelay = options.value.hideDelay || 0;
-                target.$_ptooltipAutoHide = !!options.value.autoHide === options.value.autoHide ? options.value.autoHide : true;
+                target.$_ptooltipAutoHide = !!options.value.autoHide === options.value.autoHide ? options.value.autoHide : false;
 
                 this.bindEvents(target, options);
             }
@@ -100,13 +101,15 @@ const Tooltip = BaseTooltip.extend('tooltip', {
         bindEvents(el, options) {
             const modifiers = el.$_ptooltipModifiers;
 
-            if (modifiers.focus) {
+            if (!modifiers.hover) {
                 el.$_ptooltipFocusEvent = (event) => this.onFocus(event, options);
                 el.$_ptooltipBlurEvent = this.onBlur.bind(this);
 
                 el.addEventListener('focus', el.$_ptooltipFocusEvent);
                 el.addEventListener('blur', el.$_ptooltipBlurEvent);
-            } else {
+            }
+
+            if (!modifiers.focus) {
                 el.$_ptooltipMouseEnterEvent = (event) => this.onMouseEnter(event, options);
                 el.$_ptooltipMouseLeaveEvent = this.onMouseLeave.bind(this);
                 el.$_ptooltipClickEvent = this.onClick.bind(this);
@@ -124,13 +127,15 @@ const Tooltip = BaseTooltip.extend('tooltip', {
         unbindEvents(el) {
             const modifiers = el.$_ptooltipModifiers;
 
-            if (modifiers.focus) {
+            if (!modifiers.hover) {
                 el.removeEventListener('focus', el.$_ptooltipFocusEvent);
                 el.$_ptooltipFocusEvent = null;
 
                 el.removeEventListener('blur', el.$_ptooltipBlurEvent);
                 el.$_ptooltipBlurEvent = null;
-            } else {
+            }
+
+            if (!modifiers.focus) {
                 el.removeEventListener('mouseenter', el.$_ptooltipMouseEnterEvent);
                 el.$_ptooltipMouseEnterEvent = null;
 
@@ -173,17 +178,10 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             const hideDelay = el.$_ptooltipHideDelay;
             const autoHide = el.$_ptooltipAutoHide;
 
-            if (!autoHide) {
-                const valid =
-                    getAttribute(event.target, 'data-pc-name') === 'tooltip' ||
-                    getAttribute(event.target, 'data-pc-section') === 'arrow' ||
-                    getAttribute(event.target, 'data-pc-section') === 'text' ||
-                    getAttribute(event.relatedTarget, 'data-pc-name') === 'tooltip' ||
-                    getAttribute(event.relatedTarget, 'data-pc-section') === 'arrow' ||
-                    getAttribute(event.relatedTarget, 'data-pc-section') === 'text';
+            const tooltip = this.getTooltipElement(el);
+            const enteredTooltip = event.relatedTarget && tooltip?.contains(event.relatedTarget);
 
-                !valid && this.hide(el, hideDelay);
-            } else {
+            if (autoHide || (!enteredTooltip && el.ownerDocument.activeElement !== el)) {
                 this.hide(el, hideDelay);
             }
         },
@@ -230,16 +228,18 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             this.align(el);
             !this.isUnstyled() && fadeIn(tooltipElement, 250);
 
-            const $this = this;
-
             window.addEventListener('resize', el.$_pWindowResizeEvent);
 
-            tooltipElement.addEventListener('mouseleave', function onTooltipLeave() {
-                $this.hide(el);
-
-                tooltipElement.removeEventListener('mouseleave', onTooltipLeave);
-                el.removeEventListener('mouseenter', el.$_ptooltipMouseEnterEvent);
-                setTimeout(() => el.addEventListener('mouseenter', el.$_ptooltipMouseEnterEvent), 50);
+            el.$_ptooltipDocumentEscape = (event) => {
+                if (event.code === 'Escape' && event.target !== el) {
+                    this.hide(el, el.$_ptooltipHideDelay);
+                }
+            };
+            el.ownerDocument.addEventListener('keydown', el.$_ptooltipDocumentEscape, true);
+            tooltipElement.addEventListener('mouseleave', (event) => {
+                if (!event.relatedTarget || !el.contains(event.relatedTarget)) {
+                    this.hide(el, el.$_ptooltipHideDelay);
+                }
             });
 
             this.bindScrollListener(el);
@@ -327,6 +327,13 @@ const Tooltip = BaseTooltip.extend('tooltip', {
 
             document.body.appendChild(container);
 
+            const descriptions = (el.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean);
+
+            if (!descriptions.includes(container.id)) {
+                el.setAttribute('aria-describedby', [...descriptions, container.id].join(' '));
+                el.$_ptooltipOwnDescription = container.id;
+            }
+
             el.$_ptooltipId = container.id;
             this.$el = container;
 
@@ -339,6 +346,20 @@ const Tooltip = BaseTooltip.extend('tooltip', {
                 if (tooltipElement && tooltipElement.parentElement) {
                     ZIndex.clear(tooltipElement);
                     document.body.removeChild(tooltipElement);
+                }
+
+                const description = el.$_ptooltipOwnDescription;
+
+                if (description) {
+                    const remaining = (el.getAttribute('aria-describedby') ?? '').split(/\s+/).filter((id) => id && id !== description);
+                    if (remaining.length) el.setAttribute('aria-describedby', remaining.join(' '));
+                    else el.removeAttribute('aria-describedby');
+                    el.$_ptooltipOwnDescription = null;
+                }
+
+                if (el.$_ptooltipDocumentEscape) {
+                    el.ownerDocument.removeEventListener('keydown', el.$_ptooltipDocumentEscape, true);
+                    el.$_ptooltipDocumentEscape = null;
                 }
 
                 el.$_ptooltipId = null;

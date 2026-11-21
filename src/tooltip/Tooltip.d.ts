@@ -76,7 +76,7 @@ export interface TooltipOptions {
     hideDelay?: number | undefined;
     /**
      * Whether to hide tooltip when hovering over tooltip content.
-     * @defaultValue true
+     * @defaultValue false
      */
     autoHide?: boolean | undefined;
     /**
