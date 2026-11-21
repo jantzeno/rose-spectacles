@@ -98,23 +98,24 @@
     </transition>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
+import type { ProcessedMenuItem } from '../internal/processed-menu-item';
 import { nestedPosition } from '../internal/utils/dom/index';
 import { isNotEmpty, resolve } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'ContextMenuSub',
     hostName: 'ContextMenu',
     extends: BaseComponent,
     emits: ['item-click', 'item-mouseenter', 'item-mousemove'],
     props: {
         items: {
-            type: Array,
-            default: null
+            type: Array as PropType<ProcessedMenuItem[]>,
+            default: () => []
         },
         menuId: {
             type: String,
@@ -137,12 +138,12 @@ export default {
             default: 0
         },
         templates: {
-            type: Object,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         activeItemPath: {
-            type: Object,
-            default: null
+            type: Object as PropType<ProcessedMenuItem[]>,
+            default: () => []
         },
         tabindex: {
             type: Number,
@@ -150,22 +151,22 @@ export default {
         }
     },
     methods: {
-        getItemId(processedItem) {
+        getItemId(processedItem: ProcessedMenuItem) {
             return `${this.menuId}_${processedItem.key}`;
         },
-        getItemKey(processedItem) {
+        getItemKey(processedItem: ProcessedMenuItem) {
             return this.getItemId(processedItem);
         },
-        getItemProp(processedItem, name, params) {
+        getItemProp(processedItem: ProcessedMenuItem, name: string, params?: unknown) {
             return processedItem && processedItem.item ? resolve(processedItem.item[name], params) : undefined;
         },
-        getItemLabel(processedItem) {
+        getItemLabel(processedItem: ProcessedMenuItem) {
             return this.getItemProp(processedItem, 'label');
         },
-        getItemLabelId(processedItem) {
+        getItemLabelId(processedItem: ProcessedMenuItem) {
             return `${this.menuId}_${processedItem.key}_label`;
         },
-        getPTOptions(key, processedItem, index) {
+        getPTOptions(key: string, processedItem: ProcessedMenuItem, index: number) {
             return this.ptm(key, {
                 context: {
                     item: processedItem.item,
@@ -176,35 +177,35 @@ export default {
                 }
             });
         },
-        isItemActive(processedItem) {
+        isItemActive(processedItem: ProcessedMenuItem) {
             return this.activeItemPath.some((path) => path.key === processedItem.key);
         },
-        isItemVisible(processedItem) {
+        isItemVisible(processedItem: ProcessedMenuItem) {
             return this.getItemProp(processedItem, 'visible') !== false;
         },
-        isItemDisabled(processedItem) {
+        isItemDisabled(processedItem: ProcessedMenuItem) {
             return this.getItemProp(processedItem, 'disabled');
         },
-        isItemFocused(processedItem) {
+        isItemFocused(processedItem: ProcessedMenuItem) {
             return this.focusedItemId === this.getItemId(processedItem);
         },
-        isItemGroup(processedItem) {
+        isItemGroup(processedItem: ProcessedMenuItem) {
             return isNotEmpty(processedItem.items);
         },
-        onItemClick(event, processedItem) {
+        onItemClick(event: MouseEvent, processedItem: ProcessedMenuItem) {
             this.getItemProp(processedItem, 'command', { originalEvent: event, item: processedItem.item });
             this.$emit('item-click', { originalEvent: event, processedItem, isFocus: true });
         },
-        onItemMouseEnter(event, processedItem) {
+        onItemMouseEnter(event: MouseEvent, processedItem: ProcessedMenuItem) {
             this.$emit('item-mouseenter', { originalEvent: event, processedItem });
         },
-        onItemMouseMove(event, processedItem) {
+        onItemMouseMove(event: MouseEvent, processedItem: ProcessedMenuItem) {
             this.$emit('item-mousemove', { originalEvent: event, processedItem, isFocus: true });
         },
         getAriaSetSize() {
             return this.items.filter((processedItem) => this.isItemVisible(processedItem) && !this.getItemProp(processedItem, 'separator')).length;
         },
-        getAriaPosInset(index) {
+        getAriaPosInset(index: number) {
             return (
                 index -
                 this.items.slice(0, index).filter((processedItem) => this.isItemVisible(processedItem) && this.getItemProp(processedItem, 'separator')).length +
@@ -212,9 +213,9 @@ export default {
             );
         },
         onEnter() {
-            nestedPosition(this.$refs.container, this.level);
+            nestedPosition(this.$refs.container as HTMLElement, this.level);
         },
-        getMenuItemProps(processedItem, index) {
+        getMenuItemProps(processedItem: ProcessedMenuItem, index: number) {
             return {
                 action: mergeProps(
                     {
@@ -251,5 +252,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
