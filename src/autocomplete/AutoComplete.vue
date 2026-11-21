@@ -1004,9 +1004,11 @@ export default {
             return this.$refs.dropdownButton ? event.target === this.$refs.dropdownButton || this.$refs.dropdownButton.contains(event.target) : false;
         },
         isOptionMatched(option, value) {
-            return (
-                this.isValidOption(option) && this.getOptionLabel(option)?.toLocaleLowerCase(this.searchLocale) === value.toLocaleLowerCase(this.searchLocale)
-            );
+            if (!this.isValidOption(option)) return false;
+
+            const label = this.getOptionLabel(option);
+
+            return label != null && String(label).toLocaleLowerCase(this.searchLocale) === value.toLocaleLowerCase(this.searchLocale);
         },
         isValidOption(option) {
             return isNotEmpty(option) && !(this.isOptionDisabled(option) || this.isOptionGroup(option));
