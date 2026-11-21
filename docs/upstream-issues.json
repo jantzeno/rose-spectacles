@@ -83,10 +83,17 @@
             "title": "undefined provided as `context` on `PassThroughMethodOption` of `Select` component",
             "labels": ["bug", "typescript"],
             "component": "Select",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A mounted Select previously omitted context from the root pass-through callback. The regression checks selected and unselected root states, inherited root attributes, and each option label's own selection and disabled state.",
+                "The linked https://github.com/primefaces/primevue/pull/8605 was reviewed. The fork keeps the root attribute merge."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-tvhuu2sx?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: undefined provided as `context` on `PassThroughMethodOption` of `Select` component."
+            "resolvingCommit": "ac6da87b0fcb0799df0d8d5bc647d72fbd15a86a",
+            "test": {
+                "path": "src/select/SelectPassThrough.spec.ts",
+                "name": "provides selection and item context to Select pass-through sections"
+            }
         },
         {
             "number": 39,
@@ -594,10 +601,17 @@
             "title": "Toast reset z-index race condition",
             "labels": ["bug", "styling"],
             "component": "Toast",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The regression delivers a second message during the first message's 200 ms exit delay. The previous timer cleared the second message's inline z-index. The second message now keeps its z-index and the final exit clears it.",
+                "The linked https://github.com/primefaces/primevue/pull/8356 was reviewed. The fork cancels timers per Toast instance."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-mgvudytq?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Toast reset z-index race condition."
+            "resolvingCommit": "5677e3a166a57257908398d4401178c9df58e938",
+            "test": {
+                "path": "src/toast/ToastZIndex.spec.ts",
+                "name": "keeps the z-index of a toast that arrives during the last message exit"
+            }
         },
         {
             "number": 89,
