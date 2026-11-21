@@ -266,6 +266,18 @@ export interface InputChipsSlots<T = any> {
          * Value of the component
          */
         value: T;
+        /**
+         * Index of the chip in the list.
+         */
+        index: number;
+        /**
+         * Style class of the chip.
+         */
+        class: string;
+        /**
+         * Removes this chip.
+         */
+        removeCallback: (event: Event) => void;
     }): VNode[];
     /**
      * @deprecated since v4.0. Use 'chipicon' slot.

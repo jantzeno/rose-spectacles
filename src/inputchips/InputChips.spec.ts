@@ -102,4 +102,18 @@ describe('InputChips.vue', () => {
 
         expect(icon.classes()).toContain('pi-discord');
     });
+
+    it('removes an item through the custom chip slot callback', async () => {
+        const custom = mount(InputChips, {
+            props: { modelValue: ['One', 'Two'] },
+            slots: { chip: '<template #chip="{ value, removeCallback }"><button @click="removeCallback($event)">{{ value }}</button></template>' }
+        });
+
+        try {
+            await custom.findAll('button')[1].trigger('click');
+            expect(custom.emitted('update:modelValue')).toEqual([[['One']]]);
+        } finally {
+            custom.unmount();
+        }
+    });
 });
