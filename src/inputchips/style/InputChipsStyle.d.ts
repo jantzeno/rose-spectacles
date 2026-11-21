@@ -37,3 +37,6 @@ export enum InputChipsClasses {
 }
 
 export interface InputChipsStyle extends BaseStyle {}
+
+declare const style: InputChipsStyle;
+export default style;

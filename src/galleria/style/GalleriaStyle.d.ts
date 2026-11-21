@@ -125,3 +125,6 @@ export enum GalleriaClasses {
 }
 
 export interface GalleriaStyle extends BaseStyle {}
+
+declare const style: GalleriaStyle;
+export default style;

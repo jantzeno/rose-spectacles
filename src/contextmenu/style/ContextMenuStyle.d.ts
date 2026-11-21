@@ -54,3 +54,6 @@ export enum ContextMenuClasses {
 }
 
 export interface ContextMenuStyle extends BaseStyle {}
+
+declare const style: ContextMenuStyle;
+export default style;

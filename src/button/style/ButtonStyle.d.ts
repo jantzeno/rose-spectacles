@@ -29,3 +29,6 @@ export enum ButtonClasses {
 }
 
 export interface ButtonStyle extends BaseStyle {}
+
+declare const style: ButtonStyle;
+export default style;

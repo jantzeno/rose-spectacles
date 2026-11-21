@@ -17,3 +17,6 @@ export enum AccordionPanelClasses {
 }
 
 export interface AccordionPanelStyle extends BaseStyle {}
+
+declare const style: AccordionPanelStyle;
+export default style;

@@ -21,3 +21,6 @@ export enum PopoverClasses {
 }
 
 export interface PopoverStyle extends BaseStyle {}
+
+declare const style: PopoverStyle;
+export default style;

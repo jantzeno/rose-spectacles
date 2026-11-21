@@ -97,3 +97,6 @@ export enum TreeTableClasses {
 }
 
 export interface TreeTableStyle extends BaseStyle {}
+
+declare const style: TreeTableStyle;
+export default style;

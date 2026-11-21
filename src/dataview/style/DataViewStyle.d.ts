@@ -37,3 +37,6 @@ export enum DataViewClasses {
 }
 
 export interface DataViewStyle extends BaseStyle {}
+
+declare const style: DataViewStyle;
+export default style;

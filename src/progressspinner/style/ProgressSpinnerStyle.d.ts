@@ -25,3 +25,6 @@ export enum ProgressSpinnerClasses {
 }
 
 export interface ProgressSpinnerStyle extends BaseStyle {}
+
+declare const style: ProgressSpinnerStyle;
+export default style;

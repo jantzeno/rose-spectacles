@@ -21,3 +21,6 @@ export enum InputOtpClasses {
 }
 
 export interface InputOtpStyle extends BaseStyle {}
+
+declare const style: InputOtpStyle;
+export default style;

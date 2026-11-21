@@ -21,3 +21,6 @@ export enum DividerClasses {
 }
 
 export interface DividerStyle extends BaseStyle {}
+
+declare const style: DividerStyle;
+export default style;

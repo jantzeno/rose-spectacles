@@ -37,3 +37,6 @@ export enum MessageClasses {
 }
 
 export interface MessageStyle extends BaseStyle {}
+
+declare const style: MessageStyle;
+export default style;

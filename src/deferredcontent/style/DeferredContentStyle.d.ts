@@ -12,3 +12,6 @@ import type { BaseStyle } from 'rose-spectacles/core/base/style';
 export enum DeferredContentClasses {}
 
 export interface DeferredContentStyle extends BaseStyle {}
+
+declare const style: DeferredContentStyle;
+export default style;

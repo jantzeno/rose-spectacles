@@ -69,3 +69,6 @@ export enum CarouselClasses {
 }
 
 export interface CarouselStyle extends BaseStyle {}
+
+declare const style: CarouselStyle;
+export default style;

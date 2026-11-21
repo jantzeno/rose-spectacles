@@ -19,7 +19,7 @@ import type { CalendarPassThroughOptions } from 'rose-spectacles/calendar';
 import type { CardPassThroughOptions } from 'rose-spectacles/card';
 import type { CarouselPassThroughOptions } from 'rose-spectacles/carousel';
 import type { CascadeSelectPassThroughOptions } from 'rose-spectacles/cascadeselect';
-import type { ChartPassThroughOptions } from 'rose-spectacles/chart';
+import type { ChartPassThroughOptions } from '../chart/ChartPassThrough';
 import type { CheckboxPassThroughOptions } from 'rose-spectacles/checkbox';
 import type { CheckboxGroupPassThroughOptions } from 'rose-spectacles/checkboxgroup';
 import type { ChipPassThroughOptions } from 'rose-spectacles/chip';

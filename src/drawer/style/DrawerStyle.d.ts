@@ -37,3 +37,6 @@ export enum DrawerClasses {
 }
 
 export interface DrawerStyle extends BaseStyle {}
+
+declare const style: DrawerStyle;
+export default style;

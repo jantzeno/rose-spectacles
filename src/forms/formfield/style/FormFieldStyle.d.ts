@@ -15,3 +15,6 @@ export enum FormFieldClasses {
 }
 
 export interface FormFieldStyle extends BaseStyle {}
+
+declare const style: FormFieldStyle;
+export default style;

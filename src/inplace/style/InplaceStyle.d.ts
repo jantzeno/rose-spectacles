@@ -25,3 +25,6 @@ export enum InplaceClasses {
 }
 
 export interface InplaceStyle extends BaseStyle {}
+
+declare const style: InplaceStyle;
+export default style;

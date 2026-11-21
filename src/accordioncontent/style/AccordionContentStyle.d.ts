@@ -21,3 +21,6 @@ export enum AccordionContentClasses {
 }
 
 export interface AccordionContentStyle extends BaseStyle {}
+
+declare const style: AccordionContentStyle;
+export default style;

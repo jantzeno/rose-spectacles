@@ -17,3 +17,6 @@ export enum BadgeClasses {
 }
 
 export interface BadgeStyle extends BaseStyle {}
+
+declare const style: BadgeStyle;
+export default style;

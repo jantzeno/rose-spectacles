@@ -25,3 +25,6 @@ export enum InlineMessageClasses {
 }
 
 export interface InlineMessageStyle extends BaseStyle {}
+
+declare const style: InlineMessageStyle;
+export default style;

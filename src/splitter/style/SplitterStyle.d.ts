@@ -25,3 +25,6 @@ export enum SplitterClasses {
 }
 
 export interface SplitterStyle extends BaseStyle {}
+
+declare const style: SplitterStyle;
+export default style;

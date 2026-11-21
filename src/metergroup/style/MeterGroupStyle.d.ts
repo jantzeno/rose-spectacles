@@ -45,3 +45,6 @@ export enum MeterGroupClasses {
 }
 
 export interface MeterGroupStyle extends BaseStyle {}
+
+declare const style: MeterGroupStyle;
+export default style;

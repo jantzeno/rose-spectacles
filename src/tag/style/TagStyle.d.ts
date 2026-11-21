@@ -25,3 +25,6 @@ export enum TagClasses {
 }
 
 export interface TagStyle extends BaseStyle {}
+
+declare const style: TagStyle;
+export default style;

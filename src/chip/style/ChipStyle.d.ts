@@ -33,3 +33,6 @@ export enum ChipClasses {
 }
 
 export interface ChipStyle extends BaseStyle {}
+
+declare const style: ChipStyle;
+export default style;

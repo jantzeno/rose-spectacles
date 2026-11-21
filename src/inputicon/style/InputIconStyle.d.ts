@@ -17,3 +17,6 @@ export enum InputIconClasses {
 }
 
 export interface InputIconStyle extends BaseStyle {}
+
+declare const style: InputIconStyle;
+export default style;

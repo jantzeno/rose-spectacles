@@ -41,3 +41,6 @@ export enum TimelineClasses {
 }
 
 export interface TimelineStyle extends BaseStyle {}
+
+declare const style: TimelineStyle;
+export default style;

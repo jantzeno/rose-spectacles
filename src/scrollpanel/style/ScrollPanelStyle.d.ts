@@ -33,3 +33,6 @@ export enum ScrollPanelClasses {
 }
 
 export interface ScrollPanelStyle extends BaseStyle {}
+
+declare const style: ScrollPanelStyle;
+export default style;

@@ -29,3 +29,6 @@ export enum RatingClasses {
 }
 
 export interface RatingStyle extends BaseStyle {}
+
+declare const style: RatingStyle;
+export default style;

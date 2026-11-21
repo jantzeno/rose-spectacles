@@ -12,3 +12,6 @@ import type { BaseStyle } from 'rose-spectacles/core/base/style';
 export enum RowClasses {}
 
 export interface RowStyle extends BaseStyle {}
+
+declare const style: RowStyle;
+export default style;

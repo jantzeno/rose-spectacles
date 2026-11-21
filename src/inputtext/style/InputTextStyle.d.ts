@@ -17,3 +17,6 @@ export enum InputTextClasses {
 }
 
 export interface InputTextStyle extends BaseStyle {}
+
+declare const style: InputTextStyle;
+export default style;

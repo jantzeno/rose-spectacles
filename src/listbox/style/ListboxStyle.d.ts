@@ -53,3 +53,6 @@ export enum ListboxClasses {
 }
 
 export interface ListboxStyle extends BaseStyle {}
+
+declare const style: ListboxStyle;
+export default style;

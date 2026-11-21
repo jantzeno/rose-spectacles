@@ -21,3 +21,6 @@ export enum AccordionHeaderClasses {
 }
 
 export interface AccordionHeaderStyle extends BaseStyle {}
+
+declare const style: AccordionHeaderStyle;
+export default style;

@@ -17,3 +17,6 @@ export enum ChartClasses {
 }
 
 export interface ChartStyle extends BaseStyle {}
+
+declare const style: ChartStyle;
+export default style;

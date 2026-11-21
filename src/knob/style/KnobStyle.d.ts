@@ -29,3 +29,6 @@ export enum KnobClasses {
 }
 
 export interface KnobStyle extends BaseStyle {}
+
+declare const style: KnobStyle;
+export default style;

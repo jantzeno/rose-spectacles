@@ -65,3 +65,6 @@ export enum MenubarClasses {
 }
 
 export interface MenubarStyle extends BaseStyle {}
+
+declare const style: MenubarStyle;
+export default style;

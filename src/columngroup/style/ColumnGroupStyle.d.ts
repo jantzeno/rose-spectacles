@@ -13,3 +13,6 @@ import type { BaseStyle } from 'rose-spectacles/core/base/style';
 export enum ColumnGroupClasses {}
 
 export interface ColumnGroupStyle extends BaseStyle {}
+
+declare const style: ColumnGroupStyle;
+export default style;

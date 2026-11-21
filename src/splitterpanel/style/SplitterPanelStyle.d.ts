@@ -17,3 +17,6 @@ export enum SplitterPanelClasses {
 }
 
 export interface SplitterPanelStyle extends BaseStyle {}
+
+declare const style: SplitterPanelStyle;
+export default style;

@@ -29,3 +29,6 @@ export enum RadioButtonClasses {
 }
 
 export interface RadioButtonStyle extends BaseStyle {}
+
+declare const style: RadioButtonStyle;
+export default style;

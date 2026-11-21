@@ -45,3 +45,6 @@ export enum PanelClasses {
 }
 
 export interface PanelStyle extends BaseStyle {}
+
+declare const style: PanelStyle;
+export default style;

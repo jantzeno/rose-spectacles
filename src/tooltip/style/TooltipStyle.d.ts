@@ -25,3 +25,6 @@ export enum TooltipClasses {
 }
 
 export interface TooltipStyle extends BaseStyle {}
+
+declare const style: TooltipStyle;
+export default style;

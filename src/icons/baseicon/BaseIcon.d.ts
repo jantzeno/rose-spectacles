@@ -12,3 +12,5 @@ export interface IconEmitsOptions {}
 export declare type IconEmits = EmitFn<IconEmitsOptions>;
 
 export declare const Icon: DefineComponent<IconProps, IconSlots, IconEmits>;
+
+export default Icon;

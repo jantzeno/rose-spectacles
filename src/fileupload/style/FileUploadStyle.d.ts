@@ -77,3 +77,6 @@ export enum FileUploadClasses {
 }
 
 export interface FileUploadStyle extends BaseStyle {}
+
+declare const style: FileUploadStyle;
+export default style;

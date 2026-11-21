@@ -17,3 +17,6 @@ export enum BlockUIClasses {
 }
 
 export interface BlockUIStyle extends BaseStyle {}
+
+declare const style: BlockUIStyle;
+export default style;

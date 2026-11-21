@@ -25,3 +25,6 @@ export enum SliderClasses {
 }
 
 export interface SliderStyle extends BaseStyle {}
+
+declare const style: SliderStyle;
+export default style;

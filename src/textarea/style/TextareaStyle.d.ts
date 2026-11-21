@@ -17,3 +17,6 @@ export enum TextareaClasses {
 }
 
 export interface TextareaStyle extends BaseStyle {}
+
+declare const style: TextareaStyle;
+export default style;

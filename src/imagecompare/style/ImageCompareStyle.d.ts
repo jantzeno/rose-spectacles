@@ -21,3 +21,6 @@ export enum ImageCompareClasses {
 }
 
 export interface ImageCompareStyle extends BaseStyle {}
+
+declare const style: ImageCompareStyle;
+export default style;

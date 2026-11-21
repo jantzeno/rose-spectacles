@@ -57,3 +57,6 @@ export enum MenuClasses {
 }
 
 export interface MenuStyle extends BaseStyle {}
+
+declare const style: MenuStyle;
+export default style;

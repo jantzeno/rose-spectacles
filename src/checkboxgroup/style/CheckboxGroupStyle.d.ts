@@ -17,3 +17,6 @@ export enum CheckboxGroupClasses {
 }
 
 export interface CheckboxGroupStyle extends BaseStyle {}
+
+declare const style: CheckboxGroupStyle;
+export default style;

@@ -17,3 +17,6 @@ export enum FluidClasses {
 }
 
 export interface FluidStyle extends BaseStyle {}
+
+declare const style: FluidStyle;
+export default style;

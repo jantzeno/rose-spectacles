@@ -37,3 +37,6 @@ export enum FieldsetClasses {
 }
 
 export interface FieldsetStyle extends BaseStyle {}
+
+declare const style: FieldsetStyle;
+export default style;

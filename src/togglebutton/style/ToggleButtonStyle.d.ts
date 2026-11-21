@@ -25,3 +25,6 @@ export enum ToggleButtonClasses {
 }
 
 export interface ToggleButtonStyle extends BaseStyle {}
+
+declare const style: ToggleButtonStyle;
+export default style;

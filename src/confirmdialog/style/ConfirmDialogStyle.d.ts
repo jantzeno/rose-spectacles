@@ -33,3 +33,6 @@ export enum ConfirmDialogClasses {
 }
 
 export interface ConfirmDialogStyle extends BaseStyle {}
+
+declare const style: ConfirmDialogStyle;
+export default style;

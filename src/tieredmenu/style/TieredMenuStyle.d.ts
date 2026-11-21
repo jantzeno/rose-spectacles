@@ -61,3 +61,6 @@ export enum TieredMenuClasses {
 }
 
 export interface TieredMenuStyle extends BaseStyle {}
+
+declare const style: TieredMenuStyle;
+export default style;

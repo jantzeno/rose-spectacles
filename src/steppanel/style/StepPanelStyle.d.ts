@@ -17,3 +17,6 @@ export enum StepPanelClasses {
 }
 
 export interface StepPanelStyle extends BaseStyle {}
+
+declare const style: StepPanelStyle;
+export default style;

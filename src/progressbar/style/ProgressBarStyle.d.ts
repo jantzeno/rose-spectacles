@@ -25,3 +25,6 @@ export enum ProgressBarClasses {
 }
 
 export interface ProgressBarStyle extends BaseStyle {}
+
+declare const style: ProgressBarStyle;
+export default style;

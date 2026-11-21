@@ -41,3 +41,6 @@ export enum SpeedDialClasses {
 }
 
 export interface SpeedDialStyle extends BaseStyle {}
+
+declare const style: SpeedDialStyle;
+export default style;

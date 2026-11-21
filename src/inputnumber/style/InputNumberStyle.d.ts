@@ -33,3 +33,6 @@ export enum InputNumberClasses {
 }
 
 export interface InputNumberStyle extends BaseStyle {}
+
+declare const style: InputNumberStyle;
+export default style;

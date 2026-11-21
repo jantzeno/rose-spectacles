@@ -33,3 +33,6 @@ export enum VirtualScrollerClasses {
 }
 
 export interface VirtualScrollerStyle extends BaseStyle {}
+
+declare const style: VirtualScrollerStyle;
+export default style;

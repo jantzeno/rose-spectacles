@@ -169,3 +169,6 @@ export enum DatePickerClasses {
 }
 
 export interface DatePickerStyle extends BaseStyle {}
+
+declare const style: DatePickerStyle;
+export default style;

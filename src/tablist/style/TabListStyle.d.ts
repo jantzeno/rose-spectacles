@@ -37,3 +37,6 @@ export enum TabListClasses {
 }
 
 export interface TabListStyle extends BaseStyle {}
+
+declare const style: TabListStyle;
+export default style;

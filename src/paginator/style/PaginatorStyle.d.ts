@@ -81,3 +81,6 @@ export enum PaginatorClasses {
 }
 
 export interface PaginatorStyle extends BaseStyle {}
+
+declare const style: PaginatorStyle;
+export default style;

@@ -41,3 +41,6 @@ export enum ConfirmPopupClasses {
 }
 
 export interface ConfirmPopupStyle extends BaseStyle {}
+
+declare const style: ConfirmPopupStyle;
+export default style;

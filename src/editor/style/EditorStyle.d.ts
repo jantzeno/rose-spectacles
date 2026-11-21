@@ -25,3 +25,6 @@ export enum EditorClasses {
 }
 
 export interface EditorStyle extends BaseStyle {}
+
+declare const style: EditorStyle;
+export default style;

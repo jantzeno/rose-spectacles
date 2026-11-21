@@ -49,3 +49,6 @@ export enum DialogClasses {
 }
 
 export interface DialogStyle extends BaseStyle {}
+
+declare const style: DialogStyle;
+export default style;

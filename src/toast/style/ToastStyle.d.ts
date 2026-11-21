@@ -49,3 +49,6 @@ export enum ToastClasses {
 }
 
 export interface ToastStyle extends BaseStyle {}
+
+declare const style: ToastStyle;
+export default style;

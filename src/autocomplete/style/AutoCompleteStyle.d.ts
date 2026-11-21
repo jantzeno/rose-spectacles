@@ -77,3 +77,6 @@ export enum AutoCompleteClasses {
 }
 
 export interface AutoCompleteStyle extends BaseStyle {}
+
+declare const style: AutoCompleteStyle;
+export default style;

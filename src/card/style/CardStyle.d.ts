@@ -45,3 +45,6 @@ export enum CardClasses {
 }
 
 export interface CardStyle extends BaseStyle {}
+
+declare const style: CardStyle;
+export default style;

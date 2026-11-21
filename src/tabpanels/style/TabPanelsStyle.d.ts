@@ -17,3 +17,6 @@ export enum TabPanelsClasses {
 }
 
 export interface TabPanelsStyle extends BaseStyle {}
+
+declare const style: TabPanelsStyle;
+export default style;

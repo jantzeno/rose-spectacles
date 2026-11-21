@@ -53,3 +53,6 @@ export enum OrganizationChartClasses {
 }
 
 export interface OrganizationChartStyle extends BaseStyle {}
+
+declare const style: OrganizationChartStyle;
+export default style;

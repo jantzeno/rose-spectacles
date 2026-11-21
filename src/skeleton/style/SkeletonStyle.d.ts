@@ -17,3 +17,6 @@ export enum SkeletonClasses {
 }
 
 export interface SkeletonStyle extends BaseStyle {}
+
+declare const style: SkeletonStyle;
+export default style;

@@ -12,3 +12,6 @@ export enum BaseIconClasses {
 }
 
 export interface BaseIconStyle extends BaseStyle {}
+
+declare const style: BaseIconStyle;
+export default style;

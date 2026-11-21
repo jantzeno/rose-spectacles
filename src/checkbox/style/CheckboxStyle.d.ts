@@ -29,3 +29,6 @@ export enum CheckboxClasses {
 }
 
 export interface CheckboxStyle extends BaseStyle {}
+
+declare const style: CheckboxStyle;
+export default style;

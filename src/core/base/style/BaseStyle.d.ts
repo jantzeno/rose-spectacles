@@ -17,3 +17,6 @@ export declare interface BaseStyle {
     load?: ((style: string | ((params?: any) => string | undefined), options?: StyleOptions) => Style | object | undefined) | undefined;
     getStyleSheet?: ((extendedCSS?: string, props?: any) => string | undefined) | undefined;
 }
+
+declare const style: BaseStyle;
+export default style;

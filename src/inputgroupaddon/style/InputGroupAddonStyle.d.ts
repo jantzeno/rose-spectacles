@@ -17,3 +17,6 @@ export enum InputGroupAddonClasses {
 }
 
 export interface InputGroupAddonStyle extends BaseStyle {}
+
+declare const style: InputGroupAddonStyle;
+export default style;

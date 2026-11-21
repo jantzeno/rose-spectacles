@@ -205,3 +205,6 @@ export enum DataTableClasses {
 }
 
 export interface DataTableStyle extends BaseStyle {}
+
+declare const style: DataTableStyle;
+export default style;

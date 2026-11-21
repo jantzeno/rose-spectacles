@@ -82,3 +82,6 @@ export enum PanelMenuClasses {
 }
 
 export interface PanelMenuStyle extends BaseStyle {}
+
+declare const style: PanelMenuStyle;
+export default style;

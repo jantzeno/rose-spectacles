@@ -41,3 +41,6 @@ export enum TabMenuClasses {
 }
 
 export interface TabMenuStyle extends BaseStyle {}
+
+declare const style: TabMenuStyle;
+export default style;

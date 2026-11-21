@@ -17,3 +17,6 @@ export enum IftaLabelClasses {
 }
 
 export interface IftaLabelStyle extends BaseStyle {}
+
+declare const style: IftaLabelStyle;
+export default style;

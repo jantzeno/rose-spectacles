@@ -29,3 +29,6 @@ export enum ToolbarClasses {
 }
 
 export interface ToolbarStyle extends BaseStyle {}
+
+declare const style: ToolbarStyle;
+export default style;

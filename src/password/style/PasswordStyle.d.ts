@@ -49,3 +49,6 @@ export enum PasswordClasses {
 }
 
 export interface PasswordStyle extends BaseStyle {}
+
+declare const style: PasswordStyle;
+export default style;

@@ -21,3 +21,6 @@ export enum ScrollTopClasses {
 }
 
 export interface ScrollTopStyle extends BaseStyle {}
+
+declare const style: ScrollTopStyle;
+export default style;

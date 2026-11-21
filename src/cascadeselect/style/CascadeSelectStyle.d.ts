@@ -69,3 +69,6 @@ export enum CascadeSelectClasses {
 }
 
 export interface CascadeSelectStyle extends BaseStyle {}
+
+declare const style: CascadeSelectStyle;
+export default style;

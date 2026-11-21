@@ -37,3 +37,6 @@ export enum StepsClasses {
 }
 
 export interface StepsStyle extends BaseStyle {}
+
+declare const style: StepsStyle;
+export default style;

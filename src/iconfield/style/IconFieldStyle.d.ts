@@ -17,3 +17,6 @@ export enum IconFieldClasses {
 }
 
 export interface IconFieldStyle extends BaseStyle {}
+
+declare const style: IconFieldStyle;
+export default style;

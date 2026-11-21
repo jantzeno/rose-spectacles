@@ -17,3 +17,6 @@ export enum FloatLabelClasses {
 }
 
 export interface FloatLabelStyle extends BaseStyle {}
+
+declare const style: FloatLabelStyle;
+export default style;

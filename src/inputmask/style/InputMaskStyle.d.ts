@@ -17,3 +17,6 @@ export enum InputMaskClasses {
 }
 
 export interface InputMaskStyle extends BaseStyle {}
+
+declare const style: InputMaskStyle;
+export default style;

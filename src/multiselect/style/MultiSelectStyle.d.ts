@@ -89,3 +89,6 @@ export enum MultiSelectClasses {
 }
 
 export interface MultiSelectStyle extends BaseStyle {}
+
+declare const style: MultiSelectStyle;
+export default style;

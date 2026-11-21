@@ -57,3 +57,6 @@ export enum ImageClasses {
 }
 
 export interface ImageStyle extends BaseStyle {}
+
+declare const style: ImageStyle;
+export default style;

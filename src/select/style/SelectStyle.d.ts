@@ -85,3 +85,6 @@ export enum SelectClasses {
 }
 
 export interface SelectStyle extends BaseStyle {}
+
+declare const style: SelectStyle;
+export default style;

@@ -45,3 +45,6 @@ export enum ColorPickerClasses {
 }
 
 export interface ColorPickerStyle extends BaseStyle {}
+
+declare const style: ColorPickerStyle;
+export default style;

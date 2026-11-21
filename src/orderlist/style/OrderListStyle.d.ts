@@ -21,3 +21,6 @@ export enum OrderListClasses {
 }
 
 export interface OrderListStyle extends BaseStyle {}
+
+declare const style: OrderListStyle;
+export default style;

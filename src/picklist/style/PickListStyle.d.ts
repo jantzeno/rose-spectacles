@@ -37,3 +37,6 @@ export enum PickListClasses {
 }
 
 export interface PickListStyle extends BaseStyle {}
+
+declare const style: PickListStyle;
+export default style;

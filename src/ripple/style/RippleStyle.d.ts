@@ -17,3 +17,6 @@ export enum RippleClasses {
 }
 
 export interface RippleStyle extends BaseStyle {}
+
+declare const style: RippleStyle;
+export default style;

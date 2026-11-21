@@ -9,64 +9,19 @@
  */
 import type { ChartData, ChartOptions, ChartType, Plugin } from 'chart.js';
 import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spectacles/core';
-import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { CanvasHTMLAttributes } from 'vue';
 
-export declare type ChartPassThroughOptionType = ChartPassThroughAttributes | ((options: ChartPassThroughMethodOptions) => ChartPassThroughAttributes | string) | string | null | undefined;
+import type {
+    ChartPassThroughMethodOptions as PassThroughMethod,
+    ChartPassThroughOptions as PassThroughConfig,
+    ChartPassThroughOptionType as PassThroughOption
+} from './ChartPassThrough';
 
-/**
- * Custom passthrough(pt) option method.
- */
-export interface ChartPassThroughMethodOptions {
-    /**
-     * Defines instance.
-     */
-    instance: any;
-    /**
-     * Defines valid properties.
-     */
-    props: ChartProps;
-    /**
-     * Defines valid attributes.
-     */
-    attrs: any;
-    /**
-     * Defines parent options.
-     */
-    parent: any;
-    /**
-     * Defines passthrough(pt) options in global config.
-     */
-    global: object | undefined;
-}
-
-/**
- * Custom passthrough(pt) options.
- * @see {@link ChartProps.pt}
- */
-export interface ChartPassThroughOptions {
-    /**
-     * Used to pass attributes to the root's DOM element.
-     */
-    root?: ChartPassThroughOptionType;
-    /**
-     * Used to pass attributes to the canvas's DOM element.
-     */
-    canvas?: ChartPassThroughOptionType;
-    /**
-     * Used to manage all lifecycle hooks.
-     * @see {@link BaseComponent.ComponentHooks}
-     */
-    hooks?: ComponentHooks;
-}
-
-/**
- * Custom passthrough attributes for each DOM elements
- */
-export interface ChartPassThroughAttributes {
-    [key: string]: any;
-}
+export type { ChartPassThroughAttributes } from './ChartPassThrough';
+export type ChartPassThroughOptionType = PassThroughOption<ChartProps>;
+export type ChartPassThroughMethodOptions = PassThroughMethod<ChartProps>;
+export type ChartPassThroughOptions = PassThroughConfig<ChartProps>;
 
 /**
  * Custom select event.

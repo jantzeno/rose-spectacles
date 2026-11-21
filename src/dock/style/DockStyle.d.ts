@@ -41,3 +41,6 @@ export enum DockClasses {
 }
 
 export interface DockStyle extends BaseStyle {}
+
+declare const style: DockStyle;
+export default style;

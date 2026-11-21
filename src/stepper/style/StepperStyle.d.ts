@@ -21,3 +21,6 @@ export enum StepperClasses {
 }
 
 export interface StepperStyle extends BaseStyle {}
+
+declare const style: StepperStyle;
+export default style;

@@ -62,3 +62,6 @@ export enum TabViewClasses {
 }
 
 export interface TabViewStyle extends BaseStyle {}
+
+declare const style: TabViewStyle;
+export default style;

@@ -81,3 +81,6 @@ export enum MegaMenuClasses {
 }
 
 export interface MegaMenuStyle extends BaseStyle {}
+
+declare const style: MegaMenuStyle;
+export default style;

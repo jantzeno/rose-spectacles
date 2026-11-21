@@ -29,3 +29,6 @@ export enum StepClasses {
 }
 
 export interface StepStyle extends BaseStyle {}
+
+declare const style: StepStyle;
+export default style;

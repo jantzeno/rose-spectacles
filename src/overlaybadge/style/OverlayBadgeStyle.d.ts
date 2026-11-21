@@ -17,3 +17,6 @@ export enum OverlayBadgeClasses {
 }
 
 export interface OverlayBadgeStyle extends BaseStyle {}
+
+declare const style: OverlayBadgeStyle;
+export default style;

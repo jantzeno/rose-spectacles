@@ -29,3 +29,6 @@ export enum ToggleSwitchClasses {
 }
 
 export interface ToggleSwitchStyle extends BaseStyle {}
+
+declare const style: ToggleSwitchStyle;
+export default style;

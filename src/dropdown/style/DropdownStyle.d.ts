@@ -12,3 +12,6 @@ import type { SelectStyle } from 'rose-spectacles/select/style';
 export enum DropdownClasses {}
 
 export interface DropdownStyle extends SelectStyle {}
+
+declare const style: DropdownStyle;
+export default style;

@@ -49,3 +49,6 @@ export enum BreadcrumbClasses {
 }
 
 export interface BreadcrumbStyle extends BaseStyle {}
+
+declare const style: BreadcrumbStyle;
+export default style;

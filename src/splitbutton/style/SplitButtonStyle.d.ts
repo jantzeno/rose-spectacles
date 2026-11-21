@@ -25,3 +25,6 @@ export enum SplitButtonClasses {
 }
 
 export interface SplitButtonStyle extends BaseStyle {}
+
+declare const style: SplitButtonStyle;
+export default style;

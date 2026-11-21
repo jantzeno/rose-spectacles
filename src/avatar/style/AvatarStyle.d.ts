@@ -25,3 +25,6 @@ export enum AvatarClasses {
 }
 
 export interface AvatarStyle extends BaseStyle {}
+
+declare const style: AvatarStyle;
+export default style;

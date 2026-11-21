@@ -49,3 +49,6 @@ export enum TerminalClasses {
 }
 
 export interface TerminalStyle extends BaseStyle {}
+
+declare const style: TerminalStyle;
+export default style;
