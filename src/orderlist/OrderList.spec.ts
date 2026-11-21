@@ -124,6 +124,10 @@ describe('OrderList.vue', () => {
         await listBoxOption.trigger('click');
 
         expect(wrapper.findAll('li.rs-listbox-option')[0].classes()).toContain('rs-listbox-option-selected');
+        expect(wrapper.emitted('selection-change')?.[0]?.[0]).toMatchObject({
+            originalEvent: expect.any(MouseEvent),
+            value: [wrapper.vm.modelValue[0]]
+        });
     });
 
     it('should slot works', () => {

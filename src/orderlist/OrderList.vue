@@ -144,7 +144,7 @@ export default {
         },
         onChangeSelection(params) {
             this.d_selection = params.value;
-            this.updateSelection(params.event);
+            this.updateSelection(params.originalEvent);
         },
         onListFocus(event) {
             this.$emit('focus', event);
