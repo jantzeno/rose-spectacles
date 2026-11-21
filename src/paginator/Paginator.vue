@@ -135,6 +135,8 @@ import PageLinks from './PageLinks.vue';
 import PrevPageLink from './PrevPageLink.vue';
 import RowsPerPageDropdown from './RowsPerPageDropdown.vue';
 
+const defaultTemplate = 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown';
+
 export default {
     name: 'Paginator',
     extends: BasePaginator,
@@ -220,11 +222,11 @@ export default {
 
                 let innerHTML = '';
 
-                const keys = Object.keys(this.template);
+                const keys = Object.keys(this.templateItems);
                 const sortedBreakpoints = {};
 
                 keys.sort((a, b) => parseInt(a) - parseInt(b)).forEach((key) => {
-                    sortedBreakpoints[key] = this.template[key];
+                    sortedBreakpoints[key] = this.templateItems[key];
                 });
 
                 for (const [index, [key]] of Object.entries(Object.entries(sortedBreakpoints))) {
@@ -276,29 +278,10 @@ export default {
     },
     computed: {
         templateItems() {
-            let keys = {};
+            const templates =
+                typeof this.template === 'string' ? { default: this.template } : { ...this.template, default: this.template.default || defaultTemplate };
 
-            if (this.hasBreakpoints()) {
-                keys = this.template;
-
-                if (!keys.default) {
-                    keys.default = 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown';
-                }
-
-                for (const item in keys) {
-                    keys[item] = this.template[item].split(' ').map((value) => {
-                        return value.trim();
-                    });
-                }
-
-                return keys;
-            }
-
-            keys['default'] = this.template.split(' ').map((value) => {
-                return value.trim();
-            });
-
-            return keys;
+            return Object.fromEntries(Object.entries(templates).map(([key, value]) => [key, value.split(' ').map((item) => item.trim())]));
         },
         page() {
             return Math.floor(this.d_first / this.d_rows);

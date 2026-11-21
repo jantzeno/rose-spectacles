@@ -49,3 +49,16 @@ describe('Paginator.vue', () => {
         expect(wrapper.find('.rs-select-label').text()).toBe('20');
     });
 });
+
+it('renders responsive paginator controls without changing the supplied template', () => {
+    const template = { '640px': 'PrevPageLink NextPageLink' };
+    const wrapper = mount(Paginator, { props: { rows: 10, totalRecords: 30, template } });
+
+    try {
+        expect(wrapper.get('.rs-paginator-640px').find('.rs-paginator-prev').exists()).toBe(true);
+        expect(wrapper.get('.rs-paginator-default').find('.rs-paginator-page').exists()).toBe(true);
+        expect(template).toEqual({ '640px': 'PrevPageLink NextPageLink' });
+    } finally {
+        wrapper.unmount();
+    }
+});
