@@ -43,6 +43,41 @@ describe('Splitter.vue', () => {
 
         expect(wrapper.find('.rs-splitter').classes()).toContain('rs-splitter-horizontal');
     });
+
+    afterEach(() => {
+        wrapper.unmount();
+    });
+
+    it('completes a touch resize when the gesture ends outside the gutter', () => {
+        const gutter = wrapper.find('.rs-splitter-gutter').element;
+        const addListener = vi.spyOn(document, 'addEventListener');
+
+        try {
+            const touchStart = new Event('touchstart', { cancelable: true });
+            Object.defineProperty(touchStart, 'changedTouches', { value: [{ pageX: 40, pageY: 10 }] });
+            gutter.dispatchEvent(touchStart);
+
+            const touchEnd = new Event('touchend');
+            const listener = addListener.mock.calls.find(([name]) => name === 'touchend')?.[1] as EventListener;
+            listener(touchEnd);
+
+            expect(wrapper.emitted('resizeend')).toEqual([[{ originalEvent: touchEnd, sizes: [50, 50] }]]);
+            expect(wrapper.attributes('data-p-resizing')).toBe('false');
+        } finally {
+            addListener.mockRestore();
+            wrapper.vm.unbindTouchListeners();
+        }
+    });
+
+    it('starts a mouse resize at the edge of the viewport', () => {
+        const gutter = wrapper.find('.rs-splitter-gutter').element;
+        const originalEvent = new MouseEvent('mousedown', { clientX: 0 });
+
+        gutter.dispatchEvent(originalEvent);
+
+        expect(wrapper.emitted('resizestart')).toEqual([[{ originalEvent, sizes: [50, 50] }]]);
+        expect(wrapper.attributes('data-p-resizing')).toBe('true');
+    });
 });
 
 it('sizes a newly inserted panel after the splitter DOM updates', async () => {

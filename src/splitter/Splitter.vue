@@ -9,8 +9,6 @@
                 tabindex="-1"
                 @mousedown="onGutterMouseDown($event, i)"
                 @touchstart="onGutterTouchStart($event, i)"
-                @touchmove="onGutterTouchMove($event, i)"
-                @touchend="onGutterTouchEnd($event, i)"
                 :data-p-gutter-resizing="false"
                 :data-p="dataP"
                 v-bind="ptm('gutter')"
@@ -77,7 +75,9 @@ export default {
     },
     beforeUnmount() {
         this.clear();
+        this.clearTimer();
         this.unbindMouseListeners();
+        this.unbindTouchListeners();
     },
     methods: {
         isSplitterPanel(child) {
@@ -117,8 +117,9 @@ export default {
             this.size = this.horizontal ? getWidth(this.$el) : getHeight(this.$el);
 
             if (!isKeyDown) {
+                const pointer = 'changedTouches' in event ? event.changedTouches[0] : event;
                 this.dragging = true;
-                this.startPos = this.layout === 'horizontal' ? event.pageX || event.changedTouches[0].pageX : event.pageY || event.changedTouches[0].pageY;
+                this.startPos = this.horizontal ? pointer.pageX : pointer.pageY;
             }
 
             this.prevPanelElement = this.gutterElement.previousElementSibling;
@@ -261,13 +262,9 @@ export default {
             this.bindTouchListeners();
             event.preventDefault();
         },
-        onGutterTouchMove(event) {
-            this.onResize(event);
-            event.preventDefault();
-        },
         onGutterTouchEnd(event) {
-            this.onResizeEnd(event);
             this.unbindTouchListeners();
+            this.onResizeEnd(event);
             event.preventDefault();
         },
         bindMouseListeners() {
@@ -287,17 +284,17 @@ export default {
         },
         bindTouchListeners() {
             if (!this.touchMoveListener) {
-                this.touchMoveListener = (event) => this.onResize(event.changedTouches[0]);
-                document.addEventListener('touchmove', this.touchMoveListener);
+                this.touchMoveListener = (event) => {
+                    this.onResize(event.changedTouches[0]);
+                    event.preventDefault();
+                };
+                document.addEventListener('touchmove', this.touchMoveListener, { passive: false });
             }
 
             if (!this.touchEndListener) {
-                this.touchEndListener = (event) => {
-                    this.resizeEnd(event);
-                    this.unbindTouchListeners();
-                };
-
+                this.touchEndListener = this.onGutterTouchEnd;
                 document.addEventListener('touchend', this.touchEndListener);
+                document.addEventListener('touchcancel', this.touchEndListener);
             }
         },
         validateResize(newPrevPanelSize, newNextPanelSize) {
@@ -333,6 +330,7 @@ export default {
 
             if (this.touchEndListener) {
                 document.removeEventListener('touchend', this.touchEndListener);
+                document.removeEventListener('touchcancel', this.touchEndListener);
                 this.touchEndListener = null;
             }
         },
