@@ -160,7 +160,8 @@ export default {
         },
         onPaste(event) {
             if (this.separator) {
-                let separator = this.separator.replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t');
+                const separator =
+                    typeof this.separator === 'string' ? this.separator.replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t') : this.separator;
                 let pastedData = (event.clipboardData || window['clipboardData']).getData('Text');
 
                 if (pastedData) {

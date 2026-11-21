@@ -92,6 +92,17 @@ describe('InputChips.vue', () => {
         expect(wrapper.emitted('update:modelValue')).toBeUndefined();
     });
 
+    it('splits pasted values with a regular-expression separator', async () => {
+        await wrapper.setProps({ separator: /[,;]\s*/ });
+        const paste = new Event('paste', { cancelable: true });
+
+        Object.defineProperty(paste, 'clipboardData', { value: { getData: () => 'one, two;three' } });
+        wrapper.get('input').element.dispatchEvent(paste);
+
+        expect(paste.defaultPrevented).toBe(true);
+        expect(wrapper.emitted('update:modelValue')).toEqual([[['one', 'two', 'three']]]);
+    });
+
     it('should have correct custom chip removal icon', async () => {
         await wrapper.setProps({
             modelValue: ['foo', 'bar'],
