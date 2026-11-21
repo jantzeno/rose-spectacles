@@ -344,7 +344,7 @@ export default {
         },
         onChangeSelection(params, listIndex) {
             this.d_selection[listIndex] = params.value;
-            this.updateSelection(params.event);
+            this.updateSelection(params.originalEvent);
         },
         onListFocus(event, listType) {
             this.$emit('focus', event, listType);
@@ -362,8 +362,8 @@ export default {
             });
         },
         onItemDblClick(event, listIndex) {
-            if (listIndex === 0) this.moveToTarget({ event: event.originalEvent });
-            else if (listIndex === 1) this.moveToSource({ event: event.originalEvent });
+            if (listIndex === 0) this.moveToTarget(event.originalEvent);
+            else if (listIndex === 1) this.moveToSource(event.originalEvent);
         },
         moveUp(event, listIndex) {
             if (this.d_selection && this.d_selection[listIndex]) {
@@ -476,11 +476,17 @@ export default {
             let targetList = [...this.modelValue[1]];
 
             if (selection) {
+                const movedItems = [];
+
                 for (let i = 0; i < selection.length; i++) {
                     let selectedItem = selection[i];
+                    const sourceIndex = findIndexInList(selectedItem, sourceList);
 
-                    if (findIndexInList(selectedItem, targetList) == -1) {
-                        targetList.push(sourceList.splice(findIndexInList(selectedItem, sourceList), 1)[0]);
+                    if (sourceIndex !== -1 && findIndexInList(selectedItem, targetList) === -1) {
+                        const [movedItem] = sourceList.splice(sourceIndex, 1);
+
+                        targetList.push(movedItem);
+                        movedItems.push(movedItem);
                     }
                 }
 
@@ -492,7 +498,7 @@ export default {
 
                 this.$emit('move-to-target', {
                     originalEvent: event,
-                    items: [...new Set(selection)]
+                    items: movedItems
                 });
 
                 this.d_selection[0] = [];
@@ -528,11 +534,17 @@ export default {
             let targetList = [...this.modelValue[1]];
 
             if (selection) {
+                const movedItems = [];
+
                 for (let i = 0; i < selection.length; i++) {
                     let selectedItem = selection[i];
+                    const targetIndex = findIndexInList(selectedItem, targetList);
 
-                    if (findIndexInList(selectedItem, sourceList) == -1) {
-                        sourceList.push(targetList.splice(findIndexInList(selectedItem, targetList), 1)[0]);
+                    if (targetIndex !== -1 && findIndexInList(selectedItem, sourceList) === -1) {
+                        const [movedItem] = targetList.splice(targetIndex, 1);
+
+                        sourceList.push(movedItem);
+                        movedItems.push(movedItem);
                     }
                 }
 
@@ -544,7 +556,7 @@ export default {
 
                 this.$emit('move-to-source', {
                     originalEvent: event,
-                    items: [...new Set(selection)]
+                    items: movedItems
                 });
 
                 this.d_selection[1] = [];

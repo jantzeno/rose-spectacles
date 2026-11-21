@@ -103,16 +103,32 @@ describe('PickList.vue', () => {
 
         expect(sourceListItem.classes()).toContain('rs-listbox-option-selected');
         expect(wrapper.emitted('update:selection')?.[0]?.[0]).toEqual([[wrapper.vm.modelValue[0][0]], []]);
+        expect(wrapper.emitted('selection-change')?.[0]?.[0]).toMatchObject({ originalEvent: expect.any(MouseEvent) });
     });
 
     it('should dblclick an item from source list', async () => {
         await wrapper.setProps({ selection: [[wrapper.vm.modelValue[0][0]], []] });
 
-        wrapper.vm.onItemDblClick({}, 0);
+        await wrapper.get('.rs-picklist-source-list-container .rs-listbox-option').trigger('dblclick');
 
         expect(wrapper.emitted<[unknown[][]]>('update:modelValue')?.[0]?.[0]?.[1]).toEqual([wrapper.vm.modelValue[0][0]]);
-        expect(wrapper.emitted()['move-to-target'][0]).toEqual([{ originalEvent: {}, items: [wrapper.vm.modelValue[0][0]] }]);
+        expect(wrapper.emitted()['move-to-target'][0]).toEqual([{ originalEvent: expect.any(MouseEvent), items: [wrapper.vm.modelValue[0][0]] }]);
         expect(wrapper.emitted('update:selection')?.[0]?.[0]).toEqual([[], []]);
+    });
+
+    it.each([
+        ['moveToTarget', 0],
+        ['moveToSource', 1]
+    ] as const)('keeps unrelated items when %s receives a stale selection', async (move, listIndex) => {
+        const modelValue = [['Available'], ['Chosen']];
+        const selection: string[][] = [[], []];
+        selection[listIndex] = ['Removed'];
+        await wrapper.setProps({ modelValue, selection });
+
+        wrapper.vm[move](new MouseEvent('click'));
+
+        expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual(modelValue);
+        expect(wrapper.emitted(move === 'moveToTarget' ? 'move-to-target' : 'move-to-source')?.[0]?.[0]).toMatchObject({ items: [] });
     });
 
     it('should move item up', async () => {
