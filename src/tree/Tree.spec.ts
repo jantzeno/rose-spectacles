@@ -1,9 +1,10 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import type { TreeFilterEvent } from 'rose-spectacles/tree';
 import { reactive } from 'vue';
 import Tree from './Tree.vue';
 
 describe('Tree.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof Tree>>;
 
     beforeEach(async () => {
         wrapper = mount(Tree, {
@@ -49,7 +50,7 @@ describe('Tree.vue', () => {
             }
         });
 
-        let searchField = wrapper.find('input.rs-inputtext');
+        const searchField = wrapper.get<HTMLInputElement>('input.rs-inputtext');
         const key = 't';
 
         searchField.element.value = key;
@@ -59,7 +60,7 @@ describe('Tree.vue', () => {
         });
 
         expect(wrapper.emitted('filter')).toBeTruthy();
-        expect(wrapper.emitted('filter')[0][0].value).toEqual(key);
+        expect(wrapper.emitted<[TreeFilterEvent]>('filter')?.[0][0].value).toEqual(key);
     });
 
     it('emits filteredNodes in filter event payload', async () => {
@@ -88,7 +89,7 @@ describe('Tree.vue', () => {
             }
         });
 
-        let searchField = wrapper.find('input.rs-inputtext');
+        const searchField = wrapper.get<HTMLInputElement>('input.rs-inputtext');
 
         searchField.element.value = 'Work';
 
@@ -96,10 +97,10 @@ describe('Tree.vue', () => {
 
         expect(wrapper.emitted('filter')).toBeTruthy();
 
-        const filterEvent = wrapper.emitted('filter')[0][0];
+        const filterEvent = wrapper.emitted<[TreeFilterEvent]>('filter')?.[0][0];
 
-        expect(filterEvent.filteredNodes).toBeDefined();
-        expect(Array.isArray(filterEvent.filteredNodes)).toBe(true);
+        expect(filterEvent?.filteredNodes).toBeDefined();
+        expect(Array.isArray(filterEvent?.filteredNodes)).toBe(true);
     });
 
     it('emits the node from value on expand while filtering so lazy loading can update it', async () => {
@@ -122,7 +123,7 @@ describe('Tree.vue', () => {
         await wrapper.find('input.rs-inputtext').setValue('0');
         await wrapper.find('.rs-tree-node-toggle-button').trigger('click');
 
-        expect(wrapper.emitted('node-expand')[0][0]).toBe(nodes[0]);
+        expect(wrapper.emitted('node-expand')?.[0][0]).toBe(nodes[0]);
         expect(wrapper.text()).toContain('Node 0 child');
     });
 

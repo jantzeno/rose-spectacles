@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import { beforeEach, expect } from 'vitest';
 import BlockUI from './BlockUI.vue';
 
-let wrapper = null;
+let wrapper: VueWrapper<InstanceType<typeof BlockUI>>;
 
 describe('BlockUI.vue', () => {
     beforeEach(() => {
@@ -19,22 +19,20 @@ describe('BlockUI.vue', () => {
     });
 
     afterEach(() => {
-        wrapper?.unmount();
-        wrapper = null;
+        if (wrapper.exists()) wrapper.unmount();
         vi.useRealTimers();
         vi.clearAllMocks();
     });
 
-    it('When blocked props is true, block method should be triggered on mounted hook', async () => {
-        const blockUiSpy = vi.spyOn(BlockUI.methods, 'block');
-
+    it('mounts a mask when initially blocked', async () => {
+        wrapper.unmount();
         wrapper = mount(BlockUI, {
             props: {
                 blocked: true
             }
         });
 
-        expect(blockUiSpy).toHaveBeenCalled();
+        expect(wrapper.find('.rs-blockui-mask').exists()).toBe(true);
     });
 
     it('When blocked props value is changed, block or unblock method should be triggered', async () => {
@@ -58,6 +56,7 @@ describe('BlockUI.vue', () => {
     });
 
     it('When removeMask method triggered, isBlocked should be false and emitted', async () => {
+        wrapper.unmount();
         wrapper = mount(BlockUI, {
             props: {
                 blocked: true
@@ -69,12 +68,13 @@ describe('BlockUI.vue', () => {
         await wrapper.vm.removeMask();
 
         expect(wrapper.vm.isBlocked).toBe(false);
-        expect(wrapper.emitted().unblock.length).toBe(1);
+        expect(wrapper.emitted('unblock')).toHaveLength(1);
     });
 
     it('When blocked is toggled rapidly, only one mask should exist at a time', async () => {
         vi.useFakeTimers();
 
+        wrapper.unmount();
         wrapper = mount(BlockUI, {
             attachTo: document.body,
             slots: { default: '<button>test</button>' }
@@ -96,13 +96,14 @@ describe('BlockUI.vue', () => {
     it('When unblock is requested, the mask should stop capturing pointer events before it is removed', async () => {
         vi.useFakeTimers();
 
+        wrapper.unmount();
         wrapper = mount(BlockUI, {
             attachTo: document.body,
             props: { blocked: true },
             slots: { default: '<button>test</button>' }
         });
 
-        const mask = wrapper.element.querySelector('.rs-blockui-mask');
+        const mask = wrapper.get<HTMLElement>('.rs-blockui-mask').element;
 
         await wrapper.setProps({ blocked: false });
 
@@ -112,12 +113,13 @@ describe('BlockUI.vue', () => {
 
         expect(wrapper.element.querySelectorAll('.rs-blockui-mask').length).toBe(0);
         expect(wrapper.vm.isBlocked).toBe(false);
-        expect(wrapper.emitted().unblock.length).toBe(1);
+        expect(wrapper.emitted('unblock')).toHaveLength(1);
     });
 
     it('When blocked again before the leave animation ends, the pending removal should not drop the new mask', async () => {
         vi.useFakeTimers();
 
+        wrapper.unmount();
         wrapper = mount(BlockUI, {
             attachTo: document.body,
             props: { blocked: true },
@@ -138,6 +140,7 @@ describe('BlockUI.vue', () => {
         const maskCount = () => document.querySelectorAll('.rs-blockui-mask').length;
         const initialCount = maskCount();
 
+        wrapper.unmount();
         wrapper = mount(BlockUI, {
             attachTo: document.body,
             props: { blocked: true, fullScreen: true }
@@ -147,7 +150,6 @@ describe('BlockUI.vue', () => {
         expect(document.body.classList.contains('rs-overflow-hidden')).toBe(true);
 
         wrapper.unmount();
-        wrapper = null;
 
         expect(maskCount()).toBe(initialCount);
         expect(document.body.classList.contains('rs-overflow-hidden')).toBe(false);

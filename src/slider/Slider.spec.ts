@@ -1,8 +1,13 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import type { SliderProps } from 'rose-spectacles/slider';
 import Slider from './Slider.vue';
 
+type SliderWrapper = VueWrapper<InstanceType<typeof Slider>>;
+type SliderValue = SliderProps['modelValue'] | null;
+type SliderTestProps = Omit<SliderProps, 'modelValue'> & { modelValue?: SliderValue };
+
 describe('Slider.vue', () => {
-    let wrapper;
+    let wrapper: SliderWrapper;
 
     beforeEach(() => {
         wrapper = mount(Slider, {
@@ -34,7 +39,7 @@ describe('Slider.vue', () => {
 
         await wrapper.vm.setValue({ pageX: 60 }); // TODO:
 
-        expect(wrapper.emitted()['update:modelValue'][0][0]).toBeGreaterThan(0);
+        expect(wrapper.emitted<[number]>('update:modelValue')?.[0][0]).toBeGreaterThan(0);
     });
 
     it('should set value on vertical mode', async () => {
@@ -44,7 +49,7 @@ describe('Slider.vue', () => {
 
         await wrapper.vm.setValue({ pageY: 111 }); // TODO:
 
-        expect(wrapper.emitted()['update:modelValue'][0][0]).toBe(0);
+        expect(wrapper.emitted<[number]>('update:modelValue')?.[0][0]).toBe(0);
     });
 
     it('should handle values outside range by filling the slider', async () => {
@@ -103,26 +108,26 @@ describe('Slider.vue', () => {
 });
 
 describe('Slider.vue value selection', () => {
-    const mountSlider = (props) => {
-        const wrapper = mount(Slider, {
+    const mountSlider = (props: SliderTestProps) => {
+        const wrapper: SliderWrapper = mount(Slider, {
             props: {
                 ...props,
-                'onUpdate:modelValue': (value) => wrapper.setProps({ modelValue: value })
+                'onUpdate:modelValue': (value: SliderValue) => wrapper.setProps({ modelValue: value })
             }
         });
 
-        wrapper.element.getBoundingClientRect = () => ({ left: 0, top: 0 });
+        wrapper.element.getBoundingClientRect = () => ({ left: 0, top: 0 }) as DOMRect;
         Object.defineProperty(wrapper.element, 'offsetWidth', { value: 100 });
         Object.defineProperty(wrapper.element, 'offsetHeight', { value: 100 });
 
         return wrapper;
     };
 
-    const clickAt = (wrapper, percent) => wrapper.trigger('click', { pageX: percent });
+    const clickAt = (wrapper: SliderWrapper, percent: number) => wrapper.trigger('click', { pageX: percent });
 
-    const press = (wrapper, code, handleIndex = 0) => wrapper.findAll('[role="slider"]')[handleIndex].trigger('keydown', { code });
+    const press = (wrapper: SliderWrapper, code: string, handleIndex = 0) => wrapper.findAll('[role="slider"]')[handleIndex].trigger('keydown', { code });
 
-    const emittedValues = (wrapper) => (wrapper.emitted('update:modelValue') ?? []).map(([value]) => value);
+    const emittedValues = (wrapper: SliderWrapper) => (wrapper.emitted('update:modelValue') ?? []).map(([value]) => value);
 
     describe('with step', () => {
         it('should select min when clicking near the start', async () => {

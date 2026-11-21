@@ -1,10 +1,11 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import type { InputOtpChangeEvent } from 'rose-spectacles/inputotp';
 import PrimeVue from '../config/Config';
 import { nextTick } from 'vue';
 import InputOtp from './InputOtp.vue';
 
 describe('InputOtp.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof InputOtp>>;
 
     const mountInputOtp = (props = {}) =>
         mount(InputOtp, {
@@ -31,7 +32,7 @@ describe('InputOtp.vue', () => {
 
     const values = () => inputs().map((input) => input.value);
 
-    const input = async (element, value, inputType) => {
+    const input = async (element: HTMLInputElement, value: string, inputType: string) => {
         element.focus();
         element.value = value;
         element.dispatchEvent(new InputEvent('input', { inputType, bubbles: true }));
@@ -39,7 +40,7 @@ describe('InputOtp.vue', () => {
         await nextTick();
     };
 
-    const keydown = (element, key) => {
+    const keydown = (element: HTMLInputElement, key: string) => {
         const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
 
         element.focus();
@@ -48,7 +49,7 @@ describe('InputOtp.vue', () => {
         return event;
     };
 
-    const paste = async (element, text) => {
+    const paste = async (element: HTMLInputElement, text: string) => {
         const event = new Event('paste', { bubbles: true, cancelable: true });
 
         Object.defineProperty(event, 'clipboardData', { value: { getData: () => text } });
@@ -97,14 +98,14 @@ describe('InputOtp.vue', () => {
         it('should update the value and move the focus to the next input', async () => {
             await input(inputs()[0], '5', 'insertText');
 
-            expect(wrapper.emitted('update:modelValue').at(-1)).toEqual(['5']);
+            expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['5']);
             expect(document.activeElement).toBe(inputs()[1]);
         });
 
         it('should emit a change event with the new value', async () => {
             await input(inputs()[0], '5', 'insertText');
 
-            expect(wrapper.emitted('change').at(-1)[0].value).toBe('5');
+            expect(wrapper.emitted<[InputOtpChangeEvent]>('change')?.at(-1)?.[0].value).toBe('5');
         });
 
         it('should prevent keys other than digits when integerOnly is set', async () => {
@@ -154,7 +155,7 @@ describe('InputOtp.vue', () => {
         it('should move the focus to the previous input after deleting a value', async () => {
             await input(inputs()[3], '', 'deleteContentBackward');
 
-            expect(wrapper.emitted('update:modelValue').at(-1)).toEqual(['123']);
+            expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['123']);
             expect(document.activeElement).toBe(inputs()[2]);
         });
 
@@ -171,7 +172,7 @@ describe('InputOtp.vue', () => {
         it('should remove the current value and shift the following values to the left', async () => {
             await input(inputs()[1], '', 'deleteContentForward');
 
-            expect(wrapper.emitted('update:modelValue').at(-1)).toEqual(['134']);
+            expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['134']);
             expect(values()).toEqual(['1', '3', '4', '']);
         });
 
@@ -190,7 +191,7 @@ describe('InputOtp.vue', () => {
             await input(element, '', 'deleteContentForward');
             await input(element, '', 'deleteContentForward');
 
-            expect(wrapper.emitted('update:modelValue').at(-1)).toEqual(['14']);
+            expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['14']);
             expect(document.activeElement).toBe(element);
         });
     });
@@ -200,7 +201,7 @@ describe('InputOtp.vue', () => {
             const event = await paste(inputs()[0], '567890');
 
             expect(event.defaultPrevented).toBe(true);
-            expect(wrapper.emitted('update:modelValue').at(-1)).toEqual(['5678']);
+            expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['5678']);
             expect(values()).toEqual(['5', '6', '7', '8']);
         });
 
