@@ -77,7 +77,6 @@ export * as DockStyle from './dock/index';
 export * as DrawerStyle from './drawer/index';
 
 // Editor
-export * as EditorStyle from './editor/index';
 
 // Fieldset
 export * as FieldsetStyle from './fieldset/index';

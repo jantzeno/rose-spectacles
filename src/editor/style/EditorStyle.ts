@@ -1,8 +1,8 @@
-import { style } from '../../internal/styles/editor/index';
-import BaseStyle from '../../core/base/style/BaseStyle';
+import quillStyles from 'quill/dist/quill.snow.css?inline';
+import BaseStyle, { type StyleContext } from '../../core/base/style/BaseStyle';
 
 const classes = {
-    root: ({ instance }) => [
+    root: ({ instance }: StyleContext) => [
         'rs-editor',
         {
             'rs-invalid': instance.$invalid
@@ -14,6 +14,6 @@ const classes = {
 
 export default BaseStyle.extend({
     name: 'editor',
-    style,
+    style: quillStyles,
     classes
 });

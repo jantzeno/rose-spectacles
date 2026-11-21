@@ -376,7 +376,7 @@
     },
     "./editor/style": {
       "types": "./src/editor/style/EditorStyle.d.ts",
-      "default": "./src/editor/style/EditorStyle.js"
+      "default": "./src/editor/style/EditorStyle.ts"
     },
     "./fieldset": {
       "types": "./src/fieldset/Fieldset.d.ts",
@@ -1434,8 +1434,8 @@
   },
   "peerDependencies": {
     "vue": "^3.5.0",
-    "chart.js": "^4.0.0",
-    "quill": "^2.0.0",
+    "chart.js": "4.6.1",
+    "quill": "2.0.3",
     "joi": "^17.13.3",
     "superstruct": "^2.0.2",
     "valibot": "^0.42.1",
@@ -1469,7 +1469,7 @@
     "@types/node": "22.20.1",
     "@vitejs/plugin-vue": "5.2.4",
     "@vue/test-utils": "2.5.0",
-    "chart.js": "4.5.1",
+    "chart.js": "4.6.1",
     "quill": "2.0.3",
     "jsdom": "19.0.0",
     "oxfmt": "0.79.0",
