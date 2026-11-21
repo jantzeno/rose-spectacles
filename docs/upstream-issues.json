@@ -1251,9 +1251,8 @@
             "title": "InputMask: How to Escape Character *,a,9",
             "labels": ["enhancement"],
             "component": "InputMask",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: InputMask: How to Escape Character *,a,9."
+            "disposition": "enhancement",
+            "evidence": ["The retained InputMask tokenizer interprets a, 9, and * as mask tokens. The request adds a syntax for escaping them as literals."]
         },
         {
             "number": 146,
@@ -1539,9 +1538,10 @@
             "title": "InputNumber should provide a customizable prop to allow both comma and dot as decimal separators when typing, regardless of locale",
             "labels": ["enhancement"],
             "component": "InputNumber",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: InputNumber should provide a customizable prop to allow both comma and dot as decimal separators when typing, regardless of locale."
+            "disposition": "enhancement",
+            "evidence": [
+                "The retained InputNumber parser derives one decimal expression from the active Intl number format. The request adds a prop for accepting alternative separators simultaneously."
+            ]
         },
         {
             "number": 170,
@@ -1732,9 +1732,10 @@
             "title": "No way to stop closing autocomplete suggestions on clicking suggestion",
             "labels": ["enhancement"],
             "component": "AutoComplete",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: No way to stop closing autocomplete suggestions on clicking suggestion."
+            "disposition": "enhancement",
+            "evidence": [
+                "Selecting an AutoComplete suggestion deliberately dismisses the overlay through the default selection path. The requested configurable persistence adds a behavior to that path."
+            ]
         },
         {
             "number": 188,
@@ -1860,10 +1861,9 @@
             "title": "Missing prop to DataView, inconsistency with DataTable",
             "labels": ["enhancement"],
             "component": "DataView, DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-e3ifzgme",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Missing prop to DataView, inconsistency with DataTable."
+            "disposition": "enhancement",
+            "evidence": ["DataView currently accepts data and layout props. The request adds a loading overlay analogous to the DataTable loading API."],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-e3ifzgme"
         },
         {
             "number": 200,
@@ -2583,10 +2583,16 @@
             "title": "feat(datatable): add generateCSV() to separate CSV generation from export logic",
             "labels": ["enhancement"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The runtime already generated CSV text separately from downloading the file. The packed TypeScript consumer failed when calling generateCSV through a DataTable ref because the method was missing from its declaration. The public method now type checks with the existing export options and returns a string."
+            ],
             "reproducer": "https://stackblitz.com/edit/3zpwcehb?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: feat(datatable): add generateCSV() to separate CSV generation from export logic."
+            "resolvingCommit": "2262d0e553e0826dc4d44a2da9ee4fcb150b371c",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "A packed DataTable instance returns CSV text from generateCSV"
+            }
         },
         {
             "number": 263,
@@ -3039,10 +3045,9 @@
             "title": "Form: add \"form-level\" dirty check",
             "labels": ["enhancement"],
             "component": "Form",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/yzevua4q-scs1qn1j?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Form: add \"form-level\" dirty check."
+            "disposition": "enhancement",
+            "evidence": ["Form exposes dirty state for each field through its field map. The request adds an aggregate dirty state on the form instance."],
+            "reproducer": "https://stackblitz.com/edit/yzevua4q-scs1qn1j?file=src%2FApp.vue"
         },
         {
             "number": 309,
@@ -3079,9 +3084,10 @@
             "title": "Card: Add a `border` design token",
             "labels": ["enhancement"],
             "component": "Card",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: Card: Add a `border` design token."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The report requests a new border token for the upstream Aura Card preset. The migration removed the upstream presets and uses app-owned Card styling."
+            ]
         },
         {
             "number": 312,
@@ -3099,9 +3105,10 @@
             "title": "Feature Request: Transform CSS Logical Properties to Physical Properties for Legacy Browser Support",
             "labels": ["enhancement"],
             "component": "Shared Vue behavior",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: Feature Request: Transform CSS Logical Properties to Physical Properties for Legacy Browser Support."
+            "disposition": "enhancement",
+            "evidence": [
+                "The retained structural CSS uses logical properties. The request adds a compatibility transform that emits physical properties for older browser targets."
+            ]
         },
         {
             "number": 314,
@@ -3203,10 +3210,9 @@
             "title": "Add appendTo property to Toast",
             "labels": ["enhancement", "regression"],
             "component": "Toast",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-46nw9c1j?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Add appendTo property to Toast."
+            "disposition": "enhancement",
+            "evidence": ["Toast mounts through Portal with its default target. The request adds a public appendTo prop for selecting a different target."],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-46nw9c1j?file=src%2FApp.vue"
         },
         {
             "number": 325,
@@ -3225,10 +3231,11 @@
             "title": "DataTable onRowClick should support \"Open Link in New Tab\" and right-click context menu functionality.",
             "labels": ["enhancement"],
             "component": "DataTable, Tab",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-9xe3khwc?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using chrome, safari. Verify the reported behavior: DataTable onRowClick should support \"Open Link in New Tab\" and right-click context menu functionality."
+            "disposition": "enhancement",
+            "evidence": [
+                "The DataTable row events expose click and context-menu actions. The request adds URL navigation and browser link-menu behavior directly to a row."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-9xe3khwc?file=src%2FApp.vue"
         },
         {
             "number": 328,
@@ -3625,10 +3632,11 @@
             "title": "AutoComplete: V4 Chips Component was Deprecated, AutoComplete with the multiple param does not allow the very convenient addOnBlur or separator params",
             "labels": ["enhancement"],
             "component": "AutoComplete, Chips",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-888z42?file=README.md",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: AutoComplete: V4 Chips Component was Deprecated, AutoComplete with the multiple param does not allow the very convenient addOnBlur or separator params."
+            "disposition": "enhancement",
+            "evidence": [
+                "InputChips exposes addOnBlur and separator for free text entry. The request adds those controls to AutoComplete when selecting or entering multiple values."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-888z42?file=README.md"
         },
         {
             "number": 366,
@@ -3972,10 +3980,16 @@
             "title": "Tree: Inconsistent keyboard navigation when using lazy load",
             "labels": ["bug", "accessibility"],
             "component": "Tree",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A mounted Tree moved focus during expansion, landing on the next root sibling if child data was pending. Both loaded and lazy fixtures now retain parent focus on expansion. A second ArrowRight moves focus to the first child once it exists."
+            ],
             "reproducer": "https://stackblitz.com/edit/wb5zlx?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Tree: Inconsistent keyboard navigation when using lazy load."
+            "resolvingCommit": "ea853962300918f97ec4727cdbfda41e69be888a",
+            "test": {
+                "path": "src/tree/Tree.spec.ts",
+                "name": "preserves focus when expanding a lazy tree node"
+            }
         },
         {
             "number": 398,
@@ -4836,10 +4850,11 @@
             "title": "DataTable: auto enable loading when sorting/filtering/swapping page",
             "labels": ["enhancement"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/mmym17?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: DataTable: auto enable loading when sorting/filtering/swapping page."
+            "disposition": "enhancement",
+            "evidence": [
+                "DataTable exposes a controlled loading prop. The request adds automatic progress feedback around local filtering, sorting, and pagination."
+            ],
+            "reproducer": "https://stackblitz.com/edit/mmym17?file=src%2FApp.vue"
         },
         {
             "number": 478,
