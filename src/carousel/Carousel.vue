@@ -33,19 +33,19 @@
                     <div ref="itemsContainer" :class="cx('itemList')" @transitionend="onTransitionEnd" v-bind="ptm('itemList')">
                         <template v-if="isCircular()">
                             <div
-                                v-for="(item, index) of value.slice(-1 * d_numVisible)"
+                                v-for="(item, index) of items.slice(-1 * d_numVisible)"
                                 :key="index + '_scloned'"
                                 :class="cx('itemClone', { index, value, totalShiftedItems, d_numVisible })"
                                 v-bind="ptm('itemClone')"
-                                :data-p-carousel-item-active="totalShiftedItems * -1 === value.length + d_numVisible"
+                                :data-p-carousel-item-active="totalShiftedItems * -1 === items.length + d_numVisible"
                                 :data-p-carousel-item-start="index === 0"
-                                :data-p-carousel-item-end="value.slice(-1 * d_numVisible).length - 1 === index"
+                                :data-p-carousel-item-end="items.slice(-1 * d_numVisible).length - 1 === index"
                             >
                                 <slot name="item" :data="item" :index="index"></slot>
                             </div>
                         </template>
                         <div
-                            v-for="(item, index) of value"
+                            v-for="(item, index) of items"
                             :key="index"
                             :class="cx('item', { index })"
                             role="group"
@@ -61,7 +61,7 @@
                         </div>
                         <template v-if="isCircular()">
                             <div
-                                v-for="(item, index) of value.slice(0, d_numVisible)"
+                                v-for="(item, index) of items.slice(0, d_numVisible)"
                                 :key="index + '_fcloned'"
                                 :class="cx('itemClone', { index, value, totalShiftedItems, d_numVisible })"
                                 v-bind="ptm('itemClone')"
@@ -128,7 +128,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { addClass, find, findSingle, getAttribute, removeClass, setAttribute } from '../internal/utils/dom/index';
 import { localeComparator, sort } from '../internal/utils/object/index';
 import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
@@ -139,12 +140,11 @@ import Button from '../button/Button.vue';
 import Ripple from '../ripple/Ripple';
 import BaseCarousel from './BaseCarousel.vue';
 
-export default {
+export default defineComponent({
     name: 'Carousel',
     extends: BaseCarousel,
     inheritAttrs: false,
     emits: ['update:page'],
-    isRemainingItemsAdded: false,
     data() {
         return {
             remainingItems: 0,
@@ -152,20 +152,24 @@ export default {
             d_numScroll: this.numScroll,
             d_oldNumScroll: 0,
             d_oldNumVisible: 0,
-            d_oldValue: null,
+            d_oldValue: null as unknown[] | null,
             d_page: this.page,
             totalShiftedItems: this.page * this.numScroll * -1,
             allowAutoplay: !!this.autoplayInterval,
             d_circular: this.circular || this.allowAutoplay,
-            swipeThreshold: 20
+            swipeThreshold: 20,
+            isRemainingItemsAdded: false,
+            startPos: null as { x: number; y: number } | null,
+            interval: null as ReturnType<typeof setInterval> | null,
+            carouselStyle: null as HTMLStyleElement | null
         };
     },
     watch: {
         page(newValue) {
             if (newValue > this.d_page) {
-                this.navForward({}, newValue);
+                this.navForward(undefined, newValue);
             } else if (newValue < this.d_page) {
-                this.navBackward({}, newValue);
+                this.navBackward(undefined, newValue);
             }
 
             this.d_page = newValue;
@@ -182,7 +186,7 @@ export default {
             this.d_numScroll = newValue;
         },
         value(oldValue) {
-            this.d_oldValue = oldValue;
+            this.d_oldValue = oldValue ?? null;
         }
     },
     mounted() {
@@ -192,7 +196,7 @@ export default {
         this.calculatePosition();
 
         if (this.responsiveOptions) {
-            this.bindDocumentListeners();
+            window.addEventListener('resize', this.calculatePosition);
         }
 
         if (this.isCircular()) {
@@ -201,7 +205,7 @@ export default {
             if (this.d_page === 0) {
                 totalShiftedItems = -1 * this.d_numVisible;
             } else if (totalShiftedItems === 0) {
-                totalShiftedItems = -1 * this.value.length;
+                totalShiftedItems = -1 * this.items.length;
 
                 if (this.remainingItems > 0) {
                     this.isRemainingItemsAdded = true;
@@ -229,8 +233,8 @@ export default {
                 this.stopAutoplay();
             }
 
-            if (this.d_oldNumScroll !== this.d_numScroll || this.d_oldNumVisible !== this.d_numVisible || this.d_oldValue.length !== this.value.length) {
-                this.remainingItems = (this.value.length - this.d_numVisible) % this.d_numScroll;
+            if (this.d_oldNumScroll !== this.d_numScroll || this.d_oldNumVisible !== this.d_numVisible || this.d_oldValue?.length !== this.items.length) {
+                this.remainingItems = (this.items.length - this.d_numVisible) % this.d_numScroll;
 
                 let page = this.d_page;
 
@@ -261,17 +265,21 @@ export default {
 
                 this.d_oldNumScroll = this.d_numScroll;
                 this.d_oldNumVisible = this.d_numVisible;
-                this.d_oldValue = this.value;
-                this.$refs.itemsContainer.style.transform = this.isVertical()
-                    ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
-                    : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
+                this.d_oldValue = this.items;
+                const itemsContainer = this.$refs.itemsContainer as HTMLElement | undefined;
+
+                if (itemsContainer) {
+                    itemsContainer.style.transform = this.isVertical()
+                        ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
+                        : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
+                }
             }
 
             if (isCircular) {
                 if (this.d_page === 0) {
                     totalShiftedItems = -1 * this.d_numVisible;
                 } else if (totalShiftedItems === 0) {
-                    totalShiftedItems = -1 * this.value.length;
+                    totalShiftedItems = -1 * this.items.length;
 
                     if (this.remainingItems > 0) {
                         this.isRemainingItemsAdded = true;
@@ -291,23 +299,21 @@ export default {
         }
     },
     beforeUnmount() {
-        if (this.responsiveOptions) {
-            this.unbindDocumentListeners();
-        }
+        window.removeEventListener('resize', this.calculatePosition);
 
         if (this.autoplayInterval) {
             this.stopAutoplay();
         }
     },
     methods: {
-        getIndicatorPTOptions(key, index) {
+        getIndicatorPTOptions(key: string, index: number) {
             return this.ptm(key, {
                 context: {
                     highlighted: index === this.d_page
                 }
             });
         },
-        getItemPTOptions(key, index) {
+        getItemPTOptions(key: string, index: number) {
             return this.ptm(key, {
                 context: {
                     index,
@@ -317,7 +323,7 @@ export default {
                 }
             });
         },
-        step(dir, page) {
+        step(dir: number, page?: number) {
             let totalShiftedItems = this.totalShiftedItems;
             const isCircular = this.isCircular();
 
@@ -343,7 +349,7 @@ export default {
             }
 
             if (isCircular && this.d_page === this.totalIndicators - 1 && dir === -1) {
-                totalShiftedItems = -1 * (this.value.length + this.d_numVisible);
+                totalShiftedItems = -1 * (this.items.length + this.d_numVisible);
                 page = 0;
             } else if (isCircular && this.d_page === 0 && dir === 1) {
                 totalShiftedItems = 0;
@@ -353,12 +359,14 @@ export default {
                 this.isRemainingItemsAdded = true;
             }
 
-            if (this.$refs.itemsContainer) {
-                !this.isUnstyled && removeClass(this.$refs.itemsContainer, 'rs-items-hidden');
-                this.$refs.itemsContainer.style.transform = this.isVertical()
+            const itemsContainer = this.$refs.itemsContainer as HTMLElement | undefined;
+
+            if (itemsContainer) {
+                !this.isUnstyled && removeClass(itemsContainer, 'rs-items-hidden');
+                itemsContainer.style.transform = this.isVertical()
                     ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
                     : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
-                this.$refs.itemsContainer.style.transition = 'transform 500ms ease 0s';
+                itemsContainer.style.transition = 'transform 500ms ease 0s';
             }
 
             this.totalShiftedItems = totalShiftedItems;
@@ -385,7 +393,7 @@ export default {
                 if (this.d_numScroll !== matchedResponsiveOptionsData.numScroll) {
                     let page = this.d_page;
 
-                    page = parseInt((page * this.d_numScroll) / matchedResponsiveOptionsData.numScroll);
+                    page = Math.trunc((page * this.d_numScroll) / matchedResponsiveOptionsData.numScroll);
 
                     this.totalShiftedItems = matchedResponsiveOptionsData.numScroll * page * -1;
 
@@ -404,29 +412,29 @@ export default {
                 }
             }
         },
-        navBackward(e, index) {
+        navBackward(e?: Event, index?: number) {
             if (this.d_circular || this.d_page !== 0) {
                 this.step(1, index);
             }
 
             this.allowAutoplay = false;
 
-            if (e.cancelable) {
+            if (e?.cancelable) {
                 e.preventDefault();
             }
         },
-        navForward(e, index) {
+        navForward(e?: Event, index?: number) {
             if (this.d_circular || this.d_page < this.totalIndicators - 1) {
                 this.step(-1, index);
             }
 
             this.allowAutoplay = false;
 
-            if (e.cancelable) {
+            if (e?.cancelable) {
                 e.preventDefault();
             }
         },
-        onIndicatorClick(e, index) {
+        onIndicatorClick(e: MouseEvent, index: number) {
             let page = this.d_page;
 
             if (index > page) {
@@ -436,35 +444,44 @@ export default {
             }
         },
         onTransitionEnd() {
-            if (this.$refs.itemsContainer) {
-                !this.isUnstyled && addClass(this.$refs.itemsContainer, 'rs-items-hidden');
-                this.$refs.itemsContainer.style.transition = '';
+            const itemsContainer = this.$refs.itemsContainer as HTMLElement | undefined;
+
+            if (itemsContainer) {
+                !this.isUnstyled && addClass(itemsContainer, 'rs-items-hidden');
+                itemsContainer.style.transition = '';
 
                 if ((this.d_page === 0 || this.d_page === this.totalIndicators - 1) && this.isCircular()) {
-                    this.$refs.itemsContainer.style.transform = this.isVertical()
+                    itemsContainer.style.transform = this.isVertical()
                         ? `translate3d(0, ${this.totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
                         : `translate3d(${this.totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
                 }
             }
         },
-        onTouchStart(e) {
-            let touchobj = e.changedTouches[0];
+        onTouchStart(e: TouchEvent) {
+            const touchobj = e.changedTouches[0];
+
+            if (!touchobj) return;
 
             this.startPos = {
                 x: touchobj.pageX,
                 y: touchobj.pageY
             };
         },
-        onTouchMove(e) {
+        onTouchMove(e: TouchEvent) {
             const touchobj = e.changedTouches[0];
+
+            if (!touchobj || !this.startPos) return;
+
             const diff = this.isVertical() ? touchobj.pageY - this.startPos.y : touchobj.pageX - this.startPos.x;
 
             if (Math.abs(diff) > this.swipeThreshold && e.cancelable) {
                 e.preventDefault();
             }
         },
-        onTouchEnd(e) {
-            let touchobj = e.changedTouches[0];
+        onTouchEnd(e: TouchEvent) {
+            const touchobj = e.changedTouches[0];
+
+            if (!touchobj || !this.startPos) return;
 
             if (this.isVertical()) {
                 this.changePageOnTouch(e, touchobj.pageY - this.startPos.y);
@@ -472,7 +489,7 @@ export default {
                 this.changePageOnTouch(e, touchobj.pageX - this.startPos.x);
             }
         },
-        changePageOnTouch(e, diff) {
+        changePageOnTouch(e: TouchEvent, diff: number) {
             if (Math.abs(diff) > this.swipeThreshold) {
                 if (diff < 0) {
                     // left
@@ -483,7 +500,7 @@ export default {
                 }
             }
         },
-        onIndicatorKeydown(event) {
+        onIndicatorKeydown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowRight':
                     this.onRightKey();
@@ -519,7 +536,7 @@ export default {
             }
         },
         onRightKey() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
+            const indicators = this.getIndicators();
             const activeIndex = this.findFocusedIndicatorIndex();
 
             this.changedFocusedIndicator(activeIndex, activeIndex + 1 === indicators.length ? indicators.length - 1 : activeIndex + 1);
@@ -535,47 +552,40 @@ export default {
             this.changedFocusedIndicator(activeIndex, 0);
         },
         onEndKey() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
+            const indicators = this.getIndicators();
             const activeIndex = this.findFocusedIndicatorIndex();
 
             this.changedFocusedIndicator(activeIndex, indicators.length - 1);
         },
         onTabKey() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
+            const indicators = this.getIndicators();
             const highlightedIndex = indicators.findIndex((ind) => getAttribute(ind, 'data-p-active') === true);
+            const activeIndex = this.findFocusedIndicatorIndex();
+            const active = indicators[activeIndex]?.firstElementChild;
+            const highlighted = indicators[highlightedIndex]?.firstElementChild;
 
-            const activeIndicator = findSingle(this.$refs.indicatorContent, '[data-pc-section="indicator"] > button[tabindex="0"]');
-            const activeIndex = indicators.findIndex((ind) => ind === activeIndicator.parentElement);
-
-            indicators[activeIndex].children[0].tabIndex = '-1';
-            indicators[highlightedIndex].children[0].tabIndex = '0';
-        },
-        findFocusedIndicatorIndex() {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
-            const activeIndicator = findSingle(this.$refs.indicatorContent, '[data-pc-section="indicator"] > button[tabindex="0"]');
-
-            return indicators.findIndex((ind) => ind === activeIndicator.parentElement);
-        },
-        changedFocusedIndicator(prevInd, nextInd) {
-            const indicators = [...find(this.$refs.indicatorContent, '[data-pc-section="indicator"]')];
-
-            indicators[prevInd].children[0].tabIndex = '-1';
-            indicators[nextInd].children[0].tabIndex = '0';
-            indicators[nextInd].children[0].focus();
-        },
-        bindDocumentListeners() {
-            if (!this.documentResizeListener) {
-                this.documentResizeListener = (e) => {
-                    this.calculatePosition(e);
-                };
-
-                window.addEventListener('resize', this.documentResizeListener);
+            if (active instanceof HTMLElement && highlighted instanceof HTMLElement) {
+                active.tabIndex = -1;
+                highlighted.tabIndex = 0;
             }
         },
-        unbindDocumentListeners() {
-            if (this.documentResizeListener) {
-                window.removeEventListener('resize', this.documentResizeListener);
-                this.documentResizeListener = null;
+        findFocusedIndicatorIndex() {
+            const activeIndicator = findSingle(this.$refs.indicatorContent as HTMLElement, '[data-pc-section="indicator"] > button[tabindex="0"]');
+
+            return this.getIndicators().findIndex((ind) => ind === activeIndicator?.parentElement);
+        },
+        getIndicators() {
+            return find(this.$refs.indicatorContent as HTMLElement, '[data-pc-section="indicator"]');
+        },
+        changedFocusedIndicator(prevInd: number, nextInd: number) {
+            const indicators = this.getIndicators();
+            const previous = indicators[prevInd]?.firstElementChild;
+            const next = indicators[nextInd]?.firstElementChild;
+
+            if (previous instanceof HTMLElement && next instanceof HTMLElement) {
+                previous.tabIndex = -1;
+                next.tabIndex = 0;
+                next.focus();
             }
         },
         startAutoplay() {
@@ -590,6 +600,7 @@ export default {
         stopAutoplay() {
             if (this.interval) {
                 clearInterval(this.interval);
+                this.interval = null;
             }
         },
         createStyle() {
@@ -636,7 +647,7 @@ export default {
             return this.orientation === 'vertical';
         },
         hasValidItemCount() {
-            return this.value && this.value.length > this.d_numVisible;
+            return this.items.length > this.d_numVisible;
         },
         isCircular() {
             return this.hasValidItemCount() && this.d_circular;
@@ -650,14 +661,17 @@ export default {
         lastIndex() {
             return this.firstIndex() + this.d_numVisible - 1;
         },
-        ariaSlideNumber(value) {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.slideNumber.replace(/{slideNumber}/g, value) : undefined;
+        ariaSlideNumber(value: number) {
+            return this.$primevue?.config.locale?.aria?.slideNumber?.replace(/{slideNumber}/g, String(value));
         },
-        ariaPageLabel(value) {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.pageLabel.replace(/{page}/g, value) : undefined;
+        ariaPageLabel(value: number) {
+            return this.$primevue?.config.locale?.aria?.pageLabel?.replace(/{page}/g, String(value));
         }
     },
     computed: {
+        items(): unknown[] {
+            return this.value ?? [];
+        },
         totalIndicators() {
             return this.value ? Math.max(Math.ceil((this.value.length - this.d_numVisible) / this.d_numScroll) + 1, 0) : 0;
         },
@@ -672,19 +686,19 @@ export default {
             );
         },
         ariaSlideLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.slide : undefined;
+            return this.$primevue?.config.locale?.aria?.slide;
         },
         ariaPrevButtonLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.prevPageLabel : undefined;
+            return this.$primevue?.config.locale?.aria?.prevPageLabel;
         },
         ariaNextButtonLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.nextPageLabel : undefined;
+            return this.$primevue?.config.locale?.aria?.nextPageLabel;
         },
         empty() {
             return !this.value || this.value.length === 0;
         },
         emptyMessageText() {
-            return this.$primevue.config?.locale?.emptyMessage || '';
+            return this.$primevue?.config.locale?.emptyMessage || '';
         }
     },
     components: {
@@ -697,5 +711,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

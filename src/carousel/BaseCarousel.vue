@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { CarouselResponsiveOptions } from 'rose-spectacles/carousel';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import CarouselStyle from './style/CarouselStyle';
 
@@ -7,7 +8,7 @@ export default defineComponent({
     name: 'BaseCarousel',
     extends: BaseComponent,
     props: {
-        value: null,
+        value: null as unknown as PropType<unknown[]>,
         page: {
             type: Number,
             default: 0
@@ -20,7 +21,7 @@ export default defineComponent({
             type: Number,
             default: 1
         },
-        responsiveOptions: Array,
+        responsiveOptions: Array as PropType<CarouselResponsiveOptions[]>,
         orientation: {
             type: String,
             default: 'horizontal'
