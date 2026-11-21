@@ -40,10 +40,17 @@
             "title": "PrimeVue Component (Button) CSS not injected when component is removed during initial render",
             "labels": [],
             "component": "Button",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A queued watcher interrupted the Button's first render and left the theme stylesheet missing after the button returned. The local Vitest regression passed after shared styles began loading before the mounted hook.",
+                "Firefox reproduced the linked fixture's watcher sequence in a Vite consumer with Vue 3.5.28, Vue Router 5.0.2, and a minimal local preset. The button theme stylesheet was absent before the fix and contained the expected token after it."
+            ],
             "reproducer": "https://stackblitz.com/edit/vitejs-vite-ktan6nnw",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: PrimeVue Component (Button) CSS not injected when component is removed during initial render."
+            "resolvingCommit": "7c89a609bb656c66e8de1a8d26c7d56ecfeee675",
+            "test": {
+                "path": "src/button/ButtonStyles.spec.ts",
+                "name": "injects the button theme after the original mount is interrupted"
+            }
         },
         {
             "number": 21,
@@ -51,10 +58,16 @@
             "title": "InputNumber runtime style tag created but empty when component first mounts inside a re-rendering subtree (styled mode, Aura)",
             "labels": [],
             "component": "InputNumber",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A mounted Dialog with a Form slot replaced a horizontal InputNumber during rendering. The current field rendered with no usable component stylesheet before the shared loader fix in #20. The same test passed with the expected stylesheet content after the fix."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-issue-template",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: InputNumber runtime style tag created but empty when component first mounts inside a re-rendering subtree (styled mode, Aura)."
+            "resolvingCommit": "7c89a609bb656c66e8de1a8d26c7d56ecfeee675",
+            "test": {
+                "path": "src/inputnumber/InputNumberStyles.spec.ts",
+                "name": "writes InputNumber styles when a Form slot replaces it during rendering"
+            }
         },
         {
             "number": 22,
