@@ -39,6 +39,32 @@ try {
 
         console.log(`${examples.length} gallery examples render`);
 
+        await show('#chips');
+        await browser.evaluate(`(() => {
+            const root = document.querySelector('[data-example="chips"] .rs-inputchips');
+            root.style.inlineSize = '12rem';
+            const input = root.querySelector('input');
+            input.value = 'LongTag'.repeat(18);
+            input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+            return input.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true, cancelable: true }));
+        })()`);
+        const longChip = '[data-example="chips"] .rs-inputchips-chip-item:nth-child(2)';
+        const removeChip = `${longChip} .rs-chip-remove-icon`;
+        await wait(
+            `(() => {
+                const control = document.querySelector(${JSON.stringify(removeChip)});
+                const input = control?.closest('ul');
+                if (!input) return false;
+                const outer = input.getBoundingClientRect();
+                const button = control.getBoundingClientRect();
+                return button.width > 0 && button.left >= outer.left && button.right <= outer.right + 1;
+            })()`,
+            'Long chips keep their remove controls inside the input'
+        );
+        await browser.click(removeChip);
+        await wait(`!document.querySelector(${JSON.stringify(longChip)})`, 'The long chip can be removed');
+        console.log('Long chips keep their remove controls inside the input');
+
         await show('#chart');
         await wait(
             `(() => {

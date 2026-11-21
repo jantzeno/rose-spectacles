@@ -58,12 +58,29 @@ export const style = /*css*/ `
     }
 
     .rs-inputchips-chip.rs-chip {
+        max-inline-size: 100%;
         padding-top: calc(dt('inputchips.padding.y') / 2);
         padding-bottom: calc(dt('inputchips.padding.y') / 2);
         border-radius: dt('inputchips.chip.border.radius');
         transition:
             background dt('inputchips.transition.duration'),
             color dt('inputchips.transition.duration');
+    }
+
+    .rs-inputchips-chip-item {
+        min-inline-size: 0;
+        max-inline-size: 100%;
+    }
+
+    .rs-inputchips-chip .rs-chip-label {
+        min-inline-size: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .rs-inputchips-chip .rs-chip-remove-icon {
+        flex-shrink: 0;
     }
 
     .rs-inputchips-chip-item.rs-focus .rs-inputchips-chip {
