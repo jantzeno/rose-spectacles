@@ -520,19 +520,29 @@ export interface DatePickerYearOptions {
     selectable: boolean;
 }
 
+export type DatePickerModelValue = Date | string | (Date | string | null)[] | null;
+
+type DateValue = Date | (Date | null)[] | null;
+type PickedItem<Model extends string> = string extends Model ? Date | string : Model extends 'string' ? string : Date;
+type PickedValue<Selection extends string, Model extends string> = Selection extends 'single'
+    ? PickedItem<Model> | null
+    : Selection extends 'multiple' | 'range'
+      ? (PickedItem<Model> | null)[] | null
+      : PickedItem<Model> | (PickedItem<Model> | null)[] | null;
+
 /**
  * Defines valid properties in DatePicker component.
  */
-export interface DatePickerProps {
+export interface DatePickerProps<Selection extends string = string, Model extends string = string> {
     /**
      * Value of the component.
      * @defaultValue null
      */
-    modelValue?: Date | Array<Date> | Array<Date | null> | undefined | null;
+    modelValue?: DatePickerModelValue | undefined;
     /**
      * The default value for the input when not controlled by `modelValue`.
      */
-    defaultValue?: Date | Array<Date> | Array<Date | null> | undefined | null;
+    defaultValue?: DatePickerModelValue | undefined;
     /**
      * The name attribute for the element, typically used in form submissions.
      */
@@ -541,7 +551,7 @@ export interface DatePickerProps {
      * Defines the quantity of the selection.
      * @defaultValue single
      */
-    selectionMode?: HintedString<'single' | 'multiple' | 'range'> | undefined;
+    selectionMode?: (Selection & HintedString<'single' | 'multiple' | 'range'>) | undefined;
     /**
      * Format of the date. Defaults to OpenVue Locale configuration.
      */
@@ -550,7 +560,7 @@ export interface DatePickerProps {
      * Type of the value to write back to modelValue.
      * @defaultValue date
      */
-    updateModelType?: HintedString<'date' | 'string'> | undefined;
+    updateModelType?: (Model & HintedString<'date' | 'string'>) | undefined;
     /**
      * When enabled, displays the datepicker as inline instead of an overlay.
      * @defaultValue false
@@ -1184,17 +1194,17 @@ export interface DatePickerSlots {
 /**
  * Defines valid emits in DatePicker component.
  */
-export interface DatePickerEmitsOptions {
+export interface DatePickerEmitsOptions<Value extends DatePickerModelValue = DateValue> {
     /**
      * Emitted when the value changes.
-     * @param {string | Date | string[] | Date[] | undefined} value - New value.
+     * @param {Value} value - New value.
      */
-    'update:modelValue'(value: Date | Array<Date> | Array<Date | null> | undefined | null): void;
+    'update:modelValue'(value: Value): void;
     /**
      * Emitted when the value changes in uncontrolled mode.
-     * @param {string | Date | string[] | Date[] | undefined} value - New value.
+     * @param {Value} value - New value.
      */
-    'value-change'(value: Date | Array<Date> | Array<Date | null> | undefined | null): void;
+    'value-change'(value: Value): void;
     /**
      * Callback to invoke when input field is being typed.
      * @param {Event} event - Browser event
@@ -1249,7 +1259,7 @@ export interface DatePickerEmitsOptions {
     keydown(event: Event): void;
 }
 
-export declare type DatePickerEmits = EmitFn<DatePickerEmitsOptions>;
+export declare type DatePickerEmits<Value extends DatePickerModelValue = DateValue> = EmitFn<DatePickerEmitsOptions<Value>>;
 
 /**
  * **Rose Spectacles - DatePicker**
@@ -1260,11 +1270,15 @@ export declare type DatePickerEmits = EmitFn<DatePickerEmitsOptions>;
  * @group Component
  *
  */
-declare const DatePicker: DefineComponent<DatePickerProps, DatePickerSlots, DatePickerEmits>;
+declare const DatePicker: {
+    new <Selection extends string = 'single', Model extends string = 'date'>(
+        props?: DatePickerProps<Selection, Model>
+    ): InstanceType<DefineComponent<DatePickerProps<Selection, Model>, DatePickerSlots, DatePickerEmits<PickedValue<Selection, Model>>>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        DatePicker: DefineComponent<DatePickerProps, DatePickerSlots, DatePickerEmits>;
+        DatePicker: typeof DatePicker;
     }
 }
 

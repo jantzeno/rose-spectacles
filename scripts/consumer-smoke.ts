@@ -134,8 +134,9 @@ try {
         'ModelTypes.vue',
         `
         <script setup lang="ts">
-        import { ${menuComponents.join(', ')}, Form, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
-        import type DataTable from 'rose-spectacles/datatable';
+        import { ref } from 'vue';
+        import { ${menuComponents.join(', ')}, Calendar, DatePicker, Form, InputText, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
+        import DataTable, { type DataTableFilterMetaData } from 'rose-spectacles/datatable';
         import type { FormSubmitEvent } from 'rose-spectacles/forms/form';
         import type { MenuItem } from 'rose-spectacles/menuitem';
         import type { OrganizationChartNode } from 'rose-spectacles/organizationchart';
@@ -153,6 +154,16 @@ try {
         const submitCredentials = ({ values }: FormSubmitEvent<Credentials>) => values.email.toUpperCase();
         const inferred = <T,>(value: T, ..._requiresKnownType: 0 extends (1 & T) ? [never] : []) => value;
         const csvText = (table: InstanceType<typeof DataTable>): string => table.generateCSV({ selectionOnly: false }, [{ name: 'Copper' }]);
+
+        interface ReportFilters { global: DataTableFilterMetaData; name: DataTableFilterMetaData }
+        const filters = ref<ReportFilters>({ global: { value: null, matchMode: 'contains' }, name: { value: null, matchMode: 'startsWith' } });
+        const acceptFilters = (value: ReportFilters) => { filters.value = value; };
+        const label = ref('Reports');
+        const acceptLabel = (value: string) => { label.value = value; };
+        const day = ref<Date | null>(null);
+        const acceptDay = (value: Date | null) => { day.value = value; };
+        const range = ref<(string | null)[] | null>(null);
+        const acceptRange = (value: (string | null)[] | null) => { range.value = value; };
         </script>
         <template>
             ${menuComponents
@@ -174,6 +185,11 @@ try {
             <Form :resolver="resolveCredentials" @submit="submitCredentials" v-slot="fields">
                 {{ inferred(fields.email?.value)?.toUpperCase() }}
             </Form>
+            <DataTable v-model:filters="filters" @update:filters="acceptFilters" />
+            <InputText v-model="label" @value-change="acceptLabel" />
+            <DatePicker v-model="day" @update:model-value="acceptDay" />
+            <DatePicker v-model="range" selection-mode="range" update-model-type="string" @update:model-value="acceptRange" />
+            <Calendar model-value="2024-07-01" />
         </template>
     `
     );
@@ -240,6 +256,7 @@ try {
     console.log('Menu and tree slots preserve the declared types of extended models');
     console.log('Form infers the submit event and field slot types from its resolver');
     console.log('A packed DataTable instance returns CSV text from generateCSV');
+    console.log('Packed filter and date models preserve their value types and InputText emits strings');
 
     await write('SlotTypes.vue', slotTypes.replaceAll('.title', '.missingField'));
     const invalidSlots = spawnSync('bun', ['x', '--no-install', 'vue-tsc', '--noEmit'], { cwd: consumer, encoding: 'utf8' });

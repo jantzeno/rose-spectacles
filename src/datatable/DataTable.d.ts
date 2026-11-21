@@ -922,7 +922,9 @@ export interface DataTableContext {
 /**
  * Defines valid properties in DataTable component.
  */
-export interface DataTableProps<T = any> {
+type FilterModel<Filters> = { [Field in keyof Filters]: DataTableFilterMeta[string] };
+
+export interface DataTableProps<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta> {
     /**
      * An array of objects to display.
      */
@@ -1047,7 +1049,7 @@ export interface DataTableProps<T = any> {
      * Filters object with key-value pairs to define the filters.
      * @see DataTableFilterMeta
      */
-    filters?: DataTableFilterMeta;
+    filters?: Filters;
     /**
      * Layout of the filter elements.
      */
@@ -1522,7 +1524,7 @@ export interface DataTableSlots<T = any> {
 /**
  * Defines valid emits in Datatable component.
  */
-export interface DataTableEmitsOptions<T = any> {
+export interface DataTableEmitsOptions<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta> {
     /**
      * Emitted when the first changes.
      * @param {number} value - New value.
@@ -1572,7 +1574,7 @@ export interface DataTableEmitsOptions<T = any> {
      * Emitted when the filters changes.
      * @param {DataTableFilterMeta} value - New value.
      */
-    'update:filters'(value: DataTableFilterMeta): void;
+    'update:filters'(value: Filters): void;
     /**
      * Emitted when the editingRows changes.
      * @param {DataTableEditingRows} value - New value.
@@ -1715,7 +1717,7 @@ export interface DataTableEmitsOptions<T = any> {
     'state-save'(event: DataTableStateEvent<T>): void;
 }
 
-export declare type DataTableEmits = EmitFn<DataTableEmitsOptions>;
+export declare type DataTableEmits<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta> = EmitFn<DataTableEmitsOptions<T, Filters>>;
 
 export interface DataTableMethods {
     /**
@@ -1741,11 +1743,15 @@ export interface DataTableMethods {
  * @group Component
  *
  */
-declare const DataTable: DefineComponent<DataTableProps, DataTableSlots, DataTableEmits, DataTableMethods>;
+declare const DataTable: {
+    new <T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta>(
+        props?: DataTableProps<T, Filters>
+    ): InstanceType<DefineComponent<DataTableProps<T, Filters>, DataTableSlots<T>, DataTableEmits<T, Filters>, DataTableMethods>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        DataTable: DefineComponent<DataTableProps, DataTableSlots, DataTableEmits, DataTableMethods>;
+        DataTable: typeof DataTable;
     }
 }
 

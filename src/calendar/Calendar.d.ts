@@ -6,7 +6,7 @@
  * @module calendar
  *
  */
-import type { DefineComponent, EmitFn } from 'rose-spectacles/core';
+import type { EmitFn } from 'rose-spectacles/core';
 import * as DatePicker from 'rose-spectacles/datepicker';
 import 'vue';
 
@@ -112,11 +112,11 @@ export declare type CalendarEmits = EmitFn<CalendarEmitsOptions> & DatePicker.Da
  * @group Component
  *
  */
-declare const Calendar: DefineComponent<CalendarProps, CalendarSlots, CalendarEmits>;
+declare const Calendar: typeof DatePicker.default;
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Calendar: DefineComponent<CalendarProps, CalendarSlots, CalendarEmits>;
+        Calendar: typeof Calendar;
     }
 }
 
