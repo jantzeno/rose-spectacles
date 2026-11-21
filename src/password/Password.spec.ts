@@ -25,6 +25,27 @@ describe('Password.vue', () => {
         expect(wrapper.find('.rs-password-overlay').exists()).toBe(true);
     });
 
+    it('describes password feedback with the visible panel', async () => {
+        await wrapper.setProps({ overlayProps: { id: 'custom-password-feedback' } });
+        const input = wrapper.get('input');
+        const panel = wrapper.get('[role="dialog"]');
+
+        expect(input.attributes('aria-expanded')).toBeUndefined();
+        expect(input.attributes('aria-haspopup')).toBe('dialog');
+        expect(input.attributes('aria-describedby')).toBe(panel.attributes('id'));
+        expect(panel.attributes('id')).toBe('custom-password-feedback');
+    });
+
+    it('updates the existing live region when the password strength changes', async () => {
+        const announcement = wrapper.get('[data-p-hidden-accessible][aria-live="polite"]');
+
+        await wrapper.vm.onKeyUp({ target: { value: 'short' } });
+        expect(announcement.text()).toBe('Weak');
+
+        await wrapper.vm.onKeyUp({ target: { value: 'LongerPassword123' } });
+        expect(announcement.text()).toBe('Strong');
+    });
+
     it('should update modelValue', async () => {
         await wrapper.vm.onInput(event);
 

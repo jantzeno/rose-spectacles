@@ -10,11 +10,9 @@
             :name="$formName"
             :aria-labelledby="ariaLabelledby"
             :aria-label="ariaLabel"
-            :aria-expanded="overlayVisible"
-            :aria-controls="
-                overlayVisible ? (overlayProps && overlayProps.id) || overlayId || (panelProps && panelProps.id) || panelId || overlayUniqueId : undefined
-            "
-            :aria-haspopup="feedback"
+            :aria-describedby="overlayVisible ? feedbackId : undefined"
+            :aria-controls="overlayVisible ? feedbackId : undefined"
+            :aria-haspopup="feedback ? 'dialog' : undefined"
             :placeholder="placeholder"
             :required="required"
             :fluid="fluid"
@@ -99,7 +97,7 @@
                 <div
                     v-if="overlayVisible"
                     :ref="overlayRef"
-                    :id="overlayId || panelId || overlayUniqueId"
+                    :id="feedbackId"
                     :class="[cx('overlay'), panelClass, overlayClass]"
                     :style="[overlayStyle, panelStyle]"
                     @click="onOverlayClick"
@@ -430,6 +428,9 @@ export default defineComponent({
         },
         overlayUniqueId() {
             return this.$id + '_overlay';
+        },
+        feedbackId() {
+            return this.overlayProps?.id || this.panelProps?.id || this.overlayId || this.panelId || this.overlayUniqueId;
         },
         containerDataP() {
             return cn({
