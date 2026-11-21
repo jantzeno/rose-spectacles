@@ -1,9 +1,27 @@
+import type { StyleClassOptions } from 'rose-spectacles/styleclass';
+import type { DirectiveBinding } from 'vue';
 import { addClass, getTargetElement, hasClass, isElement, removeClass } from '../internal/utils/dom/index';
 import BaseStyleClass from './BaseStyleClass';
 
+type Binding = DirectiveBinding<StyleClassOptions>;
+
+interface StyleClassElement extends HTMLElement {
+    $_pstyleclass_clicklistener?: (() => void) | null;
+    $_pstyleclass_enter_animating?: boolean;
+    $_pstyleclass_leave_animating?: boolean;
+    $p_styleclass_enterlistener?: () => void;
+    $p_styleclass_entercancellistener?: () => void;
+    $p_styleclass_leavelistener?: () => void;
+    $p_styleclass_leavecancellistener?: () => void;
+    $p_styleclass_documentlistener?: ((event: MouseEvent) => void) | null;
+    $p_styleclass_windowresizelistener?: (() => void) | null;
+    $p_styleclass_resizeselector?: ReturnType<typeof getTargetElement>;
+    $p_styleclass_resizeobserver?: ResizeObserver | null;
+}
+
 const StyleClass = BaseStyleClass.extend('styleclass', {
     mounted(el, binding) {
-        el.setAttribute('data-pd-styleclass', true);
+        el.setAttribute('data-pd-styleclass', 'true');
 
         this.bind(el, binding);
     },
@@ -11,8 +29,8 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
         this.unbind(el);
     },
     methods: {
-        bind(el, binding) {
-            const target = getTargetElement(binding.value.selector, el);
+        bind(el: StyleClassElement, binding: Binding) {
+            const target = getTargetElement(binding.value.selector, el) as StyleClassElement;
 
             this.$el = target;
 
@@ -28,7 +46,7 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
 
             el.addEventListener('click', el.$_pstyleclass_clicklistener);
         },
-        unbind(el) {
+        unbind(el: StyleClassElement) {
             if (el.$_pstyleclass_clicklistener) {
                 el.removeEventListener('click', el.$_pstyleclass_clicklistener);
                 el.$_pstyleclass_clicklistener = null;
@@ -37,7 +55,7 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
             this.unbindResizeListener(el);
             this.unbindDocumentListener(el);
         },
-        enter(target, el, binding) {
+        enter(target: StyleClassElement, el: StyleClassElement, binding: Binding) {
             if (binding.value.enterActiveClass) {
                 if (!target.$_pstyleclass_enter_animating) {
                     target.$_pstyleclass_enter_animating = true;
@@ -63,10 +81,10 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                             addClass(target, binding.value.enterToClass);
                         }
 
-                        target.removeEventListener('animationend', target.$p_styleclass_enterlistener);
-                        target.removeEventListener('animationcancel', target.$p_styleclass_entercancellistener);
+                        target.removeEventListener('animationend', target.$p_styleclass_enterlistener!);
+                        target.removeEventListener('animationcancel', target.$p_styleclass_entercancellistener!);
 
-                        if (binding.value.enterActiveClass.includes('slidedown')) {
+                        if (binding.value.enterActiveClass!.includes('slidedown')) {
                             target.style.maxHeight = '';
                         }
 
@@ -74,7 +92,7 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                     };
 
                     target.$p_styleclass_entercancellistener = () => {
-                        target.removeEventListener('animationcancel', target.$p_styleclass_entercancellistener);
+                        target.removeEventListener('animationcancel', target.$p_styleclass_entercancellistener!);
                         target.$_pstyleclass_enter_animating = false;
                     };
 
@@ -99,7 +117,7 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                 this.bindResizeListener(target, el, binding);
             }
         },
-        leave(target, binding) {
+        leave(target: StyleClassElement, binding: Binding) {
             if (binding.value.leaveActiveClass) {
                 if (!target.$_pstyleclass_leave_animating) {
                     target.$_pstyleclass_leave_animating = true;
@@ -116,13 +134,13 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                             addClass(target, binding.value.leaveToClass);
                         }
 
-                        target.removeEventListener('animationend', target.$p_styleclass_leavelistener);
-                        target.removeEventListener('animationcancel', target.$p_styleclass_leavecancellistener);
+                        target.removeEventListener('animationend', target.$p_styleclass_leavelistener!);
+                        target.removeEventListener('animationcancel', target.$p_styleclass_leavecancellistener!);
                         target.$_pstyleclass_leave_animating = false;
                     };
 
                     target.$p_styleclass_leavecancellistener = () => {
-                        target.removeEventListener('animationcancel', target.$p_styleclass_leavecancellistener);
+                        target.removeEventListener('animationcancel', target.$p_styleclass_leavecancellistener!);
                         target.$_pstyleclass_leave_animating = false;
                     };
 
@@ -147,7 +165,7 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                 this.unbindResizeListener(target);
             }
         },
-        bindDocumentListener(target, el, binding) {
+        bindDocumentListener(target: StyleClassElement, el: StyleClassElement, binding: Binding) {
             if (!target.$p_styleclass_documentlistener) {
                 target.$p_styleclass_documentlistener = (event) => {
                     if (!this.isVisible(target) || getComputedStyle(target).getPropertyValue('position') === 'static') {
@@ -160,13 +178,13 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                 target.ownerDocument.addEventListener('click', target.$p_styleclass_documentlistener);
             }
         },
-        unbindDocumentListener(target) {
+        unbindDocumentListener(target: StyleClassElement) {
             if (target.$p_styleclass_documentlistener) {
                 target.ownerDocument.removeEventListener('click', target.$p_styleclass_documentlistener);
                 target.$p_styleclass_documentlistener = null;
             }
         },
-        bindResizeListener(target, el, binding) {
+        bindResizeListener(target: StyleClassElement, el: StyleClassElement, binding: Binding) {
             target.$p_styleclass_resizeselector = getTargetElement(binding.value.resizeSelector ?? 'window');
 
             if (isElement(target.$p_styleclass_resizeselector)) {
@@ -175,11 +193,11 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                 this.bindWindowResizeListener(target, binding);
             }
         },
-        unbindResizeListener(target) {
+        unbindResizeListener(target: StyleClassElement) {
             this.unbindWindowResizeListener(target);
             this.unbindElementResizeListener(target);
         },
-        bindWindowResizeListener(target, binding) {
+        bindWindowResizeListener(target: StyleClassElement, binding: Binding) {
             if (!target.$p_styleclass_windowresizelistener) {
                 target.$p_styleclass_windowresizelistener = () => {
                     if (!this.isVisible(target)) {
@@ -189,16 +207,16 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                     }
                 };
 
-                target.ownerDocument.defaultView.addEventListener('resize', target.$p_styleclass_windowresizelistener);
+                target.ownerDocument.defaultView!.addEventListener('resize', target.$p_styleclass_windowresizelistener);
             }
         },
-        unbindWindowResizeListener(target) {
+        unbindWindowResizeListener(target: StyleClassElement) {
             if (target.$p_styleclass_windowresizelistener) {
-                target.ownerDocument.defaultView.removeEventListener('resize', target.$p_styleclass_windowresizelistener);
+                target.ownerDocument.defaultView!.removeEventListener('resize', target.$p_styleclass_windowresizelistener);
                 target.$p_styleclass_windowresizelistener = null;
             }
         },
-        bindElementResizeListener(target, binding) {
+        bindElementResizeListener(target: StyleClassElement, binding: Binding) {
             if (!target.$p_styleclass_resizeobserver && target.$p_styleclass_resizeselector) {
                 let isFirstResize = true;
 
@@ -213,20 +231,21 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                         this.leave(target, binding);
                     }
                 });
-                target.$p_styleclass_resizeobserver.observe(target.$p_styleclass_resizeselector);
+                target.$p_styleclass_resizeobserver.observe(target.$p_styleclass_resizeselector as Element);
             }
         },
-        unbindElementResizeListener(target) {
+        unbindElementResizeListener(target: StyleClassElement) {
             if (target.$p_styleclass_resizeobserver) {
                 target.$p_styleclass_resizeobserver.disconnect();
                 target.$p_styleclass_resizeobserver = null;
             }
         },
-        isVisible(target) {
+        isVisible(target: StyleClassElement) {
             return target.offsetParent !== null;
         },
-        isOutsideClick(event, target, el) {
-            return !el.isSameNode(event.target) && !el.contains(event.target) && !target.contains(event.target);
+        isOutsideClick(event: MouseEvent, target: StyleClassElement, el: StyleClassElement) {
+            const clicked = event.target as Node | null;
+            return !el.isSameNode(clicked) && !el.contains(clicked) && !target.contains(clicked);
         }
     }
 });

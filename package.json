@@ -912,7 +912,7 @@
         },
         "./styleclass": {
             "types": "./src/styleclass/StyleClass.d.ts",
-            "default": "./src/styleclass/StyleClass.js"
+            "default": "./src/styleclass/StyleClass.ts"
         },
         "./styleclass/style": {
             "types": "./src/styleclass/style/StyleClassStyle.d.ts",
@@ -1060,7 +1060,7 @@
         },
         "./tooltip": {
             "types": "./src/tooltip/Tooltip.d.ts",
-            "default": "./src/tooltip/Tooltip.js"
+            "default": "./src/tooltip/Tooltip.ts"
         },
         "./tooltip/style": {
             "types": "./src/tooltip/style/TooltipStyle.d.ts",
