@@ -366,14 +366,18 @@ export default {
             event.preventDefault();
         },
         onArrowRight(event) {
-            if (this.leaf || this.expanded) return;
+            if (this.leaf) return;
 
-            event.currentTarget.tabIndex = -1;
+            if (this.expanded) {
+                const nodeElement = event.currentTarget;
+                const child = nodeElement.querySelector(':scope > ul > [role="treeitem"]');
 
-            this.$emit('node-toggle', this.node);
-            this.$nextTick(() => {
-                this.onArrowDown(event);
-            });
+                if (child) this.focusRowChange(nodeElement, child);
+            } else {
+                this.$emit('node-toggle', this.node);
+            }
+
+            event.preventDefault();
         },
         onArrowLeft(event) {
             const togglerElement = findSingle(event.currentTarget, '[data-pc-section="nodetogglebutton"]');

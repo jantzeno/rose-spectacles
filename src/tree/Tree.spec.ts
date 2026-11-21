@@ -3,6 +3,33 @@ import type { TreeFilterEvent } from 'rose-spectacles/tree';
 import { reactive } from 'vue';
 import Tree from './Tree.vue';
 
+it.each(['loaded', 'lazy'])('preserves focus when expanding a %s tree node', async (mode) => {
+    const children = [{ key: 'child', label: 'Child' }];
+    const parentNode = { key: 'parent', label: 'Parent', leaf: false, children: mode === 'loaded' ? children : undefined };
+    const sibling = { key: 'sibling', label: 'Sibling' };
+    const wrapper = mount(Tree, { attachTo: document.body, props: { value: [parentNode, sibling] } });
+
+    try {
+        const parent = wrapper.get('[role="treeitem"][aria-label="Parent"]');
+        parent.element.focus();
+
+        await parent.trigger('keydown', { code: 'ArrowRight' });
+
+        expect(wrapper.emitted('node-expand')).toHaveLength(1);
+        expect(document.activeElement).toBe(parent.element);
+
+        if (mode === 'lazy') {
+            await wrapper.setProps({ value: [{ ...parentNode, children }, sibling] });
+            expect(document.activeElement).toBe(parent.element);
+        }
+
+        await parent.trigger('keydown', { code: 'ArrowRight' });
+        expect(document.activeElement).toBe(wrapper.get('[role="treeitem"][aria-label="Child"]').element);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('Tree.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof Tree>>;
 
