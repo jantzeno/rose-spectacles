@@ -1080,8 +1080,10 @@
             "labels": ["bug"],
             "component": "InputOtp, Form",
             "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: The 'InputOtp' component encountered an error in form validation."
+            "evidence": [
+                "The Vue Form test types one digit into each of four InputOtp fields, submits the form, and verifies that the resolver receives the four-character code and marks the submission valid."
+            ],
+            "evidenceGap": "The report contains a screenshot and conflicting required lengths. Reproduction still requires the exact resolver and form setup from the affected documentation example."
         },
         {
             "number": 134,
@@ -1407,10 +1409,17 @@
             "title": "InputOtp allows multiple characters in the last field when typing manually in forms",
             "labels": ["bug"],
             "component": "InputOtp",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "An InputOtp registered in a retained Vue Form accepted a second key in the last field when earlier fields were empty.",
+                "The regression fails before the per-field keyboard check and native maxlength. All 21 InputOtp tests pass with the fix."
+            ],
             "reproducer": "https://stackblitz.com/run?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: InputOtp allows multiple characters in the last field when typing manually in forms."
+            "resolvingCommit": "027c2d6e625109b76b4ce332d6152a3ee148bb4f",
+            "test": {
+                "path": "src/inputotp/InputOtp.spec.ts",
+                "name": "accepts only one character in the last OTP field inside a form"
+            }
         },
         {
             "number": 166,
@@ -4522,9 +4531,11 @@
             "labels": ["bug"],
             "component": "InputOtp",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "Local InputOtp checks verify the deleteContentBackward input event and the physical Backspace key path, including focus movement and model changes."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-create-vue-issue-template-guflgr?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: InputOtp: Unable to delete value on Android Chrome."
+            "evidenceGap": "The original issue concerns the Android Chrome software keyboard. Its exact input event sequence still needs to be captured on Android."
         },
         {
             "number": 464,
@@ -4852,9 +4863,10 @@
             "title": "InputOtp: Aria Label like PrimeReact/PrimeFaces",
             "labels": ["enhancement", "accessibility"],
             "component": "InputOtp",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: InputOtp: Aria Label like PrimeReact/PrimeFaces."
+            "disposition": "enhancement",
+            "evidence": [
+                "The request proposes the per-digit PrimeLocale otpLabel provided by PrimeReact and PrimeFaces. The retained InputOtp currently exposes its input pass-through and default slot so application code can supply labels. A default localized label would add a new behavior."
+            ]
         },
         {
             "number": 497,
