@@ -372,10 +372,16 @@
             "title": "FormField not initializing properly nested data with Form's initialValues",
             "labels": ["bug"],
             "component": "FormField, Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A mounted FormField and InputText rendered an empty field for both dotted and array-index paths before the fix. Both cases now render the initial value and restore it on reset."
+            ],
             "reproducer": "https://stackblitz.com/edit/sjeaqygf?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Edge 144.0.3719.115. Verify the reported behavior: FormField not initializing properly nested data with Form's initialValues."
+            "resolvingCommit": "321556d8aa0fe8cbd91b14ad03612408e64f96dd",
+            "test": {
+                "path": "src/forms/form/FormInitialValue.spec.ts",
+                "name": "initializes and resets a registered input from the form initial values at %s"
+            }
         },
         {
             "number": 69,
