@@ -2,7 +2,7 @@
     <Checkbox
         :modelValue="checked"
         :binary="true"
-        :disabled="$attrs.disabled"
+        :disabled="$attrs.disabled as boolean | undefined"
         :aria-label="checkboxAriaLabel"
         @change="onChange"
         :unstyled="unstyled"
@@ -15,13 +15,13 @@
     </Checkbox>
 </template>
 
-<script>
+<script lang="ts">
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import CheckIcon from '../icons/check/CheckIcon.vue';
 import Checkbox from '../checkbox/Checkbox.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'RowCheckbox',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -40,7 +40,7 @@ export default {
         }
     },
     methods: {
-        getColumnPT(key) {
+        getColumnPT(key: string) {
             const columnMetaData = {
                 props: this.column.props,
                 parent: {
@@ -64,7 +64,7 @@ export default {
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo:
         },
-        onChange(event) {
+        onChange(event: Event) {
             if (!this.$attrs.disabled) {
                 this.$emit('change', {
                     originalEvent: event,
@@ -75,16 +75,13 @@ export default {
     },
     computed: {
         checkboxAriaLabel() {
-            return this.$primevue.config.locale.aria
-                ? this.checked
-                    ? this.$primevue.config.locale.aria.selectRow
-                    : this.$primevue.config.locale.aria.unselectRow
-                : undefined;
+            const aria = this.$primevue.config.locale?.aria;
+            return this.checked ? aria?.selectRow : aria?.unselectRow;
         }
     },
     components: {
         CheckIcon,
         Checkbox
     }
-};
+});
 </script>

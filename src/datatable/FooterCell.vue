@@ -13,13 +13,13 @@
     </td>
 </template>
 
-<script>
+<script lang="ts">
 import { getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type CSSProperties, type VNode } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'FooterCell',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -35,7 +35,7 @@ export default {
     },
     data() {
         return {
-            styleObject: {}
+            styleObject: {} as CSSProperties
         };
     },
     mounted() {
@@ -49,10 +49,12 @@ export default {
         }
     },
     methods: {
-        columnProp(prop) {
-            return getVNodeProp(this.column, prop);
+        columnProp(prop: string) {
+            return getVNodeProp(this.column as VNode, prop);
         },
-        getColumnPT(key) {
+        getColumnPT(key: string) {
+            const { $parentInstance: parent } = this as typeof this & { $parentInstance?: { $parentInstance?: { size?: string; showGridlines?: boolean } } };
+            const table = parent?.$parentInstance;
             const columnMetaData = {
                 props: this.column.props,
                 parent: {
@@ -62,8 +64,8 @@ export default {
                 },
                 context: {
                     index: this.index,
-                    size: this.$parentInstance?.$parentInstance?.size,
-                    showGridlines: this.$parentInstance?.$parentInstance?.showGridlines || false
+                    size: table?.size,
+                    showGridlines: table?.showGridlines || false
                 }
             };
 
@@ -85,7 +87,7 @@ export default {
                     let next = getNextElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (next) {
-                        pos = getOuterWidth(next) + parseFloat(next.style['inset-inline-end'] || 0);
+                        pos = getOuterWidth(next) + parseFloat((next as HTMLElement).style.insetInlineEnd || '0');
                     }
 
                     this.styleObject.insetInlineEnd = pos + 'px';
@@ -94,7 +96,7 @@ export default {
                     let prev = getPreviousElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (prev) {
-                        pos = getOuterWidth(prev) + parseFloat(prev.style['inset-inline-start'] || 0);
+                        pos = getOuterWidth(prev) + parseFloat((prev as HTMLElement).style.insetInlineStart || '0');
                     }
 
                     this.styleObject.insetInlineStart = pos + 'px';
@@ -113,5 +115,5 @@ export default {
             return this.columnProp('frozen') ? [columnStyle, bodyStyle, this.styleObject] : [columnStyle, bodyStyle];
         }
     }
-};
+});
 </script>

@@ -2,7 +2,7 @@
     <RadioButton
         :modelValue="checked"
         :binary="true"
-        :disabled="$attrs.disabled"
+        :disabled="$attrs.disabled as boolean | undefined"
         :name="name"
         @change="onChange"
         :unstyled="unstyled"
@@ -10,12 +10,12 @@
     />
 </template>
 
-<script>
+<script lang="ts">
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import RadioButton from '../radiobutton/RadioButton.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'RowRadioButton',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -31,7 +31,7 @@ export default {
         }
     },
     methods: {
-        getColumnPT(key) {
+        getColumnPT(key: string) {
             const columnMetaData = {
                 props: this.column.props,
                 parent: {
@@ -55,7 +55,7 @@ export default {
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo:
         },
-        onChange(event) {
+        onChange(event: Event) {
             if (!this.$attrs.disabled) {
                 this.$emit('change', {
                     originalEvent: event,
@@ -67,5 +67,5 @@ export default {
     components: {
         RadioButton
     }
-};
+});
 </script>

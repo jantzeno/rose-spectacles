@@ -57,15 +57,15 @@
     </th>
 </template>
 
-<script>
+<script lang="ts">
 import { getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type CSSProperties, type VNode } from 'vue';
 import ColumnFilter from './ColumnFilter.vue';
 import HeaderCheckbox from './HeaderCheckbox.vue';
 
-export default {
+export default defineComponent({
     name: 'FilterHeaderCell',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -118,7 +118,7 @@ export default {
     },
     data() {
         return {
-            styleObject: {}
+            styleObject: {} as CSSProperties
         };
     },
     mounted() {
@@ -132,10 +132,10 @@ export default {
         }
     },
     methods: {
-        columnProp(prop) {
-            return getVNodeProp(this.column, prop);
+        columnProp(prop: string) {
+            return getVNodeProp(this.column as VNode, prop);
         },
-        getColumnPT(key) {
+        getColumnPT(key: string) {
             if (!this.column) return null;
 
             const columnMetaData = {
@@ -168,7 +168,7 @@ export default {
                     let next = getNextElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (next) {
-                        pos = getOuterWidth(next) + parseFloat(next.style['inset-inline-end'] || 0);
+                        pos = getOuterWidth(next) + parseFloat((next as HTMLElement).style.insetInlineEnd || '0');
                     }
 
                     this.styleObject.insetInlineEnd = pos + 'px';
@@ -177,7 +177,7 @@ export default {
                     let prev = getPreviousElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (prev) {
-                        pos = getOuterWidth(prev) + parseFloat(prev.style['inset-inline-start'] || 0);
+                        pos = getOuterWidth(prev) + parseFloat((prev as HTMLElement).style.insetInlineStart || '0');
                     }
 
                     this.styleObject.insetInlineStart = pos + 'px';
@@ -199,5 +199,5 @@ export default {
         DTHeaderCheckbox: HeaderCheckbox,
         DTColumnFilter: ColumnFilter
     }
-};
+});
 </script>
