@@ -328,11 +328,11 @@ export interface FormInstance {
  * @group Component
  *
  */
-declare const Form: DefineComponent<FormProps, FormSlots, FormEmits>;
+declare const Form: DefineComponent<FormProps, FormSlots, FormEmits, FormInstance>;
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Form: DefineComponent<FormProps, FormSlots, FormEmits>;
+        Form: DefineComponent<FormProps, FormSlots, FormEmits, FormInstance>;
     }
 }
 
