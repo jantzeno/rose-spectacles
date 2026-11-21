@@ -1183,10 +1183,16 @@
             "title": "AutoComplete: Shift+Home always selects entire text, not from current caret position",
             "labels": ["bug"],
             "component": "AutoComplete",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Shift+Home selected the whole input from a middle caret. The regression exercises both directions and verifies that reversing direction preserves the original anchor."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-btzd5msn?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: AutoComplete: Shift+Home always selects entire text, not from current caret position."
+            "resolvingCommit": "c1c00715c1189f07ab662e129e936e3a8059cc02",
+            "test": {
+                "path": "src/autocomplete/AutoComplete.spec.ts",
+                "name": "extends text selection from the caret with Shift+Home and Shift+End"
+            }
         },
         {
             "number": 137,
@@ -1312,10 +1318,16 @@
             "title": "Select is not clearable with keyboard",
             "labels": ["bug", "accessibility"],
             "component": "Select",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The original icon was not keyboard focusable. The regression verifies focus on the native clear button, null emission, focus return to the combobox, and the closed overlay after clearing."
+            ],
             "reproducer": "https://stackblitz.com/edit/euo7dpqi?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Select is not clearable with keyboard."
+            "resolvingCommit": "acb8d8ff76aa2961aa33be01b175b0a416fed2f7",
+            "test": {
+                "path": "src/select/Select.spec.ts",
+                "name": "provides a focusable clear button and returns focus to the combobox after clearing"
+            }
         },
         {
             "number": 150,
@@ -1545,10 +1557,16 @@
             "title": "AutoComplete: content slot is not implemented",
             "labels": ["bug"],
             "component": "AutoComplete",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The declared content slot was never invoked. The regression renders a custom list, checks that it receives both suggestions and the ID referenced by the combobox, and verifies the default list is replaced."
+            ],
             "reproducer": "https://github.com/primefaces/primevue/blob/master/packages/primevue/src/autocomplete/AutoComplete.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: AutoComplete: content slot is not implemented."
+            "resolvingCommit": "98a9eb4019f99f57d82c3372ff9686c4ec100d5f",
+            "test": {
+                "path": "src/autocomplete/AutoComplete.spec.ts",
+                "name": "renders the content slot in place of the default suggestion list"
+            }
         },
         {
             "number": 169,
@@ -4653,10 +4671,16 @@
             "title": "Autocomplete: forceSelection true causes the change event to be emitted twice when an option from the list is selected",
             "labels": ["bug"],
             "component": "AutoComplete",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Native focus loss could validate the draft before the suggestion click. In the retained component this first emitted null for an unmatched draft, or the other matching suggestion when the draft matched exactly. The regression verifies that only the clicked option is committed in either case."
+            ],
             "reproducer": "https://stackblitz.com/edit/mcve4z?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome. Verify the reported behavior: Autocomplete: forceSelection true causes the change event to be emitted twice when an option from the list is selected."
+            "resolvingCommit": "9ef96c5fbfc971cd1ee07300b5fc2d07645162cb",
+            "test": {
+                "path": "src/autocomplete/AutoComplete.spec.ts",
+                "name": "commits only the clicked suggestion with force selection after typing %s"
+            }
         },
         {
             "number": 456,
@@ -6061,10 +6085,12 @@
             "title": "AutoComplete: ForceSelection triggers \"update:modelValue\" twice when two or more options contain the same name",
             "labels": ["bug"],
             "component": "AutoComplete",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "duplicate",
+            "evidence": [
+                "The input change ran on focus loss before the clicked suggestion was committed. Issue 455 has the same pointer and blur ordering and regression coverage for an exact typed match to a different suggestion."
+            ],
             "reproducer": "https://codesandbox.io/s/primevue-autocomplete-bug-gx1sx0?file=/src/AutoCompleteDemo.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: AutoComplete: ForceSelection triggers \"update:modelValue\" twice when two or more options contain the same name."
+            "primaryIssue": 455
         },
         {
             "number": 601,
