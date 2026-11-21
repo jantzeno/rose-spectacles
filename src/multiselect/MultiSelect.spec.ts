@@ -113,7 +113,7 @@ describe('MultiSelect.vue', () => {
     });
 
     it('should select an item', async () => {
-        await wrapper.vm.onOptionSelect({}, wrapper.vm.options![0]);
+        await wrapper.vm.onOptionSelect(new MouseEvent('click'), wrapper.vm.options![0]);
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[wrapper.vm.options![0]]]);
 
@@ -127,7 +127,7 @@ describe('MultiSelect.vue', () => {
     it('should select multiple item', async () => {
         await wrapper.setProps({ modelValue: [wrapper.vm.options![0]] });
 
-        await wrapper.vm.onOptionSelect({}, wrapper.vm.options![1]);
+        await wrapper.vm.onOptionSelect(new MouseEvent('click'), wrapper.vm.options![1]);
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[wrapper.vm.options![0], wrapper.vm.options![1]]]);
 
@@ -194,7 +194,7 @@ describe('MultiSelect.vue', () => {
 
         const hideSpy = vi.spyOn(wrapper.vm, 'hide');
 
-        wrapper.vm.onTabKey({ shiftKey: false, preventDefault: vi.fn() });
+        wrapper.vm.onTabKey(new KeyboardEvent('keydown', { code: 'Tab' }));
 
         expect(wrapper.emitted('update:modelValue')).toBeUndefined();
         expect(hideSpy).toHaveBeenCalledWith(wrapper.vm.filter);
@@ -1207,14 +1207,14 @@ describe('MultiSelect.vue', () => {
         it('should select a range up to the nearest selected option', () => {
             const wrapper = mountMultiSelect({ optionValue: 'code', modelValue: ['RM'] });
 
-            wrapper.vm.onOptionSelectRange({}, -1, 3);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), -1, 3);
             expect(lastEmittedValue(wrapper)).toEqual(['RM', 'LDN', 'IST']);
         });
 
         it('should select a range down to the nearest selected option', () => {
             const wrapper = mountMultiSelect({ optionValue: 'code', modelValue: ['IST'] });
 
-            wrapper.vm.onOptionSelectRange({}, 0, -1);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), 0, -1);
             expect(lastEmittedValue(wrapper)).toEqual(['NY', 'RM', 'LDN', 'IST']);
         });
 
@@ -1222,12 +1222,12 @@ describe('MultiSelect.vue', () => {
             const options = cities();
             const wrapper = mountMultiSelect({ options, modelValue: [{ ...options[3] }] });
 
-            wrapper.vm.onOptionSelectRange({}, 1, -1);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), 1, -1);
             expect(lastEmittedValue(wrapper)).toEqual(options.slice(1, 4));
 
             await wrapper.setProps({ dataKey: 'code', modelValue: [{ code: 'NY' }] });
 
-            wrapper.vm.onOptionSelectRange({}, -1, 2);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), -1, 2);
             expect(lastEmittedValue(wrapper)).toEqual(options.slice(0, 3));
         });
     });

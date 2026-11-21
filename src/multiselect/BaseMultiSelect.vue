@@ -1,18 +1,20 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import MultiSelectStyle from './style/MultiSelectStyle';
+
+type OptionResolver = string | ((option: unknown) => unknown);
 
 export default defineComponent({
     name: 'BaseMultiSelect',
     extends: BaseInput,
     props: {
         options: Array,
-        optionLabel: null,
-        optionValue: null,
-        optionDisabled: null,
-        optionGroupLabel: null,
-        optionGroupChildren: null,
+        optionLabel: null as unknown as PropType<OptionResolver>,
+        optionValue: null as unknown as PropType<OptionResolver>,
+        optionDisabled: null as unknown as PropType<OptionResolver>,
+        optionGroupLabel: null as unknown as PropType<OptionResolver>,
+        optionGroupChildren: null as unknown as PropType<OptionResolver>,
         scrollHeight: {
             type: String,
             default: '14rem'
@@ -38,7 +40,7 @@ export default defineComponent({
             type: null,
             default: null
         },
-        dataKey: null,
+        dataKey: null as unknown as PropType<string>,
         showClear: {
             type: Boolean,
             default: false
@@ -59,7 +61,7 @@ export default defineComponent({
             default: 'contains'
         },
         filterFields: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: null
         },
         appendTo: {
@@ -115,7 +117,7 @@ export default defineComponent({
             default: undefined
         },
         selectAll: {
-            type: Boolean,
+            type: Boolean as PropType<boolean | null>,
             default: null
         },
         resetFilterOnHide: {
