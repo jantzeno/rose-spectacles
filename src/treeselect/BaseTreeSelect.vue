@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { TreeNode } from '../treenode/TreeNode';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import TreeSelectStyle from './style/TreeSelectStyle';
 
@@ -7,7 +8,7 @@ export default defineComponent({
     name: 'BaseTreeSelect',
     extends: BaseInput,
     props: {
-        options: Array,
+        options: Array as PropType<TreeNode[]>,
         scrollHeight: {
             type: String,
             default: '20rem'
@@ -121,7 +122,7 @@ export default defineComponent({
             default: null
         },
         expandedKeys: {
-            type: null,
+            type: Object as PropType<Record<string, boolean>>,
             default: null
         }
     },

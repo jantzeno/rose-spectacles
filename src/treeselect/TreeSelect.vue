@@ -159,11 +159,10 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
     absolutePosition,
     addStyle,
-    find,
     findSingle,
     focus,
     getFirstFocusableElement,
@@ -184,9 +183,14 @@ import { listenForOutsideOverlayClick } from '../internal/overlay-dismissal';
 import Portal from '../portal/Portal.vue';
 import Ripple from '../ripple/Ripple';
 import Tree from '../tree/Tree.vue';
+import { defineComponent, inject, type ComponentPublicInstance } from 'vue';
+import type { TreeNode } from '../treenode/TreeNode';
 import BaseTreeSelect from './BaseTreeSelect.vue';
 
-export default {
+type ExpandedKeys = Record<string, boolean>;
+type SelectionKeys = Record<string, boolean | { checked?: boolean; partialChecked?: boolean }>;
+
+export default defineComponent({
     name: 'TreeSelect',
     extends: BaseTreeSelect,
     inheritAttrs: false,
@@ -205,14 +209,19 @@ export default {
         'blur',
         'update:expandedKeys'
     ],
-    inject: {
-        $pcFluid: { default: null }
+    setup() {
+        return { inheritedFluid: inject('$pcFluid', null) };
     },
     data() {
         return {
             focused: false,
             overlayVisible: false,
-            d_expandedKeys: this.expandedKeys || {}
+            d_expandedKeys: (this.expandedKeys || {}) as ExpandedKeys,
+            stopOutsideClickListener: null as (() => void) | null,
+            resizeListener: null as (() => void) | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            overlay: null as HTMLElement | null,
+            selfChange: false
         };
     },
     watch: {
@@ -230,14 +239,9 @@ export default {
             this.updateTreeState();
         },
         expandedKeys(value) {
-            this.d_expandedKeys = value;
+            this.d_expandedKeys = value ?? {};
         }
     },
-    stopOutsideClickListener: null,
-    resizeListener: null,
-    scrollHandler: null,
-    overlay: null,
-    selfChange: false,
     beforeUnmount() {
         this.unbindOutsideClickListener();
         this.unbindResizeListener();
@@ -263,85 +267,78 @@ export default {
         hide() {
             this.$emit('before-hide');
             this.overlayVisible = false;
-            this.$refs.focusInput.focus();
+            (this.$refs.focusInput as HTMLInputElement | undefined)?.focus();
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.focused = true;
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.focused = false;
             this.$emit('blur', event);
             this.formField.onBlur?.();
         },
-        onClick(event) {
-            if (this.disabled) {
+        onClick(event: MouseEvent) {
+            const target = event.target;
+
+            if (this.disabled || !(target instanceof Element)) {
                 return;
             }
 
-            if (
-                event.target.tagName === 'INPUT' ||
-                event.target.getAttribute('data-pc-section') === 'clearicon' ||
-                event.target.closest('[data-pc-section="clearicon"]')
-            ) {
+            if (target.tagName === 'INPUT' || target.getAttribute('data-pc-section') === 'clearicon' || target.closest('[data-pc-section="clearicon"]')) {
                 return;
-            } else if (!this.overlay || !this.overlay.contains(event.target)) {
+            } else if (!this.overlay || !this.overlay.contains(target)) {
                 if (this.overlayVisible) this.hide();
                 else this.show();
 
-                focus(this.$refs.focusInput);
+                focus(this.$refs.focusInput as HTMLInputElement);
             }
         },
         onClearClick() {
             this.onSelectionChange(null);
         },
-        onSelectionChange(keys) {
+        onSelectionChange(keys: SelectionKeys | null) {
             this.selfChange = true;
             this.writeValue(keys);
             this.$emit('change', keys);
         },
-        onNodeSelect(node) {
+        onNodeSelect(node: TreeNode) {
             this.$emit('node-select', node);
 
             if (this.selectionMode === 'single') {
                 this.hide();
             }
         },
-        onNodeUnselect(node) {
+        onNodeUnselect(node: TreeNode) {
             this.$emit('node-unselect', node);
         },
-        onNodeToggle(keys) {
+        onNodeToggle(keys: ExpandedKeys) {
             this.d_expandedKeys = keys;
 
             this.$emit('update:expandedKeys', this.d_expandedKeys);
         },
         getSelectedItemsLabel() {
-            let pattern = /{(.*?)}/;
-            const selectedItemsLabel = this.selectedItemsLabel || this.$primevue.config.locale.selectionMessage;
+            const selectedItemsLabel = this.selectedItemsLabel || this.$primevue?.config.locale?.selectionMessage;
 
-            if (pattern.test(selectedItemsLabel)) {
-                return selectedItemsLabel.replace(selectedItemsLabel.match(pattern)[0], Object.keys(this.d_value).length + '');
-            }
-
-            return selectedItemsLabel;
+            return selectedItemsLabel?.replace(/{(.*?)}/, String(Object.keys(this.d_value).length));
         },
-        onFirstHiddenFocus(event) {
+        onFirstHiddenFocus(event: FocusEvent) {
             const focusableEl =
-                event.relatedTarget === this.$refs.focusInput
+                this.overlay && event.relatedTarget === this.$refs.focusInput
                     ? getFirstFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
-                    : this.$refs.focusInput;
+                    : (this.$refs.focusInput as HTMLInputElement);
 
-            focus(focusableEl);
+            if (focusableEl instanceof HTMLElement) focus(focusableEl);
         },
-        onLastHiddenFocus(event) {
+        onLastHiddenFocus(event: FocusEvent) {
             const focusableEl =
-                event.relatedTarget === this.$refs.focusInput
+                this.overlay && event.relatedTarget === this.$refs.focusInput
                     ? getLastFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
-                    : this.$refs.focusInput;
+                    : (this.$refs.focusInput as HTMLInputElement);
 
-            focus(focusableEl);
+            if (focusableEl instanceof HTMLElement) focus(focusableEl);
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown':
                     this.onArrowDownKey(event);
@@ -365,21 +362,21 @@ export default {
                     break;
             }
         },
-        onArrowDownKey(event) {
+        onArrowDownKey(event: KeyboardEvent) {
             if (this.overlayVisible) return;
 
             this.show();
 
             this.$nextTick(() => {
-                const treeNodeEl = find(this.$refs.tree.$el, '[data-pc-section="treeitem"]');
-                const focusedElement = [...treeNodeEl].find((item) => item.getAttribute('tabindex') === '0');
+                const tree = this.$refs.tree as ComponentPublicInstance | undefined;
+                const focusedElement = (tree?.$el as HTMLElement | undefined)?.querySelector<HTMLElement>('[data-pc-section="treeitem"][tabindex="0"]');
 
-                focus(focusedElement);
+                if (focusedElement) focus(focusedElement);
             });
 
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEnterKey(event: KeyboardEvent) {
             if (this.overlayVisible) {
                 this.hide();
             } else {
@@ -388,26 +385,28 @@ export default {
 
             event.preventDefault();
         },
-        onEscapeKey(event) {
+        onEscapeKey(event: KeyboardEvent) {
             if (this.overlayVisible) {
                 this.hide();
                 event.preventDefault();
             }
         },
-        onTabKey(event, pressedInInputText = false) {
+        onTabKey(event: KeyboardEvent, pressedInInputText = false) {
             if (!pressedInInputText) {
                 if (this.overlayVisible && this.hasFocusableElements()) {
-                    focus(this.$refs.firstHiddenFocusableElementOnOverlay);
+                    focus(this.$refs.firstHiddenFocusableElementOnOverlay as HTMLElement);
 
                     event.preventDefault();
                 }
             }
         },
         hasFocusableElements() {
-            return getFocusableElements(this.overlay, ':not([data-p-hidden-focusable="true"])').length > 0;
+            return this.overlay != null && getFocusableElements(this.overlay, ':not([data-p-hidden-focusable="true"])').length > 0;
         },
-        onOverlayEnter(el) {
-            ZIndex.set('overlay', el, this.$primevue.config.zIndex.overlay);
+        onOverlayEnter(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
+            ZIndex.set('overlay', el, this.$primevue?.config.zIndex?.overlay);
 
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
@@ -430,17 +429,19 @@ export default {
             this.$emit('hide');
             this.overlay = null;
         },
-        onOverlayAfterLeave(el) {
-            ZIndex.clear(el);
+        onOverlayAfterLeave(el: Element) {
+            if (el instanceof HTMLElement) ZIndex.clear(el);
         },
         focus() {
-            let focusableElements = getFocusableElements(this.overlay);
+            if (!this.overlay) return;
 
-            if (focusableElements && focusableElements.length > 0) {
-                focusableElements[0].focus();
-            }
+            const target = getFocusableElements(this.overlay)[0];
+
+            if (target instanceof HTMLElement) target.focus();
         },
         alignOverlay() {
+            if (!this.overlay) return;
+
             if (this.appendTo === 'self') {
                 relativePosition(this.overlay, this.$el);
             } else {
@@ -461,7 +462,7 @@ export default {
         },
         bindScrollListener() {
             if (!this.scrollHandler) {
-                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.container, () => {
+                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.container as HTMLElement, () => {
                     if (this.overlayVisible) {
                         this.hide();
                     }
@@ -492,55 +493,52 @@ export default {
                 this.resizeListener = null;
             }
         },
-        overlayRef(el) {
-            this.overlay = el;
+        overlayRef(el: Element | ComponentPublicInstance | null) {
+            this.overlay = el instanceof HTMLElement ? el : null;
         },
-        onOverlayClick(event) {
+        onOverlayClick(event: MouseEvent) {
             OverlayEventBus.emit('overlay-click', {
                 originalEvent: event,
                 target: this.$el
             });
         },
-        onOverlayKeydown(event) {
+        onOverlayKeydown(event: KeyboardEvent) {
             if (event.code === 'Escape') this.hide();
         },
-        fillNodeMap(node, nodeMap) {
+        fillNodeMap(node: TreeNode, nodeMap: Record<string, TreeNode>) {
             nodeMap[node.key] = node;
 
             if (node.children && node.children.length > 0) {
                 node.children.forEach((children) => this.fillNodeMap(children, nodeMap));
             }
         },
-        isSelected(node, keys) {
-            return this.selectionMode === 'checkbox' ? keys[node?.key] && keys[node?.key].checked : keys[node?.key];
+        isSelected(node: TreeNode | undefined, keys: SelectionKeys) {
+            if (!node) return false;
+
+            const value = keys[node.key];
+            return this.selectionMode === 'checkbox' ? typeof value === 'object' && value?.checked : value;
         },
         updateTreeState() {
-            let keys = { ...this.d_value };
+            const keys: SelectionKeys = { ...this.d_value };
 
-            if (keys && this.options && this.options.length > 0) {
-                this.updateTreeBranchState(null, null, keys);
+            for (const option of this.options ?? []) {
+                this.updateTreeBranchState(option, [], keys);
             }
         },
-        updateTreeBranchState(node, path, keys) {
-            if (node) {
-                if (this.isSelected(node, keys)) {
-                    this.expandPath(path);
-                    delete keys[node.key];
-                }
+        updateTreeBranchState(node: TreeNode, path: string[], keys: SelectionKeys) {
+            if (this.isSelected(node, keys)) {
+                this.expandPath(path);
+                delete keys[node.key];
+            }
 
-                if (Object.keys(keys).length && node.children) {
-                    for (let childNode of node.children) {
-                        path.push(node.key);
-                        this.updateTreeBranchState(childNode, path, keys);
-                    }
-                }
-            } else {
-                for (let childNode of this.options) {
-                    this.updateTreeBranchState(childNode, [], keys);
+            if (Object.keys(keys).length && node.children) {
+                for (const childNode of node.children) {
+                    path.push(node.key);
+                    this.updateTreeBranchState(childNode, path, keys);
                 }
             }
         },
-        expandPath(path) {
+        expandPath(path: string[]) {
             if (path.length > 0) {
                 for (let key of path) {
                     this.d_expandedKeys[key] = true;
@@ -555,27 +553,27 @@ export default {
                 let selectedItem = findSingle(this.overlay, '[data-p-selected="true"]');
 
                 if (selectedItem) {
-                    selectedItem.scrollIntoView({ block: 'nearest', inline: 'start' });
+                    selectedItem.scrollIntoView?.({ block: 'nearest', inline: 'start' });
                 }
             }
         }
     },
     computed: {
         nodeMap() {
-            const nodeMap = {};
+            const nodeMap: Record<string, TreeNode> = {};
 
             this.options?.forEach((node) => this.fillNodeMap(node, nodeMap));
 
             return nodeMap;
         },
         selectedNodes() {
-            let selectedNodes = [];
+            const selectedNodes: TreeNode[] = [];
 
             if (this.d_value && this.options && this.options.length > 0) {
                 Object.keys(this.d_value).forEach((key) => {
                     const node = this.nodeMap[key];
 
-                    if (this.isSelected(node, this.d_value)) {
+                    if (node && this.isSelected(node, this.d_value)) {
                         selectedNodes.push(node);
                     }
                 });
@@ -603,7 +601,7 @@ export default {
             return isNotEmpty(this.maxSelectedLabels) && this.d_value && Object.keys(this.d_value).length > this.maxSelectedLabels;
         },
         emptyMessageText() {
-            return this.emptyMessage || this.$primevue.config.locale.emptyMessage;
+            return this.emptyMessage || this.$primevue?.config.locale?.emptyMessage;
         },
         emptyValue() {
             return !this.$filled;
@@ -615,7 +613,7 @@ export default {
             return this.$id + '_list';
         },
         hasFluid() {
-            return isEmpty(this.fluid) ? !!this.$pcFluid : this.fluid;
+            return isEmpty(this.fluid) ? !!this.inheritedFluid : this.fluid;
         },
         isClearIconVisible() {
             return this.showClear && this.d_value != null && isNotEmpty(this.options) && !this.disabled && !this.loading;
@@ -631,5 +629,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
