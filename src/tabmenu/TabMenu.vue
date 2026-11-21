@@ -1,7 +1,7 @@
 <template>
     <div :class="cx('root')" v-bind="ptmi('root')">
         <ul ref="nav" :class="cx('tablist')" role="menubar" :aria-labelledby="ariaLabelledby" :aria-label="ariaLabel" v-bind="ptm('tablist')">
-            <template v-for="(item, i) of model" :key="label(item) + '_' + i.toString()">
+            <template v-for="(item, i) of model" :key="`${label(item)}_${i}`">
                 <li
                     v-if="visible(item)"
                     ref="tab"
@@ -47,13 +47,14 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { getAttribute, find, findSingle, getWidth, getOffset } from '../internal/utils/dom/index';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
 import BaseTabMenu from './BaseTabMenu.vue';
 
-export default {
+export default defineComponent({
     name: 'TabMenu',
     extends: BaseTabMenu,
     inheritAttrs: false,
@@ -79,13 +80,13 @@ export default {
 
         const activeItem = this.findActiveItem();
 
-        activeItem && (activeItem.tabIndex = '0');
+        activeItem && (activeItem.tabIndex = 0);
     },
     updated() {
         this.updateInkBar();
     },
     methods: {
-        getPTOptions(key, item, index) {
+        getPTOptions(key: string, item: MenuItem, index: number) {
             return this.ptm(key, {
                 context: {
                     item,
@@ -93,7 +94,7 @@ export default {
                 }
             });
         },
-        onItemClick(event, item, index) {
+        onItemClick(event: Event, item: MenuItem, index: number) {
             if (this.disabled(item)) {
                 event.preventDefault();
 
@@ -117,28 +118,32 @@ export default {
                 index: index
             });
         },
-        onKeydownItem(event, item, index) {
+        onKeydownItem(event: KeyboardEvent, item: MenuItem, index: number) {
+            const target = event.target;
+
+            if (!(target instanceof HTMLElement)) return;
+
             switch (event.code) {
                 case 'ArrowRight': {
-                    this.navigateToNextItem(event.target);
+                    this.navigateToNextItem(target);
                     event.preventDefault();
                     break;
                 }
 
                 case 'ArrowLeft': {
-                    this.navigateToPrevItem(event.target);
+                    this.navigateToPrevItem(target);
                     event.preventDefault();
                     break;
                 }
 
                 case 'Home': {
-                    this.navigateToFirstItem(event.target);
+                    this.navigateToFirstItem(target);
                     event.preventDefault();
                     break;
                 }
 
                 case 'End': {
-                    this.navigateToLastItem(event.target);
+                    this.navigateToLastItem(target);
                     event.preventDefault();
                     break;
                 }
@@ -161,101 +166,113 @@ export default {
                     break;
             }
         },
-        navigateToNextItem(target) {
+        navigateToNextItem(target: HTMLElement) {
             const nextItem = this.findNextItem(target);
 
             nextItem && this.setFocusToMenuitem(target, nextItem);
         },
-        navigateToPrevItem(target) {
+        navigateToPrevItem(target: HTMLElement) {
             const prevItem = this.findPrevItem(target);
 
             prevItem && this.setFocusToMenuitem(target, prevItem);
         },
-        navigateToFirstItem(target) {
-            const firstItem = this.findFirstItem(target);
+        navigateToFirstItem(target: HTMLElement) {
+            const firstItem = this.findFirstItem();
 
             firstItem && this.setFocusToMenuitem(target, firstItem);
         },
-        navigateToLastItem(target) {
-            const lastItem = this.findLastItem(target);
+        navigateToLastItem(target: HTMLElement) {
+            const lastItem = this.findLastItem();
 
             lastItem && this.setFocusToMenuitem(target, lastItem);
         },
-        findNextItem(item) {
-            const nextItem = item.parentElement.nextElementSibling;
+        findNextItem(item: HTMLElement): HTMLElement | null {
+            const nextItem = item.parentElement?.nextElementSibling;
+            const target = nextItem?.firstElementChild;
 
-            return nextItem ? (getAttribute(nextItem, 'data-p-disabled') === true ? this.findNextItem(nextItem.children[0]) : nextItem.children[0]) : null;
+            if (!nextItem || !(target instanceof HTMLElement)) return null;
+
+            return getAttribute(nextItem, 'data-p-disabled') === true ? this.findNextItem(target) : target;
         },
-        findPrevItem(item) {
-            const prevItem = item.parentElement.previousElementSibling;
+        findPrevItem(item: HTMLElement): HTMLElement | null {
+            const prevItem = item.parentElement?.previousElementSibling;
+            const target = prevItem?.firstElementChild;
 
-            return prevItem ? (getAttribute(prevItem, 'data-p-disabled') === true ? this.findPrevItem(prevItem.children[0]) : prevItem.children[0]) : null;
+            if (!prevItem || !(target instanceof HTMLElement)) return null;
+
+            return getAttribute(prevItem, 'data-p-disabled') === true ? this.findPrevItem(target) : target;
         },
         findFirstItem() {
-            const firstSibling = findSingle(this.$refs.nav, '[data-pc-section="item"][data-p-disabled="false"]');
+            const firstItem = findSingle(this.$refs.nav as HTMLElement, '[data-pc-section="item"][data-p-disabled="false"]')?.firstElementChild;
 
-            return firstSibling ? firstSibling.children[0] : null;
+            return firstItem instanceof HTMLElement ? firstItem : null;
         },
         findLastItem() {
-            const siblings = find(this.$refs.nav, '[data-pc-section="item"][data-p-disabled="false"]');
+            const siblings = find(this.$refs.nav as HTMLElement, '[data-pc-section="item"][data-p-disabled="false"]');
+            const lastItem = siblings.at(-1)?.firstElementChild;
 
-            return siblings ? siblings[siblings.length - 1].children[0] : null;
+            return lastItem instanceof HTMLElement ? lastItem : null;
         },
         findActiveItem() {
-            const activeItem = findSingle(this.$refs.nav, '[data-pc-section="item"][data-p-disabled="false"][data-p-active="true"]');
+            const activeItem = findSingle(
+                this.$refs.nav as HTMLElement,
+                '[data-pc-section="item"][data-p-disabled="false"][data-p-active="true"]'
+            )?.firstElementChild;
 
-            return activeItem ? activeItem.children[0] : null;
+            return activeItem instanceof HTMLElement ? activeItem : null;
         },
-        setFocusToMenuitem(target, focusableItem) {
-            target.tabIndex = '-1';
-            focusableItem.tabIndex = '0';
+        setFocusToMenuitem(target: HTMLElement, focusableItem: HTMLElement) {
+            target.tabIndex = -1;
+            focusableItem.tabIndex = 0;
             focusableItem.focus();
         },
         onTabKey() {
-            const activeItem = findSingle(this.$refs.nav, '[data-pc-section="item"][data-p-disabled="false"][data-p-active="true"]');
-            const focusedItem = findSingle(this.$refs.nav, '[data-pc-section="itemlink"][tabindex="0"]');
+            const activeItem = this.findActiveItem();
+            const focusedItem = findSingle(this.$refs.nav as HTMLElement, '[data-pc-section="itemlink"][tabindex="0"]');
 
-            if (focusedItem !== activeItem.children[0]) {
-                activeItem && (activeItem.children[0].tabIndex = '0');
-                focusedItem.tabIndex = '-1';
+            if (activeItem && focusedItem instanceof HTMLElement && focusedItem !== activeItem) {
+                activeItem.tabIndex = 0;
+                focusedItem.tabIndex = -1;
             }
         },
-        visible(item) {
+        visible(item: MenuItem) {
             return typeof item.visible === 'function' ? item.visible() : item.visible !== false;
         },
-        disabled(item) {
+        disabled(item: MenuItem) {
             return typeof item.disabled === 'function' ? item.disabled() : item.disabled === true;
         },
-        label(item) {
+        label(item: MenuItem) {
             return typeof item.label === 'function' ? item.label() : item.label;
         },
         updateInkBar() {
-            let tabs = this.$refs.nav.children;
+            const nav = this.$refs.nav as HTMLElement;
+            const inkbar = this.$refs.inkbar as HTMLElement;
+            const tabs = nav.children;
             let inkHighlighted = false;
 
             for (let i = 0; i < tabs.length; i++) {
                 let tab = tabs[i];
 
-                if (getAttribute(tab, 'data-p-active')) {
-                    this.$refs.inkbar.style.width = getWidth(tab) + 'px';
-                    this.$refs.inkbar.style.left = getOffset(tab).left - getOffset(this.$refs.nav).left + 'px';
+                if (tab instanceof HTMLElement && getAttribute(tab, 'data-p-active')) {
+                    inkbar.style.width = getWidth(tab) + 'px';
+                    inkbar.style.left = getOffset(tab).left - getOffset(nav).left + 'px';
                     inkHighlighted = true;
                 }
             }
 
             if (!inkHighlighted) {
-                this.$refs.inkbar.style.width = '0px';
-                this.$refs.inkbar.style.left = '0px';
+                inkbar.style.width = '0px';
+                inkbar.style.left = '0px';
             }
         },
-        getMenuItemProps(item, index) {
+        getMenuItemProps(item: MenuItem, index: number) {
             return {
                 action: mergeProps(
                     {
                         class: this.cx('itemLink'),
                         tabindex: -1,
-                        onClick: ($event) => this.onItemClick($event, item, index),
-                        onKeyDown: ($event) => this.onKeydownItem($event, item, index)
+                        onClick: ($event: MouseEvent) => this.onItemClick($event, item, index),
+                        onKeyDown: ($event: KeyboardEvent) => this.onKeydownItem($event, item, index)
                     },
                     this.getPTOptions('itemLink', item, index)
                 ),
@@ -277,5 +294,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

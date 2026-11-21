@@ -15,18 +15,19 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseDock from './BaseDock.vue';
 import DockSub from './DockSub.vue';
 
-export default {
+export default defineComponent({
     name: 'Dock',
     extends: BaseDock,
     inheritAttrs: false,
-    matchMediaListener: null,
     data() {
         return {
-            query: null,
+            query: null as MediaQueryList | null,
+            matchMediaListener: null as (() => void) | null,
             queryMatches: false
         };
     },
@@ -46,16 +47,16 @@ export default {
 
                 this.matchMediaListener = () => {
                     this.queryMatches = query.matches;
-                    this.mobileActive = false;
                 };
 
-                this.query.addEventListener('change', this.matchMediaListener);
+                query.addEventListener('change', this.matchMediaListener);
             }
         },
         unbindMatchMediaListener() {
             if (this.matchMediaListener) {
-                this.query.removeEventListener('change', this.matchMediaListener);
+                this.query?.removeEventListener('change', this.matchMediaListener);
                 this.matchMediaListener = null;
+                this.query = null;
             }
         }
     },
@@ -67,5 +68,5 @@ export default {
     components: {
         DockSub
     }
-};
+});
 </script>

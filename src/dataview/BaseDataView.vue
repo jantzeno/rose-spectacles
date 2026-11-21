@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DataViewStyle from './style/DataViewStyle';
 
@@ -48,7 +48,7 @@ export default defineComponent({
             default: 5
         },
         rowsPerPageOptions: {
-            type: Array,
+            type: Array as PropType<number[]>,
             default: null
         },
         currentPageReportTemplate: {

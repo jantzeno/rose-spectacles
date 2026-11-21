@@ -1,7 +1,7 @@
 <template>
     <nav :id="id" :class="cx('root')" v-bind="ptmi('root')">
         <ol ref="list" :class="cx('list')" v-bind="ptm('list')">
-            <template v-for="(item, index) of model" :key="label(item) + '_' + index.toString()">
+            <template v-for="(item, index) of model" :key="`${label(item)}_${index}`">
                 <li
                     v-if="visible(item)"
                     :class="[cx('item', { item, index }), item.class]"
@@ -34,12 +34,13 @@
     </nav>
 </template>
 
-<script>
+<script lang="ts">
 import { findSingle, find } from '../internal/utils/dom/index';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
 import BaseSteps from './BaseSteps.vue';
 
-export default {
+export default defineComponent({
     name: 'Steps',
     extends: BaseSteps,
     inheritAttrs: false,
@@ -57,10 +58,10 @@ export default {
     mounted() {
         const firstItem = this.findFirstItem();
 
-        firstItem && (firstItem.tabIndex = '0');
+        firstItem && (firstItem.tabIndex = 0);
     },
     methods: {
-        getPTOptions(key, item, index) {
+        getPTOptions(key: string, item: MenuItem, index: number) {
             return this.ptm(key, {
                 context: {
                     item,
@@ -70,7 +71,7 @@ export default {
                 }
             });
         },
-        onItemClick(event, item, index) {
+        onItemClick(event: Event, item: MenuItem, index: number) {
             if (this.disabled(item) || this.readonly) {
                 event.preventDefault();
 
@@ -94,28 +95,32 @@ export default {
                 index: index
             });
         },
-        onItemKeydown(event, item, index) {
+        onItemKeydown(event: KeyboardEvent, item: MenuItem, index: number) {
+            const target = event.target;
+
+            if (!(target instanceof HTMLElement)) return;
+
             switch (event.code) {
                 case 'ArrowRight': {
-                    this.navigateToNextItem(event.target);
+                    this.navigateToNextItem(target);
                     event.preventDefault();
                     break;
                 }
 
                 case 'ArrowLeft': {
-                    this.navigateToPrevItem(event.target);
+                    this.navigateToPrevItem(target);
                     event.preventDefault();
                     break;
                 }
 
                 case 'Home': {
-                    this.navigateToFirstItem(event.target);
+                    this.navigateToFirstItem(target);
                     event.preventDefault();
                     break;
                 }
 
                 case 'End': {
-                    this.navigateToLastItem(event.target);
+                    this.navigateToLastItem(target);
                     event.preventDefault();
                     break;
                 }
@@ -137,73 +142,74 @@ export default {
                     break;
             }
         },
-        navigateToNextItem(target) {
+        navigateToNextItem(target: HTMLElement) {
             const nextItem = this.findNextItem(target);
 
             nextItem && this.setFocusToMenuitem(target, nextItem);
         },
-        navigateToPrevItem(target) {
+        navigateToPrevItem(target: HTMLElement) {
             const prevItem = this.findPrevItem(target);
 
             prevItem && this.setFocusToMenuitem(target, prevItem);
         },
-        navigateToFirstItem(target) {
-            const firstItem = this.findFirstItem(target);
+        navigateToFirstItem(target: HTMLElement) {
+            const firstItem = this.findFirstItem();
 
             firstItem && this.setFocusToMenuitem(target, firstItem);
         },
-        navigateToLastItem(target) {
-            const lastItem = this.findLastItem(target);
+        navigateToLastItem(target: HTMLElement) {
+            const lastItem = this.findLastItem();
 
             lastItem && this.setFocusToMenuitem(target, lastItem);
         },
-        findNextItem(item) {
-            const nextItem = item.parentElement.nextElementSibling;
+        findNextItem(item: HTMLElement) {
+            const nextItem = item.parentElement?.nextElementSibling?.firstElementChild;
 
-            return nextItem ? nextItem.children[0] : null;
+            return nextItem instanceof HTMLElement ? nextItem : null;
         },
-        findPrevItem(item) {
-            const prevItem = item.parentElement.previousElementSibling;
+        findPrevItem(item: HTMLElement) {
+            const prevItem = item.parentElement?.previousElementSibling?.firstElementChild;
 
-            return prevItem ? prevItem.children[0] : null;
+            return prevItem instanceof HTMLElement ? prevItem : null;
         },
         findFirstItem() {
-            const firstSibling = findSingle(this.$refs.list, '[data-pc-section="item"]');
+            const firstItem = findSingle(this.$refs.list as HTMLElement, '[data-pc-section="item"]')?.firstElementChild;
 
-            return firstSibling ? firstSibling.children[0] : null;
+            return firstItem instanceof HTMLElement ? firstItem : null;
         },
         findLastItem() {
-            const siblings = find(this.$refs.list, '[data-pc-section="item"]');
+            const siblings = find(this.$refs.list as HTMLElement, '[data-pc-section="item"]');
+            const lastItem = siblings.at(-1)?.firstElementChild;
 
-            return siblings ? siblings[siblings.length - 1].children[0] : null;
+            return lastItem instanceof HTMLElement ? lastItem : null;
         },
-        setFocusToMenuitem(target, focusableItem) {
-            target.tabIndex = '-1';
-            focusableItem.tabIndex = '0';
+        setFocusToMenuitem(target: HTMLElement, focusableItem: HTMLElement) {
+            target.tabIndex = -1;
+            focusableItem.tabIndex = 0;
             focusableItem.focus();
         },
-        isActive(index) {
+        isActive(index: number) {
             return index === this.d_activeStep;
         },
-        isItemDisabled(item, index) {
+        isItemDisabled(item: MenuItem, index: number) {
             return this.disabled(item) || (this.readonly && !this.isActive(index));
         },
-        visible(item) {
+        visible(item: MenuItem) {
             return typeof item.visible === 'function' ? item.visible() : item.visible !== false;
         },
-        disabled(item) {
+        disabled(item: MenuItem) {
             return typeof item.disabled === 'function' ? item.disabled() : item.disabled;
         },
-        label(item) {
+        label(item: MenuItem) {
             return typeof item.label === 'function' ? item.label() : item.label;
         },
-        getMenuItemProps(item, index) {
+        getMenuItemProps(item: MenuItem, index: number) {
             return {
                 action: mergeProps(
                     {
                         class: this.cx('itemLink'),
-                        onClick: ($event) => this.onItemClick($event, item, index),
-                        onKeyDown: ($event) => this.onItemKeydown($event, item, index)
+                        onClick: ($event: MouseEvent) => this.onItemClick($event, item, index),
+                        onKeyDown: ($event: KeyboardEvent) => this.onItemKeydown($event, item, index)
                     },
                     this.getPTOptions('itemLink', item, index)
                 ),
@@ -222,5 +228,5 @@ export default {
             };
         }
     }
-};
+});
 </script>
