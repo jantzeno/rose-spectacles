@@ -16,7 +16,7 @@ interface FieldState {
 
 interface FieldRegistration {
     onChange?: (info: { originalEvent?: Event; value: unknown }) => void;
-    onBlur?: () => void;
+    onBlur?: (event?: Event) => void;
 }
 
 interface InjectedForm {

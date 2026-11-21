@@ -11,16 +11,18 @@
     ></textarea>
 </template>
 
-<script>
+<script lang="ts">
 import { cn } from '../internal/utils/index';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 import BaseTextarea from './BaseTextarea.vue';
 
-export default {
+export default defineComponent({
     name: 'Textarea',
     extends: BaseTextarea,
     inheritAttrs: false,
-    observer: null,
+    data() {
+        return { observer: null as ResizeObserver | null };
+    },
     mounted() {
         if (this.autoResize) {
             this.observer = new ResizeObserver(() => {
@@ -60,12 +62,12 @@ export default {
                 this.$el.style.height = `${initialScrollHeight}px`;
             }
         },
-        onInput(event) {
+        onInput(event: Event) {
             if (this.autoResize) {
                 this.resize();
             }
 
-            this.writeValue(event.target.value, event);
+            this.writeValue((event.target as HTMLTextAreaElement).value, event);
         }
     },
     computed: {
@@ -89,5 +91,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

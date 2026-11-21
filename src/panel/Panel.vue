@@ -6,13 +6,7 @@
             </slot>
             <div :class="cx('headerActions')" v-bind="ptm('headerActions')">
                 <slot name="icons"></slot>
-                <slot
-                    v-if="toggleable"
-                    name="togglebutton"
-                    :collapsed="d_collapsed"
-                    :toggleCallback="(event) => toggle(event)"
-                    :keydownCallback="(event) => onKeyDown(event)"
-                >
+                <slot v-if="toggleable" name="togglebutton" :collapsed="d_collapsed" :toggleCallback="toggle" :keydownCallback="onKeyDown">
                     <Button
                         :id="$id + '_header'"
                         :class="cx('pcToggleButton')"
@@ -57,7 +51,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import MinusIcon from '../icons/minus/MinusIcon.vue';
 import PlusIcon from '../icons/plus/PlusIcon.vue';
@@ -65,7 +60,7 @@ import Button from '../button/Button.vue';
 import Ripple from '../ripple/Ripple';
 import BasePanel from './BasePanel.vue';
 
-export default {
+export default defineComponent({
     name: 'Panel',
     extends: BasePanel,
     inheritAttrs: false,
@@ -81,7 +76,7 @@ export default {
         }
     },
     methods: {
-        toggle(event) {
+        toggle(event: Event) {
             this.d_collapsed = !this.d_collapsed;
             this.$emit('update:collapsed', this.d_collapsed);
             this.$emit('toggle', {
@@ -89,7 +84,7 @@ export default {
                 value: this.d_collapsed
             });
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (event.code === 'Enter' || event.code === 'NumpadEnter' || event.code === 'Space') {
                 this.toggle(event);
                 event.preventDefault();
@@ -114,5 +109,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

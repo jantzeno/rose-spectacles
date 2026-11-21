@@ -19,10 +19,11 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInplace from './BaseInplace.vue';
 
-export default {
+export default defineComponent({
     name: 'Inplace',
     extends: BaseInplace,
     inheritAttrs: false,
@@ -38,7 +39,7 @@ export default {
         }
     },
     methods: {
-        open(event) {
+        open(event?: Event) {
             if (this.disabled) {
                 return;
             }
@@ -48,16 +49,16 @@ export default {
             this.$emit('open', event);
             this.$emit('update:active', true);
         },
-        close(event) {
+        close(event?: Event) {
             this.d_active = false;
 
             this.$emit('close', event);
             this.$emit('update:active', false);
 
             setTimeout(() => {
-                this.$refs.display.focus();
+                (this.$refs.display as HTMLElement).focus();
             }, 0);
         }
     }
-};
+});
 </script>

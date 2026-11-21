@@ -69,13 +69,15 @@
     </table>
 </template>
 
-<script>
+<script lang="ts">
+import type { OrganizationChartNode as OrganizationChartNodeModel } from 'rose-spectacles/organizationchart';
+import { defineComponent, type CSSProperties } from 'vue';
 import { isAttributeEquals } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
 import ChevronUpIcon from '../icons/chevronup/ChevronUpIcon.vue';
 
-export default {
+export default defineComponent({
     name: 'OrganizationChartNode',
     hostName: 'OrganizationChart',
     extends: BaseComponent,
@@ -107,7 +109,7 @@ export default {
         }
     },
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             return this.ptm(key, {
                 context: {
                     expanded: this.expanded,
@@ -118,17 +120,17 @@ export default {
                 }
             });
         },
-        getNodeOptions(lineTop, key) {
+        getNodeOptions(lineTop: boolean, key: string) {
             return this.ptm(key, {
                 context: {
                     lineTop
                 }
             });
         },
-        onNodeClick(event) {
+        onNodeClick(event: MouseEvent) {
             if (
-                isAttributeEquals(event.target, 'data-pc-section', 'nodetogglebutton') ||
-                isAttributeEquals(event.target, 'data-pc-section', 'nodetogglebuttonicon')
+                isAttributeEquals(event.target as Element, 'data-pc-section', 'nodetogglebutton') ||
+                isAttributeEquals(event.target as Element, 'data-pc-section', 'nodetogglebuttonicon')
             ) {
                 return;
             }
@@ -137,16 +139,16 @@ export default {
                 this.$emit('node-click', this.node);
             }
         },
-        onChildNodeClick(node) {
+        onChildNodeClick(node: OrganizationChartNodeModel) {
             this.$emit('node-click', node);
         },
         toggleNode() {
             this.$emit('node-toggle', this.node);
         },
-        onChildNodeToggle(node) {
+        onChildNodeToggle(node: OrganizationChartNodeModel) {
             this.$emit('node-toggle', node);
         },
-        onKeydown(event) {
+        onKeydown(event: KeyboardEvent) {
             if (event.code === 'Enter' || event.code === 'NumpadEnter' || event.code === 'Space') {
                 this.toggleNode();
                 event.preventDefault();
@@ -158,9 +160,9 @@ export default {
             return this.node.leaf === false ? false : !(this.node.children && this.node.children.length);
         },
         colspan() {
-            return this.node.children && this.node.children.length ? this.node.children.length * 2 : null;
+            return this.node.children && this.node.children.length ? this.node.children.length * 2 : undefined;
         },
-        childStyle() {
+        childStyle(): CSSProperties {
             return {
                 visibility: !this.leaf && this.expanded ? 'inherit' : 'hidden'
             };
@@ -182,5 +184,5 @@ export default {
         ChevronDownIcon: ChevronDownIcon,
         ChevronUpIcon: ChevronUpIcon
     }
-};
+});
 </script>

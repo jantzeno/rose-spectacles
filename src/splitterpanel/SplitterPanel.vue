@@ -4,22 +4,23 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseSplitterPanel from './BaseSplitterPanel.vue';
 
-export default {
+export default defineComponent({
     name: 'SplitterPanel',
     extends: BaseSplitterPanel,
     inheritAttrs: false,
     data() {
         return {
-            nestedState: null
+            nestedState: null as true | null
         };
     },
     computed: {
         isNested() {
-            return this.$slots.default().some((child) => {
-                this.nestedState = child.type.name === 'Splitter' ? true : null;
+            return this.$slots.default!().some((child) => {
+                this.nestedState = (child.type as { name?: string }).name === 'Splitter' ? true : null;
 
                 return this.nestedState;
             });
@@ -32,5 +33,5 @@ export default {
             };
         }
     }
-};
+});
 </script>

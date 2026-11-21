@@ -100,12 +100,14 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import type { PageState } from 'rose-spectacles/paginator';
+import { defineComponent } from 'vue';
 import { localeComparator, resolveFieldData, sort } from '../internal/utils/object/index';
 import Paginator from '../paginator/Paginator.vue';
 import BaseDataView from './BaseDataView.vue';
 
-export default {
+export default defineComponent({
     name: 'DataView',
     extends: BaseDataView,
     inheritAttrs: false,
@@ -131,10 +133,10 @@ export default {
         }
     },
     methods: {
-        getKey(item, index) {
+        getKey(item: unknown, index: number) {
             return this.dataKey ? resolveFieldData(item, this.dataKey) : index;
         },
-        onPage(event) {
+        onPage(event: PageState) {
             this.d_first = event.first;
             this.d_rows = event.rows;
 
@@ -176,17 +178,17 @@ export default {
             return this.$primevue.config?.locale?.emptyMessage || '';
         },
         paginatorTop() {
-            return this.paginator && (this.paginatorPosition !== 'bottom' || this.paginatorPosition === 'both');
+            return this.paginator && this.paginatorPosition !== 'bottom';
         },
         paginatorBottom() {
-            return this.paginator && (this.paginatorPosition !== 'top' || this.paginatorPosition === 'both');
+            return this.paginator && this.paginatorPosition !== 'top';
         },
         items() {
             if (this.value && this.value.length) {
                 let data = this.value;
 
                 if (data && data.length && this.sortField) {
-                    data = this.sort();
+                    data = this.sort()!;
                 }
 
                 if (this.paginator) {
@@ -204,5 +206,5 @@ export default {
     components: {
         DVPaginator: Paginator
     }
-};
+});
 </script>

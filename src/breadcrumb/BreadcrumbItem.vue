@@ -18,11 +18,11 @@
     </li>
 </template>
 
-<script>
+<script lang="ts">
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'BreadcrumbItem',
     hostName: 'Breadcrumb',
     extends: BaseComponent,
@@ -32,7 +32,7 @@ export default {
         index: null
     },
     methods: {
-        onClick(event) {
+        onClick(event: MouseEvent) {
             if (this.item.command) {
                 this.item.command({
                     originalEvent: event,
@@ -71,7 +71,7 @@ export default {
                     {
                         class: this.cx('itemLink'),
                         'aria-current': this.isCurrentUrl(),
-                        onClick: ($event) => this.onClick($event)
+                        onClick: ($event: MouseEvent) => this.onClick($event)
                     },
                     this.ptm('itemLink', this.ptmOptions)
                 ),
@@ -90,5 +90,5 @@ export default {
             };
         }
     }
-};
+});
 </script>

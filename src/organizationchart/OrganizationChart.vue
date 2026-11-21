@@ -15,11 +15,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import type { OrganizationChartNode as OrganizationChartNodeModel } from 'rose-spectacles/organizationchart';
+import { defineComponent } from 'vue';
 import BaseOrganizationChart from './BaseOrganizationChart.vue';
 import OrganizationChartNode from './OrganizationChartNode.vue';
 
-export default {
+export default defineComponent({
     name: 'OrganizationChart',
     extends: BaseOrganizationChart,
     inheritAttrs: false,
@@ -35,7 +37,7 @@ export default {
         }
     },
     methods: {
-        onNodeClick(node) {
+        onNodeClick(node: OrganizationChartNodeModel) {
             const key = node.key;
 
             if (this.selectionMode) {
@@ -56,7 +58,7 @@ export default {
                 this.$emit('update:selectionKeys', _selectionKeys);
             }
         },
-        onNodeToggle(node) {
+        onNodeToggle(node: OrganizationChartNodeModel) {
             const key = node.key;
 
             if (this.d_collapsedKeys[key]) {
@@ -74,5 +76,5 @@ export default {
     components: {
         OrganizationChartNode: OrganizationChartNode
     }
-};
+});
 </script>

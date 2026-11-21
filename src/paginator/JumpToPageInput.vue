@@ -11,11 +11,12 @@
     ></JTPInput>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import InputNumber from '../inputnumber/InputNumber.vue';
 
-export default {
+export default defineComponent({
     name: 'JumpToPageInput',
     hostName: 'Paginator',
     extends: BaseComponent,
@@ -37,7 +38,7 @@ export default {
         }
     },
     methods: {
-        onChange(value) {
+        onChange(value: number) {
             if (value !== this.page) {
                 this.d_page = value;
                 this.$emit('page-change', value - 1);
@@ -46,11 +47,11 @@ export default {
     },
     computed: {
         inputArialabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.jumpToPageInputLabel : undefined;
+            return this.$primevue.config.locale?.aria?.jumpToPageInputLabel;
         }
     },
     components: {
         JTPInput: InputNumber
     }
-};
+});
 </script>

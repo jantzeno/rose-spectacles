@@ -27,17 +27,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseToggleSwitch from './BaseToggleSwitch.vue';
 
-export default {
+export default defineComponent({
     name: 'ToggleSwitch',
     extends: BaseToggleSwitch,
     inheritAttrs: false,
     emits: ['change', 'focus', 'blur'],
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             const _ptm = key === 'root' ? this.ptmi : this.ptm;
 
             return _ptm(key, {
@@ -47,7 +48,7 @@ export default {
                 }
             });
         },
-        onChange(event) {
+        onChange(event: Event) {
             if (!this.disabled && !this.readonly) {
                 const newValue = this.checked ? this.falseValue : this.trueValue;
 
@@ -55,10 +56,10 @@ export default {
                 this.$emit('change', event);
             }
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.$emit('blur', event);
             this.formField.onBlur?.(event);
         }
@@ -75,5 +76,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

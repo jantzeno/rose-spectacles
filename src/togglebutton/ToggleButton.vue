@@ -26,19 +26,20 @@
     </button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { isNotEmpty } from '../internal/utils/object/index';
 import Ripple from '../ripple/Ripple';
 import BaseToggleButton from './BaseToggleButton.vue';
 
-export default {
+export default defineComponent({
     name: 'ToggleButton',
     extends: BaseToggleButton,
     inheritAttrs: false,
     emits: ['change'],
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             const _ptm = key === 'root' ? this.ptmi : this.ptm;
 
             return _ptm(key, {
@@ -48,13 +49,13 @@ export default {
                 }
             });
         },
-        onChange(event) {
+        onChange(event: Event) {
             if (!this.disabled && !this.readonly) {
                 this.writeValue(!this.d_value, event);
                 this.$emit('change', event);
             }
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.formField.onBlur?.(event);
         }
     },
@@ -79,5 +80,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

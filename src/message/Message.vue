@@ -31,13 +31,14 @@
     </transition>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import TimesIcon from '../icons/times/TimesIcon.vue';
 import Ripple from '../ripple/Ripple';
 import BaseMessage from './BaseMessage.vue';
 
-export default {
+export default defineComponent({
     name: 'Message',
     extends: BaseMessage,
     inheritAttrs: false,
@@ -57,14 +58,14 @@ export default {
         }
     },
     methods: {
-        close(event) {
+        close(event: Event) {
             this.visible = false;
             this.$emit('close', event);
         }
     },
     computed: {
         closeAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.close : undefined;
+            return this.$primevue.config.locale?.aria?.close;
         },
         dataP() {
             return cn({
@@ -81,5 +82,5 @@ export default {
     components: {
         TimesIcon
     }
-};
+});
 </script>

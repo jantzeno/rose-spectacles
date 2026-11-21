@@ -19,24 +19,25 @@
     </ol>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseTimeline from './BaseTimeline.vue';
 
-export default {
+export default defineComponent({
     name: 'Timeline',
     extends: BaseTimeline,
     inheritAttrs: false,
     methods: {
-        getKey(item, index) {
+        getKey(item: unknown, index: number) {
             return this.dataKey ? resolveFieldData(item, this.dataKey) : index;
         },
-        getPTOptions(key, index) {
+        getPTOptions(key: string, index: number) {
             return this.ptm(key, {
                 context: {
                     index,
-                    count: this.value.length
+                    count: this.value?.length
                 }
             });
         }
@@ -49,5 +50,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

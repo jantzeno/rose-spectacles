@@ -1,5 +1,5 @@
 <template>
-    <div v-if="visible" :class="cx('root')" :aria-label="label" v-bind="ptmi('root')" :data-p="dataP">
+    <div v-if="visible" :class="cx('root')" :aria-label="label == null ? undefined : String(label)" v-bind="ptmi('root')" :data-p="dataP">
         <slot>
             <img v-if="image" :src="image" v-bind="ptm('image')" :class="cx('image')" />
             <component v-else-if="$slots.icon" :is="$slots.icon" :class="cx('icon')" v-bind="ptm('icon')" />
@@ -18,12 +18,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import TimesCircleIcon from '../icons/timescircle/TimesCircleIcon.vue';
 import BaseChip from './BaseChip.vue';
 
-export default {
+export default defineComponent({
     name: 'Chip',
     extends: BaseChip,
     inheritAttrs: false,
@@ -34,12 +35,12 @@ export default {
         };
     },
     methods: {
-        onKeydown(event) {
+        onKeydown(event: KeyboardEvent) {
             if (event.key === 'Enter' || event.key === 'Backspace') {
                 this.close(event);
             }
         },
-        close(event) {
+        close(event: Event) {
             this.visible = false;
             this.$emit('remove', event);
         }
@@ -54,5 +55,5 @@ export default {
     components: {
         TimesCircleIcon
     }
-};
+});
 </script>
