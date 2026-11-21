@@ -56,9 +56,34 @@ try {
         'tsconfig.json',
         JSON.stringify({
             compilerOptions: { target: 'ES2022', module: 'ESNext', moduleResolution: 'Bundler', strict: true, noEmit: true },
-            include: ['main.ts', 'App.vue']
+            include: ['main.ts', 'App.vue', 'SlotTypes.vue']
         })
     );
+    const slotTypes = `
+        <script setup lang="ts">
+        import { Carousel, Galleria, Timeline } from 'rose-spectacles';
+
+        const entries: { title: string }[] = [{ title: 'First entry' }];
+        </script>
+        <template>
+            <Carousel :value="entries">
+                <template #item="{ data }">
+                    {{ data.title }}
+                </template>
+            </Carousel>
+            <Galleria :value="entries">
+                <template #item="{ item }">
+                    {{ item.title }}
+                </template>
+            </Galleria>
+            <Timeline :value="entries">
+                <template #content="{ item }">
+                    {{ item.title }}
+                </template>
+            </Timeline>
+        </template>
+    `;
+    await write('SlotTypes.vue', slotTypes);
     await write(
         'main.ts',
         `
@@ -108,6 +133,17 @@ try {
         assert.equal(existsSync(join(consumer, 'node_modules', name)), false, `${name} is absent in the base consumer`);
     }
     run(['x', '--no-install', 'vue-tsc', '--noEmit']);
+
+    await write('SlotTypes.vue', slotTypes.replaceAll('.title', '.missingField'));
+    const invalidSlots = spawnSync('bun', ['x', '--no-install', 'vue-tsc', '--noEmit'], { cwd: consumer, encoding: 'utf8' });
+    if (invalidSlots.error) throw invalidSlots.error;
+    const diagnostics = invalidSlots.stdout + invalidSlots.stderr;
+    assert.equal(invalidSlots.status, 2, diagnostics);
+    const slotErrors = diagnostics.match(/SlotTypes\.vue\(\d+,\d+\): error TS2339: Property 'missingField' does not exist on type/g);
+    assert.equal(slotErrors?.length, 3, diagnostics);
+    assert.equal(diagnostics.match(/error TS\d+:/g)?.length, 3, diagnostics);
+    console.log('Carousel, Galleria, and Timeline slots reject unknown item properties');
+
     run(['x', '--no-install', 'vite', 'build']);
 } finally {
     await rm(consumer, { recursive: true, force: true });

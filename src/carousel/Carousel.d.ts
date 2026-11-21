@@ -252,11 +252,11 @@ export interface CarouselResponsiveOptions {
 /**
  * Defines valid properties in Carousel component.
  */
-export interface CarouselProps {
+export interface CarouselProps<T = any> {
     /**
      * An array of objects to display.
      */
-    value?: any | undefined;
+    value?: T[] | undefined;
     /**
      * Index of the first item.
      * @defaultValue 0
@@ -353,7 +353,7 @@ export interface CarouselProps {
 /**
  * Defines valid slots in Carousel slots.
  */
-export interface CarouselSlots {
+export interface CarouselSlots<T = any> {
     /**
      * Custom content for each item.
      * @param {Object} scope - item slot's params.
@@ -362,7 +362,7 @@ export interface CarouselSlots {
         /**
          * Data of the component
          */
-        data: any;
+        data: T;
         /**
          * Index of the item
          */
@@ -412,11 +412,13 @@ export declare type CarouselEmits = EmitFn<CarouselEmitsOptions>;
  * @group Component
  *
  */
-declare const Carousel: DefineComponent<CarouselProps, CarouselSlots, CarouselEmits>;
+declare const Carousel: {
+    new <T = any>(props?: CarouselProps<T>): InstanceType<DefineComponent<CarouselProps<T>, CarouselSlots<T>, CarouselEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Carousel: DefineComponent<CarouselProps, CarouselSlots, CarouselEmits>;
+        Carousel: typeof Carousel;
     }
 }
 

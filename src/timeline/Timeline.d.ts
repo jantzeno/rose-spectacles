@@ -112,11 +112,11 @@ export interface TimelineContext {
 /**
  * Defines valid properties in Timeline component.
  */
-export interface TimelineProps {
+export interface TimelineProps<T = any> {
     /**
      * An array of events to display.
      */
-    value?: any[] | undefined;
+    value?: T[] | undefined;
     /**
      * Position of the timeline bar relative to the content.
      * @defaultValue left
@@ -155,7 +155,7 @@ export interface TimelineProps {
 /**
  * Defines valid slots in Timeline component.
  */
-export interface TimelineSlots {
+export interface TimelineSlots<T = any> {
     /**
      * Custom content template
      * @param {Object} scope - content slot's params.
@@ -164,7 +164,7 @@ export interface TimelineSlots {
         /**
          * Item data
          */
-        item: any;
+        item: T;
         /**
          * Index of item
          */
@@ -178,7 +178,7 @@ export interface TimelineSlots {
         /**
          * Item data
          */
-        item: any;
+        item: T;
         /**
          * Index of item
          */
@@ -192,7 +192,7 @@ export interface TimelineSlots {
         /**
          * Item data
          */
-        item: any;
+        item: T;
         /**
          * Index of item
          */
@@ -205,7 +205,7 @@ export interface TimelineSlots {
         /**
          * Item data
          */
-        item: any;
+        item: T;
         /**
          * Index of item
          */
@@ -229,11 +229,13 @@ export declare type TimelineEmits = EmitFn<TimelineEmitsOptions>;
  * @group Component
  *
  */
-declare const Timeline: DefineComponent<TimelineProps, TimelineSlots, TimelineEmits>;
+declare const Timeline: {
+    new <T = any>(props?: TimelineProps<T>): InstanceType<DefineComponent<TimelineProps<T>, TimelineSlots<T>, TimelineEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Timeline: DefineComponent<TimelineProps, TimelineSlots, TimelineEmits>;
+        Timeline: typeof Timeline;
     }
 }
 

@@ -274,7 +274,7 @@ export interface GalleriaContext {
 /**
  * Defines valid properties in Galleria component.
  */
-export interface GalleriaProps {
+export interface GalleriaProps<T = any> {
     /**
      * Unique identifier of the element.
      */
@@ -282,7 +282,7 @@ export interface GalleriaProps {
     /**
      * An array of objects to display.
      */
-    value?: any[];
+    value?: T[];
     /**
      * Index of the first item.
      * @defaultValue 0
@@ -433,7 +433,7 @@ export interface GalleriaProps {
 /**
  * Defines valid slots in Galleria slots.
  */
-export interface GalleriaSlots {
+export interface GalleriaSlots<T = any> {
     /**
      * Custom header template.
      */
@@ -450,7 +450,7 @@ export interface GalleriaSlots {
         /**
          * Item instance
          */
-        item: any;
+        item: T;
     }): VNode[];
     /**
      * Custom caption template.
@@ -460,7 +460,7 @@ export interface GalleriaSlots {
         /**
          * Item instance
          */
-        item: any;
+        item: T;
     }): VNode[];
     /**
      * Custom indicator template.
@@ -488,7 +488,7 @@ export interface GalleriaSlots {
         /**
          * Item instance
          */
-        item: any;
+        item: T;
     }): VNode[];
     /**
      * Custom close icon template.
@@ -539,11 +539,13 @@ export declare type GalleriaEmits = EmitFn<GalleriaEmitsOptions>;
  * @group Component
  *
  */
-declare const Galleria: DefineComponent<GalleriaProps, GalleriaSlots, GalleriaEmits>;
+declare const Galleria: {
+    new <T = any>(props?: GalleriaProps<T>): InstanceType<DefineComponent<GalleriaProps<T>, GalleriaSlots<T>, GalleriaEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Galleria: DefineComponent<GalleriaProps, GalleriaSlots, GalleriaEmits>;
+        Galleria: typeof Galleria;
     }
 }
 
