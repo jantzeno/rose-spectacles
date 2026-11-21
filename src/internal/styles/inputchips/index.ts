@@ -79,10 +79,6 @@ export const style = /*css*/ `
         white-space: nowrap;
     }
 
-    .rs-inputchips-chip .rs-chip-remove-icon {
-        flex-shrink: 0;
-    }
-
     .rs-inputchips-chip-item.rs-focus .rs-inputchips-chip {
         background: dt('inputchips.chip.focus.background');
         color: dt('inputchips.chip.focus.color');

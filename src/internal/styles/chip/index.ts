@@ -33,20 +33,28 @@ export const style = /*css*/ `
         padding-block-end: calc(dt('chip.padding.y') / 2);
     }
 
-    .rs-chip-remove-icon {
+    .rs-chip-remove-button {
+        display: inline-flex;
+        flex: none;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
         cursor: pointer;
+        outline-color: transparent;
+        transition:
+            outline-color dt('chip.transition.duration'),
+            box-shadow dt('chip.transition.duration');
+    }
+
+    .rs-chip-remove-icon {
         font-size: dt('chip.remove.icon.size');
         width: dt('chip.remove.icon.size');
         height: dt('chip.remove.icon.size');
         color: dt('chip.remove.icon.color');
-        border-radius: 50%;
-        transition:
-            outline-color dt('chip.transition.duration'),
-            box-shadow dt('chip.transition.duration');
-        outline-color: transparent;
     }
 
-    .rs-chip-remove-icon:focus-visible {
+    .rs-chip-remove-button:focus-visible {
         box-shadow: dt('chip.remove.icon.focus.ring.shadow');
         outline: dt('chip.remove.icon.focus.ring.width') dt('chip.remove.icon.focus.ring.style') dt('chip.remove.icon.focus.ring.color');
         outline-offset: dt('chip.remove.icon.focus.ring.offset');

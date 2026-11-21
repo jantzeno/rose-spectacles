@@ -70,6 +70,10 @@ export interface ChipPassThroughOptions<T = any> {
      */
     label?: ChipPassThroughOptionType<T>;
     /**
+     * Used to pass attributes to the remove button.
+     */
+    removeButton?: ChipPassThroughOptionType<T>;
+    /**
      * Used to pass attributes to the removeIcon's DOM element.
      */
     removeIcon?: ChipPassThroughOptionType<T>;
@@ -123,6 +127,11 @@ export interface ChipProps {
      * Icon of the remove element.
      */
     removeIcon?: string;
+    /**
+     * Tab order of the remove button. Set to -1 when a parent manages keyboard navigation.
+     * @defaultValue 0
+     */
+    removeTabindex?: number;
     /**
      * It generates scoped CSS variables using design tokens for the component.
      */

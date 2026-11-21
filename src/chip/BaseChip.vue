@@ -26,6 +26,10 @@ export default defineComponent({
         removeIcon: {
             type: String,
             default: undefined
+        },
+        removeTabindex: {
+            type: Number,
+            default: 0
         }
     },
     style: ChipStyle,

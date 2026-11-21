@@ -77,6 +77,7 @@
                         :class="cx('pcChip')"
                         :label="getOptionLabel(option)?.toString()"
                         :removeIcon="chipIcon || removeTokenIcon"
+                        :removeTabindex="-1"
                         removable
                         :unstyled="unstyled"
                         @remove="removeOption($event, i)"

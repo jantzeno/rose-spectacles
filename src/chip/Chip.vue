@@ -7,13 +7,22 @@
             <div v-if="label !== null" :class="cx('label')" v-bind="ptm('label')">{{ label }}</div>
         </slot>
         <slot v-if="removable" name="removeicon" :removeCallback="close" :keydownCallback="onKeydown">
-            <component
-                :is="removeIcon ? 'span' : 'TimesCircleIcon'"
-                :class="[cx('removeIcon'), removeIcon]"
+            <button
+                type="button"
+                :class="cx('removeButton')"
+                :tabindex="removeTabindex"
+                :aria-label="label == null ? 'Remove' : `Remove ${label}`"
                 @click="close"
-                @keydown="onKeydown"
-                v-bind="ptm('removeIcon')"
-            ></component>
+                @keydown.backspace.prevent="close"
+                v-bind="ptm('removeButton')"
+            >
+                <component
+                    :is="removeIcon ? 'span' : 'TimesCircleIcon'"
+                    :class="[cx('removeIcon'), removeIcon]"
+                    aria-hidden="true"
+                    v-bind="ptm('removeIcon')"
+                />
+            </button>
         </slot>
     </div>
 </template>

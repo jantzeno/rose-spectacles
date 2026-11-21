@@ -6,6 +6,7 @@ const classes = {
     image: 'rs-chip-image',
     icon: 'rs-chip-icon',
     label: 'rs-chip-label',
+    removeButton: 'rs-chip-remove-button',
     removeIcon: 'rs-chip-remove-icon'
 };
 

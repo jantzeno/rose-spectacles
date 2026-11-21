@@ -1,6 +1,25 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import Chip from './Chip.vue';
 
+it('offers a named and focusable remove button for a standalone chip', async () => {
+    const wrapper = mount(Chip, { props: { label: 'Field notes', removable: true }, attachTo: document.body });
+
+    try {
+        const remove = wrapper.get<HTMLButtonElement>('button[aria-label="Remove Field notes"]');
+
+        expect(remove.element.tabIndex).toBe(0);
+        remove.element.focus();
+        expect(document.activeElement).toBe(remove.element);
+        expect(remove.get('svg').attributes('aria-hidden')).toBe('true');
+
+        await remove.trigger('click');
+        expect(wrapper.emitted('remove')).toHaveLength(1);
+        expect(wrapper.find('button').exists()).toBe(false);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('Chip.vue', () => {
     let wrapper: VueWrapper<any>;
 
