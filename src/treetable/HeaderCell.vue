@@ -4,7 +4,7 @@
         :style="[containerStyle]"
         @click="onClick"
         @keydown="onKeyDown"
-        :tabindex="columnProp('sortable') ? '0' : null"
+        :tabindex="columnProp('sortable') ? '0' : undefined"
         :aria-sort="ariaSort"
         role="columnheader"
         v-bind="{ ...getColumnPT('root'), ...getColumnPT('headerCell') }"
@@ -20,11 +20,11 @@
             v-bind="getColumnPT('columnResizer')"
         ></span>
         <div :class="cx('columnHeaderContent')" v-bind="getColumnPT('columnHeaderContent')">
-            <component v-if="column.children && column.children.header" :is="column.children.header" :column="column" />
+            <component v-if="columnSlots.header" :is="columnSlots.header" :column="column" />
             <span v-if="columnProp('header')" :class="cx('columnTitle')" v-bind="getColumnPT('columnTitle')">{{ columnProp('header') }}</span>
             <span v-if="columnProp('sortable')" v-bind="getColumnPT('sort')">
                 <component
-                    :is="(column.children && column.children.sorticon) || sortableColumnIcon"
+                    :is="columnSlots.sorticon || sortableColumnIcon"
                     :sorted="sortState.sorted"
                     :sortOrder="sortState.sortOrder"
                     :class="cx('sortIcon')"
@@ -33,20 +33,20 @@
             </span>
             <Badge v-if="isMultiSorted()" :class="cx('pcSortBadge')" v-bind="getColumnPT('pcSortBadge')" :value="getMultiSortMetaIndex() + 1" size="small" />
             <TTColumnFilter
-                v-if="filterDisplay === 'menu' && column.children && column.children.filter"
+                v-if="filterDisplay === 'menu' && columnSlots.filter"
                 :field="columnProp('filterField') || columnProp('field')"
                 :type="columnProp('dataType')"
                 display="menu"
                 :showMenu="columnProp('showFilterMenu')"
-                :filterElement="column.children && column.children.filter"
-                :filterHeaderTemplate="column.children && column.children.filterheader"
-                :filterFooterTemplate="column.children && column.children.filterfooter"
-                :filterClearTemplate="column.children && column.children.filterclear"
-                :filterApplyTemplate="column.children && column.children.filterapply"
-                :filterIconTemplate="column.children && column.children.filtericon"
-                :filterAddIconTemplate="column.children && column.children.filteraddicon"
-                :filterRemoveIconTemplate="column.children && column.children.filterremoveicon"
-                :filterClearIconTemplate="column.children && column.children.filterclearicon"
+                :filterElement="columnSlots.filter"
+                :filterHeaderTemplate="columnSlots.filterheader"
+                :filterFooterTemplate="columnSlots.filterfooter"
+                :filterClearTemplate="columnSlots.filterclear"
+                :filterApplyTemplate="columnSlots.filterapply"
+                :filterIconTemplate="columnSlots.filtericon"
+                :filterAddIconTemplate="columnSlots.filteraddicon"
+                :filterRemoveIconTemplate="columnSlots.filterremoveicon"
+                :filterClearIconTemplate="columnSlots.filterclearicon"
                 :filters="filters"
                 :filtersStore="filtersStore"
                 :filterInputProps="filterInputProps"
@@ -75,7 +75,8 @@
     </th>
 </template>
 
-<script>
+<script lang="ts">
+import type { TreeTableSortMeta } from 'rose-spectacles/treetable';
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { getAttribute, getIndex, getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
@@ -84,10 +85,10 @@ import SortAltIcon from '../icons/sortalt/SortAltIcon.vue';
 import SortAmountDownIcon from '../icons/sortamountdown/SortAmountDownIcon.vue';
 import SortAmountUpAltIcon from '../icons/sortamountupalt/SortAmountUpAltIcon.vue';
 import Badge from '../badge/Badge.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 import ColumnFilter from './ColumnFilter.vue';
 
-export default {
+export default defineComponent({
     name: 'HeaderCell',
     hostName: 'TreeTable',
     extends: BaseComponent,
@@ -104,8 +105,8 @@ export default {
     ],
     props: {
         column: {
-            type: Object,
-            default: null
+            type: Object as PropType<VNode>,
+            required: true
         },
         resizableColumns: {
             type: Boolean,
@@ -120,7 +121,7 @@ export default {
             default: null
         },
         multiSortMeta: {
-            type: Array,
+            type: Array as PropType<TreeTableSortMeta[]>,
             default: null
         },
         sortMode: {
@@ -154,7 +155,7 @@ export default {
     },
     data() {
         return {
-            styleObject: {}
+            styleObject: {} as CSSProperties
         };
     },
     mounted() {
@@ -168,10 +169,11 @@ export default {
         }
     },
     methods: {
-        columnProp(prop) {
+        columnProp(prop: string) {
             return getVNodeProp(this.column, prop);
         },
-        getColumnPT(key) {
+        getColumnPT(key: string) {
+            const { $parentInstance: table } = this as typeof this & { $parentInstance?: { scrollable?: boolean; showGridlines?: boolean; size?: string } };
             const columnMetaData = {
                 props: getColumnPassThroughProps(this.column),
                 parent: {
@@ -182,11 +184,11 @@ export default {
                 context: {
                     index: this.index,
                     sorted: this.isColumnSorted(),
-                    frozen: this.$parentInstance.scrollable && this.columnProp('frozen'),
+                    frozen: table?.scrollable && this.columnProp('frozen'),
                     resizable: this.resizableColumns,
-                    scrollable: this.$parentInstance.scrollable,
-                    showGridlines: this.$parentInstance.showGridlines,
-                    size: this.$parentInstance?.size
+                    scrollable: table?.scrollable,
+                    showGridlines: table?.showGridlines,
+                    size: table?.size
                 }
             };
 
@@ -208,7 +210,7 @@ export default {
                     let next = getNextElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (next) {
-                        pos = getOuterWidth(next) + parseFloat(next.style['inset-inline-end'] || 0);
+                        pos = getOuterWidth(next) + parseFloat((next as HTMLElement).style.insetInlineEnd || '0');
                     }
 
                     this.styleObject.insetInlineEnd = pos + 'px';
@@ -217,27 +219,28 @@ export default {
                     let prev = getPreviousElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (prev) {
-                        pos = getOuterWidth(prev) + parseFloat(prev.style['inset-inline-start'] || 0);
+                        pos = getOuterWidth(prev) + parseFloat((prev as HTMLElement).style.insetInlineStart || '0');
                     }
 
                     this.styleObject.insetInlineStart = pos + 'px';
                 }
 
-                const filterRow = this.$el.parentElement?.nextElementSibling;
+                const filterRow = (this.$el as HTMLElement).parentElement?.nextElementSibling;
                 const filterCell = filterRow?.children[getIndex(this.$el)];
 
-                if (filterCell?.hasAttribute('data-p-frozen-column')) {
-                    if (this.styleObject.insetInlineStart) filterCell.style.insetInlineStart = this.styleObject.insetInlineStart;
-                    if (this.styleObject.insetInlineEnd) filterCell.style.insetInlineEnd = this.styleObject.insetInlineEnd;
+                if (filterCell instanceof HTMLElement && filterCell.getAttribute('data-p-frozen-column') === 'true') {
+                    if (this.styleObject.insetInlineStart) filterCell.style.insetInlineStart = String(this.styleObject.insetInlineStart);
+                    if (this.styleObject.insetInlineEnd) filterCell.style.insetInlineEnd = String(this.styleObject.insetInlineEnd);
                 }
             }
         },
-        onClick(event) {
+        onClick(event: MouseEvent) {
             this.$emit('column-click', { originalEvent: event, column: this.column });
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (
                 (event.code === 'Enter' || event.code === 'NumpadEnter' || event.code === 'Space') &&
+                event.currentTarget instanceof HTMLTableCellElement &&
                 event.currentTarget.nodeName === 'TH' &&
                 getAttribute(event.currentTarget, 'data-p-sortable-column')
             ) {
@@ -246,22 +249,11 @@ export default {
                 event.preventDefault();
             }
         },
-        onResizeStart(event) {
+        onResizeStart(event: MouseEvent) {
             this.$emit('column-resizestart', event);
         },
         getMultiSortMetaIndex() {
-            let index = -1;
-
-            for (let i = 0; i < this.multiSortMeta.length; i++) {
-                let meta = this.multiSortMeta[i];
-
-                if (meta.field === this.columnProp('field') || meta.field === this.columnProp('sortField')) {
-                    index = i;
-                    break;
-                }
-            }
-
-            return index;
+            return this.multiSortMeta?.findIndex((meta) => meta.field === this.columnProp('field') || meta.field === this.columnProp('sortField')) ?? -1;
         },
         isMultiSorted() {
             return this.columnProp('sortable') && this.getMultiSortMetaIndex() > -1;
@@ -273,6 +265,9 @@ export default {
         }
     },
     computed: {
+        columnSlots(): Slots {
+            return (this.column.children as Slots | null) ?? {};
+        },
         containerClass() {
             return [this.columnProp('headerClass'), this.columnProp('class'), this.cx('headerCell')];
         },
@@ -284,17 +279,17 @@ export default {
         },
         sortState() {
             let sorted = false;
-            let sortOrder = null;
+            let sortOrder: number | null | undefined = null;
 
             if (this.sortMode === 'single') {
-                sorted = this.sortField && (this.sortField === this.columnProp('field') || this.sortField === this.columnProp('sortField'));
+                sorted = !!this.sortField && (this.sortField === this.columnProp('field') || this.sortField === this.columnProp('sortField'));
                 sortOrder = sorted ? this.sortOrder : 0;
             } else if (this.sortMode === 'multiple') {
                 let metaIndex = this.getMultiSortMetaIndex();
 
                 if (metaIndex > -1) {
                     sorted = true;
-                    sortOrder = this.multiSortMeta[metaIndex].order;
+                    sortOrder = this.multiSortMeta?.[metaIndex]?.order;
                 }
             }
 
@@ -307,20 +302,20 @@ export default {
             const { sorted, sortOrder } = this.sortState;
 
             if (!sorted) return SortAltIcon;
-            else if (sorted && sortOrder > 0) return SortAmountUpAltIcon;
-            else if (sorted && sortOrder < 0) return SortAmountDownIcon;
+            else if (sorted && (sortOrder ?? 0) > 0) return SortAmountUpAltIcon;
+            else if (sorted && (sortOrder ?? 0) < 0) return SortAmountDownIcon;
 
             return null;
         },
-        ariaSort() {
+        ariaSort(): 'ascending' | 'descending' | 'none' | undefined {
             if (this.columnProp('sortable')) {
                 const { sorted, sortOrder } = this.sortState;
 
-                if (sorted && sortOrder < 0) return 'descending';
-                else if (sorted && sortOrder > 0) return 'ascending';
+                if (sorted && (sortOrder ?? 0) < 0) return 'descending';
+                else if (sorted && (sortOrder ?? 0) > 0) return 'ascending';
                 else return 'none';
             } else {
-                return null;
+                return undefined;
             }
         }
     },
@@ -331,5 +326,5 @@ export default {
         SortAmountUpAltIcon: SortAmountUpAltIcon,
         SortAmountDownIcon: SortAmountDownIcon
     }
-};
+});
 </script>

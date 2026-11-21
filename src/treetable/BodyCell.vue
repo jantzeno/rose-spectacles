@@ -26,8 +26,8 @@
                 </template>
                 <template v-else>
                     <component
-                        v-if="column.children && column.children.rowtoggleicon"
-                        :is="column.children.rowtoggleicon"
+                        v-if="columnSlots.rowtoggleicon"
+                        :is="columnSlots.rowtoggleicon"
                         :node="node"
                         :expanded="expanded"
                         :class="cx('nodeToggleIcon')"
@@ -41,8 +41,8 @@
                     />
                     <!-- TODO: Deprecated since v4.0-->
                     <component
-                        v-else-if="column.children && column.children.rowtogglericon"
-                        :is="column.children.rowtogglericon"
+                        v-else-if="columnSlots.rowtogglericon"
+                        :is="columnSlots.rowtogglericon"
                         :node="node"
                         :expanded="expanded"
                         :class="cx('nodeToggleIcon')"
@@ -84,13 +84,14 @@
                     />
                 </template>
             </Checkbox>
-            <component v-if="column.children && column.children.body" :is="column.children.body" :node="node" :column="column" />
+            <component v-if="columnSlots.body" :is="columnSlots.body" :node="node" :column="column" />
             <template v-else>{{ resolveFieldData(node.data, columnProp('field')) }}</template>
         </div>
     </td>
 </template>
 
-<script>
+<script lang="ts">
+import type { TreeNode } from 'rose-spectacles/treenode';
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
@@ -103,21 +104,21 @@ import MinusIcon from '../icons/minus/MinusIcon.vue';
 import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
 import Checkbox from '../checkbox/Checkbox.vue';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'BodyCell',
     hostName: 'TreeTable',
     extends: BaseComponent,
     emits: ['node-toggle', 'checkbox-toggle'],
     props: {
         node: {
-            type: Object,
-            default: null
+            type: Object as PropType<TreeNode>,
+            required: true
         },
         column: {
-            type: Object,
-            default: null
+            type: Object as PropType<VNode>,
+            required: true
         },
         level: {
             type: Number,
@@ -148,8 +149,8 @@ export default {
             default: false
         },
         templates: {
-            type: Object,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         index: {
             type: Number,
@@ -162,7 +163,7 @@ export default {
     },
     data() {
         return {
-            styleObject: {}
+            styleObject: {} as CSSProperties
         };
     },
     mounted() {
@@ -179,10 +180,16 @@ export default {
         toggle() {
             this.$emit('node-toggle', this.node);
         },
-        columnProp(prop) {
+        columnProp(prop: string) {
             return getVNodeProp(this.column, prop);
         },
-        getColumnPT(key) {
+        getColumnPT(key: string) {
+            const table = (
+                this as typeof this & {
+                    $parentInstance?: { rowHover?: boolean; rowSelectionMode?: boolean; scrollable?: boolean; showGridlines?: boolean; size?: string };
+                }
+            ).$parentInstance;
+            const row = this.$parent as { selected?: boolean } | null;
             const columnMetaData = {
                 props: getColumnPassThroughProps(this.column),
                 parent: {
@@ -192,12 +199,12 @@ export default {
                 },
                 context: {
                     index: this.index,
-                    selectable: this.$parentInstance.rowHover || this.$parentInstance.rowSelectionMode,
-                    selected: this.$parent.selected,
+                    selectable: table?.rowHover || table?.rowSelectionMode,
+                    selected: row?.selected,
                     frozen: this.columnProp('frozen'),
-                    scrollable: this.$parentInstance.scrollable,
-                    showGridlines: this.$parentInstance.showGridlines,
-                    size: this.$parentInstance?.size,
+                    scrollable: table?.scrollable,
+                    showGridlines: table?.showGridlines,
+                    size: table?.size,
                     node: this.node
                 }
             };
@@ -211,7 +218,7 @@ export default {
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo
         },
-        getColumnCheckboxPT(key) {
+        getColumnCheckboxPT(key: string) {
             const columnMetaData = {
                 props: getColumnPassThroughProps(this.column),
                 parent: {
@@ -241,7 +248,7 @@ export default {
                     let next = getNextElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (next) {
-                        pos = getOuterWidth(next) + parseFloat(next.style['inset-inline-end'] || 0);
+                        pos = getOuterWidth(next) + parseFloat((next as HTMLElement).style.insetInlineEnd || '0');
                     }
 
                     this.styleObject.insetInlineEnd = pos + 'px';
@@ -250,14 +257,14 @@ export default {
                     let prev = getPreviousElementSibling(this.$el, '[data-p-frozen-column="true"]');
 
                     if (prev) {
-                        pos = getOuterWidth(prev) + parseFloat(prev.style['inset-inline-start'] || 0);
+                        pos = getOuterWidth(prev) + parseFloat((prev as HTMLElement).style.insetInlineStart || '0');
                     }
 
                     this.styleObject.insetInlineStart = pos + 'px';
                 }
             }
         },
-        resolveFieldData(rowData, field) {
+        resolveFieldData(rowData: unknown, field: unknown) {
             return resolveFieldData(rowData, field);
         },
         toggleCheckbox() {
@@ -265,6 +272,9 @@ export default {
         }
     },
     computed: {
+        columnSlots(): Slots {
+            return (this.column.children as Slots | null) ?? {};
+        },
         containerClass() {
             return [this.columnProp('bodyClass'), this.columnProp('class'), this.cx('bodyCell')];
         },
@@ -274,7 +284,7 @@ export default {
 
             return this.columnProp('frozen') ? [columnStyle, bodyStyle, this.styleObject] : [columnStyle, bodyStyle];
         },
-        togglerStyle() {
+        togglerStyle(): CSSProperties {
             return {
                 marginLeft: this.level * this.indentation + 'rem',
                 visibility: this.leaf ? 'hidden' : 'visible'
@@ -295,5 +305,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
