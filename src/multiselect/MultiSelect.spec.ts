@@ -1,16 +1,16 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import type { MultiSelectProps } from 'rose-spectacles/multiselect';
 import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
-import { nextTick, reactive, toRaw } from 'vue';
+import { defineComponent, nextTick, reactive, toRaw, type Component } from 'vue';
+import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
 import MultiSelect from './MultiSelect.vue';
 
-window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
+type MultiSelectWrapper = VueWrapper<InstanceType<typeof MultiSelect>>;
+type City = { name: string; code: string; disabled?: boolean };
+type GroupedOption = { group?: boolean; optionGroup?: unknown };
 
-const cities = () => [
+const cities = (): City[] => [
     { name: 'New York', code: 'NY' },
     { name: 'Rome', code: 'RM' },
     { name: 'London', code: 'LDN' },
@@ -41,40 +41,40 @@ const groupedCities = () => [
     }
 ];
 
-const mountMultiSelect = (props = {}, component = MultiSelect) =>
+const mountMultiSelect = (props: MultiSelectProps = {}, component: Component = MultiSelect): MultiSelectWrapper =>
     mount(component, {
         global: { plugins: [PrimeVue], stubs: { teleport: true } },
         props: { options: cities(), optionLabel: 'name', placeholder: 'Select Cities', ...props }
-    });
+    }) as unknown as MultiSelectWrapper;
 
-const openOverlay = async (wrapper) => {
+const openOverlay = async (wrapper: MultiSelectWrapper) => {
     wrapper.vm.show();
     await nextTick();
 };
 
-const renderedLabels = (wrapper) => wrapper.findAll('li.rs-multiselect-option').map((option) => option.attributes('aria-label'));
+const renderedLabels = (wrapper: MultiSelectWrapper) => wrapper.findAll('li.rs-multiselect-option').map((option) => option.attributes('aria-label'));
 
 // Also checks that each row's checkbox agrees with its aria-selected.
-const selectedLabels = (wrapper) =>
+const selectedLabels = (wrapper: MultiSelectWrapper) =>
     wrapper
         .findAll('li.rs-multiselect-option')
         .filter((option) => {
             const selected = option.attributes('aria-selected') === 'true';
 
-            expect(option.find('input[type="checkbox"]').element.checked).toBe(selected);
+            expect(option.get<HTMLInputElement>('input[type="checkbox"]').element.checked).toBe(selected);
 
             return selected;
         })
         .map((option) => option.attributes('aria-label'));
 
-const headerCheckbox = (wrapper) => wrapper.find('.rs-multiselect-header input[type="checkbox"]');
+const headerCheckbox = (wrapper: MultiSelectWrapper) => wrapper.get<HTMLInputElement>('.rs-multiselect-header input[type="checkbox"]');
 
-const selectedLabel = (wrapper) => wrapper.find('.rs-multiselect-label').text();
+const selectedLabel = (wrapper: MultiSelectWrapper) => wrapper.find('.rs-multiselect-label').text();
 
-const lastEmittedValue = (wrapper) => wrapper.emitted('update:modelValue').at(-1)[0];
+const lastEmittedValue = <T = unknown>(wrapper: MultiSelectWrapper) => wrapper.emitted<[T]>('update:modelValue')?.at(-1)?.[0];
 
 describe('MultiSelect.vue', () => {
-    let wrapper;
+    let wrapper: MultiSelectWrapper;
 
     beforeEach(async () => {
         wrapper = mount(MultiSelect, {
@@ -105,7 +105,7 @@ describe('MultiSelect.vue', () => {
         expect(wrapper.find('.rs-multiselect-label.rs-placeholder').text()).toBe('Select Cities');
         expect(wrapper.find('.rs-multiselect-panel').exists()).toBe(false);
 
-        await wrapper.vm.$refs.container.click();
+        await wrapper.get('.rs-multiselect').trigger('click');
 
         expect(wrapper.findAll('li.rs-multiselect-option').length).toBe(5);
         expect(wrapper.findAll('li.rs-multiselect-option')[0].attributes()['aria-label']).toBe('New York');
@@ -113,26 +113,26 @@ describe('MultiSelect.vue', () => {
     });
 
     it('should select an item', async () => {
-        await wrapper.vm.onOptionSelect({}, wrapper.vm.options[0]);
+        await wrapper.vm.onOptionSelect({}, wrapper.vm.options![0]);
 
-        expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[wrapper.vm.options[0]]]);
+        expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[wrapper.vm.options![0]]]);
 
-        await wrapper.setProps({ modelValue: [wrapper.vm.options[0]] });
-        await wrapper.vm.$refs.container.click();
+        await wrapper.setProps({ modelValue: [wrapper.vm.options![0]] });
+        await wrapper.get('.rs-multiselect').trigger('click');
 
         expect(wrapper.findAll('li.rs-multiselect-option')[0].attributes()['data-p-selected']).toBe('true');
         expect(wrapper.find('.rs-multiselect-label').text()).toBe('New York');
     });
 
     it('should select multiple item', async () => {
-        await wrapper.setProps({ modelValue: [wrapper.vm.options[0]] });
+        await wrapper.setProps({ modelValue: [wrapper.vm.options![0]] });
 
-        await wrapper.vm.onOptionSelect({}, wrapper.vm.options[1]);
+        await wrapper.vm.onOptionSelect({}, wrapper.vm.options![1]);
 
-        expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[wrapper.vm.options[0], wrapper.vm.options[1]]]);
+        expect(wrapper.emitted()['update:modelValue'][0]).toEqual([[wrapper.vm.options![0], wrapper.vm.options![1]]]);
 
-        await wrapper.setProps({ modelValue: [wrapper.vm.options[0], wrapper.vm.options[1]] });
-        await wrapper.vm.$refs.container.click();
+        await wrapper.setProps({ modelValue: [wrapper.vm.options![0], wrapper.vm.options![1]] });
+        await wrapper.get('.rs-multiselect').trigger('click');
 
         expect(wrapper.findAll('li.rs-multiselect-option')[0].attributes()['data-p-selected']).toBe('true');
         expect(wrapper.findAll('li.rs-multiselect-option')[1].attributes()['data-p-selected']).toBe('true');
@@ -169,7 +169,7 @@ describe('MultiSelect.vue', () => {
     });
 
     it('should show the empty label when the selected value is not among the options and there is no placeholder', async () => {
-        await wrapper.setProps({ optionValue: 'code', modelValue: ['XX'], placeholder: null });
+        await wrapper.setProps({ optionValue: 'code', modelValue: ['XX'], placeholder: undefined });
 
         expect(wrapper.find('.rs-multiselect-label').classes()).toContain('rs-multiselect-label-empty');
     });
@@ -181,7 +181,7 @@ describe('MultiSelect.vue', () => {
     });
 
     it('should not toggle the focused option on Tab', async () => {
-        const selectedOptions = wrapper.vm.options.slice(0, 3);
+        const selectedOptions = wrapper.vm.options!.slice(0, 3);
 
         await wrapper.setProps({
             modelValue: selectedOptions,
@@ -235,7 +235,7 @@ describe('MultiSelect.vue', () => {
     it('should chip work', async () => {
         await wrapper.setProps({
             display: 'chip',
-            modelValue: [wrapper.vm.options[0]]
+            modelValue: [wrapper.vm.options![0]]
         });
 
         expect(wrapper.find('.rs-chip.rs-multiselect-chip').exists()).toBe(true);
@@ -243,14 +243,14 @@ describe('MultiSelect.vue', () => {
     });
 
     describe('nested overlays', () => {
-        let overlay;
-        let nestedOverlay;
+        let overlay: HTMLElement;
+        let nestedOverlay: HTMLDivElement;
 
         beforeEach(async () => {
             vi.useFakeTimers();
 
-            await wrapper.vm.$refs.container.click();
-            overlay = wrapper.vm.overlay;
+            await wrapper.get('.rs-multiselect').trigger('click');
+            overlay = wrapper.get<HTMLElement>('.rs-multiselect-overlay').element;
             wrapper.vm.onOverlayEnter(overlay);
             wrapper.vm.onOverlayAfterEnter();
 
@@ -269,7 +269,7 @@ describe('MultiSelect.vue', () => {
             vi.runAllTimers();
         };
 
-        const clickOnNestedOverlay = (emitterTarget) => {
+        const clickOnNestedOverlay = (emitterTarget: Element | null) => {
             nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), {
                 once: true
             });
@@ -284,7 +284,7 @@ describe('MultiSelect.vue', () => {
         });
 
         it('should stay open when an overlay of a component inside the panel is clicked', () => {
-            clickOnNestedOverlay(wrapper.vm.overlay.firstElementChild);
+            clickOnNestedOverlay(overlay.firstElementChild);
 
             expect(wrapper.vm.overlayVisible).toBe(true);
         });
@@ -296,7 +296,7 @@ describe('MultiSelect.vue', () => {
         });
 
         it('should close on a regular outside click after a nested overlay click', () => {
-            clickOnNestedOverlay(wrapper.vm.overlay.firstElementChild);
+            clickOnNestedOverlay(overlay.firstElementChild);
             outsideClick();
 
             expect(wrapper.vm.overlayVisible).toBe(false);
@@ -306,7 +306,7 @@ describe('MultiSelect.vue', () => {
             const combobox = document.createElement('span');
 
             combobox.setAttribute('aria-expanded', 'true');
-            wrapper.vm.overlay.appendChild(combobox);
+            overlay.appendChild(combobox);
             outsideClick();
 
             expect(wrapper.vm.overlayVisible).toBe(true);
@@ -322,7 +322,7 @@ describe('MultiSelect.vue', () => {
         it('should have custom chip remove icon', async () => {
             await wrapper.setProps({
                 display: 'chip',
-                modelValue: [wrapper.vm.options[0]],
+                modelValue: [wrapper.vm.options![0]],
                 removeTokenIcon: 'pi pi-discord'
             });
 
@@ -347,7 +347,7 @@ describe('MultiSelect.vue', () => {
                 filterIcon: 'pi pi-discord'
             });
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
 
             const icon = wrapper.find('.rs-multiselect-filter-container [data-pc-section="filtericon"]');
 
@@ -364,7 +364,7 @@ describe('MultiSelect.vue', () => {
                 modelValue: wrapper.vm.options
             });
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
 
             wrapper.findAll('.rs-checkbox-icon').forEach((icon) => {
                 expect(icon.classes()).toContain('pi-discord');
@@ -413,7 +413,7 @@ describe('MultiSelect.vue', () => {
                 optionGroupChildren: 'items'
             });
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
             expect(wrapper.find('.rs-multiselect-option-group').exists()).toBe(true);
         });
 
@@ -426,7 +426,7 @@ describe('MultiSelect.vue', () => {
                 autoFilterFocus: true
             });
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
             const input = await wrapper.find('input.rs-multiselect-filter');
 
             input.setValue('Ber');
@@ -444,12 +444,8 @@ describe('MultiSelect.vue', () => {
                 autoFilterFocus: true
             });
 
-            await wrapper.vm.$refs.container.click();
-            const input = await wrapper.find('input.rs-multiselect-filter');
-
-            input.value = 'Ber';
-
-            await wrapper.vm.onFilterChange({ target: input });
+            await wrapper.get('.rs-multiselect').trigger('click');
+            await wrapper.get('input.rs-multiselect-filter').setValue('Ber');
             expect(wrapper.findAll('.rs-multiselect-list').length).toBe(1);
             expect(wrapper.find('.rs-multiselect-option-group').text()).toBe('Germany');
         });
@@ -469,7 +465,7 @@ describe('MultiSelect.vue', () => {
                 optionGroupChildren: 'items'
             });
 
-            const visibleOptions = wrapper.vm.visibleOptions;
+            const visibleOptions = wrapper.vm.visibleOptions as GroupedOption[];
 
             expect(visibleOptions.length).toBe(3);
 
@@ -477,7 +473,7 @@ describe('MultiSelect.vue', () => {
             expect(wrapper.vm.isOptionGroup(simpleOptions[1])).toBe(false);
             expect(wrapper.vm.isOptionGroup(simpleOptions[2])).toBe(false);
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
 
             expect(wrapper.findAll('.rs-multiselect-option').length).toBe(3);
             expect(wrapper.find('.rs-multiselect-option-group').exists()).toBe(false);
@@ -493,7 +489,7 @@ describe('MultiSelect.vue', () => {
                 optionLabel: 'name'
             });
 
-            const visibleOptions = wrapper.vm.visibleOptions;
+            const visibleOptions = wrapper.vm.visibleOptions as GroupedOption[];
             const groupHeaders = visibleOptions.filter((opt) => opt.group === true);
 
             expect(groupHeaders.length).toBe(1);
@@ -525,14 +521,14 @@ describe('MultiSelect.vue', () => {
                 optionLabel: 'name'
             });
 
-            const visibleOptions = wrapper.vm.visibleOptions;
+            const visibleOptions = wrapper.vm.visibleOptions as GroupedOption[];
             const groupOptions = visibleOptions.filter((opt) => opt.group === true);
 
             groupOptions.forEach((groupOpt) => {
                 expect(wrapper.vm.isOptionGroup(groupOpt)).toBe(true);
             });
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
 
             expect(wrapper.findAll('.rs-multiselect-option-group').length).toBe(2);
         });
@@ -553,7 +549,7 @@ describe('MultiSelect.vue', () => {
                 optionLabel: 'name'
             });
 
-            const visibleOptions = wrapper.vm.visibleOptions;
+            const visibleOptions = wrapper.vm.visibleOptions as GroupedOption[];
 
             expect(visibleOptions).toEqual(optionsWithGroupStructure);
 
@@ -575,7 +571,7 @@ describe('MultiSelect.vue', () => {
                 optionGroupChildren: 'items'
             });
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
 
             const checkboxes = wrapper.findAll('.rs-checkbox');
 
@@ -614,7 +610,7 @@ describe('MultiSelect.vue', () => {
                 optionValue: 'value'
             });
 
-            const visibleOptions = wrapper.vm.visibleOptions;
+            const visibleOptions = wrapper.vm.visibleOptions as GroupedOption[];
 
             expect(visibleOptions.length).toBe(8);
 
@@ -624,7 +620,7 @@ describe('MultiSelect.vue', () => {
             expect(groupHeaders.length).toBe(2);
             expect(regularOptions.length).toBe(6);
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
 
             expect(wrapper.findAll('.rs-multiselect-option-group').length).toBe(2);
             expect(wrapper.findAll('.rs-multiselect-option').length).toBe(6);
@@ -650,7 +646,7 @@ describe('MultiSelect.vue', () => {
                 optionValue: 'value'
             });
 
-            const visibleOptions = wrapper.vm.visibleOptions;
+            const visibleOptions = wrapper.vm.visibleOptions as GroupedOption[];
 
             expect(visibleOptions.length).toBe(6);
 
@@ -658,7 +654,7 @@ describe('MultiSelect.vue', () => {
 
             expect(groupHeaders.length).toBe(2);
 
-            await wrapper.vm.$refs.container.click();
+            await wrapper.get('.rs-multiselect').trigger('click');
 
             expect(wrapper.findAll('.rs-multiselect-option-group').length).toBe(2);
             expect(wrapper.findAll('.rs-multiselect-option').length).toBe(4);
@@ -722,7 +718,7 @@ describe('MultiSelect.vue', () => {
             expect(selectedLabel(wrapper)).toBe('200 items selected');
             expect(reads).toBeLessThanOrEqual(options.length);
 
-            await wrapper.setProps({ maxSelectedLabels: null, modelValue: [5, 7] });
+            await wrapper.setProps({ maxSelectedLabels: undefined, modelValue: [5, 7] });
 
             expect(selectedLabel(wrapper)).toBe('Item #5, Item #7');
         });
@@ -917,7 +913,7 @@ describe('MultiSelect.vue', () => {
 
             // jsdom has no layout, so the scroller can't work out its viewport. Set the rendered range by hand,
             // far down the list, as if the user had scrolled there.
-            const scroller = wrapper.vm.virtualScroller;
+            const scroller = wrapper.getComponent(VirtualScroller).vm;
 
             scroller.first = 900;
             scroller.last = 920;
@@ -932,7 +928,7 @@ describe('MultiSelect.vue', () => {
 
                 expect(option.attributes('aria-selected')).toBe(selected);
                 expect(option.attributes('data-p-selected')).toBe(selected);
-                expect(String(option.find('input[type="checkbox"]').element.checked)).toBe(selected);
+                expect(String(option.get<HTMLInputElement>('input[type="checkbox"]').element.checked)).toBe(selected);
             });
             expect(headerCheckbox(wrapper).element.checked).toBe(false);
         });
@@ -964,11 +960,11 @@ describe('MultiSelect.vue', () => {
             await openOverlay(wrapper);
             await headerCheckbox(wrapper).trigger('change');
 
-            const value = lastEmittedValue(wrapper);
+            const value = lastEmittedValue<City[]>(wrapper);
 
             expect(value).toEqual(options);
             // The test mount makes the props reactive, so compare the original objects behind the proxies.
-            value.forEach((selected, index) => expect(toRaw(selected)).toBe(options[index]));
+            value?.forEach((selected, index) => expect(toRaw(selected)).toBe(options[index]));
         });
 
         it('should show all selected for equal copies and dataKey matches', async () => {
@@ -1048,17 +1044,17 @@ describe('MultiSelect.vue', () => {
 
     describe('overridden isEquals', () => {
         // A component that extends MultiSelect with its own equality rule, here case-insensitive codes.
-        const CaseInsensitiveMultiSelect = {
+        const CaseInsensitiveMultiSelect = defineComponent({
             extends: MultiSelect,
             render: MultiSelect.render,
             methods: {
-                isEquals(value1, value2) {
+                isEquals(value1: unknown, value2: unknown) {
                     return String(value1).toLowerCase() === String(value2).toLowerCase();
                 }
             }
-        };
+        });
 
-        const mountCaseInsensitive = (props) => mountMultiSelect({ optionValue: 'code', ...props }, CaseInsensitiveMultiSelect);
+        const mountCaseInsensitive = (props: MultiSelectProps) => mountMultiSelect({ optionValue: 'code', ...props }, CaseInsensitiveMultiSelect);
 
         it('should use the overridden isEquals to show selected options', async () => {
             const wrapper = mountCaseInsensitive({ modelValue: ['rm', 'prs'] });

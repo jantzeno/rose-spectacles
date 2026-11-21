@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { FilterMatchMode, FilterOperator } from '../core/api/Api';
 import { mount } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
@@ -5,11 +6,11 @@ import { nextTick } from 'vue';
 import Column from '../column/Column.vue';
 import DataTable from './DataTable.vue';
 
-window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
+function elementWithin(root: ParentNode, selector: string) {
+    const element = root.querySelector(selector);
+    assert(element, `Missing ${selector}`);
+    return element;
+}
 
 const products = [
     { id: '1000', name: 'Game Controller' },
@@ -51,12 +52,12 @@ describe('ColumnFilter', () => {
         await nextTick();
 
         const columnFilter = wrapper.findComponent({ name: 'ColumnFilter' });
-        const filterOverlay = document.querySelector('.rs-datatable-filter-overlay');
+        const filterOverlay = elementWithin(document, '.rs-datatable-filter-overlay');
 
         expect(filterOverlay).not.toBeNull();
 
         // open the operator Select rendered inside the filter overlay
-        const select = filterOverlay.querySelector('[data-pc-name="pcfilteroperatordropdown"]');
+        const select = elementWithin(filterOverlay, '[data-pc-name="pcfilteroperatordropdown"]');
 
         select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
         select.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -64,12 +65,12 @@ describe('ColumnFilter', () => {
         await nextTick();
 
         // the Select overlay is portalled to the body, so it is not a DOM descendant of the filter overlay
-        const selectOverlay = document.querySelector('.rs-select-overlay');
+        const selectOverlay = elementWithin(document, '.rs-select-overlay');
 
         expect(selectOverlay).not.toBeNull();
         expect(filterOverlay.contains(selectOverlay)).toBe(false);
 
-        selectOverlay.querySelector('[data-pc-section="option"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        elementWithin(selectOverlay, '[data-pc-section="option"]').dispatchEvent(new MouseEvent('click', { bubbles: true }));
         await nextTick();
         await nextTick();
 
@@ -89,18 +90,18 @@ describe('ColumnFilter', () => {
         await nextTick();
 
         const columnFilter = wrapper.findComponent({ name: 'ColumnFilter' });
-        const filterOverlay = document.querySelector('.rs-datatable-filter-overlay');
-        const select = filterOverlay.querySelector('[data-pc-name="pcfilteroperatordropdown"]');
+        const filterOverlay = elementWithin(document, '.rs-datatable-filter-overlay');
+        const select = elementWithin(filterOverlay, '[data-pc-name="pcfilteroperatordropdown"]');
 
         select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
         select.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         await nextTick();
         await nextTick();
 
-        const selectOverlay = document.querySelector('.rs-select-overlay');
+        const selectOverlay = elementWithin(document, '.rs-select-overlay');
         const attrSelector = [...selectOverlay.attributes].map((attr) => attr.name).find((name) => /^pc\w+$/.test(name));
 
-        expect(attrSelector).toBeDefined();
+        assert(attrSelector, 'The Select overlay has a pass-through attribute selector');
 
         // rewrite the flat selector into the nested form SSR produces, on both the overlay and its owner
         const ssrAttrSelector = attrSelector.replace(/^pc/, 'pc0_');
@@ -112,7 +113,7 @@ describe('ColumnFilter', () => {
             el.setAttribute(ssrAttrSelector, '');
         });
 
-        const option = selectOverlay.querySelector('[data-pc-section="option"]');
+        const option = elementWithin(selectOverlay, '[data-pc-section="option"]');
 
         expect(columnFilter.vm.isNestedOverlayClicked(option)).toBe(true);
 
@@ -134,15 +135,15 @@ describe('ColumnFilter', () => {
         await nextTick();
 
         const columnFilter = wrapper.findComponent({ name: 'ColumnFilter' });
-        const filterOverlay = document.querySelector('.rs-datatable-filter-overlay');
-        const select = filterOverlay.querySelector('[data-pc-name="pcfilteroperatordropdown"]');
+        const filterOverlay = elementWithin(document, '.rs-datatable-filter-overlay');
+        const select = elementWithin(filterOverlay, '[data-pc-name="pcfilteroperatordropdown"]');
 
         select.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
         select.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         await nextTick();
         await nextTick();
 
-        const option = document.querySelector('.rs-select-overlay [data-pc-section="option"]');
+        const option = elementWithin(document, '.rs-select-overlay [data-pc-section="option"]');
 
         expect(option).not.toBeNull();
 

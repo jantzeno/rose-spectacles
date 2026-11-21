@@ -1,10 +1,11 @@
 import Form from '../forms/form/Form.vue';
-import { mount } from '@vue/test-utils';
-import { h, nextTick } from 'vue';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import type { InputNumberInputEvent } from 'rose-spectacles/inputnumber';
+import { h, nextTick, type Component } from 'vue';
 import InputNumber from './InputNumber.vue';
 
 describe('InputNumber.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof InputNumber>>;
 
     beforeEach(() => {
         wrapper = mount(InputNumber, {
@@ -33,39 +34,39 @@ describe('InputNumber.vue', () => {
         await wrapper.vm.onInputKeyDown({ code: 'Tab', target: { value: '12' }, preventDefault: () => {} });
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([12]);
-        expect(wrapper.find('input.rs-inputnumber-input').attributes()['aria-valuenow']).toBe('12');
+        expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').attributes()['aria-valuenow']).toBe('12');
     });
 
     it('is keydown called when enter key pressed', async () => {
         await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '12' }, preventDefault: () => {} });
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([12]);
-        expect(wrapper.find('input.rs-inputnumber-input').attributes()['aria-valuenow']).toBe('12');
+        expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').attributes()['aria-valuenow']).toBe('12');
     });
 
     it('is keypress called when pressed a number', async () => {
-        wrapper.find('input.rs-inputnumber-input').element.setSelectionRange(2, 2);
+        wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.setSelectionRange(2, 2);
 
         await wrapper.vm.onInputKeyPress({ key: '1', preventDefault: () => {} });
 
-        expect(wrapper.emitted().input[0][0].value).toBe(11);
+        expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.[0][0].value).toBe(11);
     });
 
     it('is keypress called when pressed a number in the locale numbering system', async () => {
         await wrapper.setProps({ locale: 'fa-IR' });
-        wrapper.find('input.rs-inputnumber-input').element.setSelectionRange(1, 1);
+        wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.setSelectionRange(1, 1);
 
         await wrapper.vm.onInputKeyPress({ key: '۲', preventDefault: () => {} });
 
-        expect(wrapper.emitted().input[0][0].value).toBe(12);
+        expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.[0][0].value).toBe(12);
     });
 
     it('is keypress called when pressed minus', async () => {
-        wrapper.find('input.rs-inputnumber-input').element.setSelectionRange(0, 0);
+        wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.setSelectionRange(0, 0);
 
         await wrapper.vm.onInputKeyPress({ key: '-', preventDefault: () => {} });
 
-        expect(wrapper.emitted().input[0][0].value).toBe(-1);
+        expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.[0][0].value).toBe(-1);
     });
 
     it('should have min boundary', async () => {
@@ -95,25 +96,25 @@ describe('InputNumber.vue', () => {
     it('should have currency', async () => {
         await wrapper.setProps({ modelValue: 12345, mode: 'currency', currency: 'USD', locale: 'en-US' });
 
-        expect(wrapper.find('input.rs-inputnumber-input').element._value).toBe('$12,345.00');
+        expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.value).toBe('$12,345.00');
     });
 
     it('should have prefix', async () => {
         await wrapper.setProps({ modelValue: 20, prefix: '%' });
 
-        expect(wrapper.find('input.rs-inputnumber-input').element._value).toBe('%20');
+        expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.value).toBe('%20');
     });
 
     it('should step 0.1 without floating point drift', async () => {
         await wrapper.setProps({ modelValue: 0, step: 0.1, minFractionDigits: 1 });
 
-        const input = wrapper.find('input.rs-inputnumber-input').element;
+        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
         for (let i = 0; i < 10; i++) {
             await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
         }
 
-        const emitted = wrapper.emitted()['update:modelValue'].map(([value]) => value);
+        const emitted = wrapper.emitted<[string | number | null]>('update:modelValue')?.map(([value]) => value);
 
         // as doubles this drifts to 0.30000000000000004 and ends on 0.9999999999999999
         expect(emitted).toEqual([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]);
@@ -122,7 +123,7 @@ describe('InputNumber.vue', () => {
     it('should step by a step written in exponent notation', async () => {
         await wrapper.setProps({ modelValue: 0, step: 1e-7, maxFractionDigits: 7 });
 
-        const input = wrapper.find('input.rs-inputnumber-input').element;
+        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
         await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
         await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
@@ -156,7 +157,7 @@ describe('InputNumber.vue', () => {
     it('should not round when the field is not formatted', async () => {
         await wrapper.setProps({ locale: 'en-US', format: false, modelValue: 0, step: 0.0001 });
 
-        const input = wrapper.find('input.rs-inputnumber-input').element;
+        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
         await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
         await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
@@ -176,7 +177,7 @@ describe('InputNumber.vue', () => {
         await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '1' + '0'.repeat(309) }, preventDefault: () => {} });
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([Number.MAX_VALUE]);
-        expect(wrapper.find('input.rs-inputnumber-input').element.value).not.toContain('∞');
+        expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.value).not.toContain('∞');
     });
 
     it('should not report a change for a lone minus sign', () => {
@@ -216,7 +217,7 @@ describe('InputNumber.vue', () => {
     it('should accept a string modelValue and render it exactly', async () => {
         await wrapper.setProps({ modelValue: '123456789012345678', locale: 'en-US' });
 
-        expect(wrapper.find('input.rs-inputnumber-input').element._value).toBe('123,456,789,012,345,678');
+        expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.value).toBe('123,456,789,012,345,678');
     });
 
     it('should clamp against string boundaries exactly', async () => {
@@ -234,7 +235,7 @@ describe('InputNumber.vue', () => {
     it('should keep the minus sign after typing a negative zero', async () => {
         await wrapper.setProps({ modelValue: null });
 
-        const input = wrapper.find('input.rs-inputnumber-input').element;
+        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
         input.setSelectionRange(0, 0);
 
@@ -254,7 +255,7 @@ describe('InputNumber.vue', () => {
         // the locale groups with '.', so re-parsing '10.5' would read it as 105
         await wrapper.setProps({ modelValue: 10.5, locale: 'de-DE', max: 10.5, step: 1, minFractionDigits: 1 });
 
-        const input = wrapper.find('input.rs-inputnumber-input').element;
+        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
         await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
 
@@ -264,13 +265,13 @@ describe('InputNumber.vue', () => {
     it('should step down across zero by 0.1 without floating point drift', async () => {
         await wrapper.setProps({ modelValue: 0.3, step: 0.1, minFractionDigits: 1 });
 
-        const input = wrapper.find('input.rs-inputnumber-input').element;
+        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
         for (let i = 0; i < 5; i++) {
             await wrapper.vm.onInputKeyDown({ code: 'ArrowDown', target: input, preventDefault: () => {} });
         }
 
-        const emitted = wrapper.emitted()['update:modelValue'].map(([value]) => value);
+        const emitted = wrapper.emitted<[string | number | null]>('update:modelValue')?.map(([value]) => value);
 
         // as doubles 0.3 - 0.1 is 0.19999999999999998
         expect(emitted).toEqual([0.2, 0.1, 0, -0.1, -0.2]);
@@ -305,7 +306,7 @@ describe('InputNumber.vue', () => {
     });
 
     describe('typing over initial zero', () => {
-        const type = async (input, key) => {
+        const type = async (input: HTMLInputElement, key: string) => {
             await wrapper.vm.onInputKeyPress({ key, preventDefault: () => {} });
 
             return { value: input.value, caret: input.selectionStart };
@@ -314,7 +315,7 @@ describe('InputNumber.vue', () => {
         it('should keep multi char suffix when typing digits after zero', async () => {
             await wrapper.setProps({ modelValue: 0, suffix: ' kg' });
 
-            const input = wrapper.find('input.rs-inputnumber-input').element;
+            const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
             expect(input.value).toBe('0 kg');
 
@@ -323,13 +324,13 @@ describe('InputNumber.vue', () => {
             expect(await type(input, '1')).toEqual({ value: '1 kg', caret: 1 });
             expect(await type(input, '2')).toEqual({ value: '12 kg', caret: 2 });
             expect(await type(input, '3')).toEqual({ value: '123 kg', caret: 3 });
-            expect(wrapper.emitted().input.map(([e]) => e.value)).toEqual([1, 12, 123]);
+            expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.map(([event]) => event.value)).toEqual([1, 12, 123]);
         });
 
         it('should keep multi char prefix and suffix when typing digits after zero', async () => {
             await wrapper.setProps({ modelValue: 0, prefix: '$ ', suffix: ' kg' });
 
-            const input = wrapper.find('input.rs-inputnumber-input').element;
+            const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
             expect(input.value).toBe('$ 0 kg');
 
@@ -337,13 +338,13 @@ describe('InputNumber.vue', () => {
 
             expect(await type(input, '1')).toEqual({ value: '$ 1 kg', caret: 3 });
             expect(await type(input, '2')).toEqual({ value: '$ 12 kg', caret: 4 });
-            expect(wrapper.emitted().input.map(([e]) => e.value)).toEqual([1, 12]);
+            expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.map(([event]) => event.value)).toEqual([1, 12]);
         });
 
         it('should keep typing into the integer part of a currency value', async () => {
             await wrapper.setProps({ modelValue: 0, mode: 'currency', currency: 'USD', locale: 'en-US' });
 
-            const input = wrapper.find('input.rs-inputnumber-input').element;
+            const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
             expect(input.value).toBe('$0.00');
 
@@ -353,13 +354,13 @@ describe('InputNumber.vue', () => {
             expect(await type(input, '2')).toEqual({ value: '$12.00', caret: 3 });
             expect(await type(input, '5')).toEqual({ value: '$125.00', caret: 4 });
             expect(await type(input, '0')).toEqual({ value: '$1,250.00', caret: 6 });
-            expect(wrapper.emitted().input.map(([e]) => e.value)).toEqual([1, 12, 125, 1250]);
+            expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.map(([event]) => event.value)).toEqual([1, 12, 125, 1250]);
         });
 
         it('should place caret after typed digit with single char suffix', async () => {
             await wrapper.setProps({ modelValue: 0, suffix: '%' });
 
-            const input = wrapper.find('input.rs-inputnumber-input').element;
+            const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
             input.setSelectionRange(1, 1);
 
@@ -370,7 +371,7 @@ describe('InputNumber.vue', () => {
         it('should still advance caret when overwriting fraction digits', async () => {
             await wrapper.setProps({ modelValue: 1, minFractionDigits: 2, maxFractionDigits: 2, locale: 'en-US', suffix: ' kg' });
 
-            const input = wrapper.find('input.rs-inputnumber-input').element;
+            const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
             expect(input.value).toBe('1.00 kg');
 
@@ -382,11 +383,11 @@ describe('InputNumber.vue', () => {
     });
 
     describe('inside Form with initialValues', () => {
-        let formWrapper;
+        let formWrapper: VueWrapper;
 
         beforeEach(() => {
             formWrapper = mount(
-                { render: () => h(Form, { initialValues: { amount: 555 } }, () => h(InputNumber, { name: 'amount' })) },
+                { render: () => h(Form as Component, { initialValues: { amount: 555 } }, () => h(InputNumber as Component, { name: 'amount' })) },
                 { attachTo: document.body }
             );
         });
@@ -397,7 +398,7 @@ describe('InputNumber.vue', () => {
 
         it('should stay empty after deleting the last character', async () => {
             const inputNumber = formWrapper.findComponent(InputNumber);
-            const input = formWrapper.find('input.rs-inputnumber-input').element;
+            const input = formWrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
             expect(input.value).toBe('555');
 
@@ -417,7 +418,7 @@ describe('InputNumber.vue', () => {
 
         it('should match standalone v-model behavior when deleting the last character', async () => {
             const standalone = mount(InputNumber, { props: { modelValue: 555 }, attachTo: document.body });
-            const input = standalone.find('input.rs-inputnumber-input').element;
+            const input = standalone.get<HTMLInputElement>('input.rs-inputnumber-input').element;
 
             for (let i = 0; i < 3; i++) {
                 input.setSelectionRange(input.value.length, input.value.length);

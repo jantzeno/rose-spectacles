@@ -1,15 +1,12 @@
+import assert from 'node:assert/strict';
+import type { TreeNode } from 'rose-spectacles/treenode';
+import type { TreeTableFilterMeta, TreeTableOperatorFilterMetaData } from 'rose-spectacles/treetable';
 import { FilterMatchMode, FilterOperator } from '../core/api/Api';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import { nextTick } from 'vue';
 import Column from '../column/Column.vue';
 import TreeTable from './TreeTable.vue';
-
-window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
 
 const createNodes = () => [
     {
@@ -45,9 +42,9 @@ const createNodes = () => [
     }
 ];
 
-const keys = (nodes) => (nodes || []).map((node) => node.key);
+const keys = (nodes?: TreeNode[]) => (nodes || []).map((node) => node.key);
 
-const findNode = (nodes, key) => {
+const findNode = (nodes: TreeNode[] | undefined, key: string): TreeNode | undefined => {
     for (const node of nodes || []) {
         if (node.key === key) return node;
 
@@ -71,7 +68,13 @@ const legacyTemplate = `
     </TreeTable>
 `;
 
-const mountLegacy = ({ filters = {}, filterMode = 'lenient', withFilterSlot = false } = {}) =>
+interface LegacyOptions {
+    filters?: Record<string, string>;
+    filterMode?: 'lenient' | 'strict';
+    withFilterSlot?: boolean;
+}
+
+const mountLegacy = ({ filters = {}, filterMode = 'lenient', withFilterSlot = false }: LegacyOptions = {}) =>
     mount(
         {
             components: { TreeTable, Column },
@@ -83,7 +86,7 @@ const mountLegacy = ({ filters = {}, filterMode = 'lenient', withFilterSlot = fa
         { global: { plugins: [PrimeVue], stubs: { teleport: false, transition: false } }, attachTo: document.body }
     );
 
-const treeTableOf = (wrapper) => wrapper.findComponent(TreeTable);
+const treeTableOf = (wrapper: VueWrapper) => wrapper.findComponent(TreeTable);
 
 const advancedTemplate = `
     <TreeTable :value="nodes" v-model:filters="filters" :filterMode="filterMode" :filterDisplay="filterDisplay" :globalFilterFields="globalFilterFields">
@@ -101,7 +104,7 @@ const advancedTemplate = `
     </TreeTable>
 `;
 
-const menuFilters = () => ({
+const menuFilters = (): Record<'name' | 'type', TreeTableOperatorFilterMetaData> => ({
     name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     type: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
 });
@@ -111,6 +114,15 @@ const rowFilters = () => ({
     type: { value: null, matchMode: FilterMatchMode.EQUALS }
 });
 
+interface FilterOptions {
+    filters?: TreeTableFilterMeta;
+    filterMode?: 'lenient' | 'strict';
+    filterDisplay?: 'menu' | 'row' | null;
+    globalFilterFields?: string[] | null;
+    withFilterSlots?: boolean;
+    sortableName?: boolean;
+}
+
 // the filter slots use the filterDisplay scope (filterModel), so they are only rendered for the filterDisplay tests
 const mountAdvanced = ({
     filters,
@@ -119,7 +131,7 @@ const mountAdvanced = ({
     globalFilterFields = null,
     withFilterSlots = !!filterDisplay,
     sortableName = false
-} = {}) =>
+}: FilterOptions = {}) =>
     mount(
         {
             components: { TreeTable, Column },
@@ -141,8 +153,8 @@ describe('TreeTable', () => {
             const result = treeTableOf(wrapper).vm.processedData;
 
             expect(keys(result)).toEqual(['0']);
-            expect(keys(findNode(result, '0').children)).toEqual(['0-0']);
-            expect(keys(findNode(result, '0-0').children)).toEqual(['0-0-0', '0-0-1']);
+            expect(keys(findNode(result, '0')?.children)).toEqual(['0-0']);
+            expect(keys(findNode(result, '0-0')?.children)).toEqual(['0-0-0', '0-0-1']);
 
             wrapper.unmount();
         });
@@ -155,8 +167,8 @@ describe('TreeTable', () => {
             const result = treeTableOf(wrapper).vm.processedData;
 
             expect(keys(result)).toEqual(['0']);
-            expect(keys(findNode(result, '0').children)).toEqual(['0-0']);
-            expect(keys(findNode(result, '0-0').children)).toEqual(['0-0-0']);
+            expect(keys(findNode(result, '0')?.children)).toEqual(['0-0']);
+            expect(keys(findNode(result, '0-0')?.children)).toEqual(['0-0-0']);
 
             wrapper.unmount();
         });
@@ -169,7 +181,7 @@ describe('TreeTable', () => {
             const result = treeTableOf(wrapper).vm.processedData;
 
             expect(keys(result)).toEqual(['1']);
-            expect(keys(findNode(result, '1').children)).toEqual(['1-0', '1-1']);
+            expect(keys(findNode(result, '1')?.children)).toEqual(['1-0', '1-1']);
 
             wrapper.unmount();
         });
@@ -182,7 +194,7 @@ describe('TreeTable', () => {
             const result = treeTableOf(wrapper).vm.processedData;
 
             expect(keys(result)).toEqual(['2']);
-            expect(keys(findNode(result, '2').children)).toEqual(['2-1']);
+            expect(keys(findNode(result, '2')?.children)).toEqual(['2-1']);
 
             wrapper.unmount();
         });
@@ -221,8 +233,8 @@ describe('TreeTable', () => {
             const result = treeTableOf(wrapper).vm.processedData;
 
             expect(keys(result)).toEqual(['0']);
-            expect(keys(findNode(result, '0').children)).toEqual(['0-0']);
-            expect(keys(findNode(result, '0-0').children)).toEqual(['0-0-0', '0-0-1']);
+            expect(keys(findNode(result, '0')?.children)).toEqual(['0-0']);
+            expect(keys(findNode(result, '0-0')?.children)).toEqual(['0-0-0', '0-0-1']);
 
             wrapper.unmount();
         });
@@ -246,8 +258,8 @@ describe('TreeTable', () => {
 
             // "app" matches the Applications folder itself (subtree kept), "native" then prunes it down to native.app
             expect(keys(result)).toEqual(['0']);
-            expect(keys(findNode(result, '0').children)).toEqual(['0-0']);
-            expect(keys(findNode(result, '0-0').children)).toEqual(['0-0-1']);
+            expect(keys(findNode(result, '0')?.children)).toEqual(['0-0']);
+            expect(keys(findNode(result, '0-0')?.children)).toEqual(['0-0-1']);
 
             wrapper.unmount();
         });
@@ -291,8 +303,8 @@ describe('TreeTable', () => {
             const result = treeTableOf(wrapper).vm.processedData;
 
             expect(keys(result)).toEqual(['1', '2']);
-            expect(keys(findNode(result, '1').children)).toEqual(['1-0']);
-            expect(keys(findNode(result, '2').children)).toEqual(['2-1']);
+            expect(keys(findNode(result, '1')?.children)).toEqual(['1-0']);
+            expect(keys(findNode(result, '2')?.children)).toEqual(['2-1']);
 
             wrapper.unmount();
         });
@@ -304,7 +316,7 @@ describe('TreeTable', () => {
 
             const result = treeTableOf(wrapper).vm.processedData;
 
-            expect(keys(findNode(result, '0-0').children)).toEqual(['0-0-0']);
+            expect(keys(findNode(result, '0-0')?.children)).toEqual(['0-0-0']);
 
             wrapper.unmount();
         });
@@ -319,7 +331,7 @@ describe('TreeTable', () => {
 
             expect(result).toBe(treeTable.vm.value);
             expect(keys(result)).toEqual(['0', '1', '2']);
-            expect(keys(findNode(result, '0-0').children)).toEqual(['0-0-0', '0-0-1']);
+            expect(keys(findNode(result, '0-0')?.children)).toEqual(['0-0-0', '0-0-1']);
 
             wrapper.unmount();
         });
@@ -337,7 +349,7 @@ describe('TreeTable', () => {
             const result = treeTableOf(wrapper).vm.processedData;
 
             expect(keys(result)).toEqual(['2']);
-            expect(keys(findNode(result, '2').children)).toEqual(['2-1']);
+            expect(keys(findNode(result, '2')?.children)).toEqual(['2-1']);
 
             wrapper.unmount();
         });
@@ -354,7 +366,7 @@ describe('TreeTable', () => {
             const result = treeTableOf(byType).vm.processedData;
 
             expect(keys(result)).toEqual(['2']);
-            expect(keys(findNode(result, '2').children)).toEqual(['2-0', '2-1']);
+            expect(keys(findNode(result, '2')?.children)).toEqual(['2-0', '2-1']);
 
             byName.unmount();
             byType.unmount();
@@ -425,27 +437,30 @@ describe('TreeTable', () => {
 
             const overlay = document.querySelector('.rs-treetable-filter-overlay');
 
-            expect(overlay).not.toBeNull();
+            assert(overlay, 'The filter menu is open');
             expect(overlay.classList.contains('rs-treetable-filter-overlay-popover')).toBe(true);
 
-            const input = overlay.querySelector('.name-filter');
+            const input = overlay.querySelector<HTMLInputElement>('.name-filter');
+            assert(input, 'The menu contains the name filter');
 
             input.value = 'vue';
             input.dispatchEvent(new Event('input', { bubbles: true }));
             await nextTick();
 
-            overlay.querySelector('.rs-treetable-filter-apply-button').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            const apply = overlay.querySelector('.rs-treetable-filter-apply-button');
+            assert(apply, 'The filter can be applied');
+            apply.dispatchEvent(new MouseEvent('click', { bubbles: true }));
             await nextTick();
             await nextTick();
 
-            expect(treeTable.emitted('update:first')[0]).toEqual([0]);
-            expect(treeTable.emitted('update:filters')[0][0].name.constraints[0].value).toBe('vue');
-            expect(wrapper.vm.filters.name.constraints[0].value).toBe('vue');
+            expect(treeTable.emitted('update:first')?.[0]).toEqual([0]);
+            expect(treeTable.emitted<[ReturnType<typeof menuFilters>]>('update:filters')?.[0][0].name.constraints[0].value).toBe('vue');
+            expect((wrapper.vm.filters as ReturnType<typeof menuFilters>).name.constraints[0].value).toBe('vue');
 
             const result = treeTable.vm.processedData;
 
             expect(keys(result)).toEqual(['0']);
-            expect(keys(findNode(result, '0').children)).toEqual(['0-0']);
+            expect(keys(findNode(result, '0')?.children)).toEqual(['0-0']);
 
             wrapper.unmount();
         });

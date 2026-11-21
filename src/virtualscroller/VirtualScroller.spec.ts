@@ -1,16 +1,14 @@
 import { mount } from '@vue/test-utils';
+import type { CSSProperties } from 'vue';
 import PrimeVue from '../config/Config';
 import VirtualScroller from './VirtualScroller.vue';
 
-window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
+type Item = { id: number };
+type ScrollerOptions = { items?: Item[]; getItemSize?: (index: number) => number };
 
-const buildItems = (count) => Array.from({ length: count }, (_, i) => ({ id: i }));
+const buildItems = (count: number) => Array.from({ length: count }, (_, i) => ({ id: i }));
 
-const mountScroller = (props = {}) => {
+const mountScroller = (props: ScrollerOptions = {}) => {
     const wrapper = mount(VirtualScroller, {
         global: { plugins: [PrimeVue] },
         props: {
@@ -46,7 +44,7 @@ describe('VirtualScroller.vue', () => {
         it('should compute spacer height from items.length * itemSize', () => {
             const wrapper = mountScroller();
 
-            expect(wrapper.vm.spacerStyle.height).toBe('600px');
+            expect((wrapper.vm.spacerStyle as CSSProperties).height).toBe('600px');
         });
 
         it('should compute index from scrollTop via floor division', () => {
@@ -60,24 +58,24 @@ describe('VirtualScroller.vue', () => {
 
     describe('variable-size path (getItemSize provided)', () => {
         // header on every fifth row: sizes 80, 30, 30, 30, 30, 80, 30, ...
-        const stepSize = (index) => (index % 5 === 0 ? 80 : 30);
+        const stepSize = (index: number) => (index % 5 === 0 ? 80 : 30);
 
         it('should build cumulative sizes from getItemSize', () => {
             const wrapper = mountScroller({ getItemSize: stepSize });
 
-            const sizes = wrapper.vm.cumulativeSizes;
+            const sizes = wrapper.vm.cumulativeSizes as number[] | null;
 
-            expect(sizes.length).toBe(21);
-            expect(sizes[0]).toBe(0);
-            expect(sizes[1]).toBe(80);
-            expect(sizes[5]).toBe(80 + 30 * 4);
-            expect(sizes[20]).toBe(80 * 4 + 30 * 16);
+            expect(sizes?.length).toBe(21);
+            expect(sizes?.[0]).toBe(0);
+            expect(sizes?.[1]).toBe(80);
+            expect(sizes?.[5]).toBe(80 + 30 * 4);
+            expect(sizes?.[20]).toBe(80 * 4 + 30 * 16);
         });
 
         it('should compute spacer height from cumulative total', () => {
             const wrapper = mountScroller({ getItemSize: stepSize });
 
-            expect(wrapper.vm.spacerStyle.height).toBe(`${80 * 4 + 30 * 16}px`);
+            expect((wrapper.vm.spacerStyle as CSSProperties).height).toBe(`${80 * 4 + 30 * 16}px`);
         });
 
         it('getItemOffset should return the y-coordinate of items[index]', () => {
@@ -103,11 +101,11 @@ describe('VirtualScroller.vue', () => {
         it('should rebuild cumulative sizes when getItemSize reference changes', async () => {
             const wrapper = mountScroller({ getItemSize: stepSize });
 
-            expect(wrapper.vm.spacerStyle.height).toBe(`${80 * 4 + 30 * 16}px`);
+            expect((wrapper.vm.spacerStyle as CSSProperties).height).toBe(`${80 * 4 + 30 * 16}px`);
 
             await wrapper.setProps({ getItemSize: () => 40 });
 
-            expect(wrapper.vm.spacerStyle.height).toBe('800px');
+            expect((wrapper.vm.spacerStyle as CSSProperties).height).toBe('800px');
         });
 
         it('should fall back to uniform math when getItemSize is removed', async () => {
@@ -118,7 +116,7 @@ describe('VirtualScroller.vue', () => {
             await wrapper.setProps({ getItemSize: null });
 
             expect(wrapper.vm.cumulativeSizes).toBe(null);
-            expect(wrapper.vm.spacerStyle.height).toBe('600px');
+            expect((wrapper.vm.spacerStyle as CSSProperties).height).toBe('600px');
         });
 
         it('should rebuild cumulative sizes when same-length items change', async () => {
@@ -128,7 +126,7 @@ describe('VirtualScroller.vue', () => {
             size = 50;
             await wrapper.setProps({ items: buildItems(20).map((item) => ({ ...item })) });
 
-            expect(wrapper.vm.spacerStyle.height).toBe('1000px');
+            expect((wrapper.vm.spacerStyle as CSSProperties).height).toBe('1000px');
         });
 
         it('should cap the rendered range when all remaining items have zero height', () => {
@@ -143,7 +141,7 @@ describe('VirtualScroller.vue', () => {
             wrapper.vm.first = 0;
             wrapper.vm.last = 10;
 
-            expect(wrapper.vm.loadedItems.map((item) => item.id)).toEqual([0, 2, 4, 6, 8]);
+            expect((wrapper.vm.loadedItems as Item[]).map((item) => item.id)).toEqual([0, 2, 4, 6, 8]);
             expect(wrapper.vm.getOptions(1).index).toBe(2);
         });
     });

@@ -1,5 +1,16 @@
+import type {
+    DataTableFilterEvent,
+    DataTableRowClickEvent,
+    DataTableRowSelectEvent,
+    DataTableRowSelectAllEvent,
+    DataTableRowExpandEvent,
+    DataTableRowCollapseEvent,
+    DataTableRowEditInitEvent,
+    DataTableRowEditSaveEvent,
+    DataTableRowEditCancelEvent
+} from 'rose-spectacles/datatable';
 import { FilterMatchMode } from '../core/api/Api';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Button from '../button/Button.vue';
 import PrimeVue from '../config/Config';
 import InputText from '../inputtext/InputText.vue';
@@ -9,13 +20,7 @@ import ColumnGroup from '../columngroup/ColumnGroup.vue';
 import Row from '../row/Row.vue';
 import DataTable from './DataTable.vue';
 
-window.URL.createObjectURL = function () {};
-
-window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
+window.URL.createObjectURL = () => 'blob:rose-spectacles-test';
 
 const smallData = [
     {
@@ -89,7 +94,7 @@ const data = [
 ];
 
 describe('DataTable.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(DataTable, {
@@ -221,14 +226,15 @@ describe('DataTable.vue', () => {
 
     // column grouping
     it('should exist', () => {
-        wrapper = mount({
-            components: {
-                DataTable,
-                ColumnGroup,
-                Row,
-                Column
-            },
-            template: `
+        wrapper = mount(
+            defineComponent({
+                components: {
+                    DataTable,
+                    ColumnGroup,
+                    Row,
+                    Column
+                },
+                template: `
                 <DataTable :value="sales">
                     <ColumnGroup type="header">
                         <Row>
@@ -255,44 +261,42 @@ describe('DataTable.vue', () => {
                     </ColumnGroup>
                 </DataTable>
             `,
-            data() {
-                return {
-                    sales: null
-                };
-            },
-            created() {
-                this.sales = [
-                    { product: 'Bamboo Watch', lastYearSale: 51, thisYearSale: 40, lastYearProfit: 54406, thisYearProfit: 43342 },
-                    { product: 'Black Watch', lastYearSale: 83, thisYearSale: 9, lastYearProfit: 423132, thisYearProfit: 312122 },
-                    { product: 'Blue Band', lastYearSale: 38, thisYearSale: 5, lastYearProfit: 12321, thisYearProfit: 8500 }
-                ];
-            },
-            methods: {
-                formatCurrency(value) {
-                    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-                }
-            },
-            computed: {
-                lastYearTotal() {
-                    let total = 0;
-
-                    for (let sale of this.sales) {
-                        total += sale.lastYearProfit;
-                    }
-
-                    return this.formatCurrency(total);
+                data() {
+                    return {
+                        sales: [
+                            { product: 'Bamboo Watch', lastYearSale: 51, thisYearSale: 40, lastYearProfit: 54406, thisYearProfit: 43342 },
+                            { product: 'Black Watch', lastYearSale: 83, thisYearSale: 9, lastYearProfit: 423132, thisYearProfit: 312122 },
+                            { product: 'Blue Band', lastYearSale: 38, thisYearSale: 5, lastYearProfit: 12321, thisYearProfit: 8500 }
+                        ]
+                    };
                 },
-                thisYearTotal() {
-                    let total = 0;
-
-                    for (let sale of this.sales) {
-                        total += sale.thisYearProfit;
+                methods: {
+                    formatCurrency(value: number) {
+                        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
                     }
+                },
+                computed: {
+                    lastYearTotal() {
+                        let total = 0;
 
-                    return this.formatCurrency(total);
+                        for (let sale of this.sales) {
+                            total += sale.lastYearProfit;
+                        }
+
+                        return this.formatCurrency(total);
+                    },
+                    thisYearTotal() {
+                        let total = 0;
+
+                        for (let sale of this.sales) {
+                            total += sale.thisYearProfit;
+                        }
+
+                        return this.formatCurrency(total);
+                    }
                 }
-            }
-        });
+            })
+        );
 
         expect(wrapper.find('.rs-datatable .rs-datatable-tfoot').exists()).toBe(true);
         expect(wrapper.find('.rs-datatable .rs-datatable-thead').exists()).toBe(true);
@@ -354,8 +358,8 @@ describe('DataTable.vue', () => {
         expect(headerClick).toHaveBeenCalled();
         expect(sortableTH.classes()).toContain('rs-datatable-column-sorted');
         expect(wrapper.findAll('.rs-datatable-tbody > tr')[0].findAll('td')[1].text()).not.toEqual(firstCellText);
-        expect(wrapper.emitted()['update:sortField'][0]).toEqual(['code']);
-        expect(wrapper.emitted()['value-change'][0]).not.toBeNull();
+        expect(wrapper.emitted<unknown[]>()['update:sortField'][0]).toEqual(['code']);
+        expect(wrapper.emitted<unknown[]>()['value-change'][0]).not.toBeNull();
     });
 
     it('should multiple sort', async () => {
@@ -393,9 +397,9 @@ describe('DataTable.vue', () => {
 
         expect(headerClick).toHaveBeenCalled();
         expect(sortableTHs[1].classes()).toContain('rs-datatable-column-sorted');
-        expect(wrapper.emitted()['update:multiSortMeta'][0]).toEqual([[{ field: 'code', order: 1 }]]);
-        expect(wrapper.emitted()['update:multiSortMeta'][1]).toEqual([[{ field: 'name', order: 1 }]]);
-        expect(wrapper.emitted()['value-change'][0]).not.toEqual(wrapper.emitted()['value-change'][1]);
+        expect(wrapper.emitted<unknown[]>()['update:multiSortMeta'][0]).toEqual([[{ field: 'code', order: 1 }]]);
+        expect(wrapper.emitted<unknown[]>()['update:multiSortMeta'][1]).toEqual([[{ field: 'name', order: 1 }]]);
+        expect(wrapper.emitted<unknown[]>()['value-change'][0]).not.toEqual(wrapper.emitted<unknown[]>()['value-change'][1]);
         expect(wrapper.findAll('.rs-datatable-tbody > tr')[1].findAll('td')[1].text()).not.toEqual(seconCellText);
     });
 
@@ -475,7 +479,7 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.filter(smallData);
 
-        expect(wrapper.emitted().filter[0][0].filteredValue.length).not.toEqual(3);
+        expect(wrapper.emitted<[DataTableFilterEvent]>('filter')![0][0].filteredValue.length).not.toEqual(3);
     });
 
     it('should filtered with menu display', async () => {
@@ -487,8 +491,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.filter(smallData);
 
-        expect(wrapper.emitted()['filter'][0][0].filteredValue.length).not.toEqual(3);
-        expect(wrapper.emitted()['value-change'][0][0].length).not.toEqual(3);
+        expect(wrapper.emitted<[DataTableFilterEvent]>('filter')![0][0].filteredValue.length).not.toEqual(3);
+        expect(wrapper.emitted<[unknown[]]>('value-change')![0][0].length).not.toEqual(3);
     });
 
     it('should filtered with row display', async () => {
@@ -500,13 +504,13 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.filter(smallData);
 
-        expect(wrapper.emitted()['filter'][0][0].filteredValue.length).not.toEqual(3);
-        expect(wrapper.emitted()['value-change'][0][0].length).not.toEqual(3);
+        expect(wrapper.emitted<[DataTableFilterEvent]>('filter')![0][0].filteredValue.length).not.toEqual(3);
+        expect(wrapper.emitted<[unknown[]]>('value-change')![0][0].length).not.toEqual(3);
     });
 
     // selection
     it('should single select', async () => {
-        await wrapper.setProps({ selection: null, selectionMode: 'single' });
+        await wrapper.setProps({ selection: undefined, selectionMode: 'single' });
 
         await wrapper.vm.onRowClick({
             originalEvent: { currentTarget: wrapper.findAll('tr.rs-datatable-selectable-row')[0].element },
@@ -514,13 +518,13 @@ describe('DataTable.vue', () => {
             index: 0
         });
 
-        expect(wrapper.emitted()['row-click'][0][0].index).toEqual(0);
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual(smallData[0]);
-        expect(wrapper.emitted()['row-select'][0][0].index).toEqual(0);
+        expect(wrapper.emitted<[DataTableRowClickEvent]>('row-click')![0][0].index).toEqual(0);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][0][0]).toEqual(smallData[0]);
+        expect(wrapper.emitted<[DataTableRowSelectEvent]>('row-select')![0][0].index).toEqual(0);
     });
 
     it('should multiple selection with meta key', async () => {
-        await wrapper.setProps({ selection: null, selectionMode: 'multiple' });
+        await wrapper.setProps({ selection: undefined, selectionMode: 'multiple' });
 
         await wrapper.vm.onRowClick({
             originalEvent: { shiftKey: true, currentTarget: wrapper.findAll('tr.rs-datatable-selectable-row')[0].element },
@@ -534,13 +538,13 @@ describe('DataTable.vue', () => {
             index: 1
         });
 
-        expect(wrapper.emitted()['row-click'][0][0].index).toEqual(0);
-        expect(wrapper.emitted()['row-click'][1][0].index).toEqual(1);
-        expect(wrapper.emitted()['update:selection'][1][0]).toEqual([smallData[0], smallData[1]]);
+        expect(wrapper.emitted<[DataTableRowClickEvent]>('row-click')![0][0].index).toEqual(0);
+        expect(wrapper.emitted<[DataTableRowClickEvent]>('row-click')![1][0].index).toEqual(1);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][1][0]).toEqual([smallData[0], smallData[1]]);
     });
 
     it('should multiple selection without meta key', async () => {
-        await wrapper.setProps({ selection: null, selectionMode: 'multiple', metaKeySelection: false });
+        await wrapper.setProps({ selection: undefined, selectionMode: 'multiple', metaKeySelection: false });
 
         await wrapper.vm.onRowClick({
             originalEvent: { currentTarget: wrapper.findAll('.rs-datatable-selectable-row')[0].element },
@@ -554,12 +558,12 @@ describe('DataTable.vue', () => {
             index: 1
         });
 
-        expect(wrapper.emitted()['row-click'][0][0].index).toEqual(0);
-        expect(wrapper.emitted()['row-click'][1][0].index).toEqual(1);
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual([smallData[0]]);
-        expect(wrapper.emitted()['update:selection'][1][0]).toEqual([smallData[1]]);
-        expect(wrapper.emitted()['row-select'][0][0].index).toBe(0);
-        expect(wrapper.emitted()['row-select'][1][0].index).toBe(1);
+        expect(wrapper.emitted<[DataTableRowClickEvent]>('row-click')![0][0].index).toEqual(0);
+        expect(wrapper.emitted<[DataTableRowClickEvent]>('row-click')![1][0].index).toEqual(1);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][0][0]).toEqual([smallData[0]]);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][1][0]).toEqual([smallData[1]]);
+        expect(wrapper.emitted<[DataTableRowSelectEvent]>('row-select')![0][0].index).toBe(0);
+        expect(wrapper.emitted<[DataTableRowSelectEvent]>('row-select')![1][0].index).toBe(1);
     });
 
     // radio selection
@@ -573,7 +577,7 @@ describe('DataTable.vue', () => {
             },
             props: {
                 value: smallData,
-                selection: null
+                selection: undefined
             },
             slots: {
                 default: `
@@ -589,13 +593,13 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.toggleRowWithRadio({ originalEvent: {}, data: smallData[0], index: 0 });
 
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual(smallData[0]);
-        expect(wrapper.emitted()['row-select'][0][0].index).toBe(0);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][0][0]).toEqual(smallData[0]);
+        expect(wrapper.emitted<[DataTableRowSelectEvent]>('row-select')![0][0].index).toBe(0);
 
         await wrapper.vm.toggleRowWithRadio({ originalEvent: {}, data: smallData[1], index: 1 });
 
-        expect(wrapper.emitted()['update:selection'][1][0]).toEqual(smallData[1]);
-        expect(wrapper.emitted()['row-select'][1][0].index).toBe(1);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][1][0]).toEqual(smallData[1]);
+        expect(wrapper.emitted<[DataTableRowSelectEvent]>('row-select')![1][0].index).toBe(1);
     });
 
     // checkbox selection
@@ -609,7 +613,7 @@ describe('DataTable.vue', () => {
             },
             props: {
                 value: smallData,
-                selection: null
+                selection: undefined
             },
             slots: {
                 default: `
@@ -624,13 +628,13 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.toggleRowWithCheckbox({ originalEvent: {}, data: smallData[0], index: 0 });
 
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual([smallData[0]]);
-        expect(wrapper.emitted()['row-select'][0][0].index).toBe(0);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][0][0]).toEqual([smallData[0]]);
+        expect(wrapper.emitted<[DataTableRowSelectEvent]>('row-select')![0][0].index).toBe(0);
 
         await wrapper.vm.toggleRowWithCheckbox({ originalEvent: {}, data: smallData[1], index: 1 });
 
-        expect(wrapper.emitted()['update:selection'][1][0]).toEqual([smallData[1]]);
-        expect(wrapper.emitted()['row-select'][1][0].index).toBe(1);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][1][0]).toEqual([smallData[1]]);
+        expect(wrapper.emitted<[DataTableRowSelectEvent]>('row-select')![1][0].index).toBe(1);
     });
 
     it('should not select row when inner button is clicked', async () => {
@@ -673,7 +677,7 @@ describe('DataTable.vue', () => {
 
         await button.trigger('click');
 
-        expect(wrapper.emitted()['row-click']).toBeUndefined();
+        expect(wrapper.emitted<[DataTableRowClickEvent]>('row-click')!).toBeUndefined();
     });
 
     it('should select all rows', async () => {
@@ -686,7 +690,7 @@ describe('DataTable.vue', () => {
             },
             props: {
                 value: smallData,
-                selection: null
+                selection: undefined
             },
             slots: {
                 default: `
@@ -699,8 +703,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.toggleRowsWithCheckbox({ originalEvent: {}, checked: true });
 
-        expect(wrapper.emitted()['row-select-all'][0][0].data).toEqual(smallData);
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual(smallData);
+        expect(wrapper.emitted<[DataTableRowSelectAllEvent]>('row-select-all')![0][0].data).toEqual(smallData);
+        expect(wrapper.emitted<unknown[]>()['update:selection'][0][0]).toEqual(smallData);
     });
 
     it('should unselect all rows', async () => {
@@ -726,8 +730,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.toggleRowsWithCheckbox({ originalEvent: {}, checked: false });
 
-        expect(wrapper.emitted()['row-unselect-all'][0][0].data).toBe(undefined);
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual([]);
+        expect(wrapper.emitted('row-unselect-all')?.[0]?.[0]).not.toHaveProperty('data');
+        expect(wrapper.emitted<unknown[]>()['update:selection'][0][0]).toEqual([]);
     });
 
     // scrolling
@@ -758,7 +762,6 @@ describe('DataTable.vue', () => {
 
     // frozen columns
     it('should have frozen columns', () => {
-        wrapper = null;
         wrapper = mount(DataTable, {
             global: {
                 plugins: [PrimeVue],
@@ -768,7 +771,7 @@ describe('DataTable.vue', () => {
             },
             props: {
                 value: smallData,
-                selection: null,
+                selection: undefined,
                 scrollable: true,
                 scrollDirection: 'both'
             },
@@ -798,8 +801,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.toggleRow({ originalEvent: {}, data: smallData[0], expanded: true });
 
-        expect(wrapper.emitted()['update:expandedRows'][0][0]).toEqual([smallData[0]]);
-        expect(wrapper.emitted()['row-expand'][0][0].data).toEqual(smallData[0]);
+        expect(wrapper.emitted<unknown[]>()['update:expandedRows'][0][0]).toEqual([smallData[0]]);
+        expect(wrapper.emitted<[DataTableRowExpandEvent]>('row-expand')![0][0].data).toEqual(smallData[0]);
     });
 
     it('should collapse a row', async () => {
@@ -807,8 +810,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.toggleRow({ originalEvent: {}, data: smallData[0] });
 
-        expect(wrapper.emitted()['update:expandedRows'][0][0]).toEqual([]);
-        expect(wrapper.emitted()['row-collapse'][0][0].data).toEqual(smallData[0]);
+        expect(wrapper.emitted<unknown[]>()['update:expandedRows'][0][0]).toEqual([]);
+        expect(wrapper.emitted<[DataTableRowCollapseEvent]>('row-collapse')![0][0].data).toEqual(smallData[0]);
     });
 
     // editing
@@ -851,8 +854,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.onRowEditInit({ data: smallData[0] });
 
-        expect(wrapper.emitted()['update:editingRows'][0][0]).toEqual([smallData[0]]);
-        expect(wrapper.emitted()['row-edit-init'][0][0].data).toEqual(smallData[0]);
+        expect(wrapper.emitted<unknown[]>()['update:editingRows'][0][0]).toEqual([smallData[0]]);
+        expect(wrapper.emitted<[DataTableRowEditInitEvent]>('row-edit-init')![0][0].data).toEqual(smallData[0]);
         expect(
             wrapper
                 .findAll('.rs-datatable-tbody > tr > td')
@@ -894,8 +897,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.onRowEditSave({ data: { id: '9999', code: 'vbb124btr', name: 'Game Controller' } });
 
-        expect(wrapper.emitted()['update:editingRows'][0][0]).toEqual([]);
-        expect(wrapper.emitted()['row-edit-save'][0][0].data).toEqual({ id: '9999', code: 'vbb124btr', name: 'Game Controller' });
+        expect(wrapper.emitted<unknown[]>()['update:editingRows'][0][0]).toEqual([]);
+        expect(wrapper.emitted<[DataTableRowEditSaveEvent]>('row-edit-save')![0][0].data).toEqual({ id: '9999', code: 'vbb124btr', name: 'Game Controller' });
     });
 
     it('should cancel row editing', async () => {
@@ -931,8 +934,8 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.onRowEditCancel({ data: smallData[0] });
 
-        expect(wrapper.emitted()['update:editingRows'][0][0]).toEqual([]);
-        expect(wrapper.emitted()['row-edit-cancel'][0][0].data).toEqual(smallData[0]);
+        expect(wrapper.emitted<unknown[]>()['update:editingRows'][0][0]).toEqual([]);
+        expect(wrapper.emitted<[DataTableRowEditCancelEvent]>('row-edit-cancel')![0][0].data).toEqual(smallData[0]);
     });
 
     // column resize
@@ -987,7 +990,7 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.onColumnResizeStart({ target: resizer.element });
 
-        expect(wrapper.componentVM.columnResizing).toBe(true);
+        expect(wrapper.vm.columnResizing).toBe(true);
         expect(wrapper.find('.rs-datatable-column-resize-indicator').attributes().style).toContain('display: none;');
     });
 
@@ -1072,7 +1075,7 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.onColumnResizeStart({ target: resizer.element });
 
-        expect(wrapper.componentVM.columnResizing).toBe(true);
+        expect(wrapper.vm.columnResizing).toBe(true);
         expect(wrapper.find('.rs-datatable-column-resize-indicator').attributes().style).toContain('display: none;');
     });
 
@@ -1135,7 +1138,14 @@ describe('DataTable.vue', () => {
     // column width identity
 
     // Reasoning: mirrors resizeTableCells, which measures every header cell the selector finds, so a filter row is included exactly as it is at runtime.
-    const seedResizedWidths = (table, widthByColumn) => {
+    interface ResizableTable {
+        $refs: { table: HTMLTableElement };
+        cacheColumnWidthsByKey(widths: number[]): void;
+        addColumnWidthStyles(widths: number[]): void;
+        styleElement?: HTMLStyleElement;
+    }
+
+    const seedResizedWidths = (table: ResizableTable, widthByColumn: number[]) => {
         const headers = table.$refs.table.querySelectorAll('thead[data-pc-section="thead"] > tr > th');
         const widths = [...headers].map((header, index) => widthByColumn[index % widthByColumn.length]);
 
@@ -1145,8 +1155,8 @@ describe('DataTable.vue', () => {
         table.addColumnWidthStyles(widths);
     };
 
-    const appliedWidths = (table) => {
-        const css = table.styleElement ? table.styleElement.textContent : '';
+    const appliedWidths = (table: ResizableTable) => {
+        const css = table.styleElement?.textContent ?? '';
 
         return [...css.matchAll(/th:nth-child\((\d+)\)[\s\S]*?width:\s*([\d.]+)px/g)].map((match) => Number(match[2]));
     };
@@ -1391,7 +1401,7 @@ describe('DataTable.vue', () => {
         expect(table.$refs.table.style.minWidth).toBe('320px');
     });
 
-    const mountStatefulTable = (withCode) => {
+    const mountStatefulTable = (withCode: boolean) => {
         const TestComponent = defineComponent({
             components: { Column, DataTable },
             data: () => ({ rows: smallData }),
@@ -1412,7 +1422,7 @@ describe('DataTable.vue', () => {
         wrapper.vm.$refs.table.cacheColumnWidthsByKey([80, 160, 240]);
         wrapper.vm.$refs.table.saveState();
 
-        const stored = JSON.parse(window.localStorage.getItem('dt-keyed-state'));
+        const stored = JSON.parse(window.localStorage.getItem('dt-keyed-state')!);
 
         expect(stored.columnWidthsByKey).toEqual({ id: 80, code: 160, name: 240 });
 
@@ -1439,7 +1449,7 @@ describe('DataTable.vue', () => {
         await nextTick();
         wrapper.vm.$refs.table.saveState();
 
-        const stored = JSON.parse(window.localStorage.getItem('dt-keyed-state'));
+        const stored = JSON.parse(window.localStorage.getItem('dt-keyed-state')!);
 
         // Reasoning: code is not on screen, but dropping it would lose its width for good once it is shown again.
         expect(stored.columnWidthsByKey).toEqual({ id: 80, code: 160, name: 240 });
@@ -1475,7 +1485,7 @@ describe('DataTable.vue', () => {
         wrapper.vm.$refs.table.cacheColumnWidthsByKey([80, 160, 240]);
         wrapper.vm.$refs.table.saveState();
 
-        const stored = JSON.parse(window.localStorage.getItem('dt-keyed-state'));
+        const stored = JSON.parse(window.localStorage.getItem('dt-keyed-state')!);
 
         // Reasoning: the selection column is tracked by array index in memory, which would point at a different column after a reload.
         expect(stored.columnWidthsByKey).toEqual({ id: 80, name: 240 });
@@ -1707,7 +1717,7 @@ describe('DataTable.vue', () => {
                 sortOrder: 1,
                 scrollable: true,
                 expandableRowGroups: true,
-                expandedRowGroups: null
+                expandedRowGroups: undefined
             },
             slots: {
                 default: `
@@ -1732,8 +1742,8 @@ describe('DataTable.vue', () => {
 
         await firstToggler.trigger('click');
 
-        expect(wrapper.emitted()['update:expandedRowGroups'][0]).toEqual([['Amy Elsner']]);
-        expect(wrapper.emitted()['rowgroup-expand'][0][0].data).toBe('Amy Elsner');
+        expect(wrapper.emitted<unknown[]>()['update:expandedRowGroups'][0]).toEqual([['Amy Elsner']]);
+        expect(wrapper.emitted<[{ data: string }]>('rowgroup-expand')?.[0][0].data).toBe('Amy Elsner');
     });
 
     it('should have rowspan grouping', async () => {
@@ -1820,7 +1830,7 @@ describe('DataTable.vue', () => {
 
         await wrapper.vm.getStorage();
 
-        expect(wrapper.emitted()['state-save'][0]).not.toBeNull();
+        expect(wrapper.emitted<unknown[]>()['state-save'][0]).not.toBeNull();
     });
 
     it('should save session storage', async () => {
@@ -1830,7 +1840,7 @@ describe('DataTable.vue', () => {
         await wrapper.vm.saveState();
 
         expect(sessionStorage.setItem).toHaveBeenCalled();
-        expect(wrapper.emitted()['state-save'][0]).not.toBeNull();
+        expect(wrapper.emitted<unknown[]>()['state-save'][0]).not.toBeNull();
     });
 
     it('should save local storage', async () => {
@@ -1840,7 +1850,7 @@ describe('DataTable.vue', () => {
         await wrapper.vm.saveState();
 
         expect(localStorage.setItem).toHaveBeenCalled();
-        expect(wrapper.emitted()['state-save'][0]).not.toBeNull();
+        expect(wrapper.emitted<unknown[]>()['state-save'][0]).not.toBeNull();
     });
 
     // contextmenu
@@ -1856,7 +1866,7 @@ describe('DataTable.vue', () => {
             },
             props: {
                 value: smallData,
-                selection: null
+                selection: undefined
             },
             slots: {
                 default: `
@@ -1887,7 +1897,7 @@ describe('DataTable.vue', () => {
             },
             props: {
                 value: smallData,
-                selection: null
+                selection: undefined
             },
             slots: {
                 default: `
@@ -1919,7 +1929,8 @@ describe('DataTable.vue', () => {
         { id: 3, rep: 'John' },
         { id: 4, rep: 'Maria' }
     ];
-    const mountGroupedTable = (props = {}) =>
+    type GroupedTableProps = Pick<InstanceType<typeof DataTable>['$props'], 'virtualScrollerOptions' | 'expandableRowGroups' | 'expandedRowGroups'>;
+    const mountGroupedTable = (props: GroupedTableProps = {}) =>
         mount(DataTable, {
             global: {
                 plugins: [PrimeVue],
@@ -1949,7 +1960,7 @@ describe('DataTable.vue', () => {
     });
 
     it('should include group headers, footers and custom item sizes', () => {
-        wrapper = mountGroupedTable({ virtualScrollerOptions: { itemSize: 36, getItemSize: (index) => (index === 1 ? 28 : 36) } });
+        wrapper = mountGroupedTable({ virtualScrollerOptions: { itemSize: 36, getItemSize: (index: number) => (index === 1 ? 28 : 36) } });
         wrapper.vm.d_rowGroupHeaderHeight = 40;
         wrapper.vm.d_rowGroupFooterHeight = 20;
 

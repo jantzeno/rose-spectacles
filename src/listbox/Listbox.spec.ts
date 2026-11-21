@@ -1,14 +1,13 @@
-import { mount } from '@vue/test-utils';
-import { nextTick, reactive } from 'vue';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import type { ListboxProps } from 'rose-spectacles/listbox';
+import { defineComponent, nextTick, reactive, type Component } from 'vue';
+import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
 import Listbox from './Listbox.vue';
 
-window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
+type ListboxWrapper = VueWrapper<InstanceType<typeof Listbox>>;
+type City = { name: string; code: string; disabled?: boolean };
 
-const cities = () => [
+const cities = (): City[] => [
     { name: 'New York', code: 'NY' },
     { name: 'Rome', code: 'RM' },
     { name: 'London', code: 'LDN' },
@@ -39,18 +38,19 @@ const groupedCities = () => [
     }
 ];
 
-const mountListbox = (props = {}) => mount(Listbox, { props: { options: cities(), optionLabel: 'name', ...props } });
+const mountListbox = (props: ListboxProps = {}, component: Component = Listbox): ListboxWrapper =>
+    mount(component, { props: { options: cities(), optionLabel: 'name', ...props } }) as unknown as ListboxWrapper;
 
-const selectedLabels = (wrapper) =>
+const selectedLabels = (wrapper: ListboxWrapper) =>
     wrapper
         .findAll('li.rs-listbox-option')
         .filter((option) => option.attributes('aria-selected') === 'true')
         .map((option) => option.attributes('aria-label'));
 
-const lastEmittedValue = (wrapper) => wrapper.emitted('update:modelValue').at(-1)[0];
+const lastEmittedValue = <T = unknown>(wrapper: ListboxWrapper) => wrapper.emitted<[T]>('update:modelValue')?.at(-1)?.[0];
 
 describe('Listbox.vue', () => {
-    let wrapper;
+    let wrapper: ListboxWrapper;
 
     beforeEach(() => {
         wrapper = mount(Listbox, {
@@ -75,11 +75,11 @@ describe('Listbox.vue', () => {
     });
 
     it('should select a list item', async () => {
-        await wrapper.vm.onOptionSelect({}, wrapper.vm.options[0]);
+        await wrapper.vm.onOptionSelect({}, wrapper.vm.options![0]);
 
-        expect(wrapper.emitted()['update:modelValue'][0]).toEqual([wrapper.vm.options[0]]);
+        expect(wrapper.emitted()['update:modelValue'][0]).toEqual([wrapper.vm.options![0]]);
 
-        await wrapper.setProps({ modelValue: wrapper.vm.options[0] });
+        await wrapper.setProps({ modelValue: wrapper.vm.options![0] });
 
         expect(wrapper.findAll('li.rs-listbox-option')[0].classes()).toContain('rs-listbox-option-selected');
     });
@@ -300,7 +300,7 @@ describe('Listbox.vue', () => {
 
             // jsdom has no layout, so the scroller can't work out its viewport. Set the rendered range by hand,
             // far down the list, as if the user had scrolled there.
-            const scroller = wrapper.vm.virtualScroller;
+            const scroller = wrapper.getComponent(VirtualScroller).vm;
 
             scroller.first = 900;
             scroller.last = 920;
@@ -319,18 +319,17 @@ describe('Listbox.vue', () => {
 
     describe('overridden isEquals', () => {
         // A component that extends Listbox with its own equality rule, here case-insensitive codes.
-        const CaseInsensitiveListbox = {
+        const CaseInsensitiveListbox = defineComponent({
             extends: Listbox,
             render: Listbox.render,
             methods: {
-                isEquals(value1, value2) {
+                isEquals(value1: unknown, value2: unknown) {
                     return String(value1).toLowerCase() === String(value2).toLowerCase();
                 }
             }
-        };
+        });
 
-        const mountCaseInsensitive = (props) =>
-            mount(CaseInsensitiveListbox, { props: { options: cities(), optionLabel: 'name', multiple: true, optionValue: 'code', ...props } });
+        const mountCaseInsensitive = (props: ListboxProps) => mountListbox({ multiple: true, optionValue: 'code', ...props }, CaseInsensitiveListbox);
 
         it('should use the overridden isEquals to show selected options', () => {
             const wrapper = mountCaseInsensitive({ modelValue: ['rm', 'prs'] });

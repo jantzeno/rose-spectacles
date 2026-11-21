@@ -17,7 +17,7 @@ export default defineConfig({
     resolve: { alias: sourceEntries },
     plugins: [vue()] as unknown as UserConfig['plugins'],
     test: {
-        include: ['src/**/*.spec.{js,ts}', 'gallery/**/*.spec.ts'],
+        include: ['src/**/*.spec.ts', 'gallery/**/*.spec.ts'],
         globals: true,
         environment: 'jsdom',
         environmentOptions: { jsdom: { url: 'http://localhost/' } },

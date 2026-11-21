@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import VirtualScrollerStyle from './style/VirtualScrollerStyle';
 
@@ -22,7 +22,7 @@ export default defineComponent({
             default: 0
         },
         getItemSize: {
-            type: Function,
+            type: Function as unknown as PropType<((index: number) => number) | null>,
             default: null
         },
         scrollHeight: null,

@@ -1,16 +1,15 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import type { AutoCompleteProps } from 'rose-spectacles/autocomplete';
 import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
-import { nextTick, reactive, toRaw } from 'vue';
+import { defineComponent, nextTick, reactive, toRaw, type Component } from 'vue';
+import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
 import AutoComplete from './AutoComplete.vue';
 
-window.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
+type AutoCompleteWrapper = VueWrapper<InstanceType<typeof AutoComplete>>;
+type City = { name: string; code: string; disabled?: boolean };
 
-const cities = () => [
+const cities = (): City[] => [
     { name: 'New York', code: 'NY' },
     { name: 'Rome', code: 'RM' },
     { name: 'London', code: 'LDN' },
@@ -20,7 +19,7 @@ const cities = () => [
 
 const cityNames = () => cities().map((city) => city.name);
 
-const mountAutoComplete = (props = {}, component = AutoComplete) =>
+const mountAutoComplete = (props: AutoCompleteProps = {}, component: Component = AutoComplete): AutoCompleteWrapper =>
     mount(component, {
         global: {
             plugins: [PrimeVue],
@@ -29,16 +28,16 @@ const mountAutoComplete = (props = {}, component = AutoComplete) =>
             }
         },
         props: { multiple: true, suggestions: cities(), optionLabel: 'name', ...props }
-    });
+    }) as unknown as AutoCompleteWrapper;
 
-const openOverlay = async (wrapper) => {
+const openOverlay = async (wrapper: AutoCompleteWrapper) => {
     wrapper.vm.show();
     await nextTick();
 };
 
 // The labels of the rendered options shown as selected. Fails if aria-selected, data-p-selected and the selected
 // class disagree, since each of them asks isSelected on its own.
-const selectedLabels = (wrapper) =>
+const selectedLabels = (wrapper: AutoCompleteWrapper) =>
     wrapper
         .findAll('li.rs-autocomplete-option')
         .filter((option) => {
@@ -51,10 +50,10 @@ const selectedLabels = (wrapper) =>
         })
         .map((option) => option.attributes('aria-label'));
 
-const lastEmittedValue = (wrapper) => wrapper.emitted('update:modelValue').at(-1)[0];
+const lastEmittedValue = <T = unknown>(wrapper: AutoCompleteWrapper) => wrapper.emitted<[T]>('update:modelValue')?.at(-1)?.[0];
 
 describe('AutoComplete.vue', () => {
-    let wrapper;
+    let wrapper: AutoCompleteWrapper;
 
     beforeEach(async () => {
         wrapper = mount(AutoComplete, {
@@ -65,18 +64,7 @@ describe('AutoComplete.vue', () => {
                 }
             },
             props: {
-                suggestions: null,
                 field: 'name'
-            },
-            data() {
-                return {
-                    countries: [
-                        { name: 'Afghanistan', code: 'AF' },
-                        { name: 'Bahrain', code: 'BH' },
-                        { name: 'Chile', code: 'CL' },
-                        { name: 'Denmark', code: 'DK' }
-                    ]
-                };
             }
         });
 
@@ -152,8 +140,8 @@ describe('AutoComplete.vue', () => {
     });
 
     describe('nested overlays', () => {
-        let overlay;
-        let nestedOverlay;
+        let overlay: HTMLElement;
+        let nestedOverlay: HTMLDivElement;
 
         beforeEach(async () => {
             vi.useFakeTimers();
@@ -163,7 +151,7 @@ describe('AutoComplete.vue', () => {
             wrapper.vm.search(event, event.target.value, 'input');
             await wrapper.setProps({ suggestions: [{ name: 'Bahrain', code: 'BH' }] });
 
-            overlay = wrapper.vm.overlay;
+            overlay = wrapper.get<HTMLElement>('.rs-autocomplete-overlay').element;
             wrapper.vm.onOverlayEnter(overlay);
             wrapper.vm.onOverlayAfterEnter();
 
@@ -182,7 +170,7 @@ describe('AutoComplete.vue', () => {
             vi.runAllTimers();
         };
 
-        const clickOnNestedOverlay = (emitterTarget) => {
+        const clickOnNestedOverlay = (emitterTarget: Element | null) => {
             nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), {
                 once: true
             });
@@ -403,7 +391,7 @@ describe('AutoComplete.vue selection', () => {
             await openOverlay(wrapper);
             expect(selectedLabels(wrapper)).toEqual(['Rome', 'Paris']);
 
-            await wrapper.setProps({ dataKey: null });
+            await wrapper.setProps({ dataKey: undefined });
             expect(selectedLabels(wrapper)).toEqual(['Paris']);
         });
 
@@ -437,7 +425,7 @@ describe('AutoComplete.vue selection', () => {
 
             // jsdom has no layout, so the scroller can't work out its viewport. Set the rendered range by hand,
             // far down the list, as if the user had scrolled there.
-            const scroller = wrapper.vm.virtualScroller;
+            const scroller = wrapper.getComponent(VirtualScroller).vm;
 
             scroller.first = 900;
             scroller.last = 920;
@@ -569,17 +557,18 @@ describe('AutoComplete.vue selection', () => {
 
     describe('overridden isEquals', () => {
         // A component that extends AutoComplete with its own equality rule, here case-insensitive values.
-        const CaseInsensitiveAutoComplete = {
+        const CaseInsensitiveAutoComplete = defineComponent({
             extends: AutoComplete,
             render: AutoComplete.render,
             methods: {
-                isEquals(value1, value2) {
+                isEquals(value1: unknown, value2: unknown) {
                     return String(value1).toLowerCase() === String(value2).toLowerCase();
                 }
             }
-        };
+        });
 
-        const mountCaseInsensitive = (props) => mountAutoComplete({ suggestions: cityNames(), optionLabel: undefined, ...props }, CaseInsensitiveAutoComplete);
+        const mountCaseInsensitive = (props: AutoCompleteProps) =>
+            mountAutoComplete({ suggestions: cityNames(), optionLabel: undefined, ...props }, CaseInsensitiveAutoComplete);
 
         it('should use the overridden isEquals to show selected suggestions', async () => {
             const wrapper = mountCaseInsensitive({ modelValue: ['rome', 'PARIS'] });

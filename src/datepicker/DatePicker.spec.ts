@@ -1,10 +1,10 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
 describe('DatePicker.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof DatePicker>>;
 
     beforeEach(() => {
         wrapper = mount(DatePicker, {
@@ -130,14 +130,10 @@ describe('DatePicker.vue', () => {
 
         await input.setValue('06/15/1988 14:30');
 
-        const emitted = wrapper.emitted('update:modelValue');
+        const value = wrapper.emitted<[Date]>('update:modelValue')?.at(-1)?.[0];
 
-        expect(emitted).toBeTruthy();
-
-        const value = emitted[emitted.length - 1][0];
-
-        expect(value.getHours()).toBe(14);
-        expect(value.getMinutes()).toBe(30);
+        expect(value?.getHours()).toBe(14);
+        expect(value?.getMinutes()).toBe(30);
         expect(wrapper.vm.pm).toBeNull();
     });
 
@@ -148,14 +144,10 @@ describe('DatePicker.vue', () => {
 
         await input.setValue('06/15/1988 02:30 PM');
 
-        const emitted = wrapper.emitted('update:modelValue');
+        const value = wrapper.emitted<[Date]>('update:modelValue')?.at(-1)?.[0];
 
-        expect(emitted).toBeTruthy();
-
-        const value = emitted[emitted.length - 1][0];
-
-        expect(value.getHours()).toBe(14);
-        expect(value.getMinutes()).toBe(30);
+        expect(value?.getHours()).toBe(14);
+        expect(value?.getMinutes()).toBe(30);
         expect(wrapper.vm.pm).toBe(true);
     });
 
@@ -230,11 +222,13 @@ describe('DatePicker.vue', () => {
     });
 
     describe('nested overlays', () => {
-        let nestedOverlay;
+        let nestedOverlay: HTMLDivElement;
+        let overlay: HTMLElement;
 
         beforeEach(async () => {
             await wrapper.setData({ overlayVisible: true });
-            wrapper.vm.onOverlayEnter(wrapper.vm.overlay);
+            overlay = wrapper.get<HTMLElement>('.rs-datepicker-panel').element;
+            wrapper.vm.onOverlayEnter(overlay);
             wrapper.vm.onOverlayEnterComplete();
 
             nestedOverlay = document.createElement('div');
@@ -246,7 +240,7 @@ describe('DatePicker.vue', () => {
             nestedOverlay.remove();
         });
 
-        const mousedownOnNestedOverlay = (emitterTarget) => {
+        const mousedownOnNestedOverlay = (emitterTarget: Element | null) => {
             const event = new MouseEvent('mousedown', { bubbles: true });
 
             nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), {
@@ -256,7 +250,7 @@ describe('DatePicker.vue', () => {
         };
 
         it('should stay open when an overlay of a component inside the panel is clicked', () => {
-            const footer = wrapper.vm.overlay.querySelector('.rs-datepicker-buttonbar') || wrapper.vm.overlay.firstElementChild;
+            const footer = overlay.querySelector('.rs-datepicker-buttonbar') || overlay.firstElementChild;
 
             mousedownOnNestedOverlay(footer);
 
@@ -270,7 +264,7 @@ describe('DatePicker.vue', () => {
         });
 
         it('should close on a regular outside click after a nested overlay click', () => {
-            mousedownOnNestedOverlay(wrapper.vm.overlay.firstElementChild);
+            mousedownOnNestedOverlay(overlay.firstElementChild);
             document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
 
             expect(wrapper.vm.overlayVisible).toBe(false);
@@ -280,7 +274,7 @@ describe('DatePicker.vue', () => {
             const combobox = document.createElement('span');
 
             combobox.setAttribute('aria-expanded', 'true');
-            wrapper.vm.overlay.appendChild(combobox);
+            overlay.appendChild(combobox);
             document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
 
             expect(wrapper.vm.overlayVisible).toBe(true);
