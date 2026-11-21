@@ -10,7 +10,7 @@ import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spe
 import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import { VNode } from 'vue';
 import type { PassThroughOptions } from '../types';
-import { useFormFieldState } from '../useform';
+import type { useFormFieldState } from 'rose-spectacles/forms/useform';
 
 export declare type FormPassThroughOptionType =
     | FormPassThroughAttributes
