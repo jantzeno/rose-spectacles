@@ -70,14 +70,21 @@
     </tbody>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance, type CSSProperties, type PropType, type StyleValue, type VNode } from 'vue';
 import { cn } from '../internal/utils/index';
 import { getOuterHeight } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import BodyRow from './BodyRow.vue';
 
-export default {
+type TableBodyRef = Element | ComponentPublicInstance | null;
+type VirtualScrollerBody = {
+    contentRef?: (element: TableBodyRef) => void;
+    contentStyle?: StyleValue;
+};
+
+export default defineComponent({
     name: 'TableBody',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -107,7 +114,7 @@ export default {
     ],
     props: {
         value: {
-            type: Array,
+            type: Array as PropType<Record<string, unknown>[]>,
             default: null
         },
         groupRowsValue: {
@@ -115,7 +122,7 @@ export default {
             default: null
         },
         columns: {
-            type: null,
+            type: null as unknown as PropType<VNode[]>,
             default: null
         },
         frozenRow: {
@@ -227,7 +234,7 @@ export default {
             default: null
         },
         virtualScrollerContentProps: {
-            type: Object,
+            type: Object as PropType<VirtualScrollerBody>,
             default: null
         },
         isVirtualScrollerDisabled: {
@@ -237,7 +244,7 @@ export default {
     },
     data() {
         return {
-            rowGroupHeaderStyleObject: {}
+            rowGroupHeaderStyleObject: {} as CSSProperties
         };
     },
     mounted() {
@@ -259,27 +266,26 @@ export default {
         }
     },
     methods: {
-        getRowKey(rowData, rowIndex) {
+        getRowKey(rowData: unknown, rowIndex: number) {
             return this.dataKey ? resolveFieldData(rowData, this.dataKey) : rowIndex;
         },
         updateFrozenRowStickyPosition() {
-            this.$el.style.top = getOuterHeight(this.$el.previousElementSibling) + 'px';
+            const body = this.$el as HTMLElement;
+            const previous = body.previousElementSibling;
+
+            body.style.top = (previous instanceof HTMLElement ? getOuterHeight(previous) : 0) + 'px';
         },
         updateFrozenRowGroupHeaderStickyPosition() {
-            let tableHeaderHeight = getOuterHeight(this.$el.previousElementSibling);
+            const header = (this.$el as HTMLElement).previousElementSibling;
+            const tableHeaderHeight = header instanceof HTMLElement ? getOuterHeight(header) : 0;
 
             this.rowGroupHeaderStyleObject.top = tableHeaderHeight + 'px';
         },
-        getVirtualScrollerProp(option, options) {
-            options = options || this.virtualScrollerContentProps;
-
-            return options ? options[option] : null;
+        getVirtualScrollerProp<K extends keyof VirtualScrollerBody>(option: K, options?: VirtualScrollerBody) {
+            return (options ?? this.virtualScrollerContentProps)?.[option];
         },
-        bodyRef(el) {
-            // For VirtualScroller
-            const contentRef = this.getVirtualScrollerProp('contentRef');
-
-            contentRef && contentRef(el);
+        bodyRef(el: TableBodyRef) {
+            this.getVirtualScrollerProp('contentRef')?.(el);
         }
     },
     computed: {
@@ -294,9 +300,11 @@ export default {
             return this.getVirtualScrollerProp('contentStyle');
         },
         ptmTBodyOptions() {
+            const { $parentInstance: parent } = this as typeof this & { $parentInstance?: { $parentInstance?: { scrollable?: boolean } } };
+
             return {
                 context: {
-                    scrollable: this.$parentInstance?.$parentInstance?.scrollable
+                    scrollable: parent?.$parentInstance?.scrollable
                 }
             };
         },
@@ -310,5 +318,5 @@ export default {
     components: {
         DTBodyRow: BodyRow
     }
-};
+});
 </script>

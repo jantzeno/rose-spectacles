@@ -4,7 +4,7 @@
         :style="sx('thead')"
         role="rowgroup"
         v-bind="columnGroup ? { ...ptm('thead', ptmTHeadOptions), ...getColumnGroupPT('root') } : ptm('thead', ptmTHeadOptions)"
-        :data-p-scrollable="$parentInstance?.$parentInstance?.scrollable"
+        :data-p-scrollable="ptmTHeadOptions.context.scrollable"
         data-pc-section="thead"
     >
         <template v-if="!columnGroup">
@@ -119,15 +119,15 @@
     </thead>
 </template>
 
-<script>
+<script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { HelperSet, getVNodeProp } from '../core/utils/Utils';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type PropType, type VNode } from 'vue';
 import FilterHeaderCell from './FilterHeaderCell.vue';
 import HeaderCell from './HeaderCell.vue';
 
-export default {
+export default defineComponent({
     name: 'TableHeader',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -151,11 +151,11 @@ export default {
     ],
     props: {
         columnGroup: {
-            type: null,
+            type: null as unknown as PropType<VNode>,
             default: null
         },
         columns: {
-            type: null,
+            type: null as unknown as PropType<VNode[]>,
             default: null
         },
         rowGroupMode: {
@@ -244,10 +244,10 @@ export default {
         this.d_headerColumns.clear();
     },
     methods: {
-        columnProp(col, prop) {
+        columnProp(col: VNode, prop: string) {
             return getVNodeProp(col, prop);
         },
-        getColumnGroupPT(key) {
+        getColumnGroupPT(key: string) {
             const columnGroupMetaData = {
                 props: this.getColumnGroupProps(),
                 parent: {
@@ -257,7 +257,7 @@ export default {
                 },
                 context: {
                     type: 'header',
-                    scrollable: this.$parentInstance?.$parentInstance?.scrollable
+                    scrollable: this.ptmTHeadOptions.context.scrollable
                 }
             };
 
@@ -270,7 +270,7 @@ export default {
         getColumnGroupProps() {
             return this.columnGroup && this.columnGroup.props && this.columnGroup.props.pt ? this.columnGroup.props.pt : undefined; //@todo
         },
-        getRowPT(row, key, index) {
+        getRowPT(row: VNode, key: string, index: number) {
             const rowMetaData = {
                 props: row.props,
                 parent: {
@@ -289,10 +289,10 @@ export default {
                 this.ptmo(this.getRowProp(row), key, rowMetaData)
             );
         },
-        getRowProp(row) {
+        getRowProp(row: VNode) {
             return row.props && row.props.pt ? row.props.pt : undefined; //@todo
         },
-        getColumnPT(column, key, index) {
+        getColumnPT(column: VNode, key: string, index: number) {
             const columnMetaData = {
                 props: getColumnPassThroughProps(column),
                 parent: {
@@ -311,27 +311,29 @@ export default {
                 this.ptmo(this.getColumnProp(column), key, columnMetaData)
             );
         },
-        getColumnProp(column) {
+        getColumnProp(column: VNode) {
             return column.props && column.props.pt ? column.props.pt : undefined; //@todo
         },
-        getFilterColumnHeaderClass(column) {
+        getFilterColumnHeaderClass(column: VNode) {
             return [this.cx('headerCell', { column }), this.columnProp(column, 'filterHeaderClass'), this.columnProp(column, 'class')];
         },
-        getFilterColumnHeaderStyle(column) {
+        getFilterColumnHeaderStyle(column: VNode) {
             return [this.columnProp(column, 'filterHeaderStyle'), this.columnProp(column, 'style')];
         },
         getHeaderRows() {
-            return this.d_headerRows?.get(this.columnGroup, this.columnGroup.children);
+            return this.columnGroup ? this.d_headerRows.get(this.columnGroup, this.columnGroup.children) : [];
         },
-        getHeaderColumns(row) {
-            return this.d_headerColumns?.get(row, row.children);
+        getHeaderColumns(row: VNode) {
+            return this.d_headerColumns.get(row, row.children);
         }
     },
     computed: {
         ptmTHeadOptions() {
+            const { $parentInstance: parent } = this as typeof this & { $parentInstance?: { $parentInstance?: { scrollable?: boolean } } };
+
             return {
                 context: {
-                    scrollable: this.$parentInstance?.$parentInstance?.scrollable
+                    scrollable: parent?.$parentInstance?.scrollable
                 }
             };
         }
@@ -340,5 +342,5 @@ export default {
         DTHeaderCell: HeaderCell,
         DTFilterHeaderCell: FilterHeaderCell
     }
-};
+});
 </script>
