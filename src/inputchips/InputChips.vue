@@ -83,7 +83,7 @@ export default {
     emits: ['update:modelValue', 'add', 'remove', 'focus', 'blur'],
     data() {
         return {
-            inputValue: null,
+            inputValue: '',
             focused: false,
             focusedIndex: null
         };

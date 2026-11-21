@@ -6,16 +6,31 @@ describe('InputChips.vue', () => {
 
     beforeEach(() => {
         wrapper = mount(InputChips, {
+            attachTo: document.body,
             props: {
                 modelValue: null as unknown as unknown[]
             }
         });
     });
 
+    afterEach(() => {
+        wrapper.unmount();
+    });
+
     it('should exist', () => {
         expect(wrapper.find('.rs-inputchips.rs-component.rs-inputwrapper').exists()).toBe(true);
         expect(wrapper.find('ul.rs-inputwrapper-filled').exists()).toBe(false);
         expect(wrapper.find('li.rs-inputchips-input-item').exists()).toBe(true);
+    });
+
+    it('focuses a prefilled chip on the first ArrowLeft before any input', async () => {
+        await wrapper.setProps({ modelValue: ['One', 'Two'] });
+        await wrapper.get('input').trigger('keydown', { code: 'ArrowLeft' });
+
+        const lastChip = wrapper.findAll('.rs-inputchips-chip-item')[1];
+
+        expect(lastChip.attributes('data-p-focused')).toBe('true');
+        expect(wrapper.get('[role="listbox"]').attributes('aria-activedescendant')).toBe(lastChip.attributes('id'));
     });
 
     it('should add item', async () => {
