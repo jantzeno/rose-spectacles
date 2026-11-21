@@ -1,14 +1,55 @@
-<script>
+<script lang="ts">
 import { Theme, ThemeService } from '../../internal/styled/index';
 import { findSingle, isElement } from '../../internal/utils/dom/index';
 import { getKeyValue, isArray, isFunction, isNotEmpty, isString, resolve, toFlatCase } from '../../internal/utils/object/index';
 import Base from '../base/Base';
 import BaseStyle from '../base/style/BaseStyle';
 import { useAttrSelector } from '../useattrselector/UseAttrSelector';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type ComponentPublicInstance, type Ref, type StyleValue } from 'vue';
 import BaseComponentStyle from './style/BaseComponentStyle';
 
-export default {
+type PassThrough = Record<string, any>;
+type PassThroughResolver = (options: PassThrough | undefined, key?: string, params?: PassThrough) => any;
+type Style = ReturnType<typeof BaseStyle.extend>;
+type RuntimeStyle = Omit<Partial<Style>, 'load' | 'loadCSS' | 'loadStyle'> & {
+    load: Style['load'];
+    loadCSS: (...args: Parameters<Style['loadCSS']>) => void;
+    loadStyle: (...args: Parameters<Style['loadStyle']>) => void;
+};
+type Host = ComponentPublicInstance & {
+    $parentInstance?: unknown;
+    $style?: Partial<RuntimeStyle>;
+};
+
+interface PassThroughContext {
+    instance: ComponentPublicInstance;
+    props: object;
+    state: object;
+    attrs: Record<string, unknown>;
+    parent: {
+        instance: ComponentPublicInstance | null;
+        props?: object;
+        state?: object;
+        attrs?: Record<string, unknown>;
+    };
+}
+
+declare module 'vue' {
+    interface ComponentCustomOptions {
+        hostName?: string;
+        style?: Partial<Style>;
+    }
+
+    interface ComponentCustomProperties {
+        $attrSelector: string;
+        rootEl: (Element & { $pc?: PassThrough }) | null;
+        scopedStyleEl?: Ref<HTMLStyleElement | null>;
+        uid: string;
+        _themeScopedListener?: () => void;
+    }
+}
+
+export default defineComponent({
     name: 'BaseComponent',
     props: {
         pt: {
@@ -36,7 +77,7 @@ export default {
     watch: {
         isUnstyled: {
             immediate: true,
-            handler(newValue) {
+            handler(newValue: boolean | undefined) {
                 ThemeService.off('theme:change', this._loadCoreStyles);
 
                 if (!newValue) {
@@ -47,8 +88,8 @@ export default {
         },
         dt: {
             immediate: true,
-            handler(newValue, oldValue) {
-                ThemeService.off('theme:change', this._themeScopedListener);
+            handler(newValue: unknown) {
+                if (this._themeScopedListener) ThemeService.off('theme:change', this._themeScopedListener);
 
                 if (newValue) {
                     this._loadScopedThemeStyles(newValue);
@@ -65,9 +106,10 @@ export default {
     uid: undefined,
     $attrSelector: undefined,
     beforeCreate() {
+        const name = this.$.type.name!;
         const _usept = this.pt?.['_usept'];
-        const originalValue = _usept ? this.pt?.originalValue?.[this.$.type.name] : undefined;
-        const value = _usept ? this.pt?.value?.[this.$.type.name] : this.pt;
+        const originalValue = _usept ? this.pt?.originalValue?.[name] : undefined;
+        const value = _usept ? this.pt?.value?.[name] : this.pt;
 
         (value || originalValue)?.hooks?.['onBeforeCreate']?.();
 
@@ -75,10 +117,10 @@ export default {
         const originalValueInConfig = _useptInConfig ? this.$primevue?.config?.pt?.originalValue : undefined;
         const valueInConfig = _useptInConfig ? this.$primevue?.config?.pt?.value : this.$primevue?.config?.pt;
 
-        (valueInConfig || originalValueInConfig)?.[this.$.type.name]?.hooks?.['onBeforeCreate']?.();
+        (valueInConfig || originalValueInConfig)?.[name]?.hooks?.['onBeforeCreate']?.();
 
         this.$attrSelector = useAttrSelector();
-        this.uid = this.$attrs.id || this.$attrSelector.replace('pc', 'pv_id_');
+        this.uid = (this.$attrs.id as string | undefined) || this.$attrSelector.replace('pc', 'pv_id_');
     },
     created() {
         this._hook('onCreated');
@@ -112,7 +154,7 @@ export default {
         this._hook('onUnmounted');
     },
     methods: {
-        _hook(hookName) {
+        _hook(hookName: string) {
             if (!this.$options.hostName) {
                 const selfHook = this._usePT(this._getPT(this.pt, this.$.type.name), this._getOptionValue, `hooks.${hookName}`);
                 const defaultHook = this._useDefaultPT(this._getOptionValue, `hooks.${hookName}`);
@@ -121,8 +163,8 @@ export default {
                 defaultHook?.();
             }
         },
-        _mergeProps(fn, ...args) {
-            return isFunction(fn) ? fn(...args) : mergeProps(...args);
+        _mergeProps(fn: unknown, ...args: unknown[]) {
+            return isFunction(fn) ? fn(...args) : mergeProps(...(args as PassThrough[]));
         },
         _load() {
             // @todo
@@ -140,7 +182,7 @@ export default {
             this._themeChangeListener(this._load);
         },
         _loadCoreStyles() {
-            if (!Base.isStyleNameLoaded(this.$style?.name) && this.$style?.name) {
+            if (this.$style.name && !Base.isStyleNameLoaded(this.$style.name)) {
                 BaseComponentStyle.loadCSS(this.$styleOptions);
                 this.$options.style && this.$style.loadCSS(this.$styleOptions);
 
@@ -178,7 +220,7 @@ export default {
             }
 
             // component
-            if (!Theme.isStyleNameLoaded(this.$style?.name) && this.$style?.name) {
+            if (this.$style.name && !Theme.isStyleNameLoaded(this.$style.name)) {
                 const { css, style } = this.$style?.getComponentTheme?.() || {};
 
                 this.$style?.load(css, { name: `${this.$style.name}-variables`, ...this.$styleOptions });
@@ -196,7 +238,7 @@ export default {
                 Theme.setLoadedStyleName('layer-order');
             }
         },
-        _loadScopedThemeStyles(preset) {
+        _loadScopedThemeStyles(preset: unknown) {
             const { css } = this.$style?.getPresetTheme?.(preset, `[${this.$attrSelector}]`) || {};
             const scopedStyle = this.$style?.load(css, { name: `${this.$attrSelector}-${this.$style.name}`, ...this.$styleOptions });
 
@@ -212,24 +254,24 @@ export default {
         _removeThemeListeners() {
             ThemeService.off('theme:change', this._loadCoreStyles);
             ThemeService.off('theme:change', this._load);
-            ThemeService.off('theme:change', this._themeScopedListener);
+            if (this._themeScopedListener) ThemeService.off('theme:change', this._themeScopedListener);
         },
-        _getHostInstance(instance) {
+        _getHostInstance(instance?: Host): Host | undefined {
             return instance
                 ? this.$options.hostName
                     ? instance.$.type.name === this.$options.hostName
                         ? instance
-                        : this._getHostInstance(instance.$parentInstance)
-                    : instance.$parentInstance
+                        : this._getHostInstance(instance.$parentInstance as Host | undefined)
+                    : (instance.$parentInstance as Host | undefined)
                 : undefined;
         },
-        _getPropValue(name) {
-            return this[name] || this._getHostInstance(this)?.[name];
+        _getPropValue(name: string) {
+            return (this as PassThrough)[name] || (this._getHostInstance(this) as PassThrough | undefined)?.[name];
         },
-        _getOptionValue(options, key = '', params = {}) {
+        _getOptionValue(options: PassThrough | undefined, key = '', params: PassThrough = {}): any {
             return getKeyValue(options, key, params);
         },
-        _getPTValue(obj = {}, key = '', params = {}, searchInDefaultPT = true) {
+        _getPTValue(obj = {}, key = '', params: PassThrough = {}, searchInDefaultPT = true): PassThrough {
             const searchOut = /./g.test(key) && !!params[key.split('.')[0]];
             const { mergeSections = true, mergeProps: useMergeProps = false } = this._getPropValue('ptOptions') || this.$primevueConfig?.ptOptions || {};
             const global = searchInDefaultPT
@@ -246,7 +288,7 @@ export default {
                     : { ...global, ...self, ...datasets }
                 : { ...self, ...datasets };
         },
-        _getPTSelf(obj = {}, ...args) {
+        _getPTSelf(obj: PassThrough | undefined, ...args: [PassThroughResolver, string, PassThrough]) {
             return mergeProps(
                 this._usePT(this._getPT(obj, this.$name), ...args), // Exp; <component :pt="{}"
                 this._usePT(this.$_attrsPT, ...args) // Exp; <component :pt:[passthrough_key]:[attribute]="{value}" or <component :pt:[passthrough_key]="() =>{value}"
@@ -259,24 +301,24 @@ export default {
             return (
                 key !== 'transition' && {
                     ...(key === 'root' && {
-                        [`${datasetPrefix}name`]: toFlatCase(isExtended ? this.pt?.['data-pc-section'] : this.$.type.name),
-                        ...(isExtended && { [`${datasetPrefix}extend`]: toFlatCase(this.$.type.name) }),
+                        [`${datasetPrefix}name`]: toFlatCase(isExtended ? this.pt?.['data-pc-section'] : this.$.type.name!),
+                        ...(isExtended && { [`${datasetPrefix}extend`]: toFlatCase(this.$.type.name!) }),
                         [`${this.$attrSelector}`]: ''
                     }),
                     [`${datasetPrefix}section`]: toFlatCase(key)
                 }
             );
         },
-        _getPTClassValue(...args) {
+        _getPTClassValue(...args: Parameters<PassThroughResolver>) {
             const value = this._getOptionValue(...args);
 
             return isString(value) || isArray(value) ? { class: value } : value;
         },
-        _getPT(pt, key = '', callback) {
-            const getValue = (value, checkSameKey = false) => {
+        _getPT(pt: PassThrough | undefined, key = '', callback?: PassThroughResolver) {
+            const getValue = (value?: PassThrough, checkSameKey = false) => {
                 const computedValue = callback ? callback(value) : value;
                 const _key = toFlatCase(key);
-                const _cKey = toFlatCase(this.$name);
+                const _cKey = toFlatCase(this.$name!);
 
                 return (checkSameKey ? (_key !== _cKey ? computedValue?.[_key] : undefined) : computedValue?.[_key]) ?? computedValue;
             };
@@ -289,8 +331,8 @@ export default {
                   }
                 : getValue(pt, true);
         },
-        _usePT(pt, callback, key, params) {
-            const fn = (value) => callback(value, key, params);
+        _usePT(pt: PassThrough | undefined, callback: PassThroughResolver, key: string, params?: PassThrough) {
+            const fn = (value?: PassThrough) => callback(value, key, params);
 
             if (pt?.hasOwnProperty('_usept')) {
                 const { mergeSections = true, mergeProps: useMergeProps = false } = pt['_usept'] || this.$primevueConfig?.ptOptions || {};
@@ -310,10 +352,10 @@ export default {
 
             return fn(pt);
         },
-        _useGlobalPT(callback, key, params) {
+        _useGlobalPT(callback: PassThroughResolver, key: string, params?: PassThrough) {
             return this._usePT(this.globalPT, callback, key, params);
         },
-        _useDefaultPT(callback, key, params) {
+        _useDefaultPT(callback: PassThroughResolver, key: string, params?: PassThrough) {
             return this._usePT(this.defaultPT, callback, key, params);
         },
         ptm(key = '', params = {}) {
@@ -334,8 +376,7 @@ export default {
         cx(key = '', params = {}) {
             return !this.isUnstyled ? this._getOptionValue(this.$style.classes, key, { ...this.$params, ...params }) : undefined;
         },
-        /** @returns {import('vue').StyleValue} */
-        sx(key = '', when = true, params = {}) {
+        sx(key = '', when = true, params = {}): StyleValue {
             if (when) {
                 const self = this._getOptionValue(this.$style.inlineStyles, key, { ...this.$params, ...params });
                 const base = this._getOptionValue(BaseComponentStyle.inlineStyles, key, { ...this.$params, ...params });
@@ -360,8 +401,8 @@ export default {
         isUnstyled() {
             return this.unstyled !== undefined ? this.unstyled : this.$primevueConfig?.unstyled;
         },
-        $id() {
-            return this.$attrs.id || this.uid;
+        $id(): string {
+            return (this.$attrs.id as string | undefined) || this.uid;
         },
         $inProps() {
             const nodePropKeys = Object.keys(this.$.vnode?.props || {});
@@ -371,11 +412,11 @@ export default {
         $theme() {
             return this.$primevueConfig?.theme;
         },
-        $style() {
+        $style(): RuntimeStyle {
             return {
                 classes: undefined,
                 inlineStyles: undefined,
-                load: () => {},
+                load: (): ReturnType<Style['load']> => ({}),
                 loadCSS: () => {},
                 loadStyle: () => {},
                 ...(this._getHostInstance(this) || {}).$style,
@@ -391,7 +432,7 @@ export default {
         $name() {
             return this.$options.hostName || this.$.type.name;
         },
-        $params() {
+        $params(): PassThroughContext {
             const parentInstance = this._getHostInstance(this) || this.$parent;
 
             return {
@@ -410,10 +451,10 @@ export default {
         $_attrsPT() {
             return Object.entries(this.$attrs || {})
                 .filter(([key]) => key?.startsWith('pt:'))
-                .reduce((result, [key, value]) => {
+                .reduce<PassThrough>((result, [key, value]) => {
                     const [, ...rest] = key.split(':');
 
-                    rest?.reduce((currentObj, nestedKey, index, array) => {
+                    rest?.reduce<PassThrough>((currentObj, nestedKey, index, array) => {
                         !currentObj[nestedKey] && (currentObj[nestedKey] = index === array.length - 1 ? value : {});
 
                         return currentObj[nestedKey];
@@ -425,12 +466,12 @@ export default {
         $_attrsWithoutPT() {
             return Object.entries(this.$attrs || {})
                 .filter(([key]) => !key?.startsWith('pt:'))
-                .reduce((acc, [key, value]) => {
+                .reduce<PassThrough>((acc, [key, value]) => {
                     acc[key] = value;
 
                     return acc;
                 }, {});
         }
     }
-};
+});
 </script>

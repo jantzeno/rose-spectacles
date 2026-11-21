@@ -2,8 +2,14 @@ import { addClass, createElement, hasClass, removeClass } from '../internal/util
 import { uuid } from '../internal/utils/uuid/index';
 import BaseBadgeDirective from './BaseBadgeDirective';
 
+interface BadgeHost extends HTMLElement {
+    $_pbadgeId?: string | null;
+    $_badgeValue?: string | number | null;
+}
+
 const BadgeDirective = BaseBadgeDirective.extend('badge', {
     mounted(el, binding) {
+        const host = el as BadgeHost;
         console.warn('Deprecated since v4. Use OverlayBadge component instead.');
         const id = uuid('pv_id') + '_badge';
 
@@ -20,25 +26,25 @@ const BadgeDirective = BaseBadgeDirective.extend('badge', {
             })
         });
 
-        el.$_pbadgeId = badge.getAttribute('id');
+        host.$_pbadgeId = badge.getAttribute('id');
 
         for (let modifier in binding.modifiers) {
             !this.isUnstyled() && addClass(badge, 'rs-badge-' + modifier);
         }
 
         if (binding.value != null) {
-            if (typeof binding.value === 'object') el.$_badgeValue = binding.value.value;
-            else el.$_badgeValue = binding.value;
-            badge.appendChild(document.createTextNode(el.$_badgeValue));
+            if (typeof binding.value === 'object') host.$_badgeValue = binding.value.value;
+            else host.$_badgeValue = binding.value;
+            badge.appendChild(document.createTextNode(host.$_badgeValue as string));
 
-            if (String(el.$_badgeValue).length === 1 && !this.isUnstyled()) {
+            if (String(host.$_badgeValue).length === 1 && !this.isUnstyled()) {
                 !this.isUnstyled() && addClass(badge, 'rs-badge-circle');
             }
         } else {
             !this.isUnstyled() && addClass(badge, 'rs-badge-dot');
         }
 
-        el.setAttribute('data-pd-badge', true);
+        el.setAttribute('data-pd-badge', 'true');
         !this.isUnstyled() && addClass(el, 'rs-overlay-badge');
         el.setAttribute('data-p-overlay-badge', 'true');
         el.appendChild(badge);
@@ -46,28 +52,29 @@ const BadgeDirective = BaseBadgeDirective.extend('badge', {
         this.$el = badge;
     },
     updated(el, binding) {
+        const host = el as BadgeHost;
         !this.isUnstyled() && addClass(el, 'rs-overlay-badge');
         el.setAttribute('data-p-overlay-badge', 'true');
 
         if (binding.oldValue !== binding.value) {
-            let badge = document.getElementById(el.$_pbadgeId);
+            let badge = document.getElementById(host.$_pbadgeId!)!;
 
-            if (typeof binding.value === 'object') el.$_badgeValue = binding.value.value;
-            else el.$_badgeValue = binding.value;
+            if (typeof binding.value === 'object') host.$_badgeValue = binding.value.value;
+            else host.$_badgeValue = binding.value;
 
             if (!this.isUnstyled()) {
-                if (el.$_badgeValue) {
+                if (host.$_badgeValue) {
                     if (hasClass(badge, 'rs-badge-dot')) removeClass(badge, 'rs-badge-dot');
 
-                    if (el.$_badgeValue.length === 1) addClass(badge, 'rs-badge-circle');
+                    if ((host.$_badgeValue as string).length === 1) addClass(badge, 'rs-badge-circle');
                     else removeClass(badge, 'rs-badge-circle');
-                } else if (!el.$_badgeValue && !hasClass(badge, 'rs-badge-dot')) {
+                } else if (!host.$_badgeValue && !hasClass(badge, 'rs-badge-dot')) {
                     addClass(badge, 'rs-badge-dot');
                 }
             }
 
             badge.innerHTML = '';
-            badge.appendChild(document.createTextNode(el.$_badgeValue));
+            badge.appendChild(document.createTextNode(host.$_badgeValue as string));
         }
     }
 });

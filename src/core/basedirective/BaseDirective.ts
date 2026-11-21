@@ -3,15 +3,72 @@ import { getKeyValue, isArray, isEmpty, isFunction, isObject, isString, resolve,
 import { uuid } from '../../internal/utils/uuid/index';
 import Base from '../base/Base';
 import BaseStyle from '../base/style/BaseStyle';
+import type { PrimeVueConfiguration } from 'rose-spectacles/core/config';
 import PrimeVueService from '../service/PrimeVueService';
-import { mergeProps } from 'vue';
+import type { StyleOptions } from '../usestyle/UseStyle';
+import { mergeProps, type DirectiveBinding, type ObjectDirective, type Ref, type VNode } from 'vue';
+
+type Hook = 'created' | 'beforeMount' | 'mounted' | 'beforeUpdate' | 'updated' | 'beforeUnmount' | 'unmounted';
+type ConfigWatcher = 'config' | 'config.ripple';
+type PassThrough = Record<string, any>;
+type PassThroughResolver = (options: PassThrough | undefined, key: string, params?: PassThrough) => any;
+type Style = ReturnType<typeof BaseStyle.extend>;
+type ConfigChange = { newValue: unknown; oldValue: unknown };
+type ConfigCallback = (change: unknown) => void;
+type Watchers = Partial<Record<ConfigWatcher, (newValue: unknown, oldValue?: unknown) => void>>;
+
+interface DirectiveElement extends HTMLElement {
+    _$instances: Record<string, RuntimeInstance>;
+    $instance: RuntimeInstance;
+    $pd: Record<string, { name?: string; attrSelector?: string; instance?: RuntimeInstance }>;
+}
+
+interface RuntimeInstance {
+    $name?: string;
+    $host: DirectiveElement;
+    $el: HTMLElement;
+    $binding: DirectiveBinding;
+    $modifiers: DirectiveBinding['modifiers'];
+    $value: any;
+    $style: Partial<Style> & Pick<Style, 'load' | 'loadCSS' | 'loadStyle'>;
+    $primevueConfig?: PrimeVueConfiguration;
+    $attrSelector: string;
+    $loadStyles?: () => void;
+    $watchersCallback?: Record<ConfigWatcher, ConfigCallback>;
+    scopedStyleEl?: Ref<HTMLStyleElement | null>;
+    defaultPT: () => PassThrough | undefined;
+    isUnstyled: () => boolean | undefined;
+    theme: () => unknown;
+    preset: () => unknown;
+    ptm: (key?: string, params?: PassThrough) => PassThrough;
+    ptmo: (obj?: PassThrough, key?: string, params?: PassThrough) => PassThrough;
+    cx: (key?: string, params?: PassThrough) => unknown;
+    sx: (key?: string, when?: boolean, params?: PassThrough) => unknown;
+    watch?: Watchers;
+    [property: string]: any;
+}
+
+type DirectiveHook = (el: DirectiveElement, binding: DirectiveBinding, vnode: VNode, prevVnode: VNode | null) => void;
+type DirectiveOptions = Partial<Record<Hook, DirectiveHook>> & {
+    style?: Partial<Style>;
+    watch?: Watchers & ThisType<RuntimeInstance>;
+    methods?: Record<string, (...args: any[]) => unknown> & ThisType<RuntimeInstance>;
+    [property: string]: unknown;
+} & ThisType<RuntimeInstance>;
+type DirectiveArguments = [DirectiveOptions] | [string | undefined, DirectiveOptions?];
+type ExtendedDirective = ObjectDirective<DirectiveElement> & {
+    extend: (...args: DirectiveArguments) => ExtendedDirective;
+};
 
 const BaseDirective = {
-    _getMeta: (...args) => [isObject(args[0]) ? undefined : args[0], resolve(isObject(args[0]) ? args[0] : args[1])],
-    _getConfig: (binding, vnode) => (binding?.instance?.$primevue || vnode?.ctx?.appContext?.config?.globalProperties?.$primevue)?.config,
+    _getMeta: (...args: DirectiveArguments): [string | undefined, DirectiveOptions | undefined] =>
+        isObject(args[0]) ? [undefined, resolve(args[0])] : [args[0] as string | undefined, resolve(args[1])],
+    _getConfig: (binding: DirectiveBinding, vnode: VNode): PrimeVueConfiguration | undefined =>
+        (binding.instance?.$primevue || (vnode as VNode & { ctx?: { appContext?: VNode['appContext'] } }).ctx?.appContext?.config?.globalProperties?.$primevue)
+            ?.config,
     _getOptionValue: getKeyValue,
-    _getPTValue: (instance = {}, obj = {}, key = '', params = {}, searchInDefaultPT = true) => {
-        const getValue = (...args) => {
+    _getPTValue: (instance: RuntimeInstance, obj: PassThrough = {}, key = '', params: PassThrough = {}, searchInDefaultPT = true): PassThrough => {
+        const getValue: PassThroughResolver = (...args) => {
             const value = BaseDirective._getOptionValue(...args);
 
             return isString(value) || isArray(value) ? { class: value } : value;
@@ -28,16 +85,16 @@ const BaseDirective = {
                 : { ...global, ...self, ...datasets }
             : { ...self, ...datasets };
     },
-    _getPTDatasets(instance = {}, key = '') {
+    _getPTDatasets(instance: RuntimeInstance, key = '') {
         const datasetPrefix = 'data-pc-';
 
         return {
-            ...(key === 'root' && { [`${datasetPrefix}name`]: toFlatCase(instance.$name) }),
+            ...(key === 'root' && { [`${datasetPrefix}name`]: toFlatCase(instance.$name!) }),
             [`${datasetPrefix}section`]: toFlatCase(key)
         };
     },
-    _getPT: (pt, key = '', callback) => {
-        const getValue = (value) => {
+    _getPT: (pt: PassThrough | undefined, key = '', callback?: (value?: PassThrough) => PassThrough | undefined) => {
+        const getValue = (value?: PassThrough) => {
             const computedValue = callback ? callback(value) : value;
             const _key = toFlatCase(key);
 
@@ -52,8 +109,8 @@ const BaseDirective = {
               }
             : getValue(pt);
     },
-    _usePT: (instance = {}, pt, callback, key, params) => {
-        const fn = (value) => callback(value, key, params);
+    _usePT: (instance: RuntimeInstance, pt: PassThrough | undefined, callback: PassThroughResolver, key: string, params?: PassThrough) => {
+        const fn = (value?: PassThrough) => callback(value, key, params);
 
         if (pt && Object.hasOwn(pt, '_usept')) {
             const { mergeSections = true, mergeProps: useMergeProps = false } = pt['_usept'] || instance.$primevueConfig?.ptOptions || {};
@@ -73,10 +130,12 @@ const BaseDirective = {
 
         return fn(pt);
     },
-    _useDefaultPT: (instance = {}, defaultPT = {}, callback, key, params) => {
+    _useDefaultPT: (instance: RuntimeInstance, defaultPT: PassThrough = {}, callback: PassThroughResolver, key: string, params?: PassThrough) => {
         return BaseDirective._usePT(instance, defaultPT, callback, key, params);
     },
-    _loadStyles: (instance = {}, binding, vnode) => {
+    _loadStyles: (instance: RuntimeInstance | undefined, binding: DirectiveBinding, vnode: VNode) => {
+        if (!instance) return;
+
         const config = BaseDirective._getConfig(binding, vnode);
         const useStyleOptions = { nonce: config?.csp?.nonce };
 
@@ -90,15 +149,15 @@ const BaseDirective = {
 
         BaseDirective._themeChangeListener(instance.$loadStyles);
     },
-    _loadCoreStyles(instance = {}, useStyleOptions) {
-        if (!Base.isStyleNameLoaded(instance.$style?.name) && instance.$style?.name) {
+    _loadCoreStyles(instance: RuntimeInstance, useStyleOptions: StyleOptions) {
+        if (instance.$style.name && !Base.isStyleNameLoaded(instance.$style.name)) {
             BaseStyle.loadCSS(useStyleOptions);
             instance.$style?.loadCSS(useStyleOptions);
 
             Base.setLoadedStyleName(instance.$style.name);
         }
     },
-    _loadThemeStyles: (instance = {}, useStyleOptions) => {
+    _loadThemeStyles: (instance: RuntimeInstance, useStyleOptions: StyleOptions) => {
         if (instance?.isUnstyled() || instance?.theme?.() === 'none') return;
 
         // common
@@ -114,7 +173,7 @@ const BaseDirective = {
         }
 
         // directive
-        if (!Theme.isStyleNameLoaded(instance.$style?.name) && instance.$style?.name) {
+        if (instance.$style.name && !Theme.isStyleNameLoaded(instance.$style.name)) {
             const { css, style } = instance.$style?.getDirectiveTheme?.() || {};
 
             instance.$style?.load(css, { name: `${instance.$style.name}-variables`, ...useStyleOptions });
@@ -132,7 +191,7 @@ const BaseDirective = {
             Theme.setLoadedStyleName('layer-order');
         }
     },
-    _loadScopedThemeStyles(instance = {}, useStyleOptions) {
+    _loadScopedThemeStyles(instance: RuntimeInstance, useStyleOptions: StyleOptions) {
         const preset = instance.preset();
 
         if (preset && instance.$attrSelector) {
@@ -146,11 +205,13 @@ const BaseDirective = {
         Base.clearLoadedStyleNames();
         ThemeService.on('theme:change', callback);
     },
-    _removeThemeListeners(instance = {}) {
-        ThemeService.off('theme:change', instance.$loadStyles);
-        instance.$loadStyles = undefined;
+    _removeThemeListeners(instance?: RuntimeInstance) {
+        if (instance?.$loadStyles) {
+            ThemeService.off('theme:change', instance.$loadStyles);
+            instance.$loadStyles = undefined;
+        }
     },
-    _hook: (directiveName, hookName, el, binding, vnode, prevVnode) => {
+    _hook: (directiveName: string, hookName: Hook, el: DirectiveElement, binding: DirectiveBinding, vnode: VNode, prevVnode: VNode | null) => {
         const name = `on${toCapitalCase(hookName)}`;
         const config = BaseDirective._getConfig(binding, vnode);
         const instance = el?.$instance;
@@ -167,29 +228,30 @@ const BaseDirective = {
         defaultHook?.(instance, options);
     },
     /* eslint-disable-next-line no-unused-vars */
-    _mergeProps(instance = {}, fn, ...args) {
+    _mergeProps(instance: RuntimeInstance, fn: unknown, ...args: PassThrough[]) {
         return isFunction(fn) ? fn(...args) : mergeProps(...args);
     },
-    _extend: (name, options = {}) => {
-        const handleHook = (hook, el, binding, vnode, prevVnode) => {
+    _extend: (directiveName: string | undefined, options: DirectiveOptions = {}): ObjectDirective<DirectiveElement> => {
+        const name = String(directiveName);
+        const handleHook = (hook: Hook, el: DirectiveElement, binding: DirectiveBinding, vnode: VNode, prevVnode: VNode | null) => {
             el._$instances = el._$instances || {};
 
             const config = BaseDirective._getConfig(binding, vnode);
-            const $prevInstance = el._$instances[name] || {};
+            const $prevInstance = el._$instances[name];
             const $options = isEmpty($prevInstance) ? { ...options, ...options?.methods } : {};
 
             el._$instances[name] = {
                 ...$prevInstance,
                 /* new instance variables to pass in directive methods */
-                $name: name,
+                $name: directiveName,
                 $host: el,
                 $binding: binding,
                 $modifiers: binding?.modifiers,
                 $value: binding?.value,
-                $el: $prevInstance['$el'] || el || undefined,
-                $style: { classes: undefined, inlineStyles: undefined, load: () => {}, loadCSS: () => {}, loadStyle: () => {}, ...options?.style },
+                $el: $prevInstance?.$el || el,
+                $style: { classes: undefined, inlineStyles: undefined, load: () => ({}), loadCSS: () => ({}), loadStyle: () => ({}), ...options?.style },
                 $primevueConfig: config,
-                $attrSelector: el.$pd?.[name]?.attrSelector,
+                $attrSelector: el.$pd?.[name]?.attrSelector!,
                 /* computed instance variables */
                 defaultPT: () => BaseDirective._getPT(config?.pt, undefined, (value) => value?.directives?.[name]),
                 isUnstyled: () =>
@@ -208,20 +270,26 @@ const BaseDirective = {
 
             el.$instance = el._$instances[name]; // pass instance data to hooks
             el.$instance[hook]?.(el, binding, vnode, prevVnode); // handle hook in directive implementation
-            el[`$${name}`] = el.$instance; // expose all options with $<directive_name>
-            BaseDirective._hook(name, hook, el, binding, vnode, prevVnode); // handle hooks during directive uses (global and self-definition)
+            (el as unknown as Record<string, unknown>)[`$${name}`] = el.$instance; // expose all options with $<directive_name>
+            BaseDirective._hook(directiveName!, hook, el, binding, vnode, prevVnode); // handle hooks during directive uses (global and self-definition)
 
             el.$pd ||= {};
-            el.$pd[name] = { ...el.$pd?.[name], name, instance: el._$instances[name] };
+            el.$pd[name] = { ...el.$pd?.[name], name: directiveName, instance: el._$instances[name] };
         };
 
-        const handleWatchers = (el) => {
+        const handleWatchers = (el: DirectiveElement) => {
             const instance = el._$instances[name];
             const watchers = instance?.watch;
 
-            const handleWatchConfig = ({ newValue, oldValue }) => watchers?.['config']?.call(instance, newValue, oldValue);
+            const handleWatchConfig: ConfigCallback = (change) => {
+                const { newValue, oldValue } = change as ConfigChange;
+                watchers?.config?.call(instance, newValue, oldValue);
+            };
 
-            const handleWatchConfigRipple = ({ newValue, oldValue }) => watchers?.['config.ripple']?.call(instance, newValue, oldValue);
+            const handleWatchConfigRipple: ConfigCallback = (change) => {
+                const { newValue, oldValue } = change as ConfigChange;
+                watchers?.['config.ripple']?.call(instance, newValue, oldValue);
+            };
 
             instance.$watchersCallback = { config: handleWatchConfig, 'config.ripple': handleWatchConfigRipple };
 
@@ -234,7 +302,7 @@ const BaseDirective = {
             PrimeVueService.on('config:ripple:change', handleWatchConfigRipple);
         };
 
-        const stopWatchers = (el) => {
+        const stopWatchers = (el: DirectiveElement) => {
             const watchers = el._$instances[name].$watchersCallback;
 
             if (watchers) {
@@ -247,7 +315,7 @@ const BaseDirective = {
         return {
             created: (el, binding, vnode, prevVnode) => {
                 el.$pd ||= {};
-                el.$pd[name] = { name, attrSelector: uuid('pd') };
+                el.$pd[name] = { name: directiveName, attrSelector: uuid('pd') };
                 handleHook('created', el, binding, vnode, prevVnode);
             },
             beforeMount: (el, binding, vnode, prevVnode) => {
@@ -277,11 +345,11 @@ const BaseDirective = {
             }
         };
     },
-    extend: (...args) => {
+    extend: (...args: DirectiveArguments): ExtendedDirective => {
         const [name, options] = BaseDirective._getMeta(...args);
 
         return {
-            extend: (..._args) => {
+            extend: (..._args: DirectiveArguments) => {
                 const [_name, _options] = BaseDirective._getMeta(..._args);
 
                 return BaseDirective.extend(_name, { ...options, ...options?.methods, ..._options });

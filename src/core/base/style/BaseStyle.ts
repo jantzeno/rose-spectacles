@@ -56,7 +56,7 @@ const baseStyle = {
     style,
     classes: {} as StyleEntries,
     inlineStyles: {} as StyleEntries,
-    load(style?: CssValue, options: StyleOptions = {}, transform: (css?: string) => string | undefined = (css) => css) {
+    load(style?: CssValue, options: StyleOptions = {}, transform: (css?: string) => string | undefined = (css) => css): Partial<ReturnType<typeof useStyle>> {
         const computedStyle = transform(Css`${style}`);
 
         return isNotEmpty(computedStyle) ? useStyle(minifyCSS(computedStyle) ?? '', { name: this.name, ...options }) : {};

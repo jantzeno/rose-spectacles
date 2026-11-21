@@ -1,6 +1,31 @@
-import { createElement, focus, getFirstFocusableElement, getLastFocusableElement, isFocusableElement } from '../internal/utils/dom/index';
+import type { FocusTrapOptions } from 'rose-spectacles/focustrap';
+import { createElement, focus, getFirstFocusableElement, getLastFocusableElement, isElement, isFocusableElement } from '../internal/utils/dom/index';
 import { isNotEmpty } from '../internal/utils/object/index';
 import BaseFocusTrap from './BaseFocusTrap';
+
+type FocusTrapBinding = {
+    value?: FocusTrapOptions & {
+        autoFocusSelector?: string;
+        firstFocusableSelector?: string;
+        lastFocusableSelector?: string;
+        tabIndex?: number;
+        onFocusIn?: (event: FocusEvent) => void;
+        onFocusOut?: (event: FocusEvent) => void;
+    };
+};
+
+interface FocusTrapElement extends HTMLElement {
+    $_pfocustrap_mutationobserver?: MutationObserver;
+    $_pfocustrap_focusinlistener?: (event: FocusEvent) => void;
+    $_pfocustrap_focusoutlistener?: (event: FocusEvent) => void;
+    $_pfocustrap_focusableselector?: string;
+}
+
+interface FocusSentinel extends HTMLElement {
+    $_pfocustrap_firsthiddenfocusableelement?: FocusSentinel;
+    $_pfocustrap_lasthiddenfocusableelement?: FocusSentinel;
+    $_pfocustrap_focusableselector: string;
+}
 
 const FocusTrap = BaseFocusTrap.extend('focustrap', {
     mounted(el, binding) {
@@ -12,7 +37,7 @@ const FocusTrap = BaseFocusTrap.extend('focustrap', {
             this.autoElementFocus(el, binding);
         }
 
-        el.setAttribute('data-pd-focustrap', true);
+        el.setAttribute('data-pd-focustrap', 'true');
 
         this.$el = el;
     },
@@ -25,16 +50,18 @@ const FocusTrap = BaseFocusTrap.extend('focustrap', {
         this.unbind(el);
     },
     methods: {
-        getComputedSelector(selector) {
+        getComputedSelector(selector?: string) {
             return `:not(.rs-hidden-focusable):not([data-p-hidden-focusable="true"])${selector ?? ''}`;
         },
-        bind(el, binding) {
+        bind(el: FocusTrapElement, binding: FocusTrapBinding) {
             const { onFocusIn, onFocusOut } = binding.value || {};
 
             el.$_pfocustrap_mutationobserver = new MutationObserver((mutationList) => {
                 mutationList.forEach((mutation) => {
                     if (mutation.type === 'childList' && !el.contains(document.activeElement)) {
-                        const findNextFocusableElement = (_el) => {
+                        const findNextFocusableElement = (_el: Node | null): Element | null => {
+                            if (!isElement(_el)) return _el ? findNextFocusableElement(_el.nextSibling) : null;
+
                             const focusableElement = isFocusableElement(_el)
                                 ? isFocusableElement(_el, this.getComputedSelector(el.$_pfocustrap_focusableselector))
                                     ? _el
@@ -44,7 +71,7 @@ const FocusTrap = BaseFocusTrap.extend('focustrap', {
                             return isNotEmpty(focusableElement) ? focusableElement : _el.nextSibling && findNextFocusableElement(_el.nextSibling);
                         };
 
-                        focus(findNextFocusableElement(mutation.nextSibling));
+                        focus(findNextFocusableElement(mutation.nextSibling) as HTMLElement);
                     }
                 });
             });
@@ -60,45 +87,45 @@ const FocusTrap = BaseFocusTrap.extend('focustrap', {
             el.addEventListener('focusin', el.$_pfocustrap_focusinlistener);
             el.addEventListener('focusout', el.$_pfocustrap_focusoutlistener);
         },
-        unbind(el) {
-            el.$_pfocustrap_mutationobserver && el.$_pfocustrap_mutationobserver.disconnect();
-            el.$_pfocustrap_focusinlistener && el.removeEventListener('focusin', el.$_pfocustrap_focusinlistener) && (el.$_pfocustrap_focusinlistener = null);
-            el.$_pfocustrap_focusoutlistener &&
-                el.removeEventListener('focusout', el.$_pfocustrap_focusoutlistener) &&
-                (el.$_pfocustrap_focusoutlistener = null);
+        unbind(el: FocusTrapElement) {
+            el.$_pfocustrap_mutationobserver?.disconnect();
+            if (el.$_pfocustrap_focusinlistener) el.removeEventListener('focusin', el.$_pfocustrap_focusinlistener);
+            if (el.$_pfocustrap_focusoutlistener) el.removeEventListener('focusout', el.$_pfocustrap_focusoutlistener);
         },
-        autoFocus(options) {
+        autoFocus(options?: FocusTrapBinding['value']) {
             this.autoElementFocus(this.$el, { value: { ...options, autoFocus: true } });
         },
-        autoElementFocus(el, binding) {
+        autoElementFocus(el: HTMLElement, binding: FocusTrapBinding) {
             const { autoFocusSelector = '', firstFocusableSelector = '', autoFocus = false } = binding.value || {};
             let focusableElement = getFirstFocusableElement(el, `[autofocus]${this.getComputedSelector(autoFocusSelector)}`);
 
             autoFocus && !focusableElement && (focusableElement = getFirstFocusableElement(el, this.getComputedSelector(firstFocusableSelector)));
-            focus(focusableElement);
+            focus(focusableElement as HTMLElement);
         },
-        onFirstHiddenElementFocus(event) {
-            const { currentTarget, relatedTarget } = event;
+        onFirstHiddenElementFocus(event: FocusEvent) {
+            const currentTarget = event.currentTarget as FocusSentinel;
+            const relatedTarget = event.relatedTarget as Node | null;
             const focusableElement =
                 relatedTarget === currentTarget.$_pfocustrap_lasthiddenfocusableelement || !this.$el?.contains(relatedTarget)
-                    ? getFirstFocusableElement(currentTarget.parentElement, this.getComputedSelector(currentTarget.$_pfocustrap_focusableselector))
+                    ? getFirstFocusableElement(currentTarget.parentElement!, this.getComputedSelector(currentTarget.$_pfocustrap_focusableselector))
                     : currentTarget.$_pfocustrap_lasthiddenfocusableelement;
 
-            focus(focusableElement);
+            focus(focusableElement as HTMLElement);
         },
-        onLastHiddenElementFocus(event) {
-            const { currentTarget, relatedTarget } = event;
+        onLastHiddenElementFocus(event: FocusEvent) {
+            const currentTarget = event.currentTarget as FocusSentinel;
+            const relatedTarget = event.relatedTarget as Node | null;
             const focusableElement =
                 relatedTarget === currentTarget.$_pfocustrap_firsthiddenfocusableelement || !this.$el?.contains(relatedTarget)
-                    ? getLastFocusableElement(currentTarget.parentElement, this.getComputedSelector(currentTarget.$_pfocustrap_focusableselector))
+                    ? getLastFocusableElement(currentTarget.parentElement!, this.getComputedSelector(currentTarget.$_pfocustrap_focusableselector))
                     : currentTarget.$_pfocustrap_firsthiddenfocusableelement;
 
-            focus(focusableElement);
+            focus(focusableElement as HTMLElement);
         },
-        createHiddenFocusableElements(el, binding) {
+        createHiddenFocusableElements(el: HTMLElement, binding: FocusTrapBinding) {
             const { tabIndex = 0, firstFocusableSelector = '', lastFocusableSelector = '' } = binding.value || {};
 
-            const createFocusableElement = (onFocus) => {
+            const createFocusableElement = (onFocus: (event: FocusEvent) => void) => {
                 return createElement('span', {
                     class: 'rs-hidden-accessible rs-hidden-focusable',
                     tabIndex,
@@ -107,7 +134,7 @@ const FocusTrap = BaseFocusTrap.extend('focustrap', {
                     'data-p-hidden-accessible': true,
                     'data-p-hidden-focusable': true,
                     onFocus: onFocus?.bind(this)
-                });
+                }) as FocusSentinel;
             };
 
             const firstFocusableElement = createFocusableElement(this.onFirstHiddenElementFocus);

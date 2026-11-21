@@ -8,7 +8,7 @@ const Ripple = BaseRipple.extend('ripple', {
                 this.createRipple(this.$host);
                 this.bindEvents(this.$host);
 
-                this.$host.setAttribute('data-pd-ripple', true);
+                this.$host.setAttribute('data-pd-ripple', 'true');
                 this.$host.style['overflow'] = 'hidden';
                 this.$host.style['position'] = 'relative';
             } else {
@@ -20,16 +20,16 @@ const Ripple = BaseRipple.extend('ripple', {
     unmounted(el) {
         this.remove(el);
     },
-    timeout: undefined,
+    timeout: undefined as ReturnType<typeof setTimeout> | undefined,
     methods: {
-        bindEvents(el) {
+        bindEvents(el: HTMLElement) {
             el.addEventListener('mousedown', this.onMouseDown.bind(this));
         },
-        unbindEvents(el) {
+        unbindEvents(el: HTMLElement) {
             el.removeEventListener('mousedown', this.onMouseDown.bind(this));
         },
-        createRipple(el) {
-            let ink = this.getInk(el);
+        createRipple(el: HTMLElement) {
+            let ink = this.getInk(el) as HTMLElement | undefined;
 
             if (!ink) {
                 ink = createElement('span', {
@@ -48,8 +48,8 @@ const Ripple = BaseRipple.extend('ripple', {
                 this.$el = ink;
             }
         },
-        remove(el) {
-            let ink = this.getInk(el);
+        remove(el: HTMLElement) {
+            let ink = this.getInk(el) as HTMLElement | undefined;
 
             if (ink) {
                 this.$host.style['overflow'] = '';
@@ -60,9 +60,9 @@ const Ripple = BaseRipple.extend('ripple', {
                 ink.remove();
             }
         },
-        onMouseDown(event) {
-            let target = event.currentTarget;
-            let ink = this.getInk(target);
+        onMouseDown(event: MouseEvent) {
+            let target = event.currentTarget as HTMLElement;
+            let ink = this.getInk(target) as HTMLElement | undefined;
 
             if (!ink || getComputedStyle(ink, null).display === 'none') {
                 return;
@@ -95,16 +95,18 @@ const Ripple = BaseRipple.extend('ripple', {
                 }
             }, 401);
         },
-        onAnimationEnd(event) {
+        onAnimationEnd(event: AnimationEvent) {
             if (this.timeout) {
                 clearTimeout(this.timeout);
             }
 
-            !this.isUnstyled() && removeClass(event.currentTarget, 'rs-ink-active');
-            event.currentTarget.setAttribute('data-p-ink-active', 'false');
+            const ink = event.currentTarget as HTMLElement;
+
+            !this.isUnstyled() && removeClass(ink, 'rs-ink-active');
+            ink.setAttribute('data-p-ink-active', 'false');
         },
-        getInk(el) {
-            return el && el.children ? [...el.children].find((child) => getAttribute(child, 'data-pc-name') === 'ripple') : undefined;
+        getInk(el: HTMLElement | null) {
+            return el?.children ? [...el.children].find((child) => getAttribute(child, 'data-pc-name') === 'ripple') : undefined;
         }
     }
 });

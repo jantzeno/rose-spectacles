@@ -1,9 +1,23 @@
+import type { DirectiveBinding } from 'vue';
 import { isAttributeEquals } from '../internal/utils/dom/index';
 import BaseKeyFilter from './BaseKeyFilter';
 
+type InputElement = HTMLTextAreaElement | HTMLInputElement;
+type KeyFilterElement = InputElement & {
+    $_pkeyfilterModifier?: string;
+    $_pkeyfilterPattern?: RegExp | '';
+    $_pkeyfilterValidateOnly?: boolean;
+    $_pkeyfilterComposing?: boolean;
+    $_keyfilterKeydownEvent?: EventListener | null;
+    $_keyfilterPasteEvent?: EventListener | null;
+    $_keyfilterInputEvent?: EventListener | null;
+    $_keyfilterCompositionStartEvent?: EventListener | null;
+    $_keyfilterCompositionEndEvent?: EventListener | null;
+};
+
 const KeyFilter = BaseKeyFilter.extend('keyfilter', {
     beforeMount(el, options) {
-        let target = this.getTarget(el);
+        let target = this.getTarget(el) as KeyFilterElement | null;
 
         if (!target) return;
 
@@ -16,10 +30,10 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
 
         this.bindEvents(target);
 
-        target.setAttribute('data-pd-keyfilter', true);
+        target.setAttribute('data-pd-keyfilter', 'true');
     },
     updated(el, options) {
-        let target = this.getTarget(el);
+        let target = this.getTarget(el) as KeyFilterElement | null;
 
         if (!target) return;
 
@@ -48,29 +62,29 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
         alphanum: /[a-z0-9_]/
     },
     methods: {
-        getTarget(el) {
-            return isAttributeEquals(el, 'data-pc-name', 'inputtext') || isAttributeEquals(el, 'data-pc-name', 'textarea') ? el : null;
+        getTarget(el: HTMLElement) {
+            return isAttributeEquals(el, 'data-pc-name', 'inputtext') || isAttributeEquals(el, 'data-pc-name', 'textarea') ? (el as KeyFilterElement) : null;
         },
-        getModifiers(options) {
+        getModifiers(options: DirectiveBinding) {
             if (options.modifiers && Object.keys(options.modifiers).length) {
                 return Object.keys(options.modifiers)[Object.keys(options.modifiers).length - 1];
             }
 
             return '';
         },
-        getRegex(target) {
+        getRegex(target: KeyFilterElement): RegExp | '' {
             return target.$_pkeyfilterPattern
                 ? target.$_pkeyfilterPattern
                 : target.$_pkeyfilterModifier
                   ? this.DEFAULT_PATTERNS[target.$_pkeyfilterModifier]
                   : /./;
         },
-        bindEvents(el) {
-            el.$_keyfilterKeydownEvent = (event) => this.onKeydown(event, el);
-            el.$_keyfilterPasteEvent = (event) => this.onPaste(event, el);
+        bindEvents(el: KeyFilterElement) {
+            el.$_keyfilterKeydownEvent = (event) => this.onKeydown(event as KeyboardEvent, el);
+            el.$_keyfilterPasteEvent = (event) => this.onPaste(event as ClipboardEvent, el);
             el.$_keyfilterInputEvent = (event) => this.onInput(event, el);
-            el.$_keyfilterCompositionStartEvent = (event) => this.onCompositionStart(event, el);
-            el.$_keyfilterCompositionEndEvent = (event) => this.onCompositionEnd(event, el);
+            el.$_keyfilterCompositionStartEvent = (event) => this.onCompositionStart(event as CompositionEvent, el);
+            el.$_keyfilterCompositionEndEvent = (event) => this.onCompositionEnd(event as CompositionEvent, el);
 
             el.addEventListener('keypress', el.$_keyfilterKeydownEvent);
             el.addEventListener('paste', el.$_keyfilterPasteEvent);
@@ -78,12 +92,12 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
             el.addEventListener('compositionstart', el.$_keyfilterCompositionStartEvent);
             el.addEventListener('compositionend', el.$_keyfilterCompositionEndEvent);
         },
-        unbindEvents(el) {
-            el.removeEventListener('keypress', el.$_keyfilterKeydownEvent);
-            el.removeEventListener('paste', el.$_keyfilterPasteEvent);
-            el.removeEventListener('input', el.$_keyfilterInputEvent);
-            el.removeEventListener('compositionstart', el.$_keyfilterCompositionStartEvent);
-            el.removeEventListener('compositionend', el.$_keyfilterCompositionEndEvent);
+        unbindEvents(el: KeyFilterElement) {
+            if (el.$_keyfilterKeydownEvent) el.removeEventListener('keypress', el.$_keyfilterKeydownEvent);
+            if (el.$_keyfilterPasteEvent) el.removeEventListener('paste', el.$_keyfilterPasteEvent);
+            if (el.$_keyfilterInputEvent) el.removeEventListener('input', el.$_keyfilterInputEvent);
+            if (el.$_keyfilterCompositionStartEvent) el.removeEventListener('compositionstart', el.$_keyfilterCompositionStartEvent);
+            if (el.$_keyfilterCompositionEndEvent) el.removeEventListener('compositionend', el.$_keyfilterCompositionEndEvent);
 
             el.$_keyfilterKeydownEvent = null;
             el.$_keyfilterPasteEvent = null;
@@ -91,14 +105,14 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
             el.$_keyfilterCompositionStartEvent = null;
             el.$_keyfilterCompositionEndEvent = null;
         },
-        onCompositionStart(event, target) {
+        onCompositionStart(event: CompositionEvent, target: KeyFilterElement) {
             target.$_pkeyfilterComposing = true;
         },
-        onCompositionEnd(event, target) {
+        onCompositionEnd(event: CompositionEvent, target: KeyFilterElement) {
             target.$_pkeyfilterComposing = false;
             this.onInput(event, target);
         },
-        onInput(event, target) {
+        onInput(event: Event, target: KeyFilterElement) {
             if (target.$_pkeyfilterComposing) return;
 
             const regex = this.getRegex(target);
@@ -108,12 +122,12 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
                 target.value = target.value.slice(0, -1);
             }
         },
-        onKeydown(event, target) {
+        onKeydown(event: KeyboardEvent, target: KeyFilterElement) {
             if (event.ctrlKey || event.altKey || event.metaKey || event.key === 'Tab') {
                 return;
             }
 
-            let regex = this.getRegex(target);
+            let regex = this.getRegex(target) as RegExp | '';
 
             if (regex === '') {
                 return;
@@ -122,7 +136,7 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
             let testKey = `${event.key}`;
 
             if (target.$_pkeyfilterValidateOnly) {
-                testKey = `${target.value.substring(0, target.selectionStart)}${event.key}${target.value.substring(target.selectionEnd)}`;
+                testKey = `${target.value.substring(0, target.selectionStart!)}${event.key}${target.value.substring(target.selectionEnd!)}`;
             }
 
             if (!regex.test(testKey)) {
@@ -130,17 +144,17 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
                 event.preventDefault();
             }
         },
-        onPaste(event, target) {
-            let regex = this.getRegex(target);
+        onPaste(event: ClipboardEvent, target: KeyFilterElement) {
+            let regex = this.getRegex(target) as RegExp | '';
 
             if (regex === '') {
                 return;
             }
 
-            const clipboard = event.clipboardData.getData('text');
+            const clipboard = event.clipboardData!.getData('text');
 
             if (target.$_pkeyfilterValidateOnly) {
-                const newValue = `${target.value.substring(0, target.selectionStart)}${clipboard}${target.value.substring(target.selectionEnd)}`;
+                const newValue = `${target.value.substring(0, target.selectionStart!)}${clipboard}${target.value.substring(target.selectionEnd!)}`;
 
                 if (!regex.test(newValue)) {
                     event.preventDefault();

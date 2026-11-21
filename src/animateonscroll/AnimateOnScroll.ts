@@ -7,7 +7,7 @@ const AnimateOnScroll = BaseAnimateOnScroll.extend('animateonscroll', {
         this.$el.style.opacity = this.$value.enterClass ? '0' : '';
     },
     mounted() {
-        this.$el.setAttribute('data-pd-animateonscroll', true);
+        this.$el.setAttribute('data-pd-animateonscroll', 'true');
 
         this.bindIntersectionObserver();
     },
@@ -15,11 +15,11 @@ const AnimateOnScroll = BaseAnimateOnScroll.extend('animateonscroll', {
         this.unbindAnimationEvents();
         this.unbindIntersectionObserver();
     },
-    observer: undefined,
-    resetObserver: undefined,
+    observer: undefined as IntersectionObserver | undefined,
+    resetObserver: undefined as IntersectionObserver | undefined,
     isObserverActive: false,
-    animationState: undefined,
-    animationEndListener: undefined,
+    animationState: undefined as 'enter' | 'leave' | undefined,
+    animationEndListener: undefined as (() => void) | undefined,
     methods: {
         bindAnimationEvents() {
             if (!this.animationEndListener) {
@@ -33,7 +33,7 @@ const AnimateOnScroll = BaseAnimateOnScroll.extend('animateonscroll', {
             }
         },
         bindIntersectionObserver() {
-            const { root, rootMargin, threshold = 0.5 } = this.$value;
+            const { root, rootMargin, threshold = 0.5 } = this.$value as IntersectionObserverInit;
             const options = { root, rootMargin, threshold };
 
             // States

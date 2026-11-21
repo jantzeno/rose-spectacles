@@ -72,7 +72,7 @@
         },
         "./animateonscroll": {
             "types": "./src/animateonscroll/AnimateOnScroll.d.ts",
-            "default": "./src/animateonscroll/AnimateOnScroll.js"
+            "default": "./src/animateonscroll/AnimateOnScroll.ts"
         },
         "./animateonscroll/style": {
             "types": "./src/animateonscroll/style/AnimateOnScrollStyle.d.ts",
@@ -112,7 +112,7 @@
         },
         "./badgedirective": {
             "types": "./src/badgedirective/BadgeDirective.d.ts",
-            "default": "./src/badgedirective/BadgeDirective.js"
+            "default": "./src/badgedirective/BadgeDirective.ts"
         },
         "./badgedirective/style": {
             "types": "./src/badgedirective/style/BadgeDirectiveStyle.d.ts",
@@ -412,7 +412,7 @@
         },
         "./focustrap": {
             "types": "./src/focustrap/FocusTrap.d.ts",
-            "default": "./src/focustrap/FocusTrap.js"
+            "default": "./src/focustrap/FocusTrap.ts"
         },
         "./focustrap/style": {
             "types": "./src/focustrap/style/FocusTrapStyle.d.ts",
@@ -548,7 +548,7 @@
         },
         "./keyfilter": {
             "types": "./src/keyfilter/KeyFilter.d.ts",
-            "default": "./src/keyfilter/KeyFilter.js"
+            "default": "./src/keyfilter/KeyFilter.ts"
         },
         "./keyfilter/style": {
             "types": "./src/keyfilter/style/KeyFilterStyle.d.ts",
@@ -752,7 +752,7 @@
         },
         "./ripple": {
             "types": "./src/ripple/Ripple.d.ts",
-            "default": "./src/ripple/Ripple.js"
+            "default": "./src/ripple/Ripple.ts"
         },
         "./ripple/style": {
             "types": "./src/ripple/style/RippleStyle.d.ts",
@@ -1144,7 +1144,7 @@
         },
         "./core/basedirective": {
             "types": "./src/core/basedirective/BaseDirective.d.ts",
-            "default": "./src/core/basedirective/BaseDirective.js"
+            "default": "./src/core/basedirective/BaseDirective.ts"
         },
         "./core/baseeditableholder": {
             "types": "./src/core/baseeditableholder/BaseEditableHolder.d.ts",
