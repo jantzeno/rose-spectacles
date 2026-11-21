@@ -7,7 +7,7 @@
             v-ripple
             :class="cx('prevButton')"
             :aria-label="prevButtonAriaLabel"
-            :tabindex="$pcTabs.tabindex"
+            :tabindex="tabsContext.tabindex"
             @click="onPrevButtonClick"
             v-bind="ptm('prevButton')"
             data-pc-group-section="navigator"
@@ -15,7 +15,7 @@
             <component :is="templates.previcon || 'ChevronLeftIcon'" aria-hidden="true" v-bind="ptm('prevIcon')" />
         </button>
         <div ref="content" :class="cx('content')" @scroll="onScroll" :data-p="dataP" v-bind="ptm('content')">
-            <div ref="tabs" :class="cx('tabList')" role="tablist" :aria-orientation="$pcTabs.orientation || 'horizontal'" v-bind="ptm('tabList')">
+            <div ref="tabs" :class="cx('tabList')" role="tablist" :aria-orientation="tabsContext.orientation || 'horizontal'" v-bind="ptm('tabList')">
                 <slot></slot>
                 <span ref="inkbar" :class="cx('activeBar')" role="presentation" aria-hidden="true" v-bind="ptm('activeBar')"></span>
             </div>
@@ -27,7 +27,7 @@
             v-ripple
             :class="cx('nextButton')"
             :aria-label="nextButtonAriaLabel"
-            :tabindex="$pcTabs.tabindex"
+            :tabindex="tabsContext.tabindex"
             @click="onNextButtonClick"
             v-bind="ptm('nextButton')"
             data-pc-group-section="navigator"
@@ -37,7 +37,9 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import type { TabsContext } from '../tabs/context';
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { findSingle, getHeight, getOffset, getOuterHeight, getOuterWidth, getWidth, isRTL } from '../internal/utils/dom/index';
 import ChevronLeftIcon from '../icons/chevronleft/ChevronLeftIcon.vue';
@@ -45,7 +47,16 @@ import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
 import Ripple from '../ripple/Ripple';
 import BaseTabList from './BaseTabList.vue';
 
-export default {
+interface TabListRefs {
+    content?: HTMLElement;
+    list?: HTMLElement;
+    tabs?: HTMLElement;
+    inkbar?: HTMLElement;
+    prevButton?: HTMLButtonElement;
+    nextButton?: HTMLButtonElement;
+}
+
+export default defineComponent({
     name: 'TabList',
     extends: BaseTabList,
     inheritAttrs: false,
@@ -53,11 +64,11 @@ export default {
     data() {
         return {
             isPrevButtonEnabled: false,
-            isNextButtonEnabled: true
+            isNextButtonEnabled: true,
+            resizeObserver: undefined as ResizeObserver | undefined,
+            inkBarObserver: undefined as ResizeObserver | undefined
         };
     },
-    resizeObserver: undefined,
-    inkBarObserver: undefined,
     watch: {
         showNavigators(newValue) {
             newValue ? this.bindResizeObserver() : this.unbindResizeObserver();
@@ -89,13 +100,13 @@ export default {
         this.unbindInkBarObserver();
     },
     methods: {
-        onScroll(event) {
+        onScroll(event: Event) {
             this.showNavigators && this.updateButtonState();
 
             event.preventDefault();
         },
         onPrevButtonClick() {
-            const content = this.$refs.content;
+            const content = this.$refs.content as HTMLElement;
             const buttonWidths = this.getVisibleButtonWidths();
             const width = getWidth(content) - buttonWidths;
             const currentScrollLeft = Math.abs(content.scrollLeft);
@@ -106,7 +117,7 @@ export default {
             content.scrollLeft = isRTL(content) ? -1 * scrollLeft : scrollLeft;
         },
         onNextButtonClick() {
-            const content = this.$refs.content;
+            const content = this.$refs.content as HTMLElement;
             const buttonWidths = this.getVisibleButtonWidths();
             const width = getWidth(content) - buttonWidths;
             const currentScrollLeft = Math.abs(content.scrollLeft);
@@ -119,17 +130,17 @@ export default {
         },
         bindResizeObserver() {
             this.resizeObserver = new ResizeObserver(() => this.updateButtonState());
-            this.resizeObserver.observe(this.$refs.list);
+            this.resizeObserver.observe(this.$refs.list as HTMLElement);
         },
         unbindResizeObserver() {
-            this.resizeObserver?.unobserve(this.$refs.list);
+            this.resizeObserver?.unobserve(this.$refs.list as HTMLElement);
             this.resizeObserver = undefined;
         },
         bindInkBarObserver() {
             this.unbindInkBarObserver();
 
-            const { content } = this.$refs;
-            const activeTab = findSingle(content, '[data-pc-name="tab"][data-p-active="true"]');
+            const { content } = this.$refs as TabListRefs;
+            const activeTab = findSingle(content!, '[data-pc-name="tab"][data-p-active="true"]');
 
             if (activeTab) {
                 this.inkBarObserver = new ResizeObserver(() => this.updateInkBar());
@@ -141,22 +152,22 @@ export default {
             this.inkBarObserver = undefined;
         },
         updateInkBar() {
-            const { content, inkbar, tabs } = this.$refs;
+            const { content, inkbar, tabs } = this.$refs as TabListRefs;
 
             if (!inkbar) return;
 
-            const activeTab = findSingle(content, '[data-pc-name="tab"][data-p-active="true"]');
+            const activeTab = findSingle(content!, '[data-pc-name="tab"][data-p-active="true"]');
 
-            if (this.$pcTabs.isVertical()) {
-                inkbar.style.height = getOuterHeight(activeTab) + 'px';
-                inkbar.style.top = getOffset(activeTab).top - getOffset(tabs).top + 'px';
+            if (this.tabsContext.isVertical()) {
+                inkbar.style.height = getOuterHeight(activeTab as HTMLElement) + 'px';
+                inkbar.style.top = Number(getOffset(activeTab).top) - Number(getOffset(tabs).top) + 'px';
             } else {
                 inkbar.style.width = getOuterWidth(activeTab) + 'px';
-                inkbar.style.left = getOffset(activeTab).left - getOffset(tabs).left + 'px';
+                inkbar.style.left = Number(getOffset(activeTab).left) - Number(getOffset(tabs).left) + 'px';
             }
         },
         updateButtonState() {
-            const { list, content } = this.$refs;
+            const { list, content } = this.$refs as TabListRefs;
 
             if (!list || !content) return;
 
@@ -164,16 +175,16 @@ export default {
             const scrollLeft = Math.abs(content.scrollLeft);
             const [width, height] = [getWidth(content), getHeight(content)];
 
-            if (this.$pcTabs.isVertical()) {
+            if (this.tabsContext.isVertical()) {
                 this.isPrevButtonEnabled = scrollTop !== 0;
-                this.isNextButtonEnabled = list.offsetHeight >= offsetHeight && parseInt(scrollTop) !== scrollHeight - height;
+                this.isNextButtonEnabled = list.offsetHeight >= offsetHeight && parseInt(String(scrollTop)) !== scrollHeight - height;
             } else {
                 this.isPrevButtonEnabled = scrollLeft !== 0;
-                this.isNextButtonEnabled = list.offsetWidth >= offsetWidth && parseInt(scrollLeft) !== scrollWidth - width;
+                this.isNextButtonEnabled = list.offsetWidth >= offsetWidth && parseInt(String(scrollLeft)) !== scrollWidth - width;
             }
         },
         getVisibleButtonWidths() {
-            const { prevButton, nextButton } = this.$refs;
+            const { prevButton, nextButton } = this.$refs as TabListRefs;
             let width = 0;
 
             if (this.showNavigators) {
@@ -184,24 +195,27 @@ export default {
         }
     },
     computed: {
+        tabsContext() {
+            return this.$pcTabs as TabsContext;
+        },
         templates() {
-            return this.$pcTabs.$slots;
+            return this.tabsContext.$slots;
         },
         activeValue() {
-            return this.$pcTabs.d_value;
+            return this.tabsContext.d_value;
         },
         showNavigators() {
-            return this.$pcTabs.showNavigators;
+            return this.tabsContext.showNavigators;
         },
         prevButtonAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.previous : undefined;
+            return this.$primevue.config.locale!.aria ? this.$primevue.config.locale!.aria.previous : undefined;
         },
         nextButtonAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.next : undefined;
+            return this.$primevue.config.locale!.aria ? this.$primevue.config.locale!.aria.next : undefined;
         },
         dataP() {
             return cn({
-                scrollable: this.$pcTabs.scrollable
+                scrollable: this.tabsContext.scrollable
             });
         }
     },
@@ -212,5 +226,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

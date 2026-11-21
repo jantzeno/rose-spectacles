@@ -5,27 +5,28 @@
     <slot v-else :dataP="dataP" :class="cx('root')" :active="active" :a11yAttrs="a11yAttrs" :onClick="onClick"></slot>
 </template>
 
-<script>
+<script lang="ts">
+import type { TabsContext } from '../tabs/context';
 import { cn } from '../internal/utils/index';
 import { findSingle, focus, getAttribute } from '../internal/utils/dom/index';
 import { equals } from '../internal/utils/object/index';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 import BaseTab from './BaseTab.vue';
 
-export default {
+export default defineComponent({
     name: 'Tab',
     extends: BaseTab,
     inheritAttrs: false,
     inject: ['$pcTabs', '$pcTabList'],
     methods: {
         onFocus() {
-            this.$pcTabs.selectOnFocus && this.changeActiveValue();
+            this.tabsContext.selectOnFocus && this.changeActiveValue();
         },
         onClick() {
             this.changeActiveValue();
         },
-        onKeydown(event) {
+        onKeydown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowRight':
                     this.onArrowRightKey(event);
@@ -61,43 +62,43 @@ export default {
                     break;
             }
         },
-        onArrowRightKey(event) {
-            const nextTab = this.findNextTab(event.currentTarget);
+        onArrowRightKey(event: KeyboardEvent) {
+            const nextTab = this.findNextTab(event.currentTarget as Element);
 
             nextTab ? this.changeFocusedTab(event, nextTab) : this.onHomeKey(event);
             event.preventDefault();
         },
-        onArrowLeftKey(event) {
-            const prevTab = this.findPrevTab(event.currentTarget);
+        onArrowLeftKey(event: KeyboardEvent) {
+            const prevTab = this.findPrevTab(event.currentTarget as Element);
 
             prevTab ? this.changeFocusedTab(event, prevTab) : this.onEndKey(event);
             event.preventDefault();
         },
-        onHomeKey(event) {
+        onHomeKey(event: KeyboardEvent) {
             const firstTab = this.findFirstTab();
 
             this.changeFocusedTab(event, firstTab);
             event.preventDefault();
         },
-        onEndKey(event) {
+        onEndKey(event: KeyboardEvent) {
             const lastTab = this.findLastTab();
 
             this.changeFocusedTab(event, lastTab);
             event.preventDefault();
         },
-        onPageDownKey(event) {
+        onPageDownKey(event: KeyboardEvent) {
             this.scrollInView(this.findLastTab());
             event.preventDefault();
         },
-        onPageUpKey(event) {
+        onPageUpKey(event: KeyboardEvent) {
             this.scrollInView(this.findFirstTab());
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEnterKey(event: KeyboardEvent) {
             this.changeActiveValue();
         },
-        findNextTab(tabElement, selfCheck = false) {
-            const element = selfCheck ? tabElement : tabElement.nextElementSibling;
+        findNextTab(tabElement: Element | null, selfCheck = false): Element | null {
+            const element = selfCheck ? tabElement : tabElement!.nextElementSibling;
 
             return element
                 ? getAttribute(element, 'data-p-disabled') || getAttribute(element, 'data-pc-section') === 'activebar'
@@ -105,8 +106,8 @@ export default {
                     : findSingle(element, '[data-pc-name="tab"]')
                 : null;
         },
-        findPrevTab(tabElement, selfCheck = false) {
-            const element = selfCheck ? tabElement : tabElement.previousElementSibling;
+        findPrevTab(tabElement: Element | null, selfCheck = false): Element | null {
+            const element = selfCheck ? tabElement : tabElement!.previousElementSibling;
 
             return element
                 ? getAttribute(element, 'data-p-disabled') || getAttribute(element, 'data-pc-section') === 'activebar'
@@ -115,42 +116,48 @@ export default {
                 : null;
         },
         findFirstTab() {
-            return this.findNextTab(this.$pcTabList.$refs.tabs.firstElementChild, true);
+            return this.findNextTab(this.tabListElement.firstElementChild, true);
         },
         findLastTab() {
-            return this.findPrevTab(this.$pcTabList.$refs.tabs.lastElementChild, true);
+            return this.findPrevTab(this.tabListElement.lastElementChild, true);
         },
         changeActiveValue() {
-            this.$pcTabs.updateValue(this.value);
+            this.tabsContext.updateValue(this.value);
         },
-        changeFocusedTab(event, element) {
-            focus(element);
+        changeFocusedTab(event: KeyboardEvent, element: Element | null) {
+            focus(element as HTMLElement);
             this.scrollInView(element);
         },
-        scrollInView(element) {
+        scrollInView(element: Element | null) {
             element?.scrollIntoView?.({ block: 'nearest' });
         }
     },
     computed: {
+        tabsContext() {
+            return this.$pcTabs as TabsContext;
+        },
+        tabListElement() {
+            return (this.$pcTabList as { $refs: { tabs: HTMLElement } }).$refs.tabs;
+        },
         active() {
-            return equals(this.$pcTabs?.d_value, this.value);
+            return equals(this.tabsContext?.d_value, this.value);
         },
         id() {
-            return `${this.$pcTabs?.$id}_tab_${this.value}`;
+            return `${this.tabsContext?.$id}_tab_${this.value}`;
         },
         ariaControls() {
-            return `${this.$pcTabs?.$id}_tabpanel_${this.value}`;
+            return `${this.tabsContext?.$id}_tabpanel_${this.value}`;
         },
         attrs() {
             return mergeProps(this.asAttrs, this.a11yAttrs, this.ptmi('root', this.ptParams));
         },
         asAttrs() {
-            return this.as === 'BUTTON' ? { type: 'button', disabled: this.disabled } : undefined;
+            return this.as === 'BUTTON' ? { type: 'button', disabled: this.disabled } : {};
         },
         a11yAttrs() {
             return {
                 id: this.id,
-                tabindex: this.active ? this.$pcTabs.tabindex : -1,
+                tabindex: this.active ? this.tabsContext.tabindex : -1,
                 role: 'tab',
                 'aria-selected': this.active,
                 'aria-controls': this.ariaControls,
@@ -177,5 +184,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

@@ -1,8 +1,8 @@
 <template>
-    <slot v-if="!$pcTabs"></slot>
+    <slot v-if="!tabsContext"></slot>
     <template v-else>
         <template v-if="!asChild">
-            <component v-if="$pcTabs?.lazy ? active : true" v-show="$pcTabs?.lazy ? true : active" :is="as" :class="cx('root')" v-bind="attrs">
+            <component v-if="tabsContext?.lazy ? active : true" v-show="tabsContext?.lazy ? true : active" :is="as" :class="cx('root')" v-bind="attrs">
                 <slot></slot>
             </component>
         </template>
@@ -11,25 +11,29 @@
     </template>
 </template>
 
-<script>
+<script lang="ts">
+import type { TabsContext } from '../tabs/context';
 import { equals } from '../internal/utils/object/index';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 import BaseTabPanel from './BaseTabPanel.vue';
 
-export default {
+export default defineComponent({
     name: 'TabPanel',
     extends: BaseTabPanel,
     inheritAttrs: false,
     inject: ['$pcTabs'],
     computed: {
+        tabsContext() {
+            return this.$pcTabs as TabsContext | undefined;
+        },
         active() {
-            return equals(this.$pcTabs?.d_value, this.value);
+            return equals(this.tabsContext?.d_value, this.value);
         },
         id() {
-            return `${this.$pcTabs?.$id}_tabpanel_${this.value}`;
+            return `${this.tabsContext?.$id}_tabpanel_${this.value}`;
         },
         ariaLabelledby() {
-            return `${this.$pcTabs?.$id}_tab_${this.value}`;
+            return `${this.tabsContext?.$id}_tab_${this.value}`;
         },
         attrs() {
             return mergeProps(this.a11yAttrs, this.ptmi('root', this.ptParams));
@@ -37,7 +41,7 @@ export default {
         a11yAttrs() {
             return {
                 id: this.id,
-                tabindex: this.$pcTabs?.tabindex,
+                tabindex: this.tabsContext?.tabindex,
                 role: 'tabpanel',
                 'aria-labelledby': this.ariaLabelledby,
                 'data-pc-name': 'tabpanel',
@@ -52,5 +56,5 @@ export default {
             };
         }
     }
-};
+});
 </script>
