@@ -331,6 +331,7 @@ export default {
     },
     beforeUnmount() {
         this.stopFrozenLayout?.();
+        this.unbindDocumentEditListener();
 
         if (this.overlayEventListener) {
             OverlayEventBus.off('overlay-click', this.overlayEventListener);

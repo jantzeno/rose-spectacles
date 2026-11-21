@@ -14,11 +14,39 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import Button from '../button/Button.vue';
 import PrimeVue from '../config/Config';
 import InputText from '../inputtext/InputText.vue';
+
 import { defineComponent, nextTick } from 'vue';
 import Column from '../column/Column.vue';
 import ColumnGroup from '../columngroup/ColumnGroup.vue';
 import Row from '../row/Row.vue';
 import DataTable from './DataTable.vue';
+
+it('removes the outside edit listener when the active cell unmounts', async () => {
+    const addListener = vi.spyOn(document, 'addEventListener');
+    const removeListener = vi.spyOn(document, 'removeEventListener');
+    const wrapper = mount(DataTable, {
+        props: { value: [{ name: 'Copper' }], editMode: 'cell' },
+        global: { components: { Column } },
+        slots: { default: '<Column field="name"><template #editor><input aria-label="Name" /></template></Column>' }
+    });
+    let editListener: EventListenerOrEventListenerObject | undefined;
+
+    try {
+        await wrapper.get('tbody td').trigger('click');
+        expect(wrapper.find('input[aria-label="Name"]').exists()).toBe(true);
+        editListener = addListener.mock.calls.find(([name]) => name === 'mousedown')?.[1];
+        expect(editListener).toBeDefined();
+
+        await wrapper.setProps({ value: [] });
+
+        expect(removeListener).toHaveBeenCalledWith('mousedown', editListener);
+    } finally {
+        wrapper.unmount();
+        addListener.mockRestore();
+        removeListener.mockRestore();
+        if (editListener) document.removeEventListener('mousedown', editListener);
+    }
+});
 
 window.URL.createObjectURL = () => 'blob:rose-spectacles-test';
 
