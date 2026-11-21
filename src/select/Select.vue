@@ -1,5 +1,12 @@
 <template>
-    <div ref="container" :id="$id" :class="cx('root')" @click="onContainerClick" :data-p="containerDataP" v-bind="ptmi('root')">
+    <div
+        ref="container"
+        :id="$id"
+        :class="cx('root')"
+        @click="onContainerClick"
+        :data-p="containerDataP"
+        v-bind="ptmi('root', { context: ptSelectionContext })"
+    >
         <input
             v-if="editable"
             ref="focusInput"
@@ -26,7 +33,7 @@
             @keydown="onKeyDown"
             @input="onEditableInput"
             :data-p="labelDataP"
-            v-bind="ptm('label')"
+            v-bind="getPTOptions('label')"
         />
         <span
             v-else
@@ -49,7 +56,7 @@
             @blur="onBlur"
             @keydown="onKeyDown"
             :data-p="labelDataP"
-            v-bind="ptm('label')"
+            v-bind="getPTOptions('label')"
         >
             <slot name="value" :value="d_value" :placeholder="placeholder">{{ label === 'rs-emptylabel' ? '&nbsp;' : (label ?? 'empty') }}</slot>
         </span>
@@ -59,14 +66,14 @@
                 ref="clearIcon"
                 :class="[cx('clearIcon'), clearIcon]"
                 @click="onClearClick"
-                v-bind="ptm('clearIcon')"
+                v-bind="getPTOptions('clearIcon')"
                 data-pc-section="clearicon"
             />
         </slot>
-        <div :class="cx('dropdown')" v-bind="ptm('dropdown')">
+        <div :class="cx('dropdown')" v-bind="getPTOptions('dropdown')">
             <slot v-if="loading" name="loadingicon" :class="cx('loadingIcon')">
-                <span v-if="loadingIcon" :class="[cx('loadingIcon'), 'pi-spin', loadingIcon]" aria-hidden="true" v-bind="ptm('loadingIcon')" />
-                <SpinnerIcon v-else :class="cx('loadingIcon')" spin aria-hidden="true" v-bind="ptm('loadingIcon')" />
+                <span v-if="loadingIcon" :class="[cx('loadingIcon'), 'pi-spin', loadingIcon]" aria-hidden="true" v-bind="getPTOptions('loadingIcon')" />
+                <SpinnerIcon v-else :class="cx('loadingIcon')" spin aria-hidden="true" v-bind="getPTOptions('loadingIcon')" />
             </slot>
             <slot v-else name="dropdownicon" :class="cx('dropdownIcon')">
                 <component
@@ -74,7 +81,7 @@
                     :class="[cx('dropdownIcon'), dropdownIcon]"
                     aria-hidden="true"
                     :data-p="dropdownIconDataP"
-                    v-bind="ptm('dropdownIcon')"
+                    v-bind="getPTOptions('dropdownIcon')"
                 />
             </slot>
         </div>
@@ -85,7 +92,7 @@
                 @after-enter="onOverlayAfterEnter"
                 @leave="onOverlayLeave"
                 @after-leave="onOverlayAfterLeave"
-                v-bind="ptm('transition')"
+                v-bind="getPTOptions('transition')"
             >
                 <div
                     v-if="overlayVisible"
@@ -96,7 +103,7 @@
                     @mousedown="onOverlayMouseDown"
                     @keydown="onOverlayKeyDown"
                     :data-p="overlayDataP"
-                    v-bind="ptm('overlay')"
+                    v-bind="getPTOptions('overlay')"
                 >
                     <span
                         ref="firstHiddenFocusableElementOnOverlay"
@@ -105,13 +112,13 @@
                         class="rs-hidden-accessible rs-hidden-focusable"
                         :tabindex="0"
                         @focus="onFirstHiddenFocus"
-                        v-bind="ptm('hiddenFirstFocusableEl')"
+                        v-bind="getPTOptions('hiddenFirstFocusableEl')"
                         :data-p-hidden-accessible="true"
                         :data-p-hidden-focusable="true"
                     ></span>
                     <slot name="header" :value="d_value" :options="visibleOptions"></slot>
-                    <div v-if="filter" :class="cx('header')" v-bind="ptm('header')">
-                        <IconField :unstyled="unstyled" :pt="ptm('pcFilterContainer')">
+                    <div v-if="filter" :class="cx('header')" v-bind="getPTOptions('header')">
+                        <IconField :unstyled="unstyled" :pt="getPTOptions('pcFilterContainer')">
                             <InputText
                                 ref="filterInput"
                                 type="text"
@@ -129,21 +136,31 @@
                                 @keydown="onFilterKeyDown"
                                 @blur="onFilterBlur"
                                 @input="onFilterChange"
-                                :pt="ptm('pcFilter')"
+                                :pt="getPTOptions('pcFilter')"
                                 :formControl="{ novalidate: true }"
                             />
-                            <InputIcon :unstyled="unstyled" :pt="ptm('pcFilterIconContainer')">
+                            <InputIcon :unstyled="unstyled" :pt="getPTOptions('pcFilterIconContainer')">
                                 <slot name="filtericon">
-                                    <span v-if="filterIcon" :class="filterIcon" v-bind="ptm('filterIcon')" />
-                                    <SearchIcon v-else v-bind="ptm('filterIcon')" />
+                                    <span v-if="filterIcon" :class="filterIcon" v-bind="getPTOptions('filterIcon')" />
+                                    <SearchIcon v-else v-bind="getPTOptions('filterIcon')" />
                                 </slot>
                             </InputIcon>
                         </IconField>
-                        <span role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenFilterResult')" :data-p-hidden-accessible="true">
+                        <span
+                            role="status"
+                            aria-live="polite"
+                            class="rs-hidden-accessible"
+                            v-bind="getPTOptions('hiddenFilterResult')"
+                            :data-p-hidden-accessible="true"
+                        >
                             {{ filterResultMessageText }}
                         </span>
                     </div>
-                    <div :class="cx('listContainer')" :style="{ 'max-height': virtualScrollerDisabled ? scrollHeight : '' }" v-bind="ptm('listContainer')">
+                    <div
+                        :class="cx('listContainer')"
+                        :style="{ 'max-height': virtualScrollerDisabled ? scrollHeight : '' }"
+                        v-bind="getPTOptions('listContainer')"
+                    >
                         <VirtualScroller
                             :ref="virtualScrollerRef"
                             v-bind="virtualScrollerOptions"
@@ -151,7 +168,7 @@
                             :style="{ height: scrollHeight }"
                             :tabindex="-1"
                             :disabled="virtualScrollerDisabled"
-                            :pt="ptm('virtualScroller')"
+                            :pt="getPTOptions('virtualScroller')"
                         >
                             <template v-slot:content="{ styleClass, contentRef, items, getItemOptions, contentStyle, itemSize }">
                                 <ul
@@ -160,7 +177,7 @@
                                     :class="[cx('list'), styleClass]"
                                     :style="contentStyle"
                                     role="listbox"
-                                    v-bind="ptm('list')"
+                                    v-bind="getPTOptions('list')"
                                 >
                                     <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
                                         <li
@@ -169,12 +186,14 @@
                                             :style="{ height: itemSize ? itemSize + 'px' : undefined }"
                                             :class="cx('optionGroup')"
                                             role="option"
-                                            v-bind="ptm('optionGroup')"
+                                            v-bind="getPTItemOptions(option, getItemOptions, i, 'optionGroup')"
                                         >
                                             <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">
-                                                <span :class="cx('optionGroupLabel')" v-bind="ptm('optionGroupLabel')">{{
-                                                    getOptionGroupLabel(option.optionGroup)
-                                                }}</span>
+                                                <span
+                                                    :class="cx('optionGroupLabel')"
+                                                    v-bind="getPTItemOptions(option, getItemOptions, i, 'optionGroupLabel')"
+                                                    >{{ getOptionGroupLabel(option.optionGroup) }}</span
+                                                >
                                             </slot>
                                         </li>
                                         <li
@@ -198,11 +217,21 @@
                                             v-bind="getPTItemOptions(option, getItemOptions, i, 'option')"
                                         >
                                             <template v-if="checkmark">
-                                                <CheckIcon v-if="isSelected(option)" :class="cx('optionCheckIcon')" v-bind="ptm('optionCheckIcon')" />
-                                                <BlankIcon v-else :class="cx('optionBlankIcon')" v-bind="ptm('optionBlankIcon')" />
+                                                <CheckIcon
+                                                    v-if="isSelected(option)"
+                                                    :class="cx('optionCheckIcon')"
+                                                    v-bind="getPTItemOptions(option, getItemOptions, i, 'optionCheckIcon')"
+                                                />
+                                                <BlankIcon
+                                                    v-else
+                                                    :class="cx('optionBlankIcon')"
+                                                    v-bind="getPTItemOptions(option, getItemOptions, i, 'optionBlankIcon')"
+                                                />
                                             </template>
                                             <slot name="option" :option="option" :selected="isSelected(option)" :index="getOptionIndex(i, getItemOptions)">
-                                                <span :class="cx('optionLabel')" v-bind="ptm('optionLabel')">{{ getOptionLabel(option) }}</span>
+                                                <span :class="cx('optionLabel')" v-bind="getPTItemOptions(option, getItemOptions, i, 'optionLabel')">{{
+                                                    getOptionLabel(option)
+                                                }}</span>
                                             </slot>
                                         </li>
                                     </template>
@@ -210,7 +239,7 @@
                                         v-if="filterValue && (!items || (items && items.length === 0))"
                                         :class="cx('emptyMessage')"
                                         role="option"
-                                        v-bind="ptm('emptyMessage')"
+                                        v-bind="getPTOptions('emptyMessage')"
                                         :data-p-hidden-accessible="true"
                                     >
                                         <slot name="emptyfilter">{{ emptyFilterMessageText }}</slot>
@@ -219,7 +248,7 @@
                                         v-else-if="!options || (options && options.length === 0)"
                                         :class="cx('emptyMessage')"
                                         role="option"
-                                        v-bind="ptm('emptyMessage')"
+                                        v-bind="getPTOptions('emptyMessage')"
                                         :data-p-hidden-accessible="true"
                                     >
                                         <slot name="empty">{{ emptyMessageText }}</slot>
@@ -237,12 +266,18 @@
                         role="status"
                         aria-live="polite"
                         class="rs-hidden-accessible"
-                        v-bind="ptm('hiddenEmptyMessage')"
+                        v-bind="getPTOptions('hiddenEmptyMessage')"
                         :data-p-hidden-accessible="true"
                     >
                         {{ emptyMessageText }}
                     </span>
-                    <span role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenSelectedMessage')" :data-p-hidden-accessible="true">
+                    <span
+                        role="status"
+                        aria-live="polite"
+                        class="rs-hidden-accessible"
+                        v-bind="getPTOptions('hiddenSelectedMessage')"
+                        :data-p-hidden-accessible="true"
+                    >
                         {{ selectedMessageText }}
                     </span>
                     <span
@@ -252,7 +287,7 @@
                         class="rs-hidden-accessible rs-hidden-focusable"
                         :tabindex="0"
                         @focus="onLastHiddenFocus"
-                        v-bind="ptm('hiddenLastFocusableEl')"
+                        v-bind="getPTOptions('hiddenLastFocusableEl')"
                         :data-p-hidden-accessible="true"
                         :data-p-hidden-focusable="true"
                     ></span>
@@ -373,14 +408,18 @@ export default {
         getOptionRenderKey(option, index) {
             return (this.dataKey ? resolveFieldData(option, this.dataKey) : this.getOptionLabel(option)) + '_' + index;
         },
+        getPTOptions(key) {
+            return this.ptm(key, { context: this.ptSelectionContext });
+        },
         getPTItemOptions(option, itemOptions, index, key) {
+            const optionIndex = this.getOptionIndex(index, itemOptions);
             return this.ptm(key, {
                 context: {
                     option,
-                    index,
+                    index: optionIndex,
                     selected: this.isSelected(option),
-                    focused: this.focusedOptionIndex === this.getOptionIndex(index, itemOptions),
-                    disabled: this.isOptionDisabled(option)
+                    focused: this.focusedOptionIndex === optionIndex,
+                    disabled: !!this.isOptionDisabled(option)
                 }
             });
         },
@@ -1119,6 +1158,18 @@ export default {
         }
     },
     computed: {
+        ptSelectionContext() {
+            const index = this.findSelectedOptionIndex();
+            const option = this.visibleOptions[index];
+
+            return {
+                option,
+                index,
+                selected: index !== -1,
+                focused: index !== -1 && this.focusedOptionIndex === index,
+                disabled: this.disabled
+            };
+        },
         visibleOptions() {
             const options = this.optionGroupLabel ? this.flatOptions(this.options) : this.options || [];
 
