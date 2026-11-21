@@ -18,15 +18,15 @@ export default defineComponent({
             default: null
         },
         itemSize: {
-            type: [Number, Array],
+            type: [Number, Array] as PropType<number | number[]>,
             default: 0
         },
         getItemSize: {
             type: Function as unknown as PropType<((index: number) => number) | null>,
             default: null
         },
-        scrollHeight: null,
-        scrollWidth: null,
+        scrollHeight: String,
+        scrollWidth: String,
         orientation: {
             type: String,
             default: 'vertical'
