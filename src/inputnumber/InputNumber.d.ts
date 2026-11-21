@@ -24,7 +24,12 @@ export declare type RoundingMode = 'ceil' | 'floor' | 'expand' | 'trunc' | 'half
  */
 export declare type InputNumberValue = number | string;
 
-export declare type InputNumberPassThroughOptionType<T = any> = InputNumberPassThroughAttributes | ((options: InputNumberPassThroughMethodOptions<T>) => InputNumberPassThroughAttributes | string) | string | null | undefined;
+export declare type InputNumberPassThroughOptionType<T = any> =
+    | InputNumberPassThroughAttributes
+    | ((options: InputNumberPassThroughMethodOptions<T>) => InputNumberPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

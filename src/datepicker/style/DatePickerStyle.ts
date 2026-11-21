@@ -58,7 +58,8 @@ const classes = {
             const start = typeof state.rawValue[0] === 'string' ? instance.parseValue(state.rawValue[0])[0] : state.rawValue[0];
             const end = typeof state.rawValue[1] === 'string' ? instance.parseValue(state.rawValue[1])[0] : state.rawValue[1];
 
-            selectedDayClass = instance.isDateEquals(start, date) || instance.isDateEquals(end, date) ? 'rs-datepicker-day-selected' : 'rs-datepicker-day-selected-range';
+            selectedDayClass =
+                instance.isDateEquals(start, date) || instance.isDateEquals(end, date) ? 'rs-datepicker-day-selected' : 'rs-datepicker-day-selected-range';
         }
 
         return [

@@ -7,7 +7,15 @@
         </div>
         <Badge :value="badgeValue" :class="cx('pcFileBadge')" :severity="badgeSeverity" :unstyled="unstyled" :pt="ptm('pcFileBadge')" />
         <div :class="cx('fileActions')" v-bind="ptm('fileActions')">
-            <Button @click="$emit('remove', index)" text rounded severity="danger" :class="cx('pcFileRemoveButton')" :unstyled="unstyled" :pt="ptm('pcFileRemoveButton')">
+            <Button
+                @click="$emit('remove', index)"
+                text
+                rounded
+                severity="danger"
+                :class="cx('pcFileRemoveButton')"
+                :unstyled="unstyled"
+                :pt="ptm('pcFileRemoveButton')"
+            >
                 <template #icon="iconProps">
                     <component v-if="templates.fileremoveicon" :is="templates.fileremoveicon" :class="iconProps.class" :file="file" :index="index" />
                     <TimesIcon v-else :class="iconProps.class" aria-hidden="true" v-bind="ptm('pcFileRemoveButton')['icon']" />

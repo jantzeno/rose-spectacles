@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { TextareaHTMLAttributes } from 'vue';
 
-export declare type TextareaPassThroughOptionType = TextareaPassThroughAttributes | ((options: TextareaPassThroughMethodOptions) => TextareaPassThroughAttributes | string) | string | null | undefined;
+export declare type TextareaPassThroughOptionType =
+    | TextareaPassThroughAttributes
+    | ((options: TextareaPassThroughMethodOptions) => TextareaPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

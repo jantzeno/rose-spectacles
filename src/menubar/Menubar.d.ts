@@ -13,7 +13,12 @@ import type { MenuItem } from 'rose-spectacles/menuitem';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { ButtonHTMLAttributes, VNode } from 'vue';
 
-export declare type MenubarPassThroughOptionType = MenubarPassThroughAttributes | ((options: MenubarPassThroughMethodOptions) => MenubarPassThroughAttributes | string) | string | null | undefined;
+export declare type MenubarPassThroughOptionType =
+    | MenubarPassThroughAttributes
+    | ((options: MenubarPassThroughMethodOptions) => MenubarPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

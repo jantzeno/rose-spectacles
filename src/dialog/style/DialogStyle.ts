@@ -10,8 +10,18 @@ const inlineStyles = {
         left: 0,
         top: 0,
         display: 'flex',
-        justifyContent: position === 'left' || position === 'topleft' || position === 'bottomleft' ? 'flex-start' : position === 'right' || position === 'topright' || position === 'bottomright' ? 'flex-end' : 'center',
-        alignItems: position === 'top' || position === 'topleft' || position === 'topright' ? 'flex-start' : position === 'bottom' || position === 'bottomleft' || position === 'bottomright' ? 'flex-end' : 'center',
+        justifyContent:
+            position === 'left' || position === 'topleft' || position === 'bottomleft'
+                ? 'flex-start'
+                : position === 'right' || position === 'topright' || position === 'bottomright'
+                  ? 'flex-end'
+                  : 'center',
+        alignItems:
+            position === 'top' || position === 'topleft' || position === 'topright'
+                ? 'flex-start'
+                : position === 'bottom' || position === 'bottomleft' || position === 'bottomright'
+                  ? 'flex-end'
+                  : 'center',
         pointerEvents: modal ? 'auto' : 'none'
     }),
     root: {

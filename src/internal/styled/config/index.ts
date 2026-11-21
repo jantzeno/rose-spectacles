@@ -124,10 +124,24 @@ export default {
         return ThemeUtils.transformCSS(name, css, mode, type, this.options, { layerNames: this.setLayerNames.bind(this) }, this.defaults);
     },
     getCommonStyleSheet(name = '', params: any, props = {}) {
-        return ThemeUtils.getCommonStyleSheet({ name, theme: this.theme, params, props, defaults: this.defaults, set: { layerNames: this.setLayerNames.bind(this) } });
+        return ThemeUtils.getCommonStyleSheet({
+            name,
+            theme: this.theme,
+            params,
+            props,
+            defaults: this.defaults,
+            set: { layerNames: this.setLayerNames.bind(this) }
+        });
     },
     getStyleSheet(name: string, params: any, props = {}) {
-        return ThemeUtils.getStyleSheet({ name, theme: this.theme, params, props, defaults: this.defaults, set: { layerNames: this.setLayerNames.bind(this) } });
+        return ThemeUtils.getStyleSheet({
+            name,
+            theme: this.theme,
+            params,
+            props,
+            defaults: this.defaults,
+            set: { layerNames: this.setLayerNames.bind(this) }
+        });
     },
     onStyleMounted(name: string) {
         this._loadingStyles.add(name);

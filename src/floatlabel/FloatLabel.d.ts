@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type FloatLabelPassThroughOptionType = FloatLabelPassThroughAttributes | ((options: FloatLabelPassThroughMethodOptions) => FloatLabelPassThroughAttributes | string) | string | null | undefined;
+export declare type FloatLabelPassThroughOptionType =
+    | FloatLabelPassThroughAttributes
+    | ((options: FloatLabelPassThroughMethodOptions) => FloatLabelPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type FloatLabelPassThroughTransitionType = TransitionProps | ((options: FloatLabelPassThroughMethodOptions) => TransitionProps) | undefined;
 

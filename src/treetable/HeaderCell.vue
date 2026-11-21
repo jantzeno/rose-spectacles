@@ -13,12 +13,23 @@
         :data-p-sorted="isColumnSorted()"
         :data-p-frozen-column="columnProp('frozen')"
     >
-        <span v-if="resizableColumns && !columnProp('frozen')" :class="cx('columnResizer')" @mousedown="onResizeStart" v-bind="getColumnPT('columnResizer')"></span>
+        <span
+            v-if="resizableColumns && !columnProp('frozen')"
+            :class="cx('columnResizer')"
+            @mousedown="onResizeStart"
+            v-bind="getColumnPT('columnResizer')"
+        ></span>
         <div :class="cx('columnHeaderContent')" v-bind="getColumnPT('columnHeaderContent')">
             <component v-if="column.children && column.children.header" :is="column.children.header" :column="column" />
             <span v-if="columnProp('header')" :class="cx('columnTitle')" v-bind="getColumnPT('columnTitle')">{{ columnProp('header') }}</span>
             <span v-if="columnProp('sortable')" v-bind="getColumnPT('sort')">
-                <component :is="(column.children && column.children.sorticon) || sortableColumnIcon" :sorted="sortState.sorted" :sortOrder="sortState.sortOrder" :class="cx('sortIcon')" v-bind="getColumnPT('sortIcon')" />
+                <component
+                    :is="(column.children && column.children.sorticon) || sortableColumnIcon"
+                    :sorted="sortState.sorted"
+                    :sortOrder="sortState.sortOrder"
+                    :class="cx('sortIcon')"
+                    v-bind="getColumnPT('sortIcon')"
+                />
             </span>
             <Badge v-if="isMultiSorted()" :class="cx('pcSortBadge')" v-bind="getColumnPT('pcSortBadge')" :value="getMultiSortMetaIndex() + 1" size="small" />
             <TTColumnFilter
@@ -79,7 +90,17 @@ export default {
     name: 'HeaderCell',
     hostName: 'TreeTable',
     extends: BaseComponent,
-    emits: ['column-click', 'column-resizestart', 'filter-change', 'filter-apply', 'operator-change', 'matchmode-change', 'constraint-add', 'constraint-remove', 'apply-click'],
+    emits: [
+        'column-click',
+        'column-resizestart',
+        'filter-change',
+        'filter-apply',
+        'operator-change',
+        'matchmode-change',
+        'constraint-add',
+        'constraint-remove',
+        'apply-click'
+    ],
     props: {
         column: {
             type: Object,
@@ -168,7 +189,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo:
@@ -211,7 +236,11 @@ export default {
             this.$emit('column-click', { originalEvent: event, column: this.column });
         },
         onKeyDown(event) {
-            if ((event.code === 'Enter' || event.code === 'NumpadEnter' || event.code === 'Space') && event.currentTarget.nodeName === 'TH' && getAttribute(event.currentTarget, 'data-p-sortable-column')) {
+            if (
+                (event.code === 'Enter' || event.code === 'NumpadEnter' || event.code === 'Space') &&
+                event.currentTarget.nodeName === 'TH' &&
+                getAttribute(event.currentTarget, 'data-p-sortable-column')
+            ) {
                 this.$emit('column-click', { originalEvent: event, column: this.column });
 
                 event.preventDefault();
@@ -238,7 +267,9 @@ export default {
             return this.columnProp('sortable') && this.getMultiSortMetaIndex() > -1;
         },
         isColumnSorted() {
-            return this.sortMode === 'single' ? this.sortField && (this.sortField === this.columnProp('field') || this.sortField === this.columnProp('sortField')) : this.isMultiSorted();
+            return this.sortMode === 'single'
+                ? this.sortField && (this.sortField === this.columnProp('field') || this.sortField === this.columnProp('sortField'))
+                : this.isMultiSorted();
         }
     },
     computed: {

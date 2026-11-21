@@ -1,5 +1,12 @@
 <template>
-    <div :class="cx('root')" v-bind="getPTOptions('root')" :data-p-checked="checked" :data-p-indeterminate="d_indeterminate || undefined" :data-p-disabled="disabled" :data-p="dataP">
+    <div
+        :class="cx('root')"
+        v-bind="getPTOptions('root')"
+        :data-p-checked="checked"
+        :data-p-indeterminate="d_indeterminate || undefined"
+        :data-p-disabled="disabled"
+        :data-p="dataP"
+    >
         <input
             ref="input"
             :id="inputId"
@@ -57,7 +64,7 @@ export default {
             this.d_indeterminate = newValue;
 
             this.updateIndeterminate();
-        },
+        }
     },
     mounted() {
         this.updateIndeterminate();

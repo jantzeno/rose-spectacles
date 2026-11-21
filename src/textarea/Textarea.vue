@@ -1,5 +1,14 @@
 <template>
-    <textarea :class="cx('root')" :value="d_value" :name="name" :disabled="disabled" :aria-invalid="invalid || undefined" :data-p="dataP" @input="onInput" v-bind="attrs"></textarea>
+    <textarea
+        :class="cx('root')"
+        :value="d_value"
+        :name="name"
+        :disabled="disabled"
+        :aria-invalid="invalid || undefined"
+        :data-p="dataP"
+        @input="onInput"
+        v-bind="attrs"
+    ></textarea>
 </template>
 
 <script>

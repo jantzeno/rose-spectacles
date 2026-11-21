@@ -66,7 +66,8 @@ export function useStyle(css: string, options: StyleOptions = {}) {
         const styleName = attributes.name || name;
         const styleId = attributes.id || id;
         const styleNonce = attributes.nonce || nonce;
-        const existing = document.querySelector<HTMLStyleElement>(`style[data-primevue-style-id="${styleName}"]`) ?? (styleId ? document.getElementById(styleId) : null);
+        const existing =
+            document.querySelector<HTMLStyleElement>(`style[data-primevue-style-id="${styleName}"]`) ?? (styleId ? document.getElementById(styleId) : null);
         const style = (existing as HTMLStyleElement | null) ?? document.createElement('style');
 
         styleRef.value = style;

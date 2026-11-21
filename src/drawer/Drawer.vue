@@ -1,9 +1,35 @@
 <template>
     <Portal>
-        <div v-if="containerVisible" :ref="maskRef" @mousedown="onMaskClick" :class="cx('mask')" :style="sx('mask', true, { position, modal })" :data-p="dataP" v-bind="ptm('mask')">
-            <transition name="rs-drawer" @enter="onEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave" @leave="onLeave" @after-leave="onAfterLeave" appear v-bind="ptm('transition')">
-                <div v-if="visible" :ref="containerRef" v-focustrap :class="cx('root')" :style="sx('root')" :role="modal ? 'dialog' : 'complementary'" :aria-modal="modal ? true : undefined"
-                    :data-p="dataP" v-bind="ptmi('root')">
+        <div
+            v-if="containerVisible"
+            :ref="maskRef"
+            @mousedown="onMaskClick"
+            :class="cx('mask')"
+            :style="sx('mask', true, { position, modal })"
+            :data-p="dataP"
+            v-bind="ptm('mask')"
+        >
+            <transition
+                name="rs-drawer"
+                @enter="onEnter"
+                @after-enter="onAfterEnter"
+                @before-leave="onBeforeLeave"
+                @leave="onLeave"
+                @after-leave="onAfterLeave"
+                appear
+                v-bind="ptm('transition')"
+            >
+                <div
+                    v-if="visible"
+                    :ref="containerRef"
+                    v-focustrap
+                    :class="cx('root')"
+                    :style="sx('root')"
+                    :role="modal ? 'dialog' : 'complementary'"
+                    :aria-modal="modal ? true : undefined"
+                    :data-p="dataP"
+                    v-bind="ptmi('root')"
+                >
                     <slot v-if="$slots.container" name="container" :closeCallback="hide"></slot>
                     <template v-else>
                         <div :ref="headerContainerRef" :class="cx('header')" v-bind="ptm('header')">
@@ -11,11 +37,24 @@
                                 <div v-if="header" :class="cx('title')" v-bind="ptm('title')">{{ header }}</div>
                             </slot>
                             <slot v-if="showCloseIcon" name="closebutton" :closeCallback="hide">
-                                <Button :ref="closeButtonRef" type="button" :class="cx('pcCloseButton')" :aria-label="closeAriaLabel" :unstyled="unstyled" @click="hide" v-bind="closeButtonProps"
-                                    :pt="ptm('pcCloseButton')" data-pc-group-section="iconcontainer">
+                                <Button
+                                    :ref="closeButtonRef"
+                                    type="button"
+                                    :class="cx('pcCloseButton')"
+                                    :aria-label="closeAriaLabel"
+                                    :unstyled="unstyled"
+                                    @click="hide"
+                                    v-bind="closeButtonProps"
+                                    :pt="ptm('pcCloseButton')"
+                                    data-pc-group-section="iconcontainer"
+                                >
                                     <template #icon="slotProps">
                                         <slot name="closeicon">
-                                            <component :is="closeIcon ? 'span' : 'TimesIcon'" :class="[closeIcon, slotProps.class]" v-bind="ptm('pcCloseButton')['icon']"></component>
+                                            <component
+                                                :is="closeIcon ? 'span' : 'TimesIcon'"
+                                                :class="[closeIcon, slotProps.class]"
+                                                v-bind="ptm('pcCloseButton')['icon']"
+                                            ></component>
                                         </slot>
                                     </template>
                                 </Button>

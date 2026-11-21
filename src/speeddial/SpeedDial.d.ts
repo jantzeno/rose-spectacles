@@ -14,7 +14,12 @@ import type { MenuItem } from 'rose-spectacles/menuitem';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type SpeedDialPassThroughOptionType = SpeedDialPassThroughAttributes | ((options: SpeedDialPassThroughMethodOptions) => SpeedDialPassThroughAttributes | string) | string | null | undefined;
+export declare type SpeedDialPassThroughOptionType =
+    | SpeedDialPassThroughAttributes
+    | ((options: SpeedDialPassThroughMethodOptions) => SpeedDialPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

@@ -1,5 +1,13 @@
 <template>
-    <RadioButton :modelValue="checked" :binary="true" :disabled="$attrs.disabled" :name="name" @change="onChange" :unstyled="unstyled" :pt="getColumnPT('pcRowRadiobutton')" />
+    <RadioButton
+        :modelValue="checked"
+        :binary="true"
+        :disabled="$attrs.disabled"
+        :name="name"
+        @change="onChange"
+        :unstyled="unstyled"
+        :pt="getColumnPT('pcRowRadiobutton')"
+    />
 </template>
 
 <script>
@@ -38,7 +46,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo:

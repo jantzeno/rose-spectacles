@@ -77,7 +77,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`columnGroup.${key}`, { columnGroup: columnGroupMetaData }), this.ptm(`columnGroup.${key}`, columnGroupMetaData), this.ptmo(this.getColumnGroupProps(), key, columnGroupMetaData));
+            return mergeProps(
+                this.ptm(`columnGroup.${key}`, { columnGroup: columnGroupMetaData }),
+                this.ptm(`columnGroup.${key}`, columnGroupMetaData),
+                this.ptmo(this.getColumnGroupProps(), key, columnGroupMetaData)
+            );
         },
         getColumnGroupProps() {
             return this.columnGroup && this.columnGroup.props && this.columnGroup.props.pt ? this.columnGroup.props.pt : undefined; //@todo
@@ -95,7 +99,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`row.${key}`, { row: rowMetaData }), this.ptm(`row.${key}`, rowMetaData), this.ptmo(this.getRowProp(row), key, rowMetaData));
+            return mergeProps(
+                this.ptm(`row.${key}`, { row: rowMetaData }),
+                this.ptm(`row.${key}`, rowMetaData),
+                this.ptmo(this.getRowProp(row), key, rowMetaData)
+            );
         },
         getRowProp(row) {
             return row.props && row.props.pt ? row.props.pt : undefined; //@todo

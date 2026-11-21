@@ -156,7 +156,12 @@ export default {
             this.$emit('node-toggle', this.node);
         },
         onClick(event) {
-            if (isClickable(event.target) || getAttribute(event.target, 'data-pc-section') === 'nodetogglebutton' || getAttribute(event.target, 'data-pc-section') === 'nodetoggleicon' || event.target.tagName === 'path') {
+            if (
+                isClickable(event.target) ||
+                getAttribute(event.target, 'data-pc-section') === 'nodetogglebutton' ||
+                getAttribute(event.target, 'data-pc-section') === 'nodetoggleicon' ||
+                event.target.tagName === 'path'
+            ) {
                 return;
             }
 
@@ -382,7 +387,8 @@ export default {
                     delete _selectionKeys[this.nodeKey(this.node)];
                 }
 
-                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length)) _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: true };
+                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length))
+                    _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: true };
                 else _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: false };
             }
 
@@ -410,7 +416,8 @@ export default {
                     delete _selectionKeys[this.nodeKey(this.node)];
                 }
 
-                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length)) _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: true };
+                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length))
+                    _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: true };
                 else _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: false };
             }
 

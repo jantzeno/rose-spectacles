@@ -14,7 +14,12 @@ import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { TabPanelPassThroughOptionType } from 'rose-spectacles/tabpanel';
 import { ButtonHTMLAttributes, VNode } from 'vue';
 
-export declare type TabViewPassThroughOptionType = TabViewPassThroughAttributes | ((options: TabViewPassThroughMethodOptions) => TabViewPassThroughAttributes | string) | string | null | undefined;
+export declare type TabViewPassThroughOptionType =
+    | TabViewPassThroughAttributes
+    | ((options: TabViewPassThroughMethodOptions) => TabViewPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

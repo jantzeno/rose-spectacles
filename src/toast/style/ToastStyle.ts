@@ -8,7 +8,12 @@ const inlineStyles = {
         top: position === 'top-right' || position === 'top-left' || position === 'top-center' ? '20px' : position === 'center' ? '50%' : null,
         right: (position === 'top-right' || position === 'bottom-right') && '20px',
         bottom: (position === 'bottom-left' || position === 'bottom-right' || position === 'bottom-center') && '20px',
-        left: position === 'top-left' || position === 'bottom-left' ? '20px' : position === 'center' || position === 'top-center' || position === 'bottom-center' ? '50%' : null
+        left:
+            position === 'top-left' || position === 'bottom-left'
+                ? '20px'
+                : position === 'center' || position === 'top-center' || position === 'bottom-center'
+                  ? '50%'
+                  : null
     })
 };
 

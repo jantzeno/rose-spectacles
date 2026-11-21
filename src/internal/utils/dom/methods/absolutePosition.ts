@@ -31,7 +31,8 @@ export default function absolutePosition(element: HTMLElement, target: HTMLEleme
             top = targetOuterHeight + targetOffset.top + windowScrollTop;
         }
 
-        if (targetOffset.left + elementOuterWidth > viewport.width) left = Math.max(0, targetOffset.left + windowScrollLeft + targetOuterWidth - elementOuterWidth);
+        if (targetOffset.left + elementOuterWidth > viewport.width)
+            left = Math.max(0, targetOffset.left + windowScrollLeft + targetOuterWidth - elementOuterWidth);
         else left = targetOffset.left + windowScrollLeft;
 
         if (isRTL(element)) {
@@ -42,6 +43,10 @@ export default function absolutePosition(element: HTMLElement, target: HTMLEleme
 
         element.style.top = top + 'px';
         element.style.transformOrigin = origin;
-        if (gutter) element.style.marginTop = origin === 'bottom' ? `calc(${getCSSVariableByRegex(/-anchor-gutter$/)?.value ?? '2px'} * -1)` : (getCSSVariableByRegex(/-anchor-gutter$/)?.value ?? '');
+        if (gutter)
+            element.style.marginTop =
+                origin === 'bottom'
+                    ? `calc(${getCSSVariableByRegex(/-anchor-gutter$/)?.value ?? '2px'} * -1)`
+                    : (getCSSVariableByRegex(/-anchor-gutter$/)?.value ?? '');
     }
 }

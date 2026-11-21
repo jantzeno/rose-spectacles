@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { AnchorHTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type FieldsetPassThroughOptionType = FieldsetPassThroughAttributes | ((options: FieldsetPassThroughMethodOptions) => FieldsetPassThroughAttributes | string) | string | null | undefined;
+export declare type FieldsetPassThroughOptionType =
+    | FieldsetPassThroughAttributes
+    | ((options: FieldsetPassThroughMethodOptions) => FieldsetPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type FieldsetPassThroughTransitionType = TransitionProps | ((options: FieldsetPassThroughMethodOptions) => TransitionProps) | undefined;
 

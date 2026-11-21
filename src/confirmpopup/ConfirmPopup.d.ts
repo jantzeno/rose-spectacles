@@ -14,7 +14,12 @@ import { ConfirmationOptions } from 'rose-spectacles/confirmationoptions';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type ConfirmPopupPassThroughOptionType = ConfirmPopupPassThroughAttributes | ((options: ConfirmPopupPassThroughMethodOptions) => ConfirmPopupPassThroughAttributes | string) | string | null | undefined;
+export declare type ConfirmPopupPassThroughOptionType =
+    | ConfirmPopupPassThroughAttributes
+    | ((options: ConfirmPopupPassThroughMethodOptions) => ConfirmPopupPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type ConfirmPopupPassThroughTransitionType = TransitionProps | ((options: ConfirmPopupPassThroughMethodOptions) => TransitionProps) | undefined;
 

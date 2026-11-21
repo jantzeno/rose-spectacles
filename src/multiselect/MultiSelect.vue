@@ -35,12 +35,30 @@
                             <span>{{ label }}</span>
                         </template>
                         <template v-else-if="selectedValues.length">
-                            <span v-for="(item, idx) of selectedValues" :key="`chip-${getLabelByValue(item)}_${idx}`" :class="cx('chipItem')" v-bind="ptm('chipItem')">
+                            <span
+                                v-for="(item, idx) of selectedValues"
+                                :key="`chip-${getLabelByValue(item)}_${idx}`"
+                                :class="cx('chipItem')"
+                                v-bind="ptm('chipItem')"
+                            >
                                 <slot name="chip" :value="item" :removeCallback="(event) => removeOption(event, item)">
                                     <!-- TODO: removetokenicon and removeTokenIcon  deprecated since v4.0. Use chipicon slot and chipIcon prop-->
-                                    <Chip :class="cx('pcChip')" :label="getLabelByValue(item)" :removeIcon="chipIcon || removeTokenIcon" removable :unstyled="unstyled" @remove="removeOption($event, item)" :pt="ptm('pcChip')">
+                                    <Chip
+                                        :class="cx('pcChip')"
+                                        :label="getLabelByValue(item)"
+                                        :removeIcon="chipIcon || removeTokenIcon"
+                                        removable
+                                        :unstyled="unstyled"
+                                        @remove="removeOption($event, item)"
+                                        :pt="ptm('pcChip')"
+                                    >
                                         <template #removeicon>
-                                            <slot :name="$slots.chipicon ? 'chipicon' : 'removetokenicon'" :class="cx('chipIcon')" :item="item" :removeCallback="(event) => removeOption(event, item)" />
+                                            <slot
+                                                :name="$slots.chipicon ? 'chipicon' : 'removetokenicon'"
+                                                :class="cx('chipIcon')"
+                                                :item="item"
+                                                :removeCallback="(event) => removeOption(event, item)"
+                                            />
                                         </template>
                                     </Chip>
                                 </slot>
@@ -52,7 +70,14 @@
             </div>
         </div>
         <slot v-if="isClearIconVisible" name="clearicon" :class="cx('clearIcon')" :clearCallback="onClearClick">
-            <component :is="clearIcon ? 'i' : 'TimesIcon'" ref="clearIcon" :class="[cx('clearIcon'), clearIcon]" @click="onClearClick" v-bind="ptm('clearIcon')" data-pc-section="clearicon" />
+            <component
+                :is="clearIcon ? 'i' : 'TimesIcon'"
+                ref="clearIcon"
+                :class="[cx('clearIcon'), clearIcon]"
+                @click="onClearClick"
+                v-bind="ptm('clearIcon')"
+                data-pc-section="clearicon"
+            />
         </slot>
         <div :class="cx('dropdown')" v-bind="ptm('dropdown')">
             <slot v-if="loading" name="loadingicon" :class="cx('loadingIcon')">
@@ -60,12 +85,34 @@
                 <SpinnerIcon v-else :class="cx('loadingIcon')" spin aria-hidden="true" v-bind="ptm('loadingIcon')" />
             </slot>
             <slot v-else name="dropdownicon" :class="cx('dropdownIcon')">
-                <component :is="dropdownIcon ? 'span' : 'ChevronDownIcon'" :class="[cx('dropdownIcon'), dropdownIcon]" aria-hidden="true" :data-p="dropdownIconDataP" v-bind="ptm('dropdownIcon')" />
+                <component
+                    :is="dropdownIcon ? 'span' : 'ChevronDownIcon'"
+                    :class="[cx('dropdownIcon'), dropdownIcon]"
+                    aria-hidden="true"
+                    :data-p="dropdownIconDataP"
+                    v-bind="ptm('dropdownIcon')"
+                />
             </slot>
         </div>
         <Portal :appendTo="appendTo">
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter" @after-enter="onOverlayAfterEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="ptm('transition')">
-                <div v-if="overlayVisible" :ref="overlayRef" :style="[panelStyle, overlayStyle]" :class="[cx('overlay'), panelClass, overlayClass]" @click="onOverlayClick" @keydown="onOverlayKeyDown" :data-p="overlayDataP" v-bind="ptm('overlay')">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter"
+                @after-enter="onOverlayAfterEnter"
+                @leave="onOverlayLeave"
+                @after-leave="onOverlayAfterLeave"
+                v-bind="ptm('transition')"
+            >
+                <div
+                    v-if="overlayVisible"
+                    :ref="overlayRef"
+                    :style="[panelStyle, overlayStyle]"
+                    :class="[cx('overlay'), panelClass, overlayClass]"
+                    @click="onOverlayClick"
+                    @keydown="onOverlayKeyDown"
+                    :data-p="overlayDataP"
+                    v-bind="ptm('overlay')"
+                >
                     <span
                         ref="firstHiddenFocusableElementOnOverlay"
                         role="presentation"
@@ -92,8 +139,18 @@
                             :formControl="{ novalidate: true }"
                         >
                             <template #icon="slotProps">
-                                <component v-if="$slots.headercheckboxicon" :is="$slots.headercheckboxicon" :checked="slotProps.checked" :class="slotProps.class" />
-                                <component v-else-if="slotProps.checked" :is="checkboxIcon ? 'span' : 'CheckIcon'" :class="[slotProps.class, { [checkboxIcon]: slotProps.checked }]" v-bind="getHeaderCheckboxPTOptions('pcHeaderCheckbox.icon')" />
+                                <component
+                                    v-if="$slots.headercheckboxicon"
+                                    :is="$slots.headercheckboxicon"
+                                    :checked="slotProps.checked"
+                                    :class="slotProps.class"
+                                />
+                                <component
+                                    v-else-if="slotProps.checked"
+                                    :is="checkboxIcon ? 'span' : 'CheckIcon'"
+                                    :class="[slotProps.class, { [checkboxIcon]: slotProps.checked }]"
+                                    v-bind="getHeaderCheckboxPTOptions('pcHeaderCheckbox.icon')"
+                                />
                             </template>
                         </Checkbox>
                         <IconField v-if="filter" :class="cx('pcFilterContainer')" :unstyled="unstyled" :pt="ptm('pcFilterContainer')">
@@ -124,14 +181,38 @@
                                 </slot>
                             </InputIcon>
                         </IconField>
-                        <span v-if="filter" role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenFilterResult')" :data-p-hidden-accessible="true">
+                        <span
+                            v-if="filter"
+                            role="status"
+                            aria-live="polite"
+                            class="rs-hidden-accessible"
+                            v-bind="ptm('hiddenFilterResult')"
+                            :data-p-hidden-accessible="true"
+                        >
                             {{ filterResultMessageText }}
                         </span>
                     </div>
                     <div :class="cx('listContainer')" :style="{ 'max-height': virtualScrollerDisabled ? scrollHeight : '' }" v-bind="ptm('listContainer')">
-                        <VirtualScroller :ref="virtualScrollerRef" v-bind="virtualScrollerOptions" :items="visibleOptions" :style="{ height: scrollHeight }" :tabindex="-1" :disabled="virtualScrollerDisabled" :pt="ptm('virtualScroller')">
+                        <VirtualScroller
+                            :ref="virtualScrollerRef"
+                            v-bind="virtualScrollerOptions"
+                            :items="visibleOptions"
+                            :style="{ height: scrollHeight }"
+                            :tabindex="-1"
+                            :disabled="virtualScrollerDisabled"
+                            :pt="ptm('virtualScroller')"
+                        >
                             <template v-slot:content="{ styleClass, contentRef, items, getItemOptions, contentStyle, itemSize }">
-                                <ul :ref="(el) => listRef(el, contentRef)" :id="$id + '_list'" :class="[cx('list'), styleClass]" :style="contentStyle" role="listbox" aria-multiselectable="true" :aria-label="listAriaLabel" v-bind="ptm('list')">
+                                <ul
+                                    :ref="(el) => listRef(el, contentRef)"
+                                    :id="$id + '_list'"
+                                    :class="[cx('list'), styleClass]"
+                                    :style="contentStyle"
+                                    role="listbox"
+                                    aria-multiselectable="true"
+                                    :aria-label="listAriaLabel"
+                                    v-bind="ptm('list')"
+                                >
                                     <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
                                         <li
                                             v-if="isOptionGroup(option)"
@@ -141,7 +222,9 @@
                                             role="option"
                                             v-bind="ptm('optionGroup')"
                                         >
-                                            <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{ getOptionGroupLabel(option.optionGroup) }}</slot>
+                                            <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{
+                                                getOptionGroupLabel(option.optionGroup)
+                                            }}</slot>
                                         </li>
                                         <li
                                             v-else
@@ -172,7 +255,12 @@
                                                 :formControl="{ novalidate: true }"
                                             >
                                                 <template #icon="slotProps">
-                                                    <component v-if="$slots.optioncheckboxicon || $slots.itemcheckboxicon" :is="$slots.optioncheckboxicon || $slots.itemcheckboxicon" :checked="slotProps.checked" :class="slotProps.class" />
+                                                    <component
+                                                        v-if="$slots.optioncheckboxicon || $slots.itemcheckboxicon"
+                                                        :is="$slots.optioncheckboxicon || $slots.itemcheckboxicon"
+                                                        :checked="slotProps.checked"
+                                                        :class="slotProps.class"
+                                                    />
                                                     <component
                                                         v-else-if="slotProps.checked"
                                                         :is="checkboxIcon ? 'span' : 'CheckIcon'"
@@ -186,10 +274,20 @@
                                             </slot>
                                         </li>
                                     </template>
-                                    <li v-if="filterValue && (!items || (items && items.length === 0))" :class="cx('emptyMessage')" role="option" v-bind="ptm('emptyMessage')">
+                                    <li
+                                        v-if="filterValue && (!items || (items && items.length === 0))"
+                                        :class="cx('emptyMessage')"
+                                        role="option"
+                                        v-bind="ptm('emptyMessage')"
+                                    >
                                         <slot name="emptyfilter">{{ emptyFilterMessageText }}</slot>
                                     </li>
-                                    <li v-else-if="!options || (options && options.length === 0)" :class="cx('emptyMessage')" role="option" v-bind="ptm('emptyMessage')">
+                                    <li
+                                        v-else-if="!options || (options && options.length === 0)"
+                                        :class="cx('emptyMessage')"
+                                        role="option"
+                                        v-bind="ptm('emptyMessage')"
+                                    >
                                         <slot name="empty">{{ emptyMessageText }}</slot>
                                     </li>
                                 </ul>
@@ -200,7 +298,14 @@
                         </VirtualScroller>
                     </div>
                     <slot name="footer" :value="d_value" :options="visibleOptions"></slot>
-                    <span v-if="!options || (options && options.length === 0)" role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenEmptyMessage')" :data-p-hidden-accessible="true">
+                    <span
+                        v-if="!options || (options && options.length === 0)"
+                        role="status"
+                        aria-live="polite"
+                        class="rs-hidden-accessible"
+                        v-bind="ptm('hiddenEmptyMessage')"
+                        :data-p-hidden-accessible="true"
+                    >
                         {{ emptyMessageText }}
                     </span>
                     <span role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenSelectedMessage')" :data-p-hidden-accessible="true">
@@ -225,7 +330,18 @@
 
 <script>
 import { cn } from '../internal/utils/index';
-import { absolutePosition, addStyle, findSingle, focus, getFirstFocusableElement, getFocusableElements, getLastFocusableElement, getOuterWidth, isTouchDevice, relativePosition } from '../internal/utils/dom/index';
+import {
+    absolutePosition,
+    addStyle,
+    findSingle,
+    focus,
+    getFirstFocusableElement,
+    getFocusableElements,
+    getLastFocusableElement,
+    getOuterWidth,
+    isTouchDevice,
+    relativePosition
+} from '../internal/utils/dom/index';
 import { equals, findLastIndex, isEmpty, isNotEmpty, isPrintableCharacter, resolveFieldData } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { FilterService } from '../core/api/Api';
@@ -360,7 +476,12 @@ export default {
         show(isFocus) {
             this.$emit('before-show');
             this.overlayVisible = true;
-            this.focusedOptionIndex = this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : this.findSelectedOptionIndex();
+            this.focusedOptionIndex =
+                this.focusedOptionIndex !== -1
+                    ? this.focusedOptionIndex
+                    : this.autoOptionFocus
+                      ? this.findFirstFocusedOptionIndex()
+                      : this.findSelectedOptionIndex();
 
             isFocus && focus(this.$refs.focusInput);
         },
@@ -389,7 +510,12 @@ export default {
             this.focused = true;
 
             if (this.overlayVisible) {
-                this.focusedOptionIndex = this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : this.findSelectedOptionIndex();
+                this.focusedOptionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.focusedOptionIndex
+                        : this.autoOptionFocus
+                          ? this.findFirstFocusedOptionIndex()
+                          : this.findSelectedOptionIndex();
                 !this.autoFilterFocus && this.scrollInView(this.focusedOptionIndex);
             }
 
@@ -482,7 +608,11 @@ export default {
                 return;
             }
 
-            if (event.target.tagName === 'INPUT' || event.target.getAttribute('data-pc-section') === 'clearicon' || event.target.closest('[data-pc-section="clearicon"]')) {
+            if (
+                event.target.tagName === 'INPUT' ||
+                event.target.getAttribute('data-pc-section') === 'clearicon' ||
+                event.target.closest('[data-pc-section="clearicon"]')
+            ) {
                 return;
             } else if (!this.overlay || !this.overlay.contains(event.target)) {
                 this.overlayVisible ? this.hide(true) : this.show(true);
@@ -495,12 +625,18 @@ export default {
             this.resetFilterOnClear && (this.filterValue = null);
         },
         onFirstHiddenFocus(event) {
-            const focusableEl = event.relatedTarget === this.$refs.focusInput ? getFirstFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])') : this.$refs.focusInput;
+            const focusableEl =
+                event.relatedTarget === this.$refs.focusInput
+                    ? getFirstFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
+                    : this.$refs.focusInput;
 
             focus(focusableEl);
         },
         onLastHiddenFocus(event) {
-            const focusableEl = event.relatedTarget === this.$refs.focusInput ? getLastFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])') : this.$refs.focusInput;
+            const focusableEl =
+                event.relatedTarget === this.$refs.focusInput
+                    ? getLastFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
+                    : this.$refs.focusInput;
 
             focus(focusableEl);
         },
@@ -616,7 +752,12 @@ export default {
             if (!this.overlayVisible) {
                 this.show();
             } else {
-                const optionIndex = this.focusedOptionIndex !== -1 ? this.findNextOptionIndex(this.focusedOptionIndex) : this.clicked ? this.findFirstOptionIndex() : this.findFirstFocusedOptionIndex();
+                const optionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.findNextOptionIndex(this.focusedOptionIndex)
+                        : this.clicked
+                          ? this.findFirstOptionIndex()
+                          : this.findFirstFocusedOptionIndex();
 
                 if (event.shiftKey) {
                     this.onOptionSelectRange(event, this.startRangeIndex, optionIndex);
@@ -636,7 +777,12 @@ export default {
                 this.overlayVisible && this.hide();
                 event.preventDefault();
             } else {
-                const optionIndex = this.focusedOptionIndex !== -1 ? this.findPrevOptionIndex(this.focusedOptionIndex) : this.clicked ? this.findLastOptionIndex() : this.findLastFocusedOptionIndex();
+                const optionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.findPrevOptionIndex(this.focusedOptionIndex)
+                        : this.clicked
+                          ? this.findLastOptionIndex()
+                          : this.findLastFocusedOptionIndex();
 
                 if (event.shiftKey) {
                     this.onOptionSelectRange(event, optionIndex, this.startRangeIndex);
@@ -881,7 +1027,9 @@ export default {
             if (this.selectAll !== null) {
                 this.$emit('selectall-change', { originalEvent: event, checked: !this.allSelected });
             } else {
-                const value = this.allSelected ? [] : this.visibleOptions.filter((option) => this.isValidOption(option)).map((option) => this.getOptionValue(option));
+                const value = this.allSelected
+                    ? []
+                    : this.visibleOptions.filter((option) => this.isValidOption(option)).map((option) => this.getOptionValue(option));
 
                 this.updateModel(event, value);
             }
@@ -899,7 +1047,11 @@ export default {
             return getFocusableElements(this.overlay, ':not([data-p-hidden-focusable="true"])').length > 0;
         },
         isOptionMatched(option) {
-            return this.isValidOption(option) && typeof this.getOptionLabel(option) === 'string' && this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale));
+            return (
+                this.isValidOption(option) &&
+                typeof this.getOptionLabel(option) === 'string' &&
+                this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale))
+            );
         },
         isValidOption(option) {
             return isNotEmpty(option) && !(this.isOptionDisabled(option) || this.isOptionGroup(option));
@@ -934,7 +1086,8 @@ export default {
             return findLastIndex(this.visibleOptions, (option) => this.isValidOption(option));
         },
         findNextOptionIndex(index) {
-            const matchedOptionIndex = index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
+            const matchedOptionIndex =
+                index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : index;
         },
@@ -967,7 +1120,9 @@ export default {
                     // Same fallback as isSelected: an equal copy of an option object, or a value only an overridden
                     // isEquals matches, has a different key.
                     if (this.mayMatchEqualCopy(value)) {
-                        const copyIndex = this.visibleOptions.findIndex((option) => this.isValidOption(option) && this.isEquals(value, this.getOptionValue(option)));
+                        const copyIndex = this.visibleOptions.findIndex(
+                            (option) => this.isValidOption(option) && this.isEquals(value, this.getOptionValue(option))
+                        );
 
                         if (copyIndex > -1) return copyIndex;
                     }
@@ -983,12 +1138,16 @@ export default {
             return this.$filled ? findLastIndex(this.visibleOptions, (option) => this.isValidSelectedOption(option)) : -1;
         },
         findNextSelectedOptionIndex(index) {
-            const matchedOptionIndex = this.$filled && index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidSelectedOption(option)) : -1;
+            const matchedOptionIndex =
+                this.$filled && index < this.visibleOptions.length - 1
+                    ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidSelectedOption(option))
+                    : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : -1;
         },
         findPrevSelectedOptionIndex(index) {
-            const matchedOptionIndex = this.$filled && index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidSelectedOption(option)) : -1;
+            const matchedOptionIndex =
+                this.$filled && index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidSelectedOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex : -1;
         },
@@ -1025,7 +1184,10 @@ export default {
             if (isNotEmpty(this.searchValue)) {
                 if (this.focusedOptionIndex !== -1) {
                     optionIndex = this.visibleOptions.slice(this.focusedOptionIndex).findIndex((option) => this.isOptionMatched(option));
-                    optionIndex = optionIndex === -1 ? this.visibleOptions.slice(0, this.focusedOptionIndex).findIndex((option) => this.isOptionMatched(option)) : optionIndex + this.focusedOptionIndex;
+                    optionIndex =
+                        optionIndex === -1
+                            ? this.visibleOptions.slice(0, this.focusedOptionIndex).findIndex((option) => this.isOptionMatched(option))
+                            : optionIndex + this.focusedOptionIndex;
                 } else {
                     optionIndex = this.visibleOptions.findIndex((option) => this.isOptionMatched(option));
                 }
@@ -1125,7 +1287,11 @@ export default {
                         const groupChildren = this.getOptionGroupChildren(group);
                         const filteredItems = groupChildren.filter((item) => filteredOptions.includes(item));
 
-                        if (filteredItems.length > 0) filtered.push({ ...group, [typeof this.optionGroupChildren === 'string' ? this.optionGroupChildren : 'items']: [...filteredItems] });
+                        if (filteredItems.length > 0)
+                            filtered.push({
+                                ...group,
+                                [typeof this.optionGroupChildren === 'string' ? this.optionGroupChildren : 'items']: [...filteredItems]
+                            });
                     });
 
                     return this.flatOptions(filtered);
@@ -1161,7 +1327,10 @@ export default {
             return isNotEmpty(this.maxSelectedLabels) && this.selectedValues.length > this.maxSelectedLabels;
         },
         allSelected() {
-            return this.selectAll !== null ? this.selectAll : isNotEmpty(this.visibleOptions) && this.visibleOptions.every((option) => this.isOptionGroup(option) || this.isOptionDisabled(option) || this.isSelected(option));
+            return this.selectAll !== null
+                ? this.selectAll
+                : isNotEmpty(this.visibleOptions) &&
+                      this.visibleOptions.every((option) => this.isOptionGroup(option) || this.isOptionDisabled(option) || this.isSelected(option));
         },
         // @deprecated use $filled instead.
         hasSelectedOption() {
@@ -1261,7 +1430,10 @@ export default {
                 clearable: this.showClear,
                 disabled: this.disabled,
                 [this.size]: this.size,
-                'has-chip': this.display === 'chip' && this.selectedValues.length && (this.maxSelectedLabels ? this.selectedValues.length <= this.maxSelectedLabels : true),
+                'has-chip':
+                    this.display === 'chip' &&
+                    this.selectedValues.length &&
+                    (this.maxSelectedLabels ? this.selectedValues.length <= this.maxSelectedLabels : true),
                 empty: !this.placeholder && !this.selectedValues.length
             });
         },

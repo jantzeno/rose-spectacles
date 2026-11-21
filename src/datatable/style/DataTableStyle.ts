@@ -101,7 +101,9 @@ const classes = {
 
         if (props.selection) {
             rowStyleClass.push({
-                'rs-datatable-row-selected': columnSelectionMode ? instance.isSelected && instance.$parentInstance.$parentInstance.highlightOnSelect : instance.isSelected
+                'rs-datatable-row-selected': columnSelectionMode
+                    ? instance.isSelected && instance.$parentInstance.$parentInstance.highlightOnSelect
+                    : instance.isSelected
             });
         }
 

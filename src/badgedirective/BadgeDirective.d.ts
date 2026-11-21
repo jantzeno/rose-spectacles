@@ -11,7 +11,11 @@ import type { DirectiveHooks } from 'rose-spectacles/core/basedirective';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { DirectiveBinding, ObjectDirective } from 'vue';
 
-export declare type BadgeDirectivePassThroughOptionType = BadgeDirectivePassThroughAttributes | ((options: BadgeDirectivePassThroughMethodOptions) => BadgeDirectivePassThroughAttributes) | null | undefined;
+export declare type BadgeDirectivePassThroughOptionType =
+    | BadgeDirectivePassThroughAttributes
+    | ((options: BadgeDirectivePassThroughMethodOptions) => BadgeDirectivePassThroughAttributes)
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

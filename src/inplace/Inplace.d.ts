@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { HTMLAttributes, VNode } from 'vue';
 
-export declare type InplacePassThroughOptionType = InplacePassThroughAttributes | ((options: InplacePassThroughMethodOptions) => InplacePassThroughAttributes | string) | string | null | undefined;
+export declare type InplacePassThroughOptionType =
+    | InplacePassThroughAttributes
+    | ((options: InplacePassThroughMethodOptions) => InplacePassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

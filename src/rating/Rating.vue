@@ -1,7 +1,14 @@
 <template>
     <div :class="cx('root')" v-bind="ptmi('root')" :data-p="dataP">
         <template v-for="value in stars" :key="value">
-            <div :class="cx('option', { value })" @click="onOptionClick($event, value)" v-bind="getPTOptions('option', value)" :data-p-active="value <= d_value" :data-p-focused="value === focusedOptionIndex" :data-p="dataOption(value)">
+            <div
+                :class="cx('option', { value })"
+                @click="onOptionClick($event, value)"
+                v-bind="getPTOptions('option', value)"
+                :data-p-active="value <= d_value"
+                :data-p-focused="value === focusedOptionIndex"
+                :data-p="dataOption(value)"
+            >
                 <span class="rs-hidden-accessible" v-bind="ptm('hiddenOptionInputContainer')" :data-p-hidden-accessible="true">
                     <input
                         type="radio"

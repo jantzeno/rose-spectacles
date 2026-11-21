@@ -31,7 +31,14 @@
             </slot>
         </span>
         <slot v-if="isClearIconVisible" name="clearicon" :class="cx('clearIcon')" :clearCallback="onClearClick">
-            <component :is="clearIcon ? 'i' : 'TimesIcon'" ref="clearIcon" :class="[cx('clearIcon'), clearIcon]" @click="onClearClick" v-bind="ptm('clearIcon')" data-pc-section="clearicon" />
+            <component
+                :is="clearIcon ? 'i' : 'TimesIcon'"
+                ref="clearIcon"
+                :class="[cx('clearIcon'), clearIcon]"
+                @click="onClearClick"
+                v-bind="ptm('clearIcon')"
+                data-pc-section="clearicon"
+            />
         </slot>
         <div :class="cx('dropdown')" role="button" tabindex="-1" v-bind="ptm('dropdown')">
             <slot v-if="loading" name="loadingicon" :class="cx('loadingIcon')">
@@ -39,14 +46,26 @@
                 <SpinnerIcon v-else :class="cx('loadingIcon')" spin aria-hidden="true" v-bind="ptm('loadingIcon')" />
             </slot>
             <slot v-else name="dropdownicon" :class="cx('dropdownIcon')">
-                <component :is="dropdownIcon ? 'span' : 'ChevronDownIcon'" :class="[cx('dropdownIcon'), dropdownIcon]" aria-hidden="true" v-bind="ptm('dropdownIcon')" />
+                <component
+                    :is="dropdownIcon ? 'span' : 'ChevronDownIcon'"
+                    :class="[cx('dropdownIcon'), dropdownIcon]"
+                    aria-hidden="true"
+                    v-bind="ptm('dropdownIcon')"
+                />
             </slot>
         </div>
         <span role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenSearchResult')" :data-p-hidden-accessible="true">
             {{ searchResultMessageText }}
         </span>
         <Portal :appendTo="appendTo">
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter" @after-enter="onOverlayAfterEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="ptm('transition')">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter"
+                @after-enter="onOverlayAfterEnter"
+                @leave="onOverlayLeave"
+                @after-leave="onOverlayAfterLeave"
+                v-bind="ptm('transition')"
+            >
                 <div
                     v-if="overlayVisible"
                     :ref="overlayRef"
@@ -174,7 +193,9 @@ export default {
             return this.optionGroupLabel ? resolveFieldData(optionGroup, this.optionGroupLabel) : null;
         },
         getOptionGroupChildren(optionGroup, level) {
-            return isString(this.optionGroupChildren) ? resolveFieldData(optionGroup, this.optionGroupChildren) : resolveFieldData(optionGroup, this.optionGroupChildren[level]);
+            return isString(this.optionGroupChildren)
+                ? resolveFieldData(optionGroup, this.optionGroupChildren)
+                : resolveFieldData(optionGroup, this.optionGroupChildren[level]);
         },
         isOptionGroup(option, level) {
             return Object.prototype.hasOwnProperty.call(option, this.optionGroupChildren[level]);
@@ -197,7 +218,11 @@ export default {
 
                 this.focusedOptionInfo = { index: processedOption.index, level: processedOption.level, parentKey: processedOption.parentKey };
             } else {
-                this.focusedOptionInfo = { index: this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : this.findSelectedOptionIndex(), level: 0, parentKey: '' };
+                this.focusedOptionInfo = {
+                    index: this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : this.findSelectedOptionIndex(),
+                    level: 0,
+                    parentKey: ''
+                };
             }
 
             isFocus && focus(this.$refs.focusInput);
@@ -420,7 +445,12 @@ export default {
             if (!this.overlayVisible) {
                 this.show();
             } else {
-                const optionIndex = this.focusedOptionInfo.index !== -1 ? this.findNextOptionIndex(this.focusedOptionInfo.index) : this.clicked ? this.findFirstOptionIndex() : this.findFirstFocusedOptionIndex();
+                const optionIndex =
+                    this.focusedOptionInfo.index !== -1
+                        ? this.findNextOptionIndex(this.focusedOptionInfo.index)
+                        : this.clicked
+                          ? this.findFirstOptionIndex()
+                          : this.findFirstFocusedOptionIndex();
 
                 this.changeFocusedOptionIndex(event, optionIndex, true);
             }
@@ -439,7 +469,12 @@ export default {
                 this.overlayVisible && this.hide();
                 event.preventDefault();
             } else {
-                const optionIndex = this.focusedOptionInfo.index !== -1 ? this.findPrevOptionIndex(this.focusedOptionInfo.index) : this.clicked ? this.findLastOptionIndex() : this.findLastFocusedOptionIndex();
+                const optionIndex =
+                    this.focusedOptionInfo.index !== -1
+                        ? this.findPrevOptionIndex(this.focusedOptionInfo.index)
+                        : this.clicked
+                          ? this.findLastOptionIndex()
+                          : this.findLastFocusedOptionIndex();
 
                 this.changeFocusedOptionIndex(event, optionIndex, true);
 
@@ -636,7 +671,12 @@ export default {
             }
         },
         isOptionMatched(processedOption) {
-            return this.isValidOption(processedOption) && this.getProccessedOptionLabel(processedOption)?.toLocaleLowerCase(this.searchLocale).startsWith(this.searchValue.toLocaleLowerCase(this.searchLocale));
+            return (
+                this.isValidOption(processedOption) &&
+                this.getProccessedOptionLabel(processedOption)
+                    ?.toLocaleLowerCase(this.searchLocale)
+                    .startsWith(this.searchValue.toLocaleLowerCase(this.searchLocale))
+            );
         },
         isValidOption(processedOption) {
             return isNotEmpty(processedOption) && !this.isOptionDisabled(processedOption.option);
@@ -654,12 +694,16 @@ export default {
             return findLastIndex(this.visibleOptions, (processedOption) => this.isValidOption(processedOption));
         },
         findNextOptionIndex(index) {
-            const matchedOptionIndex = index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((processedOption) => this.isValidOption(processedOption)) : -1;
+            const matchedOptionIndex =
+                index < this.visibleOptions.length - 1
+                    ? this.visibleOptions.slice(index + 1).findIndex((processedOption) => this.isValidOption(processedOption))
+                    : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : index;
         },
         findPrevOptionIndex(index) {
-            const matchedOptionIndex = index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (processedOption) => this.isValidOption(processedOption)) : -1;
+            const matchedOptionIndex =
+                index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (processedOption) => this.isValidOption(processedOption)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex : index;
         },
@@ -707,7 +751,10 @@ export default {
             if (isNotEmpty(this.searchValue)) {
                 if (this.focusedOptionInfo.index !== -1) {
                     optionIndex = this.visibleOptions.slice(this.focusedOptionInfo.index).findIndex((processedOption) => this.isOptionMatched(processedOption));
-                    optionIndex = optionIndex === -1 ? this.visibleOptions.slice(0, this.focusedOptionInfo.index).findIndex((processedOption) => this.isOptionMatched(processedOption)) : optionIndex + this.focusedOptionInfo.index;
+                    optionIndex =
+                        optionIndex === -1
+                            ? this.visibleOptions.slice(0, this.focusedOptionInfo.index).findIndex((processedOption) => this.isOptionMatched(processedOption))
+                            : optionIndex + this.focusedOptionInfo.index;
                 } else {
                     optionIndex = this.visibleOptions.findIndex((processedOption) => this.isOptionMatched(processedOption));
                 }
@@ -847,7 +894,9 @@ export default {
             return this.$filled ? this.selectionMessageText.replaceAll('{0}', '1') : this.emptySelectionMessageText;
         },
         focusedOptionId() {
-            return this.focusedOptionInfo.index !== -1 ? `${this.$id}${isNotEmpty(this.focusedOptionInfo.parentKey) ? '_' + this.focusedOptionInfo.parentKey : ''}_${this.focusedOptionInfo.index}` : null;
+            return this.focusedOptionInfo.index !== -1
+                ? `${this.$id}${isNotEmpty(this.focusedOptionInfo.parentKey) ? '_' + this.focusedOptionInfo.parentKey : ''}_${this.focusedOptionInfo.index}`
+                : null;
         },
         isClearIconVisible() {
             return this.showClear && this.d_value != null && isNotEmpty(this.options) && !this.disabled && !this.loading;

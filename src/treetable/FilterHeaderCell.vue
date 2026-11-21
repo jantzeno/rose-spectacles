@@ -1,5 +1,11 @@
 <template>
-    <th v-if="!columnProp('hidden')" :style="getFilterColumnHeaderStyle" :class="getFilterColumnHeaderClass" v-bind="{ ...getColumnPT('root'), ...getColumnPT('headerCell') }" :data-p-frozen-column="columnProp('frozen')">
+    <th
+        v-if="!columnProp('hidden')"
+        :style="getFilterColumnHeaderStyle"
+        :class="getFilterColumnHeaderClass"
+        v-bind="{ ...getColumnPT('root'), ...getColumnPT('headerCell') }"
+        :data-p-frozen-column="columnProp('frozen')"
+    >
         <TTColumnFilter
             v-if="column.children && column.children.filter"
             :field="columnProp('filterField') || columnProp('field')"
@@ -118,7 +124,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined;
@@ -154,7 +164,9 @@ export default {
             return [this.cx('headerCell', { filterCell: true }), this.columnProp('filterHeaderClass'), this.columnProp('class')];
         },
         getFilterColumnHeaderStyle() {
-            return this.columnProp('frozen') ? [this.columnProp('filterHeaderStyle'), this.columnProp('style'), this.styleObject] : [this.columnProp('filterHeaderStyle'), this.columnProp('style')];
+            return this.columnProp('frozen')
+                ? [this.columnProp('filterHeaderStyle'), this.columnProp('style'), this.styleObject]
+                : [this.columnProp('filterHeaderStyle'), this.columnProp('style')];
         }
     },
     components: {

@@ -13,7 +13,12 @@ import type { MenuItem } from 'rose-spectacles/menuitem';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type PanelMenuPassThroughOptionType = PanelMenuPassThroughAttributes | ((options: PanelMenuPassThroughMethodOptions) => PanelMenuPassThroughAttributes | string) | string | null | undefined;
+export declare type PanelMenuPassThroughOptionType =
+    | PanelMenuPassThroughAttributes
+    | ((options: PanelMenuPassThroughMethodOptions) => PanelMenuPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type PanelMenuPassThroughTransitionType = TransitionProps | ((options: PanelMenuPassThroughMethodOptions) => TransitionProps) | undefined;
 

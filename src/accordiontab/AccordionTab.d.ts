@@ -12,7 +12,12 @@ import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spe
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { AnchorHTMLAttributes, HTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type AccordionTabPassThroughOptionType = AccordionTabPassThroughAttributes | ((options: AccordionTabPassThroughMethodOptions) => AccordionTabPassThroughAttributes | string) | string | null | undefined;
+export declare type AccordionTabPassThroughOptionType =
+    | AccordionTabPassThroughAttributes
+    | ((options: AccordionTabPassThroughMethodOptions) => AccordionTabPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type AccordionTabPassThroughTransitionType = TransitionProps | ((options: AccordionTabPassThroughMethodOptions) => TransitionProps) | undefined;
 

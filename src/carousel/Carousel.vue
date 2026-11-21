@@ -22,7 +22,14 @@
                         </slot>
                     </template>
                 </Button>
-                <div :class="cx('viewport')" :style="[{ height: isVertical() ? verticalViewPortHeight : 'auto' }]" @touchend="onTouchEnd" @touchstart="onTouchStart" @touchmove="onTouchMove" v-bind="ptm('viewport')">
+                <div
+                    :class="cx('viewport')"
+                    :style="[{ height: isVertical() ? verticalViewPortHeight : 'auto' }]"
+                    @touchend="onTouchEnd"
+                    @touchstart="onTouchStart"
+                    @touchmove="onTouchMove"
+                    v-bind="ptm('viewport')"
+                >
                     <div ref="itemsContainer" :class="cx('itemList')" @transitionend="onTransitionEnd" v-bind="ptm('itemList')">
                         <template v-if="isCircular()">
                             <div
@@ -53,7 +60,12 @@
                             <slot name="item" :data="item" :index="index"></slot>
                         </div>
                         <template v-if="isCircular()">
-                            <div v-for="(item, index) of value.slice(0, d_numVisible)" :key="index + '_fcloned'" :class="cx('itemClone', { index, value, totalShiftedItems, d_numVisible })" v-bind="ptm('itemClone')">
+                            <div
+                                v-for="(item, index) of value.slice(0, d_numVisible)"
+                                :key="index + '_fcloned'"
+                                :class="cx('itemClone', { index, value, totalShiftedItems, d_numVisible })"
+                                v-bind="ptm('itemClone')"
+                            >
                                 <slot name="item" :data="item" :index="index"></slot>
                             </div>
                         </template>
@@ -72,13 +84,29 @@
                 >
                     <template #icon="slotProps">
                         <slot name="nexticon">
-                            <component :is="isVertical() ? 'ChevronDownIcon' : 'ChevronRightIcon'" :class="slotProps.class" v-bind="ptm('pcNextButton')['icon']" />
+                            <component
+                                :is="isVertical() ? 'ChevronDownIcon' : 'ChevronRightIcon'"
+                                :class="slotProps.class"
+                                v-bind="ptm('pcNextButton')['icon']"
+                            />
                         </slot>
                     </template>
                 </Button>
             </div>
-            <ul v-if="totalIndicators >= 0 && showIndicators" ref="indicatorContent" :class="[cx('indicatorList'), indicatorsContentClass]" @keydown="onIndicatorKeydown" v-bind="ptm('indicatorList')">
-                <li v-for="(indicator, i) of totalIndicators" :key="'rs-carousel-indicator-' + i.toString()" :class="cx('indicator', { index: i })" v-bind="getIndicatorPTOptions('indicator', i)" :data-p-active="d_page === i">
+            <ul
+                v-if="totalIndicators >= 0 && showIndicators"
+                ref="indicatorContent"
+                :class="[cx('indicatorList'), indicatorsContentClass]"
+                @keydown="onIndicatorKeydown"
+                v-bind="ptm('indicatorList')"
+            >
+                <li
+                    v-for="(indicator, i) of totalIndicators"
+                    :key="'rs-carousel-indicator-' + i.toString()"
+                    :class="cx('indicator', { index: i })"
+                    v-bind="getIndicatorPTOptions('indicator', i)"
+                    :data-p-active="d_page === i"
+                >
                     <button
                         :class="cx('indicatorButton')"
                         type="button"
@@ -234,7 +262,9 @@ export default {
                 this.d_oldNumScroll = this.d_numScroll;
                 this.d_oldNumVisible = this.d_numVisible;
                 this.d_oldValue = this.value;
-                this.$refs.itemsContainer.style.transform = this.isVertical() ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)` : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
+                this.$refs.itemsContainer.style.transform = this.isVertical()
+                    ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
+                    : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
             }
 
             if (isCircular) {
@@ -325,7 +355,9 @@ export default {
 
             if (this.$refs.itemsContainer) {
                 !this.isUnstyled && removeClass(this.$refs.itemsContainer, 'rs-items-hidden');
-                this.$refs.itemsContainer.style.transform = this.isVertical() ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)` : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
+                this.$refs.itemsContainer.style.transform = this.isVertical()
+                    ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
+                    : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
                 this.$refs.itemsContainer.style.transition = 'transform 500ms ease 0s';
             }
 
@@ -409,7 +441,9 @@ export default {
                 this.$refs.itemsContainer.style.transition = '';
 
                 if ((this.d_page === 0 || this.d_page === this.totalIndicators - 1) && this.isCircular()) {
-                    this.$refs.itemsContainer.style.transform = this.isVertical() ? `translate3d(0, ${this.totalShiftedItems * (100 / this.d_numVisible)}%, 0)` : `translate3d(${this.totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
+                    this.$refs.itemsContainer.style.transform = this.isVertical()
+                        ? `translate3d(0, ${this.totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
+                        : `translate3d(${this.totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
                 }
             }
         },
@@ -631,7 +665,11 @@ export default {
             return this.value && (!this.circular || this.value.length < this.d_numVisible) && this.d_page === 0;
         },
         forwardIsDisabled() {
-            return this.value && (!this.circular || this.value.length < this.d_numVisible) && (this.d_page === this.totalIndicators - 1 || this.totalIndicators === 0);
+            return (
+                this.value &&
+                (!this.circular || this.value.length < this.d_numVisible) &&
+                (this.d_page === this.totalIndicators - 1 || this.totalIndicators === 0)
+            );
         },
         ariaSlideLabel() {
             return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.slide : undefined;

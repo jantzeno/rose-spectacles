@@ -1,6 +1,13 @@
 <template>
     <Portal :appendTo="appendTo">
-        <transition name="rs-anchored-overlay" @enter="onEnter" @after-enter="onAfterEnter" @leave="onLeave" @after-leave="onAfterLeave" v-bind="ptm('transition')">
+        <transition
+            name="rs-anchored-overlay"
+            @enter="onEnter"
+            @after-enter="onAfterEnter"
+            @leave="onLeave"
+            @after-leave="onAfterLeave"
+            v-bind="ptm('transition')"
+        >
             <div v-if="visible" :ref="containerRef" :class="cx('root')" v-bind="ptmi('root')">
                 <ContextMenuSub
                     :ref="listRef"
@@ -524,10 +531,18 @@ export default {
             }
         },
         isItemMatched(processedItem) {
-            return this.isValidItem(processedItem) && this.getProccessedItemLabel(processedItem)?.toLocaleLowerCase().startsWith(this.searchValue.toLocaleLowerCase());
+            return (
+                this.isValidItem(processedItem) &&
+                this.getProccessedItemLabel(processedItem)?.toLocaleLowerCase().startsWith(this.searchValue.toLocaleLowerCase())
+            );
         },
         isValidItem(processedItem) {
-            return !!processedItem && !this.isItemDisabled(processedItem.item) && !this.isItemSeparator(processedItem.item) && this.isItemVisible(processedItem.item);
+            return (
+                !!processedItem &&
+                !this.isItemDisabled(processedItem.item) &&
+                !this.isItemSeparator(processedItem.item) &&
+                this.isItemVisible(processedItem.item)
+            );
         },
         isValidSelectedItem(processedItem) {
             return this.isValidItem(processedItem) && this.isSelected(processedItem);
@@ -542,7 +557,8 @@ export default {
             return findLastIndex(this.visibleItems, (processedItem) => this.isValidItem(processedItem));
         },
         findNextItemIndex(index) {
-            const matchedItemIndex = index < this.visibleItems.length - 1 ? this.visibleItems.slice(index + 1).findIndex((processedItem) => this.isValidItem(processedItem)) : -1;
+            const matchedItemIndex =
+                index < this.visibleItems.length - 1 ? this.visibleItems.slice(index + 1).findIndex((processedItem) => this.isValidItem(processedItem)) : -1;
 
             return matchedItemIndex > -1 ? matchedItemIndex + index + 1 : index;
         },
@@ -572,7 +588,10 @@ export default {
 
             if (this.focusedItemInfo.index !== -1) {
                 itemIndex = this.visibleItems.slice(this.focusedItemInfo.index).findIndex((processedItem) => this.isItemMatched(processedItem));
-                itemIndex = itemIndex === -1 ? this.visibleItems.slice(0, this.focusedItemInfo.index).findIndex((processedItem) => this.isItemMatched(processedItem)) : itemIndex + this.focusedItemInfo.index;
+                itemIndex =
+                    itemIndex === -1
+                        ? this.visibleItems.slice(0, this.focusedItemInfo.index).findIndex((processedItem) => this.isItemMatched(processedItem))
+                        : itemIndex + this.focusedItemInfo.index;
             } else {
                 itemIndex = this.visibleItems.findIndex((processedItem) => this.isItemMatched(processedItem));
             }
@@ -652,7 +671,9 @@ export default {
             return processedItem ? processedItem.items : this.processedItems;
         },
         focusedItemIdx() {
-            return this.focusedItemInfo.index !== -1 ? `${this.$id}${isNotEmpty(this.focusedItemInfo.parentKey) ? '_' + this.focusedItemInfo.parentKey : ''}_${this.focusedItemInfo.index}` : null;
+            return this.focusedItemInfo.index !== -1
+                ? `${this.$id}${isNotEmpty(this.focusedItemInfo.parentKey) ? '_' + this.focusedItemInfo.parentKey : ''}_${this.focusedItemInfo.index}`
+                : null;
         }
     },
     components: {

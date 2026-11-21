@@ -14,7 +14,12 @@ import type { ListboxPassThroughOptions } from 'rose-spectacles/listbox';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type PickListPassThroughOptionType = PickListPassThroughAttributes | ((options: PickListPassThroughMethodOptions) => PickListPassThroughAttributes | string) | string | null | undefined;
+export declare type PickListPassThroughOptionType =
+    | PickListPassThroughAttributes
+    | ((options: PickListPassThroughMethodOptions) => PickListPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type PickListPassThroughTransitionType = TransitionProps | ((options: PickListPassThroughMethodOptions) => TransitionProps) | undefined;
 

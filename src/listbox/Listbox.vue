@@ -44,7 +44,15 @@
             </span>
         </div>
         <div :class="cx('listContainer')" :style="[{ 'max-height': virtualScrollerDisabled ? scrollHeight : '' }, listStyle]" v-bind="ptm('listContainer')">
-            <VirtualScroller :ref="virtualScrollerRef" v-bind="virtualScrollerOptions" :items="visibleOptions" :style="[{ height: scrollHeight }, listStyle]" :tabindex="-1" :disabled="virtualScrollerDisabled" :pt="ptm('virtualScroller')">
+            <VirtualScroller
+                :ref="virtualScrollerRef"
+                v-bind="virtualScrollerOptions"
+                :items="visibleOptions"
+                :style="[{ height: scrollHeight }, listStyle]"
+                :tabindex="-1"
+                :disabled="virtualScrollerDisabled"
+                :pt="ptm('virtualScroller')"
+            >
                 <template v-slot:content="{ styleClass, contentRef, items, getItemOptions, contentStyle, itemSize }">
                     <ul
                         :ref="(el) => listRef(el, contentRef)"
@@ -64,8 +72,17 @@
                         v-bind="ptm('list')"
                     >
                         <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
-                            <li v-if="isOptionGroup(option)" :id="$id + '_' + getOptionIndex(i, getItemOptions)" :style="{ height: itemSize ? itemSize + 'px' : undefined }" :class="cx('optionGroup')" role="option" v-bind="ptm('optionGroup')">
-                                <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{ getOptionGroupLabel(option.optionGroup) }}</slot>
+                            <li
+                                v-if="isOptionGroup(option)"
+                                :id="$id + '_' + getOptionIndex(i, getItemOptions)"
+                                :style="{ height: itemSize ? itemSize + 'px' : undefined }"
+                                :class="cx('optionGroup')"
+                                role="option"
+                                v-bind="ptm('optionGroup')"
+                            >
+                                <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{
+                                    getOptionGroupLabel(option.optionGroup)
+                                }}</slot>
                             </li>
                             <li
                                 v-else
@@ -93,10 +110,17 @@
                                     <CheckIcon v-if="isSelected(option)" :class="cx('optionCheckIcon')" v-bind="ptm('optionCheckIcon')" />
                                     <BlankIcon v-else :class="cx('optionBlankIcon')" v-bind="ptm('optionBlankIcon')" />
                                 </template>
-                                <slot name="option" :option="option" :selected="isSelected(option)" :index="getOptionIndex(i, getItemOptions)">{{ getOptionLabel(option) }}</slot>
+                                <slot name="option" :option="option" :selected="isSelected(option)" :index="getOptionIndex(i, getItemOptions)">{{
+                                    getOptionLabel(option)
+                                }}</slot>
                             </li>
                         </template>
-                        <li v-if="filterValue && (!items || (items && items.length === 0))" :class="cx('emptyMessage')" role="option" v-bind="ptm('emptyMessage')">
+                        <li
+                            v-if="filterValue && (!items || (items && items.length === 0))"
+                            :class="cx('emptyMessage')"
+                            role="option"
+                            v-bind="ptm('emptyMessage')"
+                        >
                             <slot name="emptyfilter">{{ emptyFilterMessageText }}</slot>
                         </li>
                         <li v-else-if="!options || (options && options.length === 0)" :class="cx('emptyMessage')" role="option" v-bind="ptm('emptyMessage')">
@@ -110,7 +134,14 @@
             </VirtualScroller>
         </div>
         <slot name="footer" :value="d_value" :options="visibleOptions"></slot>
-        <span v-if="!options || (options && options.length === 0)" role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenEmptyMessage')" :data-p-hidden-accessible="true">
+        <span
+            v-if="!options || (options && options.length === 0)"
+            role="status"
+            aria-live="polite"
+            class="rs-hidden-accessible"
+            v-bind="ptm('hiddenEmptyMessage')"
+            :data-p-hidden-accessible="true"
+        >
             {{ emptyMessageText }}
         </span>
         <span role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenSelectedMessage')" :data-p-hidden-accessible="true">
@@ -182,7 +213,11 @@ export default {
             return this.virtualScrollerDisabled ? index : fn && fn(index)['index'];
         },
         getOptionLabel(option) {
-            return this.optionLabel ? resolveFieldData(option, this.optionLabel) : typeof option === 'string' || typeof option === 'number' || typeof option === 'boolean' ? option : null;
+            return this.optionLabel
+                ? resolveFieldData(option, this.optionLabel)
+                : typeof option === 'string' || typeof option === 'number' || typeof option === 'boolean'
+                  ? option
+                  : null;
         },
         getOptionValue(option) {
             return this.optionValue ? resolveFieldData(option, this.optionValue) : option;
@@ -243,7 +278,12 @@ export default {
         },
         onListFocus(event) {
             this.focused = true;
-            this.focusedOptionIndex = this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : this.findSelectedOptionIndex();
+            this.focusedOptionIndex =
+                this.focusedOptionIndex !== -1
+                    ? this.focusedOptionIndex
+                    : this.autoOptionFocus
+                      ? this.findFirstFocusedOptionIndex()
+                      : this.findSelectedOptionIndex();
             this.autoUpdateModel();
             this.scrollInView(this.focusedOptionIndex);
             this.$emit('focus', event);
@@ -545,7 +585,11 @@ export default {
             this.startRangeIndex = this.focusedOptionIndex;
         },
         isOptionMatched(option) {
-            return this.isValidOption(option) && typeof this.getOptionLabel(option) === 'string' && this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale));
+            return (
+                this.isValidOption(option) &&
+                typeof this.getOptionLabel(option) === 'string' &&
+                this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale))
+            );
         },
         isValidOption(option) {
             return isNotEmpty(option) && !(this.isOptionDisabled(option) || this.isOptionGroup(option));
@@ -580,7 +624,8 @@ export default {
             return findLastIndex(this.visibleOptions, (option) => this.isValidOption(option));
         },
         findNextOptionIndex(index) {
-            const matchedOptionIndex = index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
+            const matchedOptionIndex =
+                index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : index;
         },
@@ -614,7 +659,9 @@ export default {
                         // Same fallback as isSelected: an equal copy of an option object, or a value only an overridden
                         // isEquals matches, has a different key.
                         if (this.usesCustomEquality || (!this.equalityKey && typeof value === 'object' && value !== null)) {
-                            const copyIndex = this.visibleOptions.findIndex((option) => this.isValidOption(option) && this.isEquals(value, this.getOptionValue(option)));
+                            const copyIndex = this.visibleOptions.findIndex(
+                                (option) => this.isValidOption(option) && this.isEquals(value, this.getOptionValue(option))
+                            );
 
                             if (copyIndex > -1) return copyIndex;
                         }
@@ -633,12 +680,16 @@ export default {
             return this.$filled ? findLastIndex(this.visibleOptions, (option) => this.isValidSelectedOption(option)) : -1;
         },
         findNextSelectedOptionIndex(index) {
-            const matchedOptionIndex = this.$filled && index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidSelectedOption(option)) : -1;
+            const matchedOptionIndex =
+                this.$filled && index < this.visibleOptions.length - 1
+                    ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidSelectedOption(option))
+                    : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : -1;
         },
         findPrevSelectedOptionIndex(index) {
-            const matchedOptionIndex = this.$filled && index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidSelectedOption(option)) : -1;
+            const matchedOptionIndex =
+                this.$filled && index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidSelectedOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex : -1;
         },
@@ -675,7 +726,10 @@ export default {
             if (isNotEmpty(this.searchValue)) {
                 if (this.focusedOptionIndex !== -1) {
                     optionIndex = this.visibleOptions.slice(this.focusedOptionIndex).findIndex((option) => this.isOptionMatched(option));
-                    optionIndex = optionIndex === -1 ? this.visibleOptions.slice(0, this.focusedOptionIndex).findIndex((option) => this.isOptionMatched(option)) : optionIndex + this.focusedOptionIndex;
+                    optionIndex =
+                        optionIndex === -1
+                            ? this.visibleOptions.slice(0, this.focusedOptionIndex).findIndex((option) => this.isOptionMatched(option))
+                            : optionIndex + this.focusedOptionIndex;
                 } else {
                     optionIndex = this.visibleOptions.findIndex((option) => this.isOptionMatched(option));
                 }
@@ -743,14 +797,18 @@ export default {
     },
     computed: {
         optionsListFlat() {
-            return this.filterValue ? FilterService.filter(this.options, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale) : this.options;
+            return this.filterValue
+                ? FilterService.filter(this.options, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale)
+                : this.options;
         },
         optionsListGroup() {
             const filteredOptions = [];
 
             (this.options || []).forEach((optionGroup) => {
                 const optionGroupChildren = this.getOptionGroupChildren(optionGroup) || [];
-                const filteredChildren = this.filterValue ? FilterService.filter(optionGroupChildren, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale) : optionGroupChildren;
+                const filteredChildren = this.filterValue
+                    ? FilterService.filter(optionGroupChildren, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale)
+                    : optionGroupChildren;
 
                 if (filteredChildren?.length) {
                     filteredOptions.push({ optionGroup, group: true }, ...filteredChildren);

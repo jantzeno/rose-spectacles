@@ -13,7 +13,12 @@ import { VNode } from 'vue';
 // import { ToggleButtonPassThroughOptions } from 'rose-spectacles/togglebutton';
 import type { DefineComponent, DesignToken, EmitFn, HintedString, PassThrough } from 'rose-spectacles/core';
 
-export declare type SelectButtonPassThroughOptionType = SelectButtonPassThroughAttributes | ((options: SelectButtonPassThroughMethodOptions) => SelectButtonPassThroughAttributes | string) | string | null | undefined;
+export declare type SelectButtonPassThroughOptionType =
+    | SelectButtonPassThroughAttributes
+    | ((options: SelectButtonPassThroughMethodOptions) => SelectButtonPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Defines current options in SelectButton component.

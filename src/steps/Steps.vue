@@ -19,7 +19,15 @@
                             <span :class="cx('itemLabel')" v-bind="getPTOptions('itemLabel', item, index)">{{ label(item) }}</span>
                         </span>
                     </template>
-                    <component v-else :is="$slots.item" :item="item" :index="index" :active="index === d_activeStep" :label="label(item)" :props="getMenuItemProps(item, index)"></component>
+                    <component
+                        v-else
+                        :is="$slots.item"
+                        :item="item"
+                        :index="index"
+                        :active="index === d_activeStep"
+                        :label="label(item)"
+                        :props="getMenuItemProps(item, index)"
+                    ></component>
                 </li>
             </template>
         </ol>

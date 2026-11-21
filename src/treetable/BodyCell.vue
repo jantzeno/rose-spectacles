@@ -1,7 +1,23 @@
 <template>
-    <td :style="containerStyle" :class="containerClass" role="cell" v-bind="{ ...getColumnPT('root'), ...getColumnPT('bodyCell') }" :data-p-frozen-column="columnProp('frozen')">
+    <td
+        :style="containerStyle"
+        :class="containerClass"
+        role="cell"
+        v-bind="{ ...getColumnPT('root'), ...getColumnPT('bodyCell') }"
+        :data-p-frozen-column="columnProp('frozen')"
+    >
         <div :class="cx('bodyCellContent')" v-bind="getColumnPT('bodyCellContent')">
-            <button v-if="columnProp('expander')" v-ripple type="button" :class="cx('nodeToggleButton')" @click="toggle" :style="togglerStyle" tabindex="-1" v-bind="getColumnPT('nodeToggleButton')" data-pc-group-section="rowactionbutton">
+            <button
+                v-if="columnProp('expander')"
+                v-ripple
+                type="button"
+                :class="cx('nodeToggleButton')"
+                @click="toggle"
+                :style="togglerStyle"
+                tabindex="-1"
+                v-bind="getColumnPT('nodeToggleButton')"
+                data-pc-group-section="rowactionbutton"
+            >
                 <template v-if="node.loading && loadingMode === 'icon'">
                     <component v-if="templates['nodetoggleicon']" :is="templates['nodetoggleicon']" />
                     <!-- TODO: Deprecated since v4.0-->
@@ -9,12 +25,40 @@
                     <SpinnerIcon v-else spin v-bind="ptm('nodetoggleicon')" />
                 </template>
                 <template v-else>
-                    <component v-if="column.children && column.children.rowtoggleicon" :is="column.children.rowtoggleicon" :node="node" :expanded="expanded" :class="cx('nodeToggleIcon')" />
-                    <component v-else-if="templates['nodetoggleicon']" :is="templates['nodetoggleicon']" :node="node" :expanded="expanded" :class="cx('nodeToggleIcon')" />
+                    <component
+                        v-if="column.children && column.children.rowtoggleicon"
+                        :is="column.children.rowtoggleicon"
+                        :node="node"
+                        :expanded="expanded"
+                        :class="cx('nodeToggleIcon')"
+                    />
+                    <component
+                        v-else-if="templates['nodetoggleicon']"
+                        :is="templates['nodetoggleicon']"
+                        :node="node"
+                        :expanded="expanded"
+                        :class="cx('nodeToggleIcon')"
+                    />
                     <!-- TODO: Deprecated since v4.0-->
-                    <component v-else-if="column.children && column.children.rowtogglericon" :is="column.children.rowtogglericon" :node="node" :expanded="expanded" :class="cx('nodeToggleIcon')" />
-                    <component v-else-if="expanded" :is="node.expandedIcon ? 'span' : 'ChevronDownIcon'" :class="cx('nodeToggleIcon')" v-bind="getColumnPT('nodeToggleIcon')" />
-                    <component v-else :is="node.collapsedIcon ? 'span' : 'ChevronRightIcon'" :class="cx('nodeToggleIcon')" v-bind="getColumnPT('nodeToggleIcon')" />
+                    <component
+                        v-else-if="column.children && column.children.rowtogglericon"
+                        :is="column.children.rowtogglericon"
+                        :node="node"
+                        :expanded="expanded"
+                        :class="cx('nodeToggleIcon')"
+                    />
+                    <component
+                        v-else-if="expanded"
+                        :is="node.expandedIcon ? 'span' : 'ChevronDownIcon'"
+                        :class="cx('nodeToggleIcon')"
+                        v-bind="getColumnPT('nodeToggleIcon')"
+                    />
+                    <component
+                        v-else
+                        :is="node.collapsedIcon ? 'span' : 'ChevronRightIcon'"
+                        :class="cx('nodeToggleIcon')"
+                        v-bind="getColumnPT('nodeToggleIcon')"
+                    />
                 </template>
             </button>
             <Checkbox
@@ -31,7 +75,13 @@
                 :data-p-partialchecked="partialChecked"
             >
                 <template #icon="slotProps">
-                    <component v-if="templates['checkboxicon']" :is="templates['checkboxicon']" :checked="slotProps.checked" :partialChecked="partialChecked" :class="slotProps.class" />
+                    <component
+                        v-if="templates['checkboxicon']"
+                        :is="templates['checkboxicon']"
+                        :checked="slotProps.checked"
+                        :partialChecked="partialChecked"
+                        :class="slotProps.class"
+                    />
                 </template>
             </Checkbox>
             <component v-if="column.children && column.children.body" :is="column.children.body" :node="node" :column="column" />
@@ -151,7 +201,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo
@@ -171,7 +225,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         updateStickyPosition() {
             if (this.columnProp('frozen')) {

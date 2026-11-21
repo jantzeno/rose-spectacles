@@ -13,7 +13,12 @@ import type { InputTextPassThroughOptions } from 'rose-spectacles/inputtext';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type InputOtpPassThroughOptionType = InputOtpPassThroughAttributes | ((options: InputOtpPassThroughMethodOptions) => InputOtpPassThroughAttributes | string) | string | null | undefined;
+export declare type InputOtpPassThroughOptionType =
+    | InputOtpPassThroughAttributes
+    | ((options: InputOtpPassThroughMethodOptions) => InputOtpPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

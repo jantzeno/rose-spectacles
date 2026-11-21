@@ -13,7 +13,12 @@ import type { ButtonPassThroughOptions, ButtonProps } from 'rose-spectacles/butt
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type ScrollTopPassThroughOptionType = ScrollTopPassThroughAttributes | ((options: ScrollTopPassThroughMethodOptions) => ScrollTopPassThroughAttributes | string) | string | null | undefined;
+export declare type ScrollTopPassThroughOptionType =
+    | ScrollTopPassThroughAttributes
+    | ((options: ScrollTopPassThroughMethodOptions) => ScrollTopPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type ScrollTopPassThroughTransitionType = TransitionProps | ((options: ScrollTopPassThroughMethodOptions) => TransitionProps) | undefined;
 

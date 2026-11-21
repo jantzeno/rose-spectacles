@@ -13,7 +13,12 @@ import { VNode } from 'vue';
 import type { PassThroughOptions } from '../types';
 import { useFormFieldState } from '../useform';
 
-export declare type FormPassThroughOptionType = FormPassThroughAttributes | ((options: FormPassThroughMethodOptions) => FormPassThroughAttributes | string) | string | null | undefined;
+export declare type FormPassThroughOptionType =
+    | FormPassThroughAttributes
+    | ((options: FormPassThroughMethodOptions) => FormPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

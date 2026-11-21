@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type IftaLabelPassThroughOptionType = IftaLabelPassThroughAttributes | ((options: IftaLabelPassThroughMethodOptions) => IftaLabelPassThroughAttributes | string) | string | null | undefined;
+export declare type IftaLabelPassThroughOptionType =
+    | IftaLabelPassThroughAttributes
+    | ((options: IftaLabelPassThroughMethodOptions) => IftaLabelPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type IftaLabelPassThroughTransitionType = TransitionProps | ((options: IftaLabelPassThroughMethodOptions) => TransitionProps) | undefined;
 

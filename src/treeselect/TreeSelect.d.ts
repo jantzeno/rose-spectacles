@@ -15,7 +15,12 @@ import type { TreeExpandedKeys, TreeFilterEvent, TreePassThroughOptions } from '
 import type { TreeNode } from 'rose-spectacles/treenode';
 import { InputHTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type TreeSelectPassThroughOptionType = TreeSelectPassThroughAttributes | ((options: TreeSelectPassThroughMethodOptions) => TreeSelectPassThroughAttributes | string) | string | null | undefined;
+export declare type TreeSelectPassThroughOptionType =
+    | TreeSelectPassThroughAttributes
+    | ((options: TreeSelectPassThroughMethodOptions) => TreeSelectPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type TreeSelectPassThroughTransitionType = TransitionProps | ((options: TreeSelectPassThroughMethodOptions) => TransitionProps) | undefined;
 

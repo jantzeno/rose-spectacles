@@ -1,6 +1,11 @@
 import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 
-export declare type ChartPassThroughOptionType<P> = ChartPassThroughAttributes | ((options: ChartPassThroughMethodOptions<P>) => ChartPassThroughAttributes | string) | string | null | undefined;
+export declare type ChartPassThroughOptionType<P> =
+    | ChartPassThroughAttributes
+    | ((options: ChartPassThroughMethodOptions<P>) => ChartPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

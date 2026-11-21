@@ -1,13 +1,27 @@
 <template>
     <template v-if="!empty">
-        <tr v-if="templates['groupheader'] && rowGroupMode === 'subheader' && shouldRenderRowGroupHeader" :class="cx('rowGroupHeader')" :style="rowGroupHeaderStyle" role="row" v-bind="ptm('rowGroupHeader')">
+        <tr
+            v-if="templates['groupheader'] && rowGroupMode === 'subheader' && shouldRenderRowGroupHeader"
+            :class="cx('rowGroupHeader')"
+            :style="rowGroupHeaderStyle"
+            role="row"
+            v-bind="ptm('rowGroupHeader')"
+        >
             <td :colspan="columnsLength - 1" v-bind="{ ...getColumnPT('bodycell'), ...ptm('rowGroupHeaderCell') }">
                 <button v-if="expandableRowGroups" :class="cx('rowToggleButton')" @click="onRowGroupToggle" type="button" v-bind="ptm('rowToggleButton')">
-                    <component v-if="templates['rowtoggleicon'] || templates['rowgrouptogglericon']" :is="templates['rowtoggleicon'] || templates['rowgrouptogglericon']" :expanded="isRowGroupExpanded" />
+                    <component
+                        v-if="templates['rowtoggleicon'] || templates['rowgrouptogglericon']"
+                        :is="templates['rowtoggleicon'] || templates['rowgrouptogglericon']"
+                        :expanded="isRowGroupExpanded"
+                    />
                     <template v-else>
                         <span v-if="isRowGroupExpanded && expandedRowIcon" :class="[cx('rowToggleIcon'), expandedRowIcon]" v-bind="ptm('rowToggleIcon')" />
                         <ChevronDownIcon v-else-if="isRowGroupExpanded && !expandedRowIcon" :class="cx('rowToggleIcon')" v-bind="ptm('rowToggleIcon')" />
-                        <span v-else-if="!isRowGroupExpanded && collapsedRowIcon" :class="[cx('rowToggleIcon'), collapsedRowIcon]" v-bind="ptm('rowToggleIcon')" />
+                        <span
+                            v-else-if="!isRowGroupExpanded && collapsedRowIcon"
+                            :class="[cx('rowToggleIcon'), collapsedRowIcon]"
+                            v-bind="ptm('rowToggleIcon')"
+                        />
                         <ChevronRightIcon v-else-if="!isRowGroupExpanded && !collapsedRowIcon" :class="cx('rowToggleIcon')" v-bind="ptm('rowToggleIcon')" />
                     </template>
                 </button>
@@ -74,12 +88,23 @@
                 />
             </template>
         </tr>
-        <tr v-if="templates['expansion'] && expandedRows && d_rowExpanded" :id="expandedRowId + '_' + rowIndex + '_expansion'" :class="cx('rowExpansion')" role="row" v-bind="ptm('rowExpansion')">
+        <tr
+            v-if="templates['expansion'] && expandedRows && d_rowExpanded"
+            :id="expandedRowId + '_' + rowIndex + '_expansion'"
+            :class="cx('rowExpansion')"
+            role="row"
+            v-bind="ptm('rowExpansion')"
+        >
             <td :colspan="columnsLength" v-bind="{ ...getColumnPT('bodycell'), ...ptm('rowExpansionCell') }">
                 <component :is="templates['expansion']" :data="rowData" :index="rowIndex" />
             </td>
         </tr>
-        <tr v-if="templates['groupfooter'] && rowGroupMode === 'subheader' && shouldRenderRowGroupFooter" :class="cx('rowGroupFooter')" role="row" v-bind="ptm('rowGroupFooter')">
+        <tr
+            v-if="templates['groupfooter'] && rowGroupMode === 'subheader' && shouldRenderRowGroupFooter"
+            :class="cx('rowGroupFooter')"
+            role="row"
+            v-bind="ptm('rowGroupFooter')"
+        >
             <td :colspan="columnsLength - 1" v-bind="{ ...getColumnPT('bodycell'), ...ptm('rowGroupFooterCell') }">
                 <component :is="templates['groupfooter']" :data="rowData" :index="rowIndex" />
             </td>
@@ -285,11 +310,15 @@ export default {
             deep: true,
             immediate: true,
             handler(newValue) {
-                this.d_rowExpanded = this.dataKey ? newValue?.[resolveFieldData(this.rowData, this.dataKey)] !== undefined : newValue?.some((d) => this.equals(this.rowData, d));
+                this.d_rowExpanded = this.dataKey
+                    ? newValue?.[resolveFieldData(this.rowData, this.dataKey)] !== undefined
+                    : newValue?.some((d) => this.equals(this.rowData, d));
             }
         },
         rowData(newValue) {
-            this.d_rowExpanded = this.dataKey ? this.expandedRows?.[resolveFieldData(newValue, this.dataKey)] !== undefined : this.expandedRows?.some((d) => this.equals(newValue, d));
+            this.d_rowExpanded = this.dataKey
+                ? this.expandedRows?.[resolveFieldData(newValue, this.dataKey)] !== undefined
+                : this.expandedRows?.some((d) => this.equals(newValue, d));
         }
     },
     methods: {
@@ -306,7 +335,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.columnProp({}, 'pt'), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.columnProp({}, 'pt'), key, columnMetaData)
+            );
         },
         //@todo - update this method
         getBodyRowPTOptions(key) {
@@ -514,7 +547,10 @@ export default {
             return [this.cx('row', { rowData: this.rowData, index: this.rowIndex, columnSelectionMode }), rowStyleClass];
         },
         rowTabindex() {
-            if ((this.selection === null || (Array.isArray(this.selection) && this.selection.length === 0)) && (this.selectionMode === 'single' || this.selectionMode === 'multiple')) {
+            if (
+                (this.selection === null || (Array.isArray(this.selection) && this.selection.length === 0)) &&
+                (this.selectionMode === 'single' || this.selectionMode === 'multiple')
+            ) {
                 return this.rowIndex === 0 ? 0 : -1;
             }
 

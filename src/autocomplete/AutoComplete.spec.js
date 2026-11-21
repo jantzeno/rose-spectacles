@@ -183,7 +183,9 @@ describe('AutoComplete.vue', () => {
         };
 
         const clickOnNestedOverlay = (emitterTarget) => {
-            nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), { once: true });
+            nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), {
+                once: true
+            });
             nestedOverlay.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
             outsideClick(nestedOverlay);
         };

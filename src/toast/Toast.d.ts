@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { ButtonHTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type ToastPassThroughOptionType = ToastPassThroughAttributes | ((options: ToastPassThroughMethodOptions) => ToastPassThroughAttributes | string) | string | null | undefined;
+export declare type ToastPassThroughOptionType =
+    | ToastPassThroughAttributes
+    | ((options: ToastPassThroughMethodOptions) => ToastPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type ToastPassThroughTransitionType = TransitionProps | ((options: ToastPassThroughMethodOptions) => TransitionProps) | undefined;
 

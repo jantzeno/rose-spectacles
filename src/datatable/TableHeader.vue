@@ -55,7 +55,11 @@
             <tr v-for="(row, i) of getHeaderRows()" :key="i" role="row" v-bind="{ ...ptm('headerRow'), ...getRowPT(row, 'root', i) }">
                 <template v-for="(col, j) of getHeaderColumns(row)" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || j">
                     <DTHeaderCell
-                        v-if="!columnProp(col, 'hidden') && (rowGroupMode !== 'subheader' || groupRowsBy !== columnProp(col, 'field')) && typeof col.children !== 'string'"
+                        v-if="
+                            !columnProp(col, 'hidden') &&
+                            (rowGroupMode !== 'subheader' || groupRowsBy !== columnProp(col, 'field')) &&
+                            typeof col.children !== 'string'
+                        "
                         :column="col"
                         @column-click="$emit('column-click', $event)"
                         @column-mousedown="$emit('column-mousedown', $event)"
@@ -256,7 +260,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`columnGroup.${key}`, { columnGroup: columnGroupMetaData }), this.ptm(`columnGroup.${key}`, columnGroupMetaData), this.ptmo(this.getColumnGroupProps(), key, columnGroupMetaData));
+            return mergeProps(
+                this.ptm(`columnGroup.${key}`, { columnGroup: columnGroupMetaData }),
+                this.ptm(`columnGroup.${key}`, columnGroupMetaData),
+                this.ptmo(this.getColumnGroupProps(), key, columnGroupMetaData)
+            );
         },
         getColumnGroupProps() {
             return this.columnGroup && this.columnGroup.props && this.columnGroup.props.pt ? this.columnGroup.props.pt : undefined; //@todo
@@ -274,7 +282,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`row.${key}`, { row: rowMetaData }), this.ptm(`row.${key}`, rowMetaData), this.ptmo(this.getRowProp(row), key, rowMetaData));
+            return mergeProps(
+                this.ptm(`row.${key}`, { row: rowMetaData }),
+                this.ptm(`row.${key}`, rowMetaData),
+                this.ptmo(this.getRowProp(row), key, rowMetaData)
+            );
         },
         getRowProp(row) {
             return row.props && row.props.pt ? row.props.pt : undefined; //@todo
@@ -292,7 +304,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(column), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(column), key, columnMetaData)
+            );
         },
         getColumnProp(column) {
             return column.props && column.props.pt ? column.props.pt : undefined; //@todo

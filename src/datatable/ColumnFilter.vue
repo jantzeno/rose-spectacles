@@ -17,11 +17,22 @@
             v-bind="{ ...getColumnPT('pcColumnFilterButton', ptmFilterMenuParams), ...filterButtonProps.filter }"
         >
             <template #icon="slotProps">
-                <component :is="filterIconTemplate || (hasFilter() ? 'FilterFillIcon' : 'FilterIcon')" :class="slotProps.class" v-bind="getColumnPT('filterMenuIcon')" />
+                <component
+                    :is="filterIconTemplate || (hasFilter() ? 'FilterFillIcon' : 'FilterIcon')"
+                    :class="slotProps.class"
+                    v-bind="getColumnPT('filterMenuIcon')"
+                />
             </template>
         </Button>
         <Portal>
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter" @after-enter="onOverlayAfterEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="getColumnPT('transition')">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter"
+                @after-enter="onOverlayAfterEnter"
+                @leave="onOverlayLeave"
+                @after-leave="onOverlayAfterLeave"
+                v-bind="getColumnPT('transition')"
+            >
                 <div
                     v-if="overlayVisible"
                     :ref="overlayRef"
@@ -51,7 +62,13 @@
                                 {{ matchMode.label }}
                             </li>
                             <li :class="cx('filterConstraintSeparator')" v-bind="getColumnPT('filterConstraintSeparator')"></li>
-                            <li :class="cx('filterConstraint')" @click="clearFilter()" @keydown="onRowMatchModeKeyDown($event)" @keydown.enter="onRowClearItemClick()" v-bind="getColumnPT('filterConstraint')">
+                            <li
+                                :class="cx('filterConstraint')"
+                                @click="clearFilter()"
+                                @keydown="onRowMatchModeKeyDown($event)"
+                                @keydown.enter="onRowClearItemClick()"
+                                v-bind="getColumnPT('filterConstraint')"
+                            >
                                 {{ noFilterLabel }}
                             </li>
                         </ul>
@@ -84,7 +101,14 @@
                                     :unstyled="unstyled"
                                     :pt="getColumnPT('pcFilterConstraintDropdown')"
                                 ></Select>
-                                <component v-if="display === 'menu'" :is="filterElement" :field="field" :filterModel="fieldConstraint" :filterCallback="filterCallback" :applyFilter="applyFilter" />
+                                <component
+                                    v-if="display === 'menu'"
+                                    :is="filterElement"
+                                    :field="field"
+                                    :filterModel="fieldConstraint"
+                                    :filterCallback="filterCallback"
+                                    :applyFilter="applyFilter"
+                                />
                                 <div v-if="showRemoveIcon" v-bind="getColumnPT('filterRemove')">
                                     <Button
                                         type="button"
@@ -96,7 +120,11 @@
                                         :pt="getColumnPT('pcFilterRemoveRuleButton')"
                                     >
                                         <template #icon="iconProps">
-                                            <component :is="filterRemoveIconTemplate || 'TrashIcon'" :class="iconProps.class" v-bind="getColumnPT('pcFilterRemoveRuleButton')['icon']" />
+                                            <component
+                                                :is="filterRemoveIconTemplate || 'TrashIcon'"
+                                                :class="iconProps.class"
+                                                v-bind="getColumnPT('pcFilterRemoveRuleButton')['icon']"
+                                            />
                                         </template>
                                     </Button>
                                 </div>
@@ -114,7 +142,11 @@
                                 :pt="getColumnPT('pcFilterAddRuleButton')"
                             >
                                 <template #icon="iconProps">
-                                    <component :is="filterAddIconTemplate || 'PlusIcon'" :class="iconProps.class" v-bind="getColumnPT('pcFilterAddRuleButton')['icon']" />
+                                    <component
+                                        :is="filterAddIconTemplate || 'PlusIcon'"
+                                        :class="iconProps.class"
+                                        v-bind="getColumnPT('pcFilterAddRuleButton')['icon']"
+                                    />
                                 </template>
                             </Button>
                         </div>
@@ -331,7 +363,11 @@ export default {
                 ...params
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined;
@@ -567,7 +603,11 @@ export default {
             this.overlay = el;
         },
         isOutsideClicked(target) {
-            return !this.isTargetClicked(target) && this.overlay && !(this.overlay.isSameNode(target) || this.overlay.contains(target) || this.isNestedOverlayClicked(target));
+            return (
+                !this.isTargetClicked(target) &&
+                this.overlay &&
+                !(this.overlay.isSameNode(target) || this.overlay.contains(target) || this.isNestedOverlayClicked(target))
+            );
         },
         isNestedOverlayClicked(target) {
             let node = target;
@@ -694,7 +734,11 @@ export default {
             return this.$primevue.config.locale ? this.$primevue.config.locale.apply : undefined;
         },
         columnFilterButtonAriaLabel() {
-            return this.$primevue.config.locale?.aria ? (this.overlayVisible ? this.$primevue.config.locale.aria.hideFilterMenu : this.$primevue.config.locale.aria.showFilterMenu) : undefined;
+            return this.$primevue.config.locale?.aria
+                ? this.overlayVisible
+                    ? this.$primevue.config.locale.aria.hideFilterMenu
+                    : this.$primevue.config.locale.aria.showFilterMenu
+                : undefined;
         },
         filterOperatorAriaLabel() {
             return this.$primevue.config.locale ? this.$primevue.config.locale.filterOperator : undefined;

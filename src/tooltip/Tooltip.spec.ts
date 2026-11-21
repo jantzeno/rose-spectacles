@@ -2,19 +2,26 @@ import { mount } from '@vue/test-utils';
 import { h, withDirectives } from 'vue';
 import Tooltip from './Tooltip';
 
-beforeEach(() => { vi.useFakeTimers(); });
-afterEach(() => { vi.useRealTimers(); });
+beforeEach(() => {
+    vi.useFakeTimers();
+});
+afterEach(() => {
+    vi.useRealTimers();
+});
 
 const shown = () => document.querySelector<HTMLElement>('[role="tooltip"]');
 
 function fixture() {
-    return mount({
-        props: { mode: String },
-        render() {
-            const trigger = h('button', { type: 'button', 'aria-describedby': 'existing-description' }, 'Open note');
-            return withDirectives(trigger, [[Tooltip, 'Stored locally', this.mode ? { event: this.mode } : undefined]]);
-        }
-    }, { attachTo: document.body });
+    return mount(
+        {
+            props: { mode: String },
+            render() {
+                const trigger = h('button', { type: 'button', 'aria-describedby': 'existing-description' }, 'Open note');
+                return withDirectives(trigger, [[Tooltip, 'Stored locally', this.mode ? { event: this.mode } : undefined]]);
+            }
+        },
+        { attachTo: document.body }
+    );
 }
 
 it('names a focus-triggered tooltip and preserves descriptions owned by the caller', async () => {

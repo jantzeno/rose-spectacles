@@ -16,7 +16,14 @@
         :unstyled="unstyled"
     >
         <template v-if="$slots.container" #container="slotProps">
-            <slot name="container" :message="confirmation" :closeCallback="slotProps.closeCallback" :acceptCallback="accept" :rejectCallback="reject" :initDragCallback="slotProps.initDragCallback" />
+            <slot
+                name="container"
+                :message="confirmation"
+                :closeCallback="slotProps.closeCallback"
+                :acceptCallback="accept"
+                :rejectCallback="reject"
+                :initDragCallback="slotProps.initDragCallback"
+            />
         </template>
         <template v-if="!$slots.container">
             <template v-if="!$slots.message">
@@ -45,7 +52,15 @@
                     </slot>
                 </template>
             </Button>
-            <Button :label="acceptLabel" :class="[cx('pcAcceptButton'), confirmation.acceptClass]" :autofocus="autoFocusAccept" :unstyled="unstyled" @click="accept()" v-bind="confirmation.acceptProps" :pt="ptm('pcAcceptButton')">
+            <Button
+                :label="acceptLabel"
+                :class="[cx('pcAcceptButton'), confirmation.acceptClass]"
+                :autofocus="autoFocusAccept"
+                :unstyled="unstyled"
+                @click="accept()"
+                v-bind="confirmation.acceptProps"
+                :pt="ptm('pcAcceptButton')"
+            >
                 <template v-if="acceptIcon || $slots.accepticon" #icon="iconProps">
                     <slot name="accepticon">
                         <span :class="[acceptIcon, iconProps.class]" v-bind="ptm('pcAcceptButton')['icon']" data-pc-section="acceptbuttonicon" />

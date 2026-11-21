@@ -73,7 +73,12 @@
                 <slot name="paginatorrowsperpagedropdownicon" :class="slotProps.class"></slot>
             </template>
         </DTPaginator>
-        <div :class="cx('tableContainer')" :style="[sx('tableContainer'), { maxHeight: virtualScrollerDisabled ? scrollHeight : '' }]" :data-p="dataP" v-bind="ptm('tableContainer')">
+        <div
+            :class="cx('tableContainer')"
+            :style="[sx('tableContainer'), { maxHeight: virtualScrollerDisabled ? scrollHeight : '' }]"
+            :data-p="dataP"
+            v-bind="ptm('tableContainer')"
+        >
             <DTVirtualScroller
                 ref="virtualScroller"
                 v-bind="virtualScrollerOptions"
@@ -90,7 +95,13 @@
                 :pt="ptm('virtualScroller')"
             >
                 <template #content="slotProps">
-                    <table ref="table" role="table" :class="[cx('table'), tableClass]" :style="[tableStyle, slotProps.spacerStyle]" v-bind="{ ...tableProps, ...ptm('table') }">
+                    <table
+                        ref="table"
+                        role="table"
+                        :class="[cx('table'), tableClass]"
+                        :style="[tableStyle, slotProps.spacerStyle]"
+                        v-bind="{ ...tableProps, ...ptm('table') }"
+                    >
                         <DTTableHeader
                             v-if="showHeaders"
                             :columnGroup="headerColumnGroup"
@@ -315,10 +326,22 @@
             <slot name="footer"></slot>
         </div>
         <div ref="resizeHelper" :class="cx('columnResizeIndicator')" style="display: none" v-bind="ptm('columnResizeIndicator')"></div>
-        <span v-if="reorderableColumns" ref="reorderIndicatorUp" :class="cx('rowReorderIndicatorUp')" style="position: absolute; display: none" v-bind="ptm('rowReorderIndicatorUp')">
+        <span
+            v-if="reorderableColumns"
+            ref="reorderIndicatorUp"
+            :class="cx('rowReorderIndicatorUp')"
+            style="position: absolute; display: none"
+            v-bind="ptm('rowReorderIndicatorUp')"
+        >
             <component :is="$slots.rowreorderindicatorupicon || $slots.reorderindicatorupicon || 'ArrowDownIcon'" />
         </span>
-        <span v-if="reorderableColumns" ref="reorderIndicatorDown" :class="cx('rowReorderIndicatorDown')" style="position: absolute; display: none" v-bind="ptm('rowReorderIndicatorDown')">
+        <span
+            v-if="reorderableColumns"
+            ref="reorderIndicatorDown"
+            :class="cx('rowReorderIndicatorDown')"
+            style="position: absolute; display: none"
+            v-bind="ptm('rowReorderIndicatorDown')"
+        >
             <component :is="$slots.rowreorderindicatordownicon || $slots.reorderindicatordownicon || 'ArrowUpIcon'" />
         </span>
     </div>
@@ -566,7 +589,9 @@ export default {
                     getAttribute(targetNode, 'data-pc-section') === 'sorticon' ||
                     getAttribute(targetNode.parentElement, 'data-pc-section') === 'sorticon' ||
                     getAttribute(targetNode.parentElement.parentElement, 'data-pc-section') === 'sorticon' ||
-                    (targetNode.closest('[data-p-sortable-column="true"]') && !targetNode.closest('[data-pc-section="columnfilterbutton"]') && !isClickable(event.target))
+                    (targetNode.closest('[data-p-sortable-column="true"]') &&
+                        !targetNode.closest('[data-pc-section="columnfilterbutton"]') &&
+                        !isClickable(event.target))
                 ) {
                     clearSelection();
 
@@ -709,7 +734,8 @@ export default {
             let globalFilterFieldsArray;
 
             if (activeFilters['global']) {
-                globalFilterFieldsArray = this.globalFilterFields || this.columns.map((col) => this.columnProp(col, 'filterField') || this.columnProp(col, 'field'));
+                globalFilterFieldsArray =
+                    this.globalFilterFields || this.columns.map((col) => this.columnProp(col, 'filterField') || this.columnProp(col, 'field'));
             }
 
             let filteredValue = [];
@@ -747,7 +773,11 @@ export default {
                     for (let j = 0; j < globalFilterFieldsArray.length; j++) {
                         let globalFilterField = globalFilterFieldsArray[j];
 
-                        globalMatch = FilterService.filters[activeFilters['global'].matchMode || FilterMatchMode.CONTAINS](resolveFieldData(data[i], globalFilterField), activeFilters['global'].value, this.filterLocale);
+                        globalMatch = FilterService.filters[activeFilters['global'].matchMode || FilterMatchMode.CONTAINS](
+                            resolveFieldData(data[i], globalFilterField),
+                            activeFilters['global'].value,
+                            this.filterLocale
+                        );
 
                         if (globalMatch) {
                             break;
@@ -1323,7 +1353,9 @@ export default {
             this.$refs.resizeHelper.style.display = 'block';
         },
         onColumnResizeEnd() {
-            let delta = isRTL(this.$el) ? this.lastResizeHelperX - this.$refs.resizeHelper.offsetLeft : this.$refs.resizeHelper.offsetLeft - this.lastResizeHelperX;
+            let delta = isRTL(this.$el)
+                ? this.lastResizeHelperX - this.$refs.resizeHelper.offsetLeft
+                : this.$refs.resizeHelper.offsetLeft - this.lastResizeHelperX;
             let columnWidth = this.resizeColumnElement.offsetWidth;
             let newColumnWidth = columnWidth + delta;
             let minWidth = this.resizeColumnElement.style.minWidth || 15;
@@ -1478,7 +1510,12 @@ export default {
             const column = e.column;
 
             if (this.reorderableColumns && this.columnProp(column, 'reorderableColumn') !== false) {
-                if (event.target.nodeName === 'INPUT' || event.target.nodeName === 'TEXTAREA' || getAttribute(event.target, '[data-pc-section="columnresizer"]')) event.currentTarget.draggable = false;
+                if (
+                    event.target.nodeName === 'INPUT' ||
+                    event.target.nodeName === 'TEXTAREA' ||
+                    getAttribute(event.target, '[data-pc-section="columnresizer"]')
+                )
+                    event.currentTarget.draggable = false;
                 else event.currentTarget.draggable = true;
             }
         },
@@ -1554,7 +1591,9 @@ export default {
 
                 if (allowDrop) {
                     let isSameColumn = (col1, col2) =>
-                        this.columnProp(col1, 'columnKey') || this.columnProp(col2, 'columnKey') ? this.columnProp(col1, 'columnKey') === this.columnProp(col2, 'columnKey') : this.columnProp(col1, 'field') === this.columnProp(col2, 'field');
+                        this.columnProp(col1, 'columnKey') || this.columnProp(col2, 'columnKey')
+                            ? this.columnProp(col1, 'columnKey') === this.columnProp(col2, 'columnKey')
+                            : this.columnProp(col1, 'field') === this.columnProp(col2, 'field');
                     let dragColIndex = this.columns.findIndex((child) => isSameColumn(child, this.draggedColumn));
                     let dropColIndex = this.columns.findIndex((child) => isSameColumn(child, column));
                     let widths = [];
@@ -1621,7 +1660,11 @@ export default {
             return null;
         },
         onRowMouseDown(event) {
-            if (getAttribute(event.target, 'data-pc-section') === 'reorderablerowhandle' || getAttribute(event.target.parentElement, 'data-pc-section') === 'reorderablerowhandle') event.currentTarget.draggable = true;
+            if (
+                getAttribute(event.target, 'data-pc-section') === 'reorderablerowhandle' ||
+                getAttribute(event.target.parentElement, 'data-pc-section') === 'reorderablerowhandle'
+            )
+                event.currentTarget.draggable = true;
             else event.currentTarget.draggable = false;
         },
         onRowDragStart(e) {

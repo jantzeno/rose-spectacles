@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type PopoverPassThroughOptionType = PopoverPassThroughAttributes | ((options: PopoverPassThroughMethodOptions) => PopoverPassThroughAttributes | string) | string | null | undefined;
+export declare type PopoverPassThroughOptionType =
+    | PopoverPassThroughAttributes
+    | ((options: PopoverPassThroughMethodOptions) => PopoverPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type PopoverPassThroughTransitionType = TransitionProps | ((options: PopoverPassThroughMethodOptions) => TransitionProps) | undefined;
 

@@ -13,7 +13,12 @@ import type { InputTextPassThroughOptions } from 'rose-spectacles/inputtext';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { HTMLAttributes, InputHTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type PasswordPassThroughOptionType = PasswordPassThroughAttributes | ((options: PasswordPassThroughMethodOptions) => PasswordPassThroughAttributes | string) | string | null | undefined;
+export declare type PasswordPassThroughOptionType =
+    | PasswordPassThroughAttributes
+    | ((options: PasswordPassThroughMethodOptions) => PasswordPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type PasswordPassThroughTransitionType = TransitionProps | ((options: PasswordPassThroughMethodOptions) => TransitionProps) | undefined;
 

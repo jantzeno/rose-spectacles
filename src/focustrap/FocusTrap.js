@@ -63,7 +63,9 @@ const FocusTrap = BaseFocusTrap.extend('focustrap', {
         unbind(el) {
             el.$_pfocustrap_mutationobserver && el.$_pfocustrap_mutationobserver.disconnect();
             el.$_pfocustrap_focusinlistener && el.removeEventListener('focusin', el.$_pfocustrap_focusinlistener) && (el.$_pfocustrap_focusinlistener = null);
-            el.$_pfocustrap_focusoutlistener && el.removeEventListener('focusout', el.$_pfocustrap_focusoutlistener) && (el.$_pfocustrap_focusoutlistener = null);
+            el.$_pfocustrap_focusoutlistener &&
+                el.removeEventListener('focusout', el.$_pfocustrap_focusoutlistener) &&
+                (el.$_pfocustrap_focusoutlistener = null);
         },
         autoFocus(options) {
             this.autoElementFocus(this.$el, { value: { ...options, autoFocus: true } });

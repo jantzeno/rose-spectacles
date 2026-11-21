@@ -60,7 +60,15 @@
                             :unstyled="unstyled"
                             :pt="pt"
                         />
-                        <PageLinks v-else-if="item === 'PageLinks'" :aria-label="getAriaLabel('pageLabel')" :value="pageLinks" :page="page" @click="changePageLink($event)" :unstyled="unstyled" :pt="pt" />
+                        <PageLinks
+                            v-else-if="item === 'PageLinks'"
+                            :aria-label="getAriaLabel('pageLabel')"
+                            :value="pageLinks"
+                            :page="page"
+                            @click="changePageLink($event)"
+                            :unstyled="unstyled"
+                            :pt="pt"
+                        />
                         <CurrentPageReport
                             v-else-if="item === 'CurrentPageReport'"
                             aria-live="polite"
@@ -96,7 +104,14 @@
                             :unstyled="unstyled"
                             :pt="pt"
                         />
-                        <JumpToPageInput v-else-if="item === 'JumpToPageInput'" :page="currentPage" @page-change="changePage($event)" :disabled="empty" :unstyled="unstyled" :pt="pt" />
+                        <JumpToPageInput
+                            v-else-if="item === 'JumpToPageInput'"
+                            :page="currentPage"
+                            @page-change="changePage($event)"
+                            :disabled="empty"
+                            :unstyled="unstyled"
+                            :pt="pt"
+                        />
                     </template>
                 </div>
                 <div v-if="$slots.end" :class="cx('contentEnd')" v-bind="ptm('contentEnd')">

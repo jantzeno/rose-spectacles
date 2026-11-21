@@ -33,7 +33,7 @@
             :disabled="disabled"
             aria-haspopup="true"
             :aria-expanded="isExpanded"
-            :aria-controls="isExpanded ?  $id + '_overlay' : undefined"
+            :aria-controls="isExpanded ? $id + '_overlay' : undefined"
             @click="onDropdownButtonClick"
             @keydown="onDropdownKeydown"
             :severity="severity"
@@ -47,11 +47,26 @@
             <template #icon="slotProps">
                 <!--TODO: menubuttonicon and menuButtonIcon deprecated since v4.0-->
                 <slot :name="$slots.dropdownicon ? 'dropdownicon' : 'menubuttonicon'" :class="slotProps.class">
-                    <component :is="menuButtonIcon || dropdownIcon ? 'span' : 'ChevronDownIcon'" :class="[dropdownIcon || menuButtonIcon, slotProps.class]" v-bind="ptm('pcDropdown')['icon']" data-pc-section="menubuttonicon" />
+                    <component
+                        :is="menuButtonIcon || dropdownIcon ? 'span' : 'ChevronDownIcon'"
+                        :class="[dropdownIcon || menuButtonIcon, slotProps.class]"
+                        v-bind="ptm('pcDropdown')['icon']"
+                        data-pc-section="menubuttonicon"
+                    />
                 </slot>
             </template>
         </PVSButton>
-        <PVSMenu ref="menu" :id="$id + '_overlay'" :model="model" :popup="true" :autoZIndex="autoZIndex" :baseZIndex="baseZIndex" :appendTo="appendTo" :unstyled="unstyled" :pt="ptm('pcMenu')">
+        <PVSMenu
+            ref="menu"
+            :id="$id + '_overlay'"
+            :model="model"
+            :popup="true"
+            :autoZIndex="autoZIndex"
+            :baseZIndex="baseZIndex"
+            :appendTo="appendTo"
+            :unstyled="unstyled"
+            :pt="ptm('pcMenu')"
+        >
             <template v-if="$slots.menuitemicon" #itemicon="slotProps">
                 <slot name="menuitemicon" :item="slotProps.item" :class="slotProps.class" />
             </template>

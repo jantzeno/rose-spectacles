@@ -13,7 +13,12 @@ import type { BadgePassThroughOptions } from 'rose-spectacles/badge';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type OverlayBadgePassThroughOptionType<T = any> = OverlayBadgePassThroughAttributes | ((options: OverlayBadgePassThroughMethodOptions<T>) => OverlayBadgePassThroughAttributes | string) | string | null | undefined;
+export declare type OverlayBadgePassThroughOptionType<T = any> =
+    | OverlayBadgePassThroughAttributes
+    | ((options: OverlayBadgePassThroughMethodOptions<T>) => OverlayBadgePassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

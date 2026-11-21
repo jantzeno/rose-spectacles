@@ -112,7 +112,14 @@ const rowFilters = () => ({
 });
 
 // the filter slots use the filterDisplay scope (filterModel), so they are only rendered for the filterDisplay tests
-const mountAdvanced = ({ filters, filterMode = 'lenient', filterDisplay = null, globalFilterFields = null, withFilterSlots = !!filterDisplay, sortableName = false } = {}) =>
+const mountAdvanced = ({
+    filters,
+    filterMode = 'lenient',
+    filterDisplay = null,
+    globalFilterFields = null,
+    withFilterSlots = !!filterDisplay,
+    sortableName = false
+} = {}) =>
     mount(
         {
             components: { TreeTable, Column },

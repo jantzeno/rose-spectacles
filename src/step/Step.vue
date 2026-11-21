@@ -1,6 +1,27 @@
 <template>
-    <component v-if="!asChild" :is="as" :class="cx('root')" role="presentation" :data-p-active="active" :data-p-disabled="isStepDisabled" :data-p="dataP" v-bind="getPTOptions('root')">
-        <button :id="id" :class="cx('header')" role="tab" type="button" :tabindex="isStepDisabled ? -1 : undefined" :aria-selected="active" :aria-controls="ariaControls" :disabled="isStepDisabled" @click="onStepClick" :data-p="dataP" v-bind="getPTOptions('header')">
+    <component
+        v-if="!asChild"
+        :is="as"
+        :class="cx('root')"
+        role="presentation"
+        :data-p-active="active"
+        :data-p-disabled="isStepDisabled"
+        :data-p="dataP"
+        v-bind="getPTOptions('root')"
+    >
+        <button
+            :id="id"
+            :class="cx('header')"
+            role="tab"
+            type="button"
+            :tabindex="isStepDisabled ? -1 : undefined"
+            :aria-selected="active"
+            :aria-controls="ariaControls"
+            :disabled="isStepDisabled"
+            @click="onStepClick"
+            :data-p="dataP"
+            v-bind="getPTOptions('header')"
+        >
             <span :class="cx('number')" :data-p="dataP" v-bind="getPTOptions('number')">{{ activeValue }}</span>
             <span :class="cx('title')" :data-p="dataP" v-bind="getPTOptions('title')">
                 <slot />
@@ -43,7 +64,10 @@ export default {
         updateState() {
             if (this.$el && this.$pcStepList) {
                 let index = findIndexInList(this.$el, find(this.$pcStepper.$el, '[data-pc-name="step"]'));
-                let activeIndex = findIndexInList(findSingle(this.$pcStepper.$el, '[data-pc-name="step"][data-p-active="true"]'), find(this.$pcStepper.$el, '[data-pc-name="step"]'));
+                let activeIndex = findIndexInList(
+                    findSingle(this.$pcStepper.$el, '[data-pc-name="step"][data-p-active="true"]'),
+                    find(this.$pcStepper.$el, '[data-pc-name="step"]')
+                );
                 let stepLen = find(this.$pcStepper.$el, '[data-pc-name="step"]').length;
 
                 this.isSeparatorVisible = index !== stepLen - 1;

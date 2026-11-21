@@ -43,7 +43,14 @@
             </div>
         </div>
         <slot v-if="isClearIconVisible" name="clearicon" :class="cx('clearIcon')" :clearCallback="onClearClick">
-            <component :is="clearIcon ? 'i' : 'TimesIcon'" ref="clearIcon" :class="[cx('clearIcon'), clearIcon]" @click="onClearClick" v-bind="ptm('clearIcon')" data-pc-section="clearicon" />
+            <component
+                :is="clearIcon ? 'i' : 'TimesIcon'"
+                ref="clearIcon"
+                :class="[cx('clearIcon'), clearIcon]"
+                @click="onClearClick"
+                v-bind="ptm('clearIcon')"
+                data-pc-section="clearicon"
+            />
         </slot>
         <div :class="cx('dropdown')" role="button" aria-haspopup="tree" :aria-expanded="overlayVisible" v-bind="ptm('dropdown')">
             <!-- TODO: triggericon is deprecated since v4.0 -->
@@ -52,8 +59,22 @@
             </slot>
         </div>
         <Portal :appendTo="appendTo">
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter" @after-enter="onOverlayAfterEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="ptm('transition')">
-                <div v-if="overlayVisible" :ref="overlayRef" @click="onOverlayClick" :class="[cx('panel'), panelClass]" @keydown="onOverlayKeydown" v-bind="{ ...panelProps, ...ptm('panel') }">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter"
+                @after-enter="onOverlayAfterEnter"
+                @leave="onOverlayLeave"
+                @after-leave="onOverlayAfterLeave"
+                v-bind="ptm('transition')"
+            >
+                <div
+                    v-if="overlayVisible"
+                    :ref="overlayRef"
+                    @click="onOverlayClick"
+                    :class="[cx('panel'), panelClass]"
+                    @keydown="onOverlayKeydown"
+                    v-bind="{ ...panelProps, ...ptm('panel') }"
+                >
                     <span
                         ref="firstHiddenFocusableElementOnOverlay"
                         role="presentation"
@@ -106,7 +127,12 @@
                                 <slot name="itemtogglericon" :node="iconSlotProps.node" :expanded="iconSlotProps.expanded" :class="iconSlotProps.class" />
                             </template>
                             <template v-if="$slots.itemcheckboxicon" #checkboxicon="iconSlotProps">
-                                <slot name="itemcheckboxicon" :checked="iconSlotProps.checked" :partialChecked="iconSlotProps.partialChecked" :class="iconSlotProps.class" />
+                                <slot
+                                    name="itemcheckboxicon"
+                                    :checked="iconSlotProps.checked"
+                                    :partialChecked="iconSlotProps.partialChecked"
+                                    :class="iconSlotProps.class"
+                                />
                             </template>
                             <template #empty>
                                 <slot name="empty">{{ emptyMessageText }}</slot>
@@ -134,7 +160,19 @@
 </template>
 
 <script>
-import { absolutePosition, addStyle, find, findSingle, focus, getFirstFocusableElement, getFocusableElements, getLastFocusableElement, getOuterWidth, isTouchDevice, relativePosition } from '../internal/utils/dom/index';
+import {
+    absolutePosition,
+    addStyle,
+    find,
+    findSingle,
+    focus,
+    getFirstFocusableElement,
+    getFocusableElements,
+    getLastFocusableElement,
+    getOuterWidth,
+    isTouchDevice,
+    relativePosition
+} from '../internal/utils/dom/index';
 import { isEmpty, isNotEmpty } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
@@ -152,7 +190,21 @@ export default {
     name: 'TreeSelect',
     extends: BaseTreeSelect,
     inheritAttrs: false,
-    emits: ['before-show', 'before-hide', 'change', 'show', 'hide', 'node-select', 'node-unselect', 'node-expand', 'node-collapse', 'filter', 'focus', 'blur', 'update:expandedKeys'],
+    emits: [
+        'before-show',
+        'before-hide',
+        'change',
+        'show',
+        'hide',
+        'node-select',
+        'node-unselect',
+        'node-expand',
+        'node-collapse',
+        'filter',
+        'focus',
+        'blur',
+        'update:expandedKeys'
+    ],
     inject: {
         $pcFluid: { default: null }
     },
@@ -227,7 +279,11 @@ export default {
                 return;
             }
 
-            if (event.target.tagName === 'INPUT' || event.target.getAttribute('data-pc-section') === 'clearicon' || event.target.closest('[data-pc-section="clearicon"]')) {
+            if (
+                event.target.tagName === 'INPUT' ||
+                event.target.getAttribute('data-pc-section') === 'clearicon' ||
+                event.target.closest('[data-pc-section="clearicon"]')
+            ) {
                 return;
             } else if (!this.overlay || !this.overlay.contains(event.target)) {
                 if (this.overlayVisible) this.hide();
@@ -270,12 +326,18 @@ export default {
             return selectedItemsLabel;
         },
         onFirstHiddenFocus(event) {
-            const focusableEl = event.relatedTarget === this.$refs.focusInput ? getFirstFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])') : this.$refs.focusInput;
+            const focusableEl =
+                event.relatedTarget === this.$refs.focusInput
+                    ? getFirstFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
+                    : this.$refs.focusInput;
 
             focus(focusableEl);
         },
         onLastHiddenFocus(event) {
-            const focusableEl = event.relatedTarget === this.$refs.focusInput ? getLastFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])') : this.$refs.focusInput;
+            const focusableEl =
+                event.relatedTarget === this.$refs.focusInput
+                    ? getLastFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
+                    : this.$refs.focusInput;
 
             focus(focusableEl);
         },

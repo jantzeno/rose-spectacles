@@ -1,9 +1,21 @@
 <template>
     <div :class="cx('root')" v-bind="ptmi('root')">
         <template v-if="hasAccordionTab">
-            <AccordionPanel v-for="(tab, i) of tabs" :key="getKey(tab, i)" :value="`${i}`" :pt="{ root: getTabPT(tab, 'root', i) }" :disabled="getTabProp(tab, 'disabled')">
+            <AccordionPanel
+                v-for="(tab, i) of tabs"
+                :key="getKey(tab, i)"
+                :value="`${i}`"
+                :pt="{ root: getTabPT(tab, 'root', i) }"
+                :disabled="getTabProp(tab, 'disabled')"
+            >
                 <AccordionHeader :class="getTabProp(tab, 'headerClass')" :pt="getHeaderPT(tab, i)">
-                    <component v-if="tab.children && tab.children.headericon" :is="tab.children.headericon" :isTabActive="isItemActive(`${i}`)" :active="isItemActive(`${i}`)" :index="i"></component>
+                    <component
+                        v-if="tab.children && tab.children.headericon"
+                        :is="tab.children.headericon"
+                        :isTabActive="isItemActive(`${i}`)"
+                        :active="isItemActive(`${i}`)"
+                        :index="i"
+                    ></component>
                     <span v-if="tab.props && tab.props.header" v-bind="getTabPT(tab, 'headertitle', i)">{{ tab.props.header }}</span>
                     <template #toggleicon="slotProps">
                         <component
@@ -13,7 +25,13 @@
                             aria-hidden="true"
                             v-bind="getTabPT(tab, 'headericon', i)"
                         />
-                        <component v-else :is="$slots.expandicon ? $slots.expandicon : expandIcon ? 'span' : 'ChevronUpIcon'" :class="[expandIcon, slotProps.class]" aria-hidden="true" v-bind="getTabPT(tab, 'headericon', i)" />
+                        <component
+                            v-else
+                            :is="$slots.expandicon ? $slots.expandicon : expandIcon ? 'span' : 'ChevronUpIcon'"
+                            :class="[expandIcon, slotProps.class]"
+                            aria-hidden="true"
+                            v-bind="getTabPT(tab, 'headericon', i)"
+                        />
                     </template>
                     <component v-if="tab.children && tab.children.header" :is="tab.children.header"></component>
                 </AccordionHeader>
@@ -95,7 +113,11 @@ export default {
         },
         getHeaderPT(tab, index) {
             return {
-                root: mergeProps({ onClick: (event) => this.onTabClick(event, index) }, this.getTabProp(tab, 'headerProps'), this.getTabPT(tab, 'header', index)),
+                root: mergeProps(
+                    { onClick: (event) => this.onTabClick(event, index) },
+                    this.getTabProp(tab, 'headerProps'),
+                    this.getTabPT(tab, 'header', index)
+                ),
                 toggleicon: mergeProps(this.getTabProp(tab, 'headeractionprops'), this.getTabPT(tab, 'headeraction', index))
             };
         },

@@ -59,7 +59,11 @@ const KeyFilter = BaseKeyFilter.extend('keyfilter', {
             return '';
         },
         getRegex(target) {
-            return target.$_pkeyfilterPattern ? target.$_pkeyfilterPattern : target.$_pkeyfilterModifier ? this.DEFAULT_PATTERNS[target.$_pkeyfilterModifier] : /./;
+            return target.$_pkeyfilterPattern
+                ? target.$_pkeyfilterPattern
+                : target.$_pkeyfilterModifier
+                  ? this.DEFAULT_PATTERNS[target.$_pkeyfilterModifier]
+                  : /./;
         },
         bindEvents(el) {
             el.$_keyfilterKeydownEvent = (event) => this.onKeydown(event, el);

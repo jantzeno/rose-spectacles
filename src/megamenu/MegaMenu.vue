@@ -311,7 +311,10 @@ export default {
         deferItemChange(event) {
             const { originalEvent, processedItem } = event;
             const activeItem = this.activeItem;
-            const overlay = activeItem && activeItem.parentKey === processedItem.parentKey && activeItem.key !== processedItem.key ? findSingle(this.menubar, `[id="${this.$id}_${activeItem.key}"] > [data-pc-section="overlay"]`) : null;
+            const overlay =
+                activeItem && activeItem.parentKey === processedItem.parentKey && activeItem.key !== processedItem.key
+                    ? findSingle(this.menubar, `[id="${this.$id}_${activeItem.key}"] > [data-pc-section="overlay"]`)
+                    : null;
 
             return !!this.safeTriangle && this.safeTriangle.defer(originalEvent, overlay, () => this.onItemChange(event));
         },
@@ -541,10 +544,18 @@ export default {
             }
         },
         isItemMatched(processedItem) {
-            return this.isValidItem(processedItem) && this.getProccessedItemLabel(processedItem)?.toLocaleLowerCase().startsWith(this.searchValue.toLocaleLowerCase());
+            return (
+                this.isValidItem(processedItem) &&
+                this.getProccessedItemLabel(processedItem)?.toLocaleLowerCase().startsWith(this.searchValue.toLocaleLowerCase())
+            );
         },
         isValidItem(processedItem) {
-            return !!processedItem && !this.isItemDisabled(processedItem.item) && !this.isItemSeparator(processedItem.item) && this.isItemVisible(processedItem.item);
+            return (
+                !!processedItem &&
+                !this.isItemDisabled(processedItem.item) &&
+                !this.isItemSeparator(processedItem.item) &&
+                this.isItemVisible(processedItem.item)
+            );
         },
         isValidSelectedItem(processedItem) {
             return this.isValidItem(processedItem) && this.isSelected(processedItem);
@@ -559,7 +570,8 @@ export default {
             return findLastIndex(this.visibleItems, (processedItem) => this.isValidItem(processedItem));
         },
         findNextItemIndex(index) {
-            const matchedItemIndex = index < this.visibleItems.length - 1 ? this.visibleItems.slice(index + 1).findIndex((processedItem) => this.isValidItem(processedItem)) : -1;
+            const matchedItemIndex =
+                index < this.visibleItems.length - 1 ? this.visibleItems.slice(index + 1).findIndex((processedItem) => this.isValidItem(processedItem)) : -1;
 
             return matchedItemIndex > -1 ? matchedItemIndex + index + 1 : index;
         },
@@ -592,7 +604,10 @@ export default {
 
             if (this.focusedItemInfo.index !== -1) {
                 itemIndex = this.visibleItems.slice(this.focusedItemInfo.index).findIndex((processedItem) => this.isItemMatched(processedItem));
-                itemIndex = itemIndex === -1 ? this.visibleItems.slice(0, this.focusedItemInfo.index).findIndex((processedItem) => this.isItemMatched(processedItem)) : itemIndex + this.focusedItemInfo.index;
+                itemIndex =
+                    itemIndex === -1
+                        ? this.visibleItems.slice(0, this.focusedItemInfo.index).findIndex((processedItem) => this.isItemMatched(processedItem))
+                        : itemIndex + this.focusedItemInfo.index;
             } else {
                 itemIndex = this.visibleItems.findIndex((processedItem) => this.isItemMatched(processedItem));
             }
@@ -658,7 +673,9 @@ export default {
                     };
 
                     newItem['items'] =
-                        level === 0 && item.items && item.items.length > 0 ? item.items.map((_items, _index) => this.createProcessedItems(_items, level + 1, newItem, key, _index)) : this.createProcessedItems(item.items, level + 1, newItem, key);
+                        level === 0 && item.items && item.items.length > 0
+                            ? item.items.map((_items, _index) => this.createProcessedItems(_items, level + 1, newItem, key, _index))
+                            : this.createProcessedItems(item.items, level + 1, newItem, key);
                     processedItems.push(newItem);
                 });
 

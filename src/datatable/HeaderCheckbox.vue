@@ -1,5 +1,13 @@
 <template>
-    <Checkbox :modelValue="checked" :binary="true" :disabled="disabled" :aria-label="headerCheckboxAriaLabel" @change="onChange" :unstyled="unstyled" :pt="getColumnPT('pcHeaderCheckbox')">
+    <Checkbox
+        :modelValue="checked"
+        :binary="true"
+        :disabled="disabled"
+        :aria-label="headerCheckboxAriaLabel"
+        @change="onChange"
+        :unstyled="unstyled"
+        :pt="getColumnPT('pcHeaderCheckbox')"
+    >
         <template #icon="slotProps">
             <component v-if="headerCheckboxIconTemplate" :is="headerCheckboxIconTemplate" :checked="slotProps.checked" :class="slotProps.class" />
             <!-- <CheckIcon v-else-if="!headerCheckboxIconTemplate && slotProps.checked" :class="slotProps.class" v-bind="getColumnPT('pcHeaderCheckbox')['icon']" /> -->
@@ -42,7 +50,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined; //@todo:
@@ -56,7 +68,11 @@ export default {
     },
     computed: {
         headerCheckboxAriaLabel() {
-            return this.$primevue.config.locale.aria ? (this.checked ? this.$primevue.config.locale.aria.selectAll : this.$primevue.config.locale.aria.unselectAll) : undefined;
+            return this.$primevue.config.locale.aria
+                ? this.checked
+                    ? this.$primevue.config.locale.aria.selectAll
+                    : this.$primevue.config.locale.aria.unselectAll
+                : undefined;
         }
     },
     components: {

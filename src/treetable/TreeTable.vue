@@ -115,7 +115,12 @@
                                 :unstyled="unstyled"
                                 :pt="pt"
                             />
-                            <th v-else-if="!columnProp(col, 'hidden')" :class="getFilterColumnHeaderClass(col)" :style="[columnProp(col, 'style'), columnProp(col, 'filterHeaderStyle')]" v-bind="ptm('headerCell', ptHeaderCellOptions(col))">
+                            <th
+                                v-else-if="!columnProp(col, 'hidden')"
+                                :class="getFilterColumnHeaderClass(col)"
+                                :style="[columnProp(col, 'style'), columnProp(col, 'filterHeaderStyle')]"
+                                v-bind="ptm('headerCell', ptHeaderCellOptions(col))"
+                            >
                                 <component v-if="col.children && col.children.filter" :is="col.children.filter" :column="col" :index="i" />
                             </th>
                         </template>
@@ -231,7 +236,18 @@
 
 <script>
 import { cn } from '../internal/utils/index';
-import { addStyle, clearSelection, find, getAttribute, getIndex, getOffset, getOuterWidth, isClickable, isRTL, setAttribute } from '../internal/utils/dom/index';
+import {
+    addStyle,
+    clearSelection,
+    find,
+    getAttribute,
+    getIndex,
+    getOffset,
+    getOuterWidth,
+    isClickable,
+    isRTL,
+    setAttribute
+} from '../internal/utils/dom/index';
 import { localeComparator, resolveFieldData, sort } from '../internal/utils/object/index';
 import { FilterMatchMode, FilterOperator, FilterService } from '../core/api/Api';
 import { getVNodeProp, HelperSet } from '../core/utils/Utils';
@@ -474,7 +490,9 @@ export default {
                     getAttribute(targetNode, 'data-pc-section') === 'sorticon' ||
                     getAttribute(targetNode.parentElement, 'data-pc-section') === 'sorticon' ||
                     getAttribute(targetNode.parentElement.parentElement, 'data-pc-section') === 'sorticon' ||
-                    (targetNode.closest('[data-p-sortable-column="true"]') && !targetNode.closest('[data-pc-section="columnfilterbutton"]') && !isClickable(event.target))
+                    (targetNode.closest('[data-p-sortable-column="true"]') &&
+                        !targetNode.closest('[data-pc-section="columnfilterbutton"]') &&
+                        !isClickable(event.target))
                 ) {
                     clearSelection();
 
@@ -564,7 +582,9 @@ export default {
             let filteredNodes = value;
 
             if (Object.keys(activeFilters).length > 0) {
-                const globalFilterFields = hasGlobalFilter ? this.globalFilterFields || this.columns.map((col) => this.columnProp(col, 'filterField') || this.columnProp(col, 'field')) : [];
+                const globalFilterFields = hasGlobalFilter
+                    ? this.globalFilterFields || this.columns.map((col) => this.columnProp(col, 'filterField') || this.columnProp(col, 'field'))
+                    : [];
 
                 filteredNodes = [];
 
@@ -591,7 +611,9 @@ export default {
                     if (localMatch && hasGlobalFilter) {
                         const globalFilterMeta = activeFilters['global'];
                         const filterValue = this.isFilterMetaObject(globalFilterMeta) ? globalFilterMeta.value : globalFilterMeta;
-                        const filterConstraint = this.resolveFilterConstraint(this.isFilterMetaObject(globalFilterMeta) ? globalFilterMeta.matchMode || FilterMatchMode.CONTAINS : FilterMatchMode.CONTAINS);
+                        const filterConstraint = this.resolveFilterConstraint(
+                            this.isFilterMetaObject(globalFilterMeta) ? globalFilterMeta.matchMode || FilterMatchMode.CONTAINS : FilterMatchMode.CONTAINS
+                        );
 
                         for (let filterField of globalFilterFields) {
                             let copyNodeForGlobal = { ...copyNode };
@@ -626,7 +648,12 @@ export default {
         isColumnFilterMatched(node, col, filterField, filterMeta, strict) {
             if (!this.isFilterMetaObject(filterMeta)) {
                 // legacy flat value, the match mode comes from the column
-                return this.isNodeFilterMatched(node, { filterField, filterValue: filterMeta, filterConstraint: this.resolveFilterConstraint(this.columnProp(col, 'filterMatchMode')), strict });
+                return this.isNodeFilterMatched(node, {
+                    filterField,
+                    filterValue: filterMeta,
+                    filterConstraint: this.resolveFilterConstraint(this.columnProp(col, 'filterMatchMode')),
+                    strict
+                });
             }
 
             if (filterMeta.operator) {
@@ -634,20 +661,35 @@ export default {
 
                 if (filterMeta.operator === FilterOperator.OR) {
                     // single pass with a combined predicate, keeps every branch matching any constraint
-                    const filterConstraint = (dataFieldValue, filterValue, filterLocale) => constraints.some((constraint) => this.resolveFilterConstraint(constraint.matchMode)(dataFieldValue, constraint.value, filterLocale));
+                    const filterConstraint = (dataFieldValue, filterValue, filterLocale) =>
+                        constraints.some((constraint) => this.resolveFilterConstraint(constraint.matchMode)(dataFieldValue, constraint.value, filterLocale));
 
                     return this.isNodeFilterMatched(node, { filterField, filterValue: null, filterConstraint, strict });
                 }
 
                 // each constraint prunes the subtree left by the previous one
-                return constraints.every((constraint) => this.isNodeFilterMatched(node, { filterField, filterValue: constraint.value, filterConstraint: this.resolveFilterConstraint(constraint.matchMode), strict }));
+                return constraints.every((constraint) =>
+                    this.isNodeFilterMatched(node, {
+                        filterField,
+                        filterValue: constraint.value,
+                        filterConstraint: this.resolveFilterConstraint(constraint.matchMode),
+                        strict
+                    })
+                );
             }
 
-            return this.isNodeFilterMatched(node, { filterField, filterValue: filterMeta.value, filterConstraint: this.resolveFilterConstraint(filterMeta.matchMode || this.columnProp(col, 'filterMatchMode')), strict });
+            return this.isNodeFilterMatched(node, {
+                filterField,
+                filterValue: filterMeta.value,
+                filterConstraint: this.resolveFilterConstraint(filterMeta.matchMode || this.columnProp(col, 'filterMatchMode')),
+                strict
+            });
         },
         isNodeFilterMatched(node, paramsWithoutNode) {
             // evaluation order matters, findFilteredNodes prunes the children of the node copy
-            return paramsWithoutNode.strict ? !!(this.findFilteredNodes(node, paramsWithoutNode) || this.isFilterMatched(node, paramsWithoutNode)) : !!(this.isFilterMatched(node, paramsWithoutNode) || this.findFilteredNodes(node, paramsWithoutNode));
+            return paramsWithoutNode.strict
+                ? !!(this.findFilteredNodes(node, paramsWithoutNode) || this.isFilterMatched(node, paramsWithoutNode))
+                : !!(this.isFilterMatched(node, paramsWithoutNode) || this.findFilteredNodes(node, paramsWithoutNode));
         },
         getActiveFilters(filters) {
             const removeEmptyFilters = ([key, value]) => {
@@ -800,7 +842,9 @@ export default {
             this.$refs.resizeHelper.style.display = 'block';
         },
         onColumnResizeEnd() {
-            let delta = isRTL(this.$el) ? this.lastResizeHelperX - this.$refs.resizeHelper.offsetLeft : this.$refs.resizeHelper.offsetLeft - this.lastResizeHelperX;
+            let delta = isRTL(this.$el)
+                ? this.lastResizeHelperX - this.$refs.resizeHelper.offsetLeft
+                : this.$refs.resizeHelper.offsetLeft - this.lastResizeHelperX;
             let columnWidth = this.resizeColumnElement.offsetWidth;
             let newColumnWidth = columnWidth + delta;
             let minWidth = this.resizeColumnElement.style.minWidth || 15;
@@ -896,7 +940,11 @@ export default {
             }
         },
         onColumnKeyDown(event, col) {
-            if ((event.code === 'Enter' || event.code === 'NumpadEnter') && event.currentTarget.nodeName === 'TH' && getAttribute(event.currentTarget, 'data-p-sortable-column')) {
+            if (
+                (event.code === 'Enter' || event.code === 'NumpadEnter') &&
+                event.currentTarget.nodeName === 'TH' &&
+                getAttribute(event.currentTarget, 'data-p-sortable-column')
+            ) {
                 this.onColumnHeaderClick(event, col);
             }
         },

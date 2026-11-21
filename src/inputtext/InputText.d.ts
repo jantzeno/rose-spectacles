@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { InputHTMLAttributes } from 'vue';
 
-export declare type InputTextPassThroughOptionType<T = any> = InputTextPassThroughAttributes | ((options: InputTextPassThroughMethodOptions<T>) => InputTextPassThroughAttributes | string) | string | null | undefined;
+export declare type InputTextPassThroughOptionType<T = any> =
+    | InputTextPassThroughAttributes
+    | ((options: InputTextPassThroughMethodOptions<T>) => InputTextPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

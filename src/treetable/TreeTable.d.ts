@@ -16,7 +16,12 @@ import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { TreeNode } from 'rose-spectacles/treenode';
 import { InputHTMLAttributes, VNode } from 'vue';
 
-export declare type TreeTablePassThroughOptionType = TreeTablePassThroughAttributes | ((options: TreeTablePassThroughMethodOptions) => TreeTablePassThroughAttributes | string) | string | null | undefined;
+export declare type TreeTablePassThroughOptionType =
+    | TreeTablePassThroughAttributes
+    | ((options: TreeTablePassThroughMethodOptions) => TreeTablePassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.
@@ -77,7 +82,26 @@ export interface TreeTableFilterMetaData {
     /**
      * Filter match mode
      */
-    matchMode: HintedString<'startsWith' | 'contains' | 'notContains' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' | 'between' | 'dateIs' | 'dateIsNot' | 'dateBefore' | 'dateAfter'> | undefined;
+    matchMode:
+        | HintedString<
+              | 'startsWith'
+              | 'contains'
+              | 'notContains'
+              | 'endsWith'
+              | 'equals'
+              | 'notEquals'
+              | 'in'
+              | 'lt'
+              | 'lte'
+              | 'gt'
+              | 'gte'
+              | 'between'
+              | 'dateIs'
+              | 'dateIsNot'
+              | 'dateBefore'
+              | 'dateAfter'
+          >
+        | undefined;
 }
 
 /**
@@ -193,7 +217,26 @@ export interface TreeTableSortEvent {
     /**
      * Match modes per field
      */
-    filterMatchModes: HintedString<'startsWith' | 'contains' | 'notContains' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' | 'between' | 'dateIs' | 'dateIsNot' | 'dateBefore' | 'dateAfter'> | undefined;
+    filterMatchModes:
+        | HintedString<
+              | 'startsWith'
+              | 'contains'
+              | 'notContains'
+              | 'endsWith'
+              | 'equals'
+              | 'notEquals'
+              | 'in'
+              | 'lt'
+              | 'lte'
+              | 'gt'
+              | 'gte'
+              | 'between'
+              | 'dateIs'
+              | 'dateIsNot'
+              | 'dateBefore'
+              | 'dateAfter'
+          >
+        | undefined;
 }
 
 /**

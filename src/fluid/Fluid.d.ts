@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type FluidPassThroughOptionType = FluidPassThroughAttributes | ((options: FluidPassThroughMethodOptions) => FluidPassThroughAttributes | string) | string | null | undefined;
+export declare type FluidPassThroughOptionType =
+    | FluidPassThroughAttributes
+    | ((options: FluidPassThroughMethodOptions) => FluidPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type FluidPassThroughTransitionType = TransitionProps | ((options: FluidPassThroughMethodOptions) => TransitionProps) | undefined;
 

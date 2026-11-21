@@ -157,7 +157,11 @@ export default {
         return !(options.darkModeSelector === 'none' || options.darkModeSelector === false);
     },
     getColorSchemeOption(options: any, defaults: any) {
-        return this.applyDarkColorScheme(options) ? this.regex.resolve(options.darkModeSelector === true ? defaults.options.darkModeSelector : (options.darkModeSelector ?? defaults.options.darkModeSelector)) : [];
+        return this.applyDarkColorScheme(options)
+            ? this.regex.resolve(
+                  options.darkModeSelector === true ? defaults.options.darkModeSelector : (options.darkModeSelector ?? defaults.options.darkModeSelector)
+              )
+            : [];
     },
     getLayerOrder(name: string, options: any = {}, params: any, defaults: any) {
         const { cssLayer } = options;
@@ -257,7 +261,11 @@ export default {
 
         const traverse = (obj: any, parentKey: string, parentPath: string) => {
             Object.entries(obj).forEach(([key, value]) => {
-                const currentKey = matchRegex(key, defaults.variable.excludedKeyRegex) ? parentKey : parentKey ? `${parentKey}.${toTokenKey(key)}` : toTokenKey(key);
+                const currentKey = matchRegex(key, defaults.variable.excludedKeyRegex)
+                    ? parentKey
+                    : parentKey
+                      ? `${parentKey}.${toTokenKey(key)}`
+                      : toTokenKey(key);
 
                 const currentPath = parentPath ? `${parentPath}.${key}` : key;
 
@@ -322,7 +330,9 @@ export default {
               }, undefined);
     },
     getSelectorRule(selector1: any, selector2: any, type: string, css: string) {
-        return type === 'class' || type === 'attr' ? getRule(isNotEmpty(selector2) ? `${selector1}${selector2},${selector1} ${selector2}` : selector1, css) : getRule(selector1, getRule(selector2 ?? ':root,:host', css));
+        return type === 'class' || type === 'attr'
+            ? getRule(isNotEmpty(selector2) ? `${selector1}${selector2},${selector1} ${selector2}` : selector1, css)
+            : getRule(selector1, getRule(selector2 ?? ':root,:host', css));
     },
     transformCSS(name: string, css: string, mode?: string, type?: string, options: any = {}, set?: any, defaults?: any, selector?: string) {
         if (isNotEmpty(css)) {

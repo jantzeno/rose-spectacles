@@ -10,7 +10,15 @@
         </div>
         <div :class="cx('prompt')" v-bind="ptm('container')">
             <span :class="cx('promptLabel')" v-bind="ptm('prompt')">{{ prompt }}</span>
-            <input ref="input" v-model="commandText" :class="cx('promptValue')" type="text" autocomplete="off" @keydown="onKeydown" v-bind="ptm('commandText')" />
+            <input
+                ref="input"
+                v-model="commandText"
+                :class="cx('promptValue')"
+                type="text"
+                autocomplete="off"
+                @keydown="onKeydown"
+                v-bind="ptm('commandText')"
+            />
         </div>
     </div>
 </template>

@@ -12,7 +12,11 @@ export default function getScrollableParents(element: Element): Element[] {
             try {
                 const styleDeclaration = window['getComputedStyle'](node, null);
 
-                return overflowRegex.test(styleDeclaration.getPropertyValue('overflow')) || overflowRegex.test(styleDeclaration.getPropertyValue('overflowX')) || overflowRegex.test(styleDeclaration.getPropertyValue('overflowY'));
+                return (
+                    overflowRegex.test(styleDeclaration.getPropertyValue('overflow')) ||
+                    overflowRegex.test(styleDeclaration.getPropertyValue('overflowX')) ||
+                    overflowRegex.test(styleDeclaration.getPropertyValue('overflowY'))
+                );
             } catch {
                 return false;
             }

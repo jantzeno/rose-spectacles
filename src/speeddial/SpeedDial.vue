@@ -17,13 +17,36 @@
             >
                 <template #icon="slotProps">
                     <slot name="icon" :visible="d_visible">
-                        <component v-if="d_visible && !!hideIcon" :is="hideIcon ? 'span' : 'PlusIcon'" :class="[hideIcon, slotProps.class]" v-bind="ptm('pcButton')['icon']" data-pc-section="icon" />
-                        <component v-else :is="showIcon ? 'span' : 'PlusIcon'" :class="[d_visible && !!hideIcon ? hideIcon : showIcon, slotProps.class]" v-bind="ptm('pcButton')['icon']" data-pc-section="icon" />
+                        <component
+                            v-if="d_visible && !!hideIcon"
+                            :is="hideIcon ? 'span' : 'PlusIcon'"
+                            :class="[hideIcon, slotProps.class]"
+                            v-bind="ptm('pcButton')['icon']"
+                            data-pc-section="icon"
+                        />
+                        <component
+                            v-else
+                            :is="showIcon ? 'span' : 'PlusIcon'"
+                            :class="[d_visible && !!hideIcon ? hideIcon : showIcon, slotProps.class]"
+                            v-bind="ptm('pcButton')['icon']"
+                            data-pc-section="icon"
+                        />
                     </slot>
                 </template>
             </Button>
         </slot>
-        <ul :ref="listRef" :id="$id + '_list'" :class="cx('list')" :style="sx('list')" role="menu" tabindex="-1" @focus="onFocus" @blur="onBlur" @keydown="onKeyDown" v-bind="ptm('list')">
+        <ul
+            :ref="listRef"
+            :id="$id + '_list'"
+            :class="cx('list')"
+            :style="sx('list')"
+            role="menu"
+            tabindex="-1"
+            @focus="onFocus"
+            @blur="onBlur"
+            @keydown="onKeyDown"
+            v-bind="ptm('list')"
+        >
             <template v-for="(item, index) of model" :key="index">
                 <li
                     v-if="isItemVisible(item)"
@@ -56,7 +79,13 @@
                             </template>
                         </Button>
                     </template>
-                    <component v-else :is="$slots.item" :item="item" :onClick="(event) => onItemClick(event, item)" :toggleCallback="(event) => onItemClick(event, item)"></component>
+                    <component
+                        v-else
+                        :is="$slots.item"
+                        :item="item"
+                        :onClick="(event) => onItemClick(event, item)"
+                        :toggleCallback="(event) => onItemClick(event, item)"
+                    ></component>
                 </li>
             </template>
         </ul>

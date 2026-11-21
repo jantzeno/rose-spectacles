@@ -1,5 +1,13 @@
 <template>
-    <div :class="cx('root')" @dragover="onDragOver" @dragenter="onDragEnter" @dragleave="onDragLeave" @drop="onDrop" :data-p="containerDataP" v-bind="ptmi('root')">
+    <div
+        :class="cx('root')"
+        @dragover="onDragOver"
+        @dragenter="onDragEnter"
+        @dragleave="onDragLeave"
+        @drop="onDrop"
+        :data-p="containerDataP"
+        v-bind="ptmi('root')"
+    >
         <transition name="rs-overlay-mask">
             <div v-if="loading && loadingMode === 'mask'" :class="cx('mask')" v-bind="ptm('mask')">
                 <slot name="loadingicon" :class="cx('loadingIcon')">
@@ -9,7 +17,15 @@
             </div>
         </transition>
         <IconField v-if="filter" :unstyled="unstyled" :pt="{ ...ptm('pcFilter'), ...ptm('pcFilterContainer') }" :class="cx('pcFilterContainer')">
-            <InputText v-model="filterValue" autocomplete="off" :class="cx('pcFilterInput')" :placeholder="filterPlaceholder" :unstyled="unstyled" @keyup="onFilterKeyup" :pt="ptm('pcFilterInput')" />
+            <InputText
+                v-model="filterValue"
+                autocomplete="off"
+                :class="cx('pcFilterInput')"
+                :placeholder="filterPlaceholder"
+                :unstyled="unstyled"
+                @keyup="onFilterKeyup"
+                :pt="ptm('pcFilterInput')"
+            />
             <InputIcon :unstyled="unstyled" :pt="ptm('pcFilterIconContainer')">
                 <!--TODO: searchicon deprecated since v4.0-->
                 <slot :name="$slots.filtericon ? 'filtericon' : 'searchicon'" :class="cx('filterIcon')">
@@ -73,7 +89,21 @@ export default {
     name: 'Tree',
     extends: BaseTree,
     inheritAttrs: false,
-    emits: ['node-expand', 'node-collapse', 'update:expandedKeys', 'update:selectionKeys', 'node-select', 'node-unselect', 'filter', 'node-drop', 'node-dragenter', 'node-dragleave', 'update:value', 'drag-enter', 'drag-leave'],
+    emits: [
+        'node-expand',
+        'node-collapse',
+        'update:expandedKeys',
+        'update:selectionKeys',
+        'node-select',
+        'node-unselect',
+        'filter',
+        'node-drop',
+        'node-dragenter',
+        'node-dragleave',
+        'update:value',
+        'drag-enter',
+        'drag-leave'
+    ],
     data() {
         return {
             d_expandedKeys: this.expandedKeys || {},

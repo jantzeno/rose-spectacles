@@ -215,7 +215,13 @@ export default {
             ThemeService.off('theme:change', this._themeScopedListener);
         },
         _getHostInstance(instance) {
-            return instance ? (this.$options.hostName ? (instance.$.type.name === this.$options.hostName ? instance : this._getHostInstance(instance.$parentInstance)) : instance.$parentInstance) : undefined;
+            return instance
+                ? this.$options.hostName
+                    ? instance.$.type.name === this.$options.hostName
+                        ? instance
+                        : this._getHostInstance(instance.$parentInstance)
+                    : instance.$parentInstance
+                : undefined;
         },
         _getPropValue(name) {
             return this[name] || this._getHostInstance(this)?.[name];
@@ -226,11 +232,19 @@ export default {
         _getPTValue(obj = {}, key = '', params = {}, searchInDefaultPT = true) {
             const searchOut = /./g.test(key) && !!params[key.split('.')[0]];
             const { mergeSections = true, mergeProps: useMergeProps = false } = this._getPropValue('ptOptions') || this.$primevueConfig?.ptOptions || {};
-            const global = searchInDefaultPT ? (searchOut ? this._useGlobalPT(this._getPTClassValue, key, params) : this._useDefaultPT(this._getPTClassValue, key, params)) : undefined;
+            const global = searchInDefaultPT
+                ? searchOut
+                    ? this._useGlobalPT(this._getPTClassValue, key, params)
+                    : this._useDefaultPT(this._getPTClassValue, key, params)
+                : undefined;
             const self = searchOut ? undefined : this._getPTSelf(obj, this._getPTClassValue, key, { ...params, global: global || {} });
             const datasets = this._getPTDatasets(key);
 
-            return mergeSections || (!mergeSections && self) ? (useMergeProps ? this._mergeProps(useMergeProps, global, self, datasets) : { ...global, ...self, ...datasets }) : { ...self, ...datasets };
+            return mergeSections || (!mergeSections && self)
+                ? useMergeProps
+                    ? this._mergeProps(useMergeProps, global, self, datasets)
+                    : { ...global, ...self, ...datasets }
+                : { ...self, ...datasets };
         },
         _getPTSelf(obj = {}, ...args) {
             return mergeProps(
@@ -287,7 +301,11 @@ export default {
                 else if (isString(value)) return value;
                 else if (isString(originalValue)) return originalValue;
 
-                return mergeSections || (!mergeSections && value) ? (useMergeProps ? this._mergeProps(useMergeProps, originalValue, value) : { ...originalValue, ...value }) : value;
+                return mergeSections || (!mergeSections && value)
+                    ? useMergeProps
+                        ? this._mergeProps(useMergeProps, originalValue, value)
+                        : { ...originalValue, ...value }
+                    : value;
             }
 
             return fn(pt);
@@ -331,7 +349,11 @@ export default {
             return this._getPT(this.$primevueConfig?.pt, undefined, (value) => resolve(value, { instance: this }));
         },
         defaultPT() {
-            return this._getPT(this.$primevueConfig?.pt, undefined, (value) => this._getOptionValue(value, this.$name, { ...this.$params }) || resolve(value, { ...this.$params }));
+            return this._getPT(
+                this.$primevueConfig?.pt,
+                undefined,
+                (value) => this._getOptionValue(value, this.$name, { ...this.$params }) || resolve(value, { ...this.$params })
+            );
         },
         isUnstyled() {
             return this.unstyled !== undefined ? this.unstyled : this.$primevueConfig?.unstyled;
@@ -348,7 +370,15 @@ export default {
             return this.$primevueConfig?.theme;
         },
         $style() {
-            return { classes: undefined, inlineStyles: undefined, load: () => {}, loadCSS: () => {}, loadStyle: () => {}, ...(this._getHostInstance(this) || {}).$style, ...this.$options.style };
+            return {
+                classes: undefined,
+                inlineStyles: undefined,
+                load: () => {},
+                loadCSS: () => {},
+                loadStyle: () => {},
+                ...(this._getHostInstance(this) || {}).$style,
+                ...this.$options.style
+            };
         },
         $styleOptions() {
             return { nonce: this.$primevueConfig?.csp?.nonce };

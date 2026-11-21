@@ -12,7 +12,11 @@ import type { DirectiveHooks } from 'rose-spectacles/core/basedirective';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { DirectiveBinding, ObjectDirective } from 'vue';
 
-export declare type TooltipDirectivePassThroughOptionType = TooltipDirectivePassThroughAttributes | ((options: TooltipPassThroughMethodOptions) => TooltipDirectivePassThroughAttributes) | null | undefined;
+export declare type TooltipDirectivePassThroughOptionType =
+    | TooltipDirectivePassThroughAttributes
+    | ((options: TooltipPassThroughMethodOptions) => TooltipDirectivePassThroughAttributes)
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

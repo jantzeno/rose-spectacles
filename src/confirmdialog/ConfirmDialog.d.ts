@@ -14,7 +14,12 @@ import type { ConfirmationOptions } from 'rose-spectacles/confirmationoptions';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type ConfirmDialogPassThroughOptionType = ConfirmDialogPassThroughAttributes | ((options: ConfirmDialogPassThroughMethodOptions) => ConfirmDialogPassThroughAttributes | string) | string | null | undefined;
+export declare type ConfirmDialogPassThroughOptionType =
+    | ConfirmDialogPassThroughAttributes
+    | ((options: ConfirmDialogPassThroughMethodOptions) => ConfirmDialogPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

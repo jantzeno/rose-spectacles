@@ -36,7 +36,10 @@ describe('Splitter.vue', () => {
         const gutter = wrapper.find('.rs-splitter-gutter-handle').element;
         const siblings = wrapper.findAll('.rs-splitterpanel');
 
-        await wrapper.vm.onGutterMouseDown({ currentTarget: { gutter, previousElementSibling: siblings[0].element, nextElementSibling: siblings[1].element }, pageX: 123 }, 0);
+        await wrapper.vm.onGutterMouseDown(
+            { currentTarget: { gutter, previousElementSibling: siblings[0].element, nextElementSibling: siblings[1].element }, pageX: 123 },
+            0
+        );
 
         expect(wrapper.find('.rs-splitter').classes()).toContain('rs-splitter-horizontal');
     });

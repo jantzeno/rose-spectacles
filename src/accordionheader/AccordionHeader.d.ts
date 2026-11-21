@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { Component, VNode } from 'vue';
 
-export declare type AccordionHeaderPassThroughOptionType = AccordionHeaderPassThroughAttributes | ((options: AccordionHeaderPassThroughMethodOptions) => AccordionHeaderPassThroughAttributes | string) | string | null | undefined;
+export declare type AccordionHeaderPassThroughOptionType =
+    | AccordionHeaderPassThroughAttributes
+    | ((options: AccordionHeaderPassThroughMethodOptions) => AccordionHeaderPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

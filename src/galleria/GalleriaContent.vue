@@ -9,7 +9,16 @@
         :aria-roledescription="$attrs.ariaRoledescription"
         v-bind="{ ...$attrs.containerProps, ...getPTOptions('root') }"
     >
-        <button v-if="$attrs.fullScreen" v-ripple autofocus type="button" :class="cx('closeButton')" :aria-label="closeAriaLabel" @click="$emit('mask-hide')" v-bind="getPTOptions('closeButton')">
+        <button
+            v-if="$attrs.fullScreen"
+            v-ripple
+            autofocus
+            type="button"
+            :class="cx('closeButton')"
+            :aria-label="closeAriaLabel"
+            @click="$emit('mask-hide')"
+            v-bind="getPTOptions('closeButton')"
+        >
             <component :is="$attrs.templates['closeicon'] || 'TimesIcon'" :class="cx('closeIcon')" v-bind="getPTOptions('closeIcon')" />
         </button>
         <div v-if="$attrs.templates && $attrs.templates['header']" :class="cx('header')" v-bind="getPTOptions('header')">

@@ -16,15 +16,42 @@
                 :data-p-focused="isItemFocused(processedItem)"
                 :data-p-disabled="isItemDisabled(processedItem)"
             >
-                <div :class="cx('itemContent')" @click="onItemClick($event, processedItem)" @mousemove="onItemMouseMove($event, processedItem)" v-bind="getPTOptions('itemContent', processedItem, index)">
+                <div
+                    :class="cx('itemContent')"
+                    @click="onItemClick($event, processedItem)"
+                    @mousemove="onItemMouseMove($event, processedItem)"
+                    v-bind="getPTOptions('itemContent', processedItem, index)"
+                >
                     <template v-if="!templates.item">
-                        <a v-ripple :href="getItemProp(processedItem, 'url')" :class="cx('itemLink')" :target="getItemProp(processedItem, 'target')" tabindex="-1" v-bind="getPTOptions('itemLink', processedItem, index)">
+                        <a
+                            v-ripple
+                            :href="getItemProp(processedItem, 'url')"
+                            :class="cx('itemLink')"
+                            :target="getItemProp(processedItem, 'target')"
+                            tabindex="-1"
+                            v-bind="getPTOptions('itemLink', processedItem, index)"
+                        >
                             <template v-if="isItemGroup(processedItem)">
-                                <component v-if="templates.submenuicon" :is="templates.submenuicon" :class="cx('submenuIcon')" :active="isItemActive(processedItem)" v-bind="getPTOptions('submenuIcon', processedItem, index)" />
-                                <component v-else :is="isItemActive(processedItem) ? 'ChevronDownIcon' : 'ChevronRightIcon'" :class="cx('submenuIcon')" v-bind="getPTOptions('submenuIcon', processedItem, index)" />
+                                <component
+                                    v-if="templates.submenuicon"
+                                    :is="templates.submenuicon"
+                                    :class="cx('submenuIcon')"
+                                    :active="isItemActive(processedItem)"
+                                    v-bind="getPTOptions('submenuIcon', processedItem, index)"
+                                />
+                                <component
+                                    v-else
+                                    :is="isItemActive(processedItem) ? 'ChevronDownIcon' : 'ChevronRightIcon'"
+                                    :class="cx('submenuIcon')"
+                                    v-bind="getPTOptions('submenuIcon', processedItem, index)"
+                                />
                             </template>
                             <component v-if="templates.itemicon" :is="templates.itemicon" :item="processedItem.item" :class="cx('itemIcon')" />
-                            <span v-else-if="getItemProp(processedItem, 'icon')" :class="[cx('itemIcon'), getItemProp(processedItem, 'icon')]" v-bind="getPTOptions('itemIcon', processedItem, index)" />
+                            <span
+                                v-else-if="getItemProp(processedItem, 'icon')"
+                                :class="[cx('itemIcon'), getItemProp(processedItem, 'icon')]"
+                                v-bind="getPTOptions('itemIcon', processedItem, index)"
+                            />
                             <span :class="cx('itemLabel')" v-bind="getPTOptions('itemLabel', processedItem, index)">{{ getItemLabel(processedItem) }}</span>
                         </a>
                     </template>
@@ -169,7 +196,11 @@ export default {
             return this.items.filter((processedItem) => this.isItemVisible(processedItem) && !this.getItemProp(processedItem, 'separator')).length;
         },
         getAriaPosInset(index) {
-            return index - this.items.slice(0, index).filter((processedItem) => this.isItemVisible(processedItem) && this.getItemProp(processedItem, 'separator')).length + 1;
+            return (
+                index -
+                this.items.slice(0, index).filter((processedItem) => this.isItemVisible(processedItem) && this.getItemProp(processedItem, 'separator')).length +
+                1
+            );
         },
         getMenuItemProps(processedItem, index) {
             return {

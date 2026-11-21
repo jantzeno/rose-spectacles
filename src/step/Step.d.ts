@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { Component, VNode } from 'vue';
 
-export declare type StepPassThroughOptionType = StepPassThroughAttributes | ((options: StepPassThroughMethodOptions) => StepPassThroughAttributes | string) | string | null | undefined;
+export declare type StepPassThroughOptionType =
+    | StepPassThroughAttributes
+    | ((options: StepPassThroughMethodOptions) => StepPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

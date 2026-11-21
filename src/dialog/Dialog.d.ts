@@ -13,7 +13,12 @@ import type { ButtonPassThroughOptions, ButtonProps } from 'rose-spectacles/butt
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { HTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type DialogPassThroughOptionType<T = any> = DialogPassThroughAttributes | ((options: DialogPassThroughMethodOptions<T>) => DialogPassThroughAttributes | string) | string | null | undefined;
+export declare type DialogPassThroughOptionType<T = any> =
+    | DialogPassThroughAttributes
+    | ((options: DialogPassThroughMethodOptions<T>) => DialogPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type DialogPassThroughTransitionType<T = any> = TransitionProps | ((options: DialogPassThroughMethodOptions<T>) => TransitionProps) | undefined;
 

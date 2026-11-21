@@ -37,16 +37,44 @@
         </slot>
         <span v-if="showButtons && buttonLayout === 'stacked'" :class="cx('buttonGroup')" v-bind="ptm('buttonGroup')" :data-p="dataP">
             <slot name="incrementbutton" :listeners="upButtonListeners">
-                <button :class="[cx('incrementButton'), incrementButtonClass]" v-on="upButtonListeners" :disabled="disabled" :tabindex="-1" aria-hidden="true" type="button" v-bind="ptm('incrementButton')" :data-p="dataP">
+                <button
+                    :class="[cx('incrementButton'), incrementButtonClass]"
+                    v-on="upButtonListeners"
+                    :disabled="disabled"
+                    :tabindex="-1"
+                    aria-hidden="true"
+                    type="button"
+                    v-bind="ptm('incrementButton')"
+                    :data-p="dataP"
+                >
                     <slot :name="$slots.incrementicon ? 'incrementicon' : 'incrementbuttonicon'">
-                        <component :is="incrementIcon || incrementButtonIcon ? 'span' : 'AngleUpIcon'" :class="[incrementIcon, incrementButtonIcon]" v-bind="ptm('incrementIcon')" data-pc-section="incrementicon" />
+                        <component
+                            :is="incrementIcon || incrementButtonIcon ? 'span' : 'AngleUpIcon'"
+                            :class="[incrementIcon, incrementButtonIcon]"
+                            v-bind="ptm('incrementIcon')"
+                            data-pc-section="incrementicon"
+                        />
                     </slot>
                 </button>
             </slot>
             <slot name="decrementbutton" :listeners="downButtonListeners">
-                <button :class="[cx('decrementButton'), decrementButtonClass]" v-on="downButtonListeners" :disabled="disabled" :tabindex="-1" aria-hidden="true" type="button" v-bind="ptm('decrementButton')" :data-p="dataP">
+                <button
+                    :class="[cx('decrementButton'), decrementButtonClass]"
+                    v-on="downButtonListeners"
+                    :disabled="disabled"
+                    :tabindex="-1"
+                    aria-hidden="true"
+                    type="button"
+                    v-bind="ptm('decrementButton')"
+                    :data-p="dataP"
+                >
                     <slot :name="$slots.decrementicon ? 'decrementicon' : 'decrementbuttonicon'">
-                        <component :is="decrementIcon || decrementButtonIcon ? 'span' : 'AngleDownIcon'" :class="[decrementIcon, decrementButtonIcon]" v-bind="ptm('decrementIcon')" data-pc-section="decrementicon" />
+                        <component
+                            :is="decrementIcon || decrementButtonIcon ? 'span' : 'AngleDownIcon'"
+                            :class="[decrementIcon, decrementButtonIcon]"
+                            v-bind="ptm('decrementIcon')"
+                            data-pc-section="decrementicon"
+                        />
                     </slot>
                 </button>
             </slot>
@@ -64,7 +92,12 @@
                 :data-p="dataP"
             >
                 <slot :name="$slots.incrementicon ? 'incrementicon' : 'incrementbuttonicon'">
-                    <component :is="incrementIcon || incrementButtonIcon ? 'span' : 'AngleUpIcon'" :class="[incrementIcon, incrementButtonIcon]" v-bind="ptm('incrementIcon')" data-pc-section="incrementicon" />
+                    <component
+                        :is="incrementIcon || incrementButtonIcon ? 'span' : 'AngleUpIcon'"
+                        :class="[incrementIcon, incrementButtonIcon]"
+                        v-bind="ptm('incrementIcon')"
+                        data-pc-section="incrementicon"
+                    />
                 </slot>
             </button>
         </slot>
@@ -81,7 +114,12 @@
                 :data-p="dataP"
             >
                 <slot :name="$slots.decrementicon ? 'decrementicon' : 'decrementbuttonicon'">
-                    <component :is="decrementIcon || decrementButtonIcon ? 'span' : 'AngleDownIcon'" :class="[decrementIcon, decrementButtonIcon]" v-bind="ptm('decrementIcon')" data-pc-section="decrementicon" />
+                    <component
+                        :is="decrementIcon || decrementButtonIcon ? 'span' : 'AngleDownIcon'"
+                        :class="[decrementIcon, decrementButtonIcon]"
+                        v-bind="ptm('decrementIcon')"
+                        data-pc-section="decrementicon"
+                    />
                 </slot>
             </button>
         </slot>
@@ -242,7 +280,14 @@ export default {
         },
         getCurrencyExpression() {
             if (this.currency) {
-                const formatter = new Intl.NumberFormat(this.locale, { style: 'currency', currency: this.currency, currencyDisplay: this.currencyDisplay, minimumFractionDigits: 0, maximumFractionDigits: 0, roundingMode: this.roundingMode });
+                const formatter = new Intl.NumberFormat(this.locale, {
+                    style: 'currency',
+                    currency: this.currency,
+                    currencyDisplay: this.currencyDisplay,
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                    roundingMode: this.roundingMode
+                });
 
                 return new RegExp(`[${formatter.format(1).replace(/\s/g, '').replace(this._numeral, '').replace(this._group, '')}]`, 'g');
             }
@@ -265,7 +310,14 @@ export default {
             if (this.suffix) {
                 this.suffixChar = this.suffix;
             } else {
-                const formatter = new Intl.NumberFormat(this.locale, { style: this.mode, currency: this.currency, currencyDisplay: this.currencyDisplay, minimumFractionDigits: 0, maximumFractionDigits: 0, roundingMode: this.roundingMode });
+                const formatter = new Intl.NumberFormat(this.locale, {
+                    style: this.mode,
+                    currency: this.currency,
+                    currencyDisplay: this.currencyDisplay,
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                    roundingMode: this.roundingMode
+                });
                 const one = new Intl.NumberFormat(this.locale).format(1);
 
                 this.suffixChar = formatter.format(1).split(one)[1];
@@ -732,9 +784,18 @@ export default {
 
                 if (decimalCharIndex > 0 && selectionStart > decimalCharIndex) {
                     if (selectionStart + text.length - (decimalCharIndex + 1) <= maxFractionDigits) {
-                        const charIndex = currencyCharIndex >= selectionStart ? currencyCharIndex - 1 : suffixCharIndex >= selectionStart ? suffixCharIndex : inputValue.length;
+                        const charIndex =
+                            currencyCharIndex >= selectionStart
+                                ? currencyCharIndex - 1
+                                : suffixCharIndex >= selectionStart
+                                  ? suffixCharIndex
+                                  : inputValue.length;
 
-                        newValueStr = inputValue.slice(0, selectionStart) + text + inputValue.slice(selectionStart + text.length, charIndex) + inputValue.slice(charIndex);
+                        newValueStr =
+                            inputValue.slice(0, selectionStart) +
+                            text +
+                            inputValue.slice(selectionStart + text.length, charIndex) +
+                            inputValue.slice(charIndex);
                         this.updateValue(event, newValueStr, text, operation);
                     }
                 } else {
@@ -1000,7 +1061,11 @@ export default {
                 this._decimal.lastIndex = 0;
 
                 if (this.suffixChar) {
-                    return decimalCharIndex !== -1 ? val1.replace(this.suffixChar, '').split(this._decimal)[0] + val2.replace(this.suffixChar, '').slice(decimalCharIndex) + this.suffixChar : val1;
+                    return decimalCharIndex !== -1
+                        ? val1.replace(this.suffixChar, '').split(this._decimal)[0] +
+                              val2.replace(this.suffixChar, '').slice(decimalCharIndex) +
+                              this.suffixChar
+                        : val1;
                 } else {
                     return decimalCharIndex !== -1 ? val1.split(this._decimal)[0] + val2.slice(decimalCharIndex) : val1;
                 }

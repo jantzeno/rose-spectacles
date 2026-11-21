@@ -13,7 +13,12 @@ import type { ButtonPassThroughOptions } from 'rose-spectacles/button';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type CarouselPassThroughOptionType = CarouselPassThroughAttributes | ((options: CarouselPassThroughMethodOptions) => CarouselPassThroughAttributes | string) | string | null | undefined;
+export declare type CarouselPassThroughOptionType =
+    | CarouselPassThroughAttributes
+    | ((options: CarouselPassThroughMethodOptions) => CarouselPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

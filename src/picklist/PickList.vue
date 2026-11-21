@@ -2,28 +2,56 @@
     <div :class="cx('root')" v-bind="ptmi('root')">
         <div v-if="showSourceControls" :class="cx('sourceControls')" v-bind="ptm('sourceControls')" data-pc-group-section="controls">
             <slot name="sourcecontrolsstart"></slot>
-            <Button :aria-label="moveUpAriaLabel" :disabled="moveDisabled(0)" @click="moveUp($event, 0)" v-bind="{ ...buttonProps, ...moveUpButtonProps }" :pt="ptm('pcSourceMoveUpButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveUpAriaLabel"
+                :disabled="moveDisabled(0)"
+                @click="moveUp($event, 0)"
+                v-bind="{ ...buttonProps, ...moveUpButtonProps }"
+                :pt="ptm('pcSourceMoveUpButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="moveupicon">
                         <AngleUpIcon v-bind="ptm('pcSourceMoveUpButton')['icon']" data-pc-section="moveupicon" />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveTopAriaLabel" :disabled="moveDisabled(0)" @click="moveTop($event, 0)" v-bind="{ ...buttonProps, ...moveTopButtonProps }" :pt="ptm('pcSourceMoveTopButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveTopAriaLabel"
+                :disabled="moveDisabled(0)"
+                @click="moveTop($event, 0)"
+                v-bind="{ ...buttonProps, ...moveTopButtonProps }"
+                :pt="ptm('pcSourceMoveTopButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movetopicon">
                         <AngleDoubleUpIcon v-bind="ptm('pcSourceMoveTopButton')['icon']" data-pc-section="movetopicon" />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveDownAriaLabel" :disabled="moveDisabled(0)" @click="moveDown($event, 0)" v-bind="{ ...buttonProps, ...moveDownButtonProps }" :pt="ptm('pcSourceMoveDownButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveDownAriaLabel"
+                :disabled="moveDisabled(0)"
+                @click="moveDown($event, 0)"
+                v-bind="{ ...buttonProps, ...moveDownButtonProps }"
+                :pt="ptm('pcSourceMoveDownButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movedownicon">
                         <AngleDownIcon v-bind="ptm('pcSourceMoveDownButton')['icon']" data-pc-section="movedownicon" />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveBottomAriaLabel" :disabled="moveDisabled(0)" @click="moveBottom($event, 0)" v-bind="{ ...buttonProps, ...moveBottomButtonProps }" :pt="ptm('pcSourceMoveBottomButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveBottomAriaLabel"
+                :disabled="moveDisabled(0)"
+                @click="moveBottom($event, 0)"
+                v-bind="{ ...buttonProps, ...moveBottomButtonProps }"
+                :pt="ptm('pcSourceMoveBottomButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movebottomicon">
                         <AngleDoubleDownIcon v-bind="ptm('pcSourceMoveBottomButton')['icon']" data-pc-section="movebottomicon" />
@@ -67,31 +95,75 @@
         </div>
         <div :class="cx('transferControls')" v-bind="ptm('transferControls')" data-pc-group-section="controls">
             <slot name="movecontrolsstart"></slot>
-            <Button :aria-label="moveToTargetAriaLabel" @click="moveToTarget" :disabled="moveDisabled(0)" v-bind="{ ...buttonProps, ...moveToTargetProps }" :pt="ptm('pcMoveToTargetButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveToTargetAriaLabel"
+                @click="moveToTarget"
+                :disabled="moveDisabled(0)"
+                v-bind="{ ...buttonProps, ...moveToTargetProps }"
+                :pt="ptm('pcMoveToTargetButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movetotargeticon" :viewChanged="viewChanged">
-                        <component :is="viewChanged ? 'AngleDownIcon' : 'AngleRightIcon'" v-bind="ptm('pcMoveToTargetButton')['icon']" data-pc-section="movetotargeticon" />
+                        <component
+                            :is="viewChanged ? 'AngleDownIcon' : 'AngleRightIcon'"
+                            v-bind="ptm('pcMoveToTargetButton')['icon']"
+                            data-pc-section="movetotargeticon"
+                        />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveAllToTargetAriaLabel" @click="moveAllToTarget" :disabled="moveAllDisabled('sourceList')" v-bind="{ ...buttonProps, ...moveAllToTargetProps }" :pt="ptm('pcMoveAllToTargetButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveAllToTargetAriaLabel"
+                @click="moveAllToTarget"
+                :disabled="moveAllDisabled('sourceList')"
+                v-bind="{ ...buttonProps, ...moveAllToTargetProps }"
+                :pt="ptm('pcMoveAllToTargetButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movealltotargeticon" :viewChanged="viewChanged">
-                        <component :is="viewChanged ? 'AngleDoubleDownIcon' : 'AngleDoubleRightIcon'" v-bind="ptm('pcMoveAllToTargetButton')['icon']" data-pc-section="movealltotargeticon" />
+                        <component
+                            :is="viewChanged ? 'AngleDoubleDownIcon' : 'AngleDoubleRightIcon'"
+                            v-bind="ptm('pcMoveAllToTargetButton')['icon']"
+                            data-pc-section="movealltotargeticon"
+                        />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveToSourceAriaLabel" @click="moveToSource" :disabled="moveDisabled(1)" v-bind="{ ...buttonProps, ...moveToSourceProps }" :pt="ptm('pcMoveToSourceButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveToSourceAriaLabel"
+                @click="moveToSource"
+                :disabled="moveDisabled(1)"
+                v-bind="{ ...buttonProps, ...moveToSourceProps }"
+                :pt="ptm('pcMoveToSourceButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movetosourceicon" :viewChanged="viewChanged">
-                        <component :is="viewChanged ? 'AngleUpIcon' : 'AngleLeftIcon'" v-bind="ptm('pcMoveToSourceButton')['icon']" data-pc-section="movetosourceicon" />
+                        <component
+                            :is="viewChanged ? 'AngleUpIcon' : 'AngleLeftIcon'"
+                            v-bind="ptm('pcMoveToSourceButton')['icon']"
+                            data-pc-section="movetosourceicon"
+                        />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveAllToSourceAriaLabel" @click="moveAllToSource" :disabled="moveAllDisabled('targetList')" v-bind="{ ...buttonProps, ...moveAllToSourceProps }" :pt="ptm('pcMoveAllToSourceButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveAllToSourceAriaLabel"
+                @click="moveAllToSource"
+                :disabled="moveAllDisabled('targetList')"
+                v-bind="{ ...buttonProps, ...moveAllToSourceProps }"
+                :pt="ptm('pcMoveAllToSourceButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movealltosourceicon" :viewChanged="viewChanged">
-                        <component :is="viewChanged ? 'AngleDoubleUpIcon' : 'AngleDoubleLeftIcon'" v-bind="ptm('pcMoveAllToSourceButton')['icon']" data-pc-section="movealltosourceicon" />
+                        <component
+                            :is="viewChanged ? 'AngleDoubleUpIcon' : 'AngleDoubleLeftIcon'"
+                            v-bind="ptm('pcMoveAllToSourceButton')['icon']"
+                            data-pc-section="movealltosourceicon"
+                        />
                     </slot>
                 </template>
             </Button>
@@ -132,28 +204,56 @@
         </div>
         <div v-if="showTargetControls" :class="cx('targetControls')" v-bind="ptm('targetControls')" data-pc-group-section="controls">
             <slot name="targetcontrolsstart"></slot>
-            <Button :aria-label="moveUpAriaLabel" :disabled="moveDisabled(1)" @click="moveUp($event, 1)" v-bind="{ ...buttonProps, ...moveUpButtonProps }" :pt="ptm('pcTargetMoveUpButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveUpAriaLabel"
+                :disabled="moveDisabled(1)"
+                @click="moveUp($event, 1)"
+                v-bind="{ ...buttonProps, ...moveUpButtonProps }"
+                :pt="ptm('pcTargetMoveUpButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="moveupicon">
                         <AngleUpIcon v-bind="ptm('pcTargetMoveUpButton')['icon']" data-pc-section="moveupicon" />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveTopAriaLabel" :disabled="moveDisabled(1)" @click="moveTop($event, 1)" v-bind="{ ...buttonProps, ...moveTopButtonProps }" :pt="ptm('pcTargetMoveTopButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveTopAriaLabel"
+                :disabled="moveDisabled(1)"
+                @click="moveTop($event, 1)"
+                v-bind="{ ...buttonProps, ...moveTopButtonProps }"
+                :pt="ptm('pcTargetMoveTopButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movetopicon">
                         <AngleDoubleUpIcon v-bind="ptm('pcTargetMoveTopButton')['icon']" data-pc-section="movetopicon" />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveDownAriaLabel" :disabled="moveDisabled(1)" @click="moveDown($event, 1)" v-bind="{ ...buttonProps, ...moveDownButtonProps }" :pt="ptm('pcTargetMoveDownButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveDownAriaLabel"
+                :disabled="moveDisabled(1)"
+                @click="moveDown($event, 1)"
+                v-bind="{ ...buttonProps, ...moveDownButtonProps }"
+                :pt="ptm('pcTargetMoveDownButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movedownicon">
                         <AngleDownIcon v-bind="ptm('pcTargetMoveDownButton')['icon']" data-pc-section="movedownicon" />
                     </slot>
                 </template>
             </Button>
-            <Button :aria-label="moveBottomAriaLabel" :disabled="moveDisabled(1)" @click="moveBottom($event, 1)" v-bind="{ ...buttonProps, ...moveBottomButtonProps }" :pt="ptm('pcTargetMoveBottomButton')" :unstyled="unstyled">
+            <Button
+                :aria-label="moveBottomAriaLabel"
+                :disabled="moveDisabled(1)"
+                @click="moveBottom($event, 1)"
+                v-bind="{ ...buttonProps, ...moveBottomButtonProps }"
+                :pt="ptm('pcTargetMoveBottomButton')"
+                :unstyled="unstyled"
+            >
                 <template #icon>
                     <slot name="movebottomicon">
                         <AngleDoubleDownIcon v-bind="ptm('pcTargetMoveBottomButton')['icon']" data-pc-section="movebottomicon" />
@@ -185,7 +285,18 @@ export default {
     name: 'PickList',
     extends: BasePickList,
     inheritAttrs: false,
-    emits: ['update:modelValue', 'reorder', 'update:selection', 'selection-change', 'move-to-target', 'move-to-source', 'move-all-to-target', 'move-all-to-source', 'focus', 'blur'],
+    emits: [
+        'update:modelValue',
+        'reorder',
+        'update:selection',
+        'selection-change',
+        'move-to-target',
+        'move-to-source',
+        'move-all-to-target',
+        'move-all-to-source',
+        'focus',
+        'blur'
+    ],
     itemTouched: false,
     reorderDirection: null,
     styleElement: null,

@@ -21,18 +21,47 @@
                         <template v-if="!$slots.item">
                             <a :href="getItemProp(item, 'url')" :class="cx('headerLink')" :tabindex="-1" v-bind="getPTOptions('headerLink', item, index)">
                                 <slot v-if="getItemProp(item, 'items')" name="submenuicon" :active="isItemActive(item)">
-                                    <component :is="isItemActive(item) ? 'ChevronDownIcon' : 'ChevronRightIcon'" :class="cx('submenuIcon')" v-bind="getPTOptions('submenuIcon', item, index)" />
+                                    <component
+                                        :is="isItemActive(item) ? 'ChevronDownIcon' : 'ChevronRightIcon'"
+                                        :class="cx('submenuIcon')"
+                                        v-bind="getPTOptions('submenuIcon', item, index)"
+                                    />
                                 </slot>
-                                <component v-if="$slots.headericon" :is="$slots.headericon" :item="item" :class="[cx('headerIcon'), getItemProp(item, 'icon')]" />
-                                <span v-else-if="getItemProp(item, 'icon')" :class="[cx('headerIcon'), getItemProp(item, 'icon')]" v-bind="getPTOptions('headerIcon', item, index)" />
+                                <component
+                                    v-if="$slots.headericon"
+                                    :is="$slots.headericon"
+                                    :item="item"
+                                    :class="[cx('headerIcon'), getItemProp(item, 'icon')]"
+                                />
+                                <span
+                                    v-else-if="getItemProp(item, 'icon')"
+                                    :class="[cx('headerIcon'), getItemProp(item, 'icon')]"
+                                    v-bind="getPTOptions('headerIcon', item, index)"
+                                />
                                 <span :class="cx('headerLabel')" v-bind="getPTOptions('headerLabel', item, index)">{{ getItemLabel(item) }}</span>
                             </a>
                         </template>
-                        <component v-else :is="$slots.item" :item="item" :root="true" :active="isItemActive(item)" :hasSubmenu="isItemGroup(item)" :label="getItemLabel(item)" :props="getMenuItemProps(item, index)"></component>
+                        <component
+                            v-else
+                            :is="$slots.item"
+                            :item="item"
+                            :root="true"
+                            :active="isItemActive(item)"
+                            :hasSubmenu="isItemGroup(item)"
+                            :label="getItemLabel(item)"
+                            :props="getMenuItemProps(item, index)"
+                        ></component>
                     </div>
                 </div>
                 <transition name="rs-collapsible" v-bind="ptm('transition')">
-                    <div v-show="isItemActive(item)" :id="getContentId(index)" :class="cx('contentContainer')" role="region" :aria-labelledby="getHeaderId(index)" v-bind="ptm('contentContainer')">
+                    <div
+                        v-show="isItemActive(item)"
+                        :id="getContentId(index)"
+                        :class="cx('contentContainer')"
+                        role="region"
+                        :aria-labelledby="getHeaderId(index)"
+                        v-bind="ptm('contentContainer')"
+                    >
                         <div :class="cx('contentWrapper')" v-bind="ptm('contentWrapper')">
                             <div v-if="getItemProp(item, 'items')" :class="cx('content')" v-bind="ptm('content')">
                                 <PanelMenuList
@@ -92,7 +121,11 @@ export default {
             });
         },
         isItemActive(item) {
-            return this.expandedKeys ? this.expandedKeys[this.getItemProp(item, 'key')] : this.multiple ? this.activeItems.some((subItem) => equals(item, subItem)) : equals(item, this.activeItem);
+            return this.expandedKeys
+                ? this.expandedKeys[this.getItemProp(item, 'key')]
+                : this.multiple
+                  ? this.activeItems.some((subItem) => equals(item, subItem))
+                  : equals(item, this.activeItem);
         },
         isItemVisible(item) {
             return this.getItemProp(item, 'visible') !== false;
@@ -161,14 +194,18 @@ export default {
             }
         },
         onHeaderArrowDownKey(event) {
-            const rootList = getAttribute(event.currentTarget, 'data-p-active') === true ? findSingle(event.currentTarget.nextElementSibling, '[data-pc-section="rootlist"]') : null;
+            const rootList =
+                getAttribute(event.currentTarget, 'data-p-active') === true
+                    ? findSingle(event.currentTarget.nextElementSibling, '[data-pc-section="rootlist"]')
+                    : null;
 
             rootList ? focus(rootList) : this.updateFocusedHeader({ originalEvent: event, focusOnNext: true });
             event.preventDefault();
         },
         onHeaderArrowUpKey(event) {
             const prevHeader = this.findPrevHeader(event.currentTarget.parentElement) || this.findLastHeader();
-            const rootList = getAttribute(prevHeader, 'data-p-active') === true ? findSingle(prevHeader.nextElementSibling, '[data-pc-section="rootlist"]') : null;
+            const rootList =
+                getAttribute(prevHeader, 'data-p-active') === true ? findSingle(prevHeader.nextElementSibling, '[data-pc-section="rootlist"]') : null;
 
             rootList ? focus(rootList) : this.updateFocusedHeader({ originalEvent: event, focusOnNext: false });
             event.preventDefault();
@@ -208,7 +245,11 @@ export default {
         updateFocusedHeader(event) {
             const { originalEvent, focusOnNext, selfCheck } = event;
             const panelElement = originalEvent.currentTarget.closest('[data-pc-section="panel"]');
-            const header = selfCheck ? findSingle(panelElement, '[data-pc-section="header"]') : focusOnNext ? this.findNextHeader(panelElement) : this.findPrevHeader(panelElement);
+            const header = selfCheck
+                ? findSingle(panelElement, '[data-pc-section="header"]')
+                : focusOnNext
+                  ? this.findNextHeader(panelElement)
+                  : this.findPrevHeader(panelElement);
 
             header ? this.changeFocusedHeader(originalEvent, header) : focusOnNext ? this.onHeaderHomeKey(originalEvent) : this.onHeaderEndKey(originalEvent);
         },

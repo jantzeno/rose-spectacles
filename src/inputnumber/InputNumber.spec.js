@@ -385,7 +385,10 @@ describe('InputNumber.vue', () => {
         let formWrapper;
 
         beforeEach(() => {
-            formWrapper = mount({ render: () => h(Form, { initialValues: { amount: 555 } }, () => h(InputNumber, { name: 'amount' })) }, { attachTo: document.body });
+            formWrapper = mount(
+                { render: () => h(Form, { initialValues: { amount: 555 } }, () => h(InputNumber, { name: 'amount' })) },
+                { attachTo: document.body }
+            );
         });
 
         afterEach(() => {

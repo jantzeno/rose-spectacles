@@ -1,4 +1,19 @@
-import { addClass, createElement, fadeIn, findSingle, getAttribute, getOuterHeight, getOuterWidth, getViewport, getWindowScrollLeft, getWindowScrollTop, hasClass, isExist, isTouchDevice, removeClass } from '../internal/utils/dom/index';
+import {
+    addClass,
+    createElement,
+    fadeIn,
+    findSingle,
+    getAttribute,
+    getOuterHeight,
+    getOuterWidth,
+    getViewport,
+    getWindowScrollLeft,
+    getWindowScrollTop,
+    hasClass,
+    isExist,
+    isTouchDevice,
+    removeClass
+} from '../internal/utils/dom/index';
 import { isEmpty } from '../internal/utils/object/index';
 import { uuid } from '../internal/utils/uuid/index';
 import { ZIndex } from '../internal/utils/zindex/index';

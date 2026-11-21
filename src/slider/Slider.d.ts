@@ -11,7 +11,12 @@ import type { DefineComponent, DesignToken, EmitFn, HintedString, PassThrough } 
 import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 
-export declare type SliderPassThroughOptionType = SliderPassThroughAttributes | ((options: SliderPassThroughMethodOptions) => SliderPassThroughAttributes | string) | string | null | undefined;
+export declare type SliderPassThroughOptionType =
+    | SliderPassThroughAttributes
+    | ((options: SliderPassThroughMethodOptions) => SliderPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

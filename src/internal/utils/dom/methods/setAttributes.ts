@@ -12,7 +12,11 @@ export default function setAttributes(element: HTMLElement, attributes: { [key: 
                     if (type === 'string' || type === 'number') {
                         cv.push(v);
                     } else if (type === 'object') {
-                        const _cv = Array.isArray(v) ? computedStyles(rule, v) : Object.entries(v).map(([_k, _v]) => (rule === 'style' && (!!_v || _v === 0) ? `${_k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}:${_v}` : _v ? _k : undefined));
+                        const _cv = Array.isArray(v)
+                            ? computedStyles(rule, v)
+                            : Object.entries(v).map(([_k, _v]) =>
+                                  rule === 'style' && (!!_v || _v === 0) ? `${_k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}:${_v}` : _v ? _k : undefined
+                              );
 
                         cv = _cv.length ? cv.concat(_cv.filter((c) => !!c)) : cv;
                     }
@@ -31,7 +35,12 @@ export default function setAttributes(element: HTMLElement, attributes: { [key: 
                 } else if (key === 'rs-bind' || key === 'p-bind' || key === 'pBind') {
                     setAttributes(element, value);
                 } else {
-                    value = key === 'class' ? [...new Set(computedStyles('class', value))].join(' ').trim() : key === 'style' ? computedStyles('style', value).join(';').trim() : value;
+                    value =
+                        key === 'class'
+                            ? [...new Set(computedStyles('class', value))].join(' ').trim()
+                            : key === 'style'
+                              ? computedStyles('style', value).join(';').trim()
+                              : value;
                     ((element as any).$attrs = (element as any).$attrs || {}) && ((element as any).$attrs[key] = value);
                     element.setAttribute(key, value);
                 }

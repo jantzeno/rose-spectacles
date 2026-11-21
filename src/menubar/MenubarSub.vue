@@ -26,17 +26,49 @@
                     v-bind="getPTOptions(processedItem, index, 'itemContent')"
                 >
                     <template v-if="!templates.item">
-                        <a v-ripple :href="getItemProp(processedItem, 'url')" :class="cx('itemLink')" :target="getItemProp(processedItem, 'target')" tabindex="-1" v-bind="getPTOptions(processedItem, index, 'itemLink')">
+                        <a
+                            v-ripple
+                            :href="getItemProp(processedItem, 'url')"
+                            :class="cx('itemLink')"
+                            :target="getItemProp(processedItem, 'target')"
+                            tabindex="-1"
+                            v-bind="getPTOptions(processedItem, index, 'itemLink')"
+                        >
                             <component v-if="templates.itemicon" :is="templates.itemicon" :item="processedItem.item" :class="cx('itemIcon')" />
-                            <span v-else-if="getItemProp(processedItem, 'icon')" :class="[cx('itemIcon'), getItemProp(processedItem, 'icon')]" v-bind="getPTOptions(processedItem, index, 'itemIcon')" />
-                            <span :id="getItemLabelId(processedItem)" :class="cx('itemLabel')" v-bind="getPTOptions(processedItem, index, 'itemLabel')">{{ getItemLabel(processedItem) }}</span>
+                            <span
+                                v-else-if="getItemProp(processedItem, 'icon')"
+                                :class="[cx('itemIcon'), getItemProp(processedItem, 'icon')]"
+                                v-bind="getPTOptions(processedItem, index, 'itemIcon')"
+                            />
+                            <span :id="getItemLabelId(processedItem)" :class="cx('itemLabel')" v-bind="getPTOptions(processedItem, index, 'itemLabel')">{{
+                                getItemLabel(processedItem)
+                            }}</span>
                             <template v-if="getItemProp(processedItem, 'items')">
-                                <component v-if="templates.submenuicon" :is="templates.submenuicon" :root="root" :active="isItemActive(processedItem)" :class="cx('submenuIcon')" />
-                                <component v-else :is="root ? 'AngleDownIcon' : 'AngleRightIcon'" :class="cx('submenuIcon')" v-bind="getPTOptions(processedItem, index, 'submenuIcon')" />
+                                <component
+                                    v-if="templates.submenuicon"
+                                    :is="templates.submenuicon"
+                                    :root="root"
+                                    :active="isItemActive(processedItem)"
+                                    :class="cx('submenuIcon')"
+                                />
+                                <component
+                                    v-else
+                                    :is="root ? 'AngleDownIcon' : 'AngleRightIcon'"
+                                    :class="cx('submenuIcon')"
+                                    v-bind="getPTOptions(processedItem, index, 'submenuIcon')"
+                                />
                             </template>
                         </a>
                     </template>
-                    <component v-else :is="templates.item" :item="processedItem.item" :root="root" :hasSubmenu="!!getItemProp(processedItem, 'items')" :label="getItemLabel(processedItem)" :props="getMenuItemProps(processedItem, index)"></component>
+                    <component
+                        v-else
+                        :is="templates.item"
+                        :item="processedItem.item"
+                        :root="root"
+                        :hasSubmenu="!!getItemProp(processedItem, 'items')"
+                        :label="getItemLabel(processedItem)"
+                        :props="getMenuItemProps(processedItem, index)"
+                    ></component>
                 </div>
                 <MenubarSub
                     v-if="isItemVisible(processedItem) && isItemGroup(processedItem)"

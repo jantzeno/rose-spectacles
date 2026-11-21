@@ -14,13 +14,32 @@
                     :data-p-disabled="disabled(item)"
                 >
                     <template v-if="!$slots.item">
-                        <a ref="tabLink" v-ripple role="menuitem" :href="item.url" :class="cx('itemLink')" :target="item.target" :aria-label="label(item)" :aria-disabled="disabled(item)" :tabindex="-1" v-bind="getPTOptions('itemLink', item, i)">
+                        <a
+                            ref="tabLink"
+                            v-ripple
+                            role="menuitem"
+                            :href="item.url"
+                            :class="cx('itemLink')"
+                            :target="item.target"
+                            :aria-label="label(item)"
+                            :aria-disabled="disabled(item)"
+                            :tabindex="-1"
+                            v-bind="getPTOptions('itemLink', item, i)"
+                        >
                             <component v-if="$slots.itemicon" :is="$slots.itemicon" :item="item" :class="cx('itemIcon')" />
                             <span v-else-if="item.icon" :class="[cx('itemIcon'), item.icon]" v-bind="getPTOptions('itemIcon', item, i)" />
                             <span :class="cx('itemLabel')" v-bind="getPTOptions('itemLabel', item, i)">{{ label(item) }}</span>
                         </a>
                     </template>
-                    <component v-else :is="$slots.item" :item="item" :index="i" :active="i === d_activeIndex" :label="label(item)" :props="getMenuItemProps(item, i)"></component>
+                    <component
+                        v-else
+                        :is="$slots.item"
+                        :item="item"
+                        :index="i"
+                        :active="i === d_activeIndex"
+                        :label="label(item)"
+                        :props="getMenuItemProps(item, i)"
+                    ></component>
                 </li>
             </template>
             <li ref="inkbar" role="none" :class="cx('activeBar')" v-bind="ptm('activeBar')"></li>

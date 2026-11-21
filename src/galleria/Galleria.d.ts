@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { ButtonHTMLAttributes, HTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type GalleriaPassThroughOptionType = GalleriaPassThroughAttributes | ((options: GalleriaPassThroughMethodOptions) => GalleriaPassThroughAttributes | string) | string | null | undefined;
+export declare type GalleriaPassThroughOptionType =
+    | GalleriaPassThroughAttributes
+    | ((options: GalleriaPassThroughMethodOptions) => GalleriaPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type GalleriaPassThroughTransitionType = TransitionProps | ((options: GalleriaPassThroughMethodOptions) => TransitionProps) | undefined;
 

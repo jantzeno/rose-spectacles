@@ -107,7 +107,10 @@ export default {
             return isNotEmpty(this.d_value);
         },
         $invalid() {
-            return !this.$formNovalidate && this.findNonEmpty(this.invalid, this.$pcFormField?.$field?.invalid, this.$pcForm?.getFieldState(this.$formName)?.invalid);
+            return (
+                !this.$formNovalidate &&
+                this.findNonEmpty(this.invalid, this.$pcFormField?.$field?.invalid, this.$pcForm?.getFieldState(this.$formName)?.invalid)
+            );
         },
         $formName() {
             return !this.$formNovalidate ? this.name || this.$formControl?.name : undefined;

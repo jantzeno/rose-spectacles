@@ -12,7 +12,11 @@
                 v-bind="{ ...prevButtonProps, ...ptm('thumbnailPrevButton') }"
                 data-pc-group-section="thumbnailnavigator"
             >
-                <component :is="templates.previousthumbnailicon || (isVertical ? 'ChevronUpIcon' : 'ChevronLeftIcon')" :class="cx('thumbnailPrevIcon')" v-bind="ptm('thumbnailPrevIcon')" />
+                <component
+                    :is="templates.previousthumbnailicon || (isVertical ? 'ChevronUpIcon' : 'ChevronLeftIcon')"
+                    :class="cx('thumbnailPrevIcon')"
+                    v-bind="ptm('thumbnailPrevIcon')"
+                />
             </button>
             <div :class="cx('thumbnailsViewport')" :style="{ height: isVertical ? contentHeight : '' }" v-bind="ptm('thumbnailsViewport')">
                 <div
@@ -64,7 +68,11 @@
                 v-bind="{ ...nextButtonProps, ...ptm('thumbnailNextButton') }"
                 data-pc-group-section="thumbnailnavigator"
             >
-                <component :is="templates.nextthumbnailicon || (isVertical ? 'ChevronDownIcon' : 'ChevronRightIcon')" :class="cx('thumbnailNextIcon')" v-bind="ptm('thumbnailNextIcon')" />
+                <component
+                    :is="templates.nextthumbnailicon || (isVertical ? 'ChevronDownIcon' : 'ChevronRightIcon')"
+                    :class="cx('thumbnailNextIcon')"
+                    v-bind="ptm('thumbnailNextIcon')"
+                />
             </button>
         </div>
     </div>
@@ -188,7 +196,9 @@ export default {
                 this.totalShiftedItems = totalShiftedItems;
             }
 
-            this.$refs.itemsContainer.style.transform = this.isVertical ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)` : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
+            this.$refs.itemsContainer.style.transform = this.isVertical
+                ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
+                : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
 
             if (this.d_oldActiveItemIndex !== this.d_activeIndex) {
                 document.body.setAttribute('data-p-items-hidden', 'false');
@@ -230,7 +240,9 @@ export default {
             if (this.$refs.itemsContainer) {
                 document.body.setAttribute('data-p-items-hidden', 'false');
                 !this.isUnstyled && removeClass(this.$refs.itemsContainer, 'rs-items-hidden');
-                this.$refs.itemsContainer.style.transform = this.isVertical ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)` : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
+                this.$refs.itemsContainer.style.transform = this.isVertical
+                    ? `translate3d(0, ${totalShiftedItems * (100 / this.d_numVisible)}%, 0)`
+                    : `translate3d(${totalShiftedItems * (100 / this.d_numVisible)}%, 0, 0)`;
                 this.$refs.itemsContainer.style.transition = 'transform 500ms ease 0s';
             }
 
@@ -269,7 +281,10 @@ export default {
 
             let nextItemIndex = this.d_activeIndex === this.value.length - 1 ? this.value.length - 1 : this.d_activeIndex + 1;
 
-            if (nextItemIndex + this.totalShiftedItems > this.getMedianItemIndex() && (-1 * this.totalShiftedItems < this.getTotalPageNumber() - 1 || this.circular)) {
+            if (
+                nextItemIndex + this.totalShiftedItems > this.getMedianItemIndex() &&
+                (-1 * this.totalShiftedItems < this.getTotalPageNumber() - 1 || this.circular)
+            ) {
                 this.step(-1);
             }
 
@@ -421,9 +436,9 @@ export default {
             }
         },
         changePageOnTouch(e, diff) {
-            const touchThreshold = 10
+            const touchThreshold = 10;
 
-            if(Math.abs(diff) < touchThreshold) {
+            if (Math.abs(diff) < touchThreshold) {
                 // only a click/tap
                 return;
             }

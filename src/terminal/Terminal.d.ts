@@ -11,7 +11,12 @@ import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spe
 import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 
-export declare type TerminalPassThroughOptionType = TerminalPassThroughAttributes | ((options: TerminalPassThroughMethodOptions) => TerminalPassThroughAttributes | string) | string | null | undefined;
+export declare type TerminalPassThroughOptionType =
+    | TerminalPassThroughAttributes
+    | ((options: TerminalPassThroughMethodOptions) => TerminalPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

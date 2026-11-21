@@ -10,7 +10,12 @@
 import type { DefineComponent, EmitFn, PassThrough } from 'rose-spectacles/core';
 import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 
-export declare type RowPassThroughOptionType<T = any> = RowPassThroughAttributes | ((options: RowPassThroughMethodOptions<T>) => RowPassThroughAttributes | string) | string | null | undefined;
+export declare type RowPassThroughOptionType<T = any> =
+    | RowPassThroughAttributes
+    | ((options: RowPassThroughMethodOptions<T>) => RowPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

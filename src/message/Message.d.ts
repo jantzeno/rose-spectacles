@@ -12,9 +12,17 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { ButtonHTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type MessagePassThroughOptionType<T = any> = MessagePassThroughAttributes | ((options: MessagePassThroughMethodOptions<T>) => MessagePassThroughAttributes | string) | string | null | undefined;
+export declare type MessagePassThroughOptionType<T = any> =
+    | MessagePassThroughAttributes
+    | ((options: MessagePassThroughMethodOptions<T>) => MessagePassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
-export declare type MessagePassThroughTransitionType<T = any> = TransitionProps | ((options: MessagePassThroughMethodOptions<T>) => TransitionProps) | undefined;
+export declare type MessagePassThroughTransitionType<T = any> =
+    | TransitionProps
+    | ((options: MessagePassThroughMethodOptions<T>) => TransitionProps)
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

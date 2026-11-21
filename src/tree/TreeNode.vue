@@ -31,17 +31,47 @@
             :data-p-selected="checkboxMode ? checked : selected"
             :data-p-selectable="selectable"
         >
-            <button v-ripple type="button" :class="cx('nodeToggleButton')" @click="toggle" tabindex="-1" :data-p-leaf="leaf" v-bind="getPTOptions('nodeToggleButton')">
+            <button
+                v-ripple
+                type="button"
+                :class="cx('nodeToggleButton')"
+                @click="toggle"
+                tabindex="-1"
+                :data-p-leaf="leaf"
+                v-bind="getPTOptions('nodeToggleButton')"
+            >
                 <template v-if="node.loading && loadingMode === 'icon'">
                     <!-- TODO: nodetogglericon deprecated since v4.0-->
-                    <component v-if="templates['nodetoggleicon'] || templates['nodetogglericon']" :is="templates['nodetoggleicon'] || templates['nodetogglericon']" :node="node" :expanded="expanded" :class="cx('nodeToggleIcon')" />
+                    <component
+                        v-if="templates['nodetoggleicon'] || templates['nodetogglericon']"
+                        :is="templates['nodetoggleicon'] || templates['nodetogglericon']"
+                        :node="node"
+                        :expanded="expanded"
+                        :class="cx('nodeToggleIcon')"
+                    />
                     <SpinnerIcon v-else spin :class="cx('nodeToggleIcon')" v-bind="getPTOptions('nodeToggleIcon')" />
                 </template>
                 <template v-else>
                     <!-- TODO: togglericon deprecated since v4.0-->
-                    <component v-if="templates['nodetoggleicon'] || templates['togglericon']" :is="templates['nodetoggleicon'] || templates['togglericon']" :node="node" :expanded="expanded" :class="cx('nodeToggleIcon')" />
-                    <component v-else-if="expanded" :is="node.expandedIcon ? 'span' : 'ChevronDownIcon'" :class="cx('nodeToggleIcon')" v-bind="getPTOptions('nodeToggleIcon')" />
-                    <component v-else :is="node.collapsedIcon ? 'span' : 'ChevronRightIcon'" :class="cx('nodeToggleIcon')" v-bind="getPTOptions('nodeToggleIcon')" />
+                    <component
+                        v-if="templates['nodetoggleicon'] || templates['togglericon']"
+                        :is="templates['nodetoggleicon'] || templates['togglericon']"
+                        :node="node"
+                        :expanded="expanded"
+                        :class="cx('nodeToggleIcon')"
+                    />
+                    <component
+                        v-else-if="expanded"
+                        :is="node.expandedIcon ? 'span' : 'ChevronDownIcon'"
+                        :class="cx('nodeToggleIcon')"
+                        v-bind="getPTOptions('nodeToggleIcon')"
+                    />
+                    <component
+                        v-else
+                        :is="node.collapsedIcon ? 'span' : 'ChevronRightIcon'"
+                        :class="cx('nodeToggleIcon')"
+                        v-bind="getPTOptions('nodeToggleIcon')"
+                    />
                 </template>
             </button>
             <Checkbox
@@ -56,13 +86,31 @@
                 :data-p-partialchecked="partialChecked"
             >
                 <template #icon="slotProps">
-                    <component v-if="templates['checkboxicon']" :is="templates['checkboxicon']" :checked="slotProps.checked" :partialChecked="partialChecked" :class="slotProps.class" />
+                    <component
+                        v-if="templates['checkboxicon']"
+                        :is="templates['checkboxicon']"
+                        :checked="slotProps.checked"
+                        :partialChecked="partialChecked"
+                        :class="slotProps.class"
+                    />
                 </template>
             </Checkbox>
-            <component v-if="templates['nodeicon']" :is="templates['nodeicon']" :node="node" :class="[cx('nodeIcon')]" v-bind="getPTOptions('nodeIcon')"></component>
+            <component
+                v-if="templates['nodeicon']"
+                :is="templates['nodeicon']"
+                :node="node"
+                :class="[cx('nodeIcon')]"
+                v-bind="getPTOptions('nodeIcon')"
+            ></component>
             <span v-else :class="[cx('nodeIcon'), node.icon]" v-bind="getPTOptions('nodeIcon')"></span>
             <span :class="cx('nodeLabel')" v-bind="getPTOptions('nodeLabel')" @keydown.stop>
-                <component v-if="templates[node.type] || templates['default']" :is="templates[node.type] || templates['default']" :node="node" :expanded="expanded" :selected="checkboxMode ? checked : selected" />
+                <component
+                    v-if="templates[node.type] || templates['default']"
+                    :is="templates[node.type] || templates['default']"
+                    :node="node"
+                    :expanded="expanded"
+                    :selected="checkboxMode ? checked : selected"
+                />
                 <template v-else>{{ label(node) }}</template>
             </span>
         </div>
@@ -212,7 +260,11 @@ export default {
             });
         },
         onClick(event) {
-            if (this.toggleClicked || getAttribute(event.target, '[data-pc-section="nodetogglebutton"]') || getAttribute(event.target.parentElement, '[data-pc-section="nodetogglebutton"]')) {
+            if (
+                this.toggleClicked ||
+                getAttribute(event.target, '[data-pc-section="nodetogglebutton"]') ||
+                getAttribute(event.target.parentElement, '[data-pc-section="nodetogglebutton"]')
+            ) {
                 this.toggleClicked = false;
 
                 return;
@@ -566,7 +618,9 @@ export default {
             });
 
             if (hasSelectedNode) {
-                const selectedNodes = [...nodes].filter((node) => node.getAttribute('aria-selected') === 'true' || node.getAttribute('aria-checked') === 'true');
+                const selectedNodes = [...nodes].filter(
+                    (node) => node.getAttribute('aria-selected') === 'true' || node.getAttribute('aria-checked') === 'true'
+                );
 
                 selectedNodes[0].tabIndex = 0;
 
@@ -647,7 +701,8 @@ export default {
                     delete _selectionKeys[this.node.key];
                 }
 
-                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length)) _selectionKeys[this.node.key] = { checked: false, partialChecked: true };
+                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== this.node.children.length))
+                    _selectionKeys[this.node.key] = { checked: false, partialChecked: true };
                 else delete _selectionKeys[this.node.key];
             }
 
@@ -693,7 +748,10 @@ export default {
             return this.selectionMode === 'checkbox';
         },
         isSameNode(event) {
-            return event.currentTarget && (event.currentTarget.isSameNode(event.target) || event.currentTarget.isSameNode(event.target.closest('[role="treeitem"]')));
+            return (
+                event.currentTarget &&
+                (event.currentTarget.isSameNode(event.target) || event.currentTarget.isSameNode(event.target.closest('[role="treeitem"]')))
+            );
         }
     },
     computed: {

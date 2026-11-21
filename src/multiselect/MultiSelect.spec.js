@@ -270,7 +270,9 @@ describe('MultiSelect.vue', () => {
         };
 
         const clickOnNestedOverlay = (emitterTarget) => {
-            nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), { once: true });
+            nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), {
+                once: true
+            });
             nestedOverlay.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
             outsideClick(nestedOverlay);
         };
@@ -783,7 +785,13 @@ describe('MultiSelect.vue', () => {
             await openOverlay(wrapper);
 
             expect(selectedLabels(wrapper)).toEqual(['Rome', 'Paris']);
-            expect(wrapper.findAll('li.rs-multiselect-option').map((option) => option.attributes('aria-disabled'))).toEqual(['true', 'false', 'true', 'true', 'false']);
+            expect(wrapper.findAll('li.rs-multiselect-option').map((option) => option.attributes('aria-disabled'))).toEqual([
+                'true',
+                'false',
+                'true',
+                'true',
+                'false'
+            ]);
         });
 
         it('should match options inside groups', async () => {

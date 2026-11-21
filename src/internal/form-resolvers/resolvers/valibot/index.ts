@@ -9,7 +9,9 @@ export const valibotResolver =
         const { sync = false, raw = false } = resolverOptions || {};
 
         try {
-            const result: InferOutput<any> | Promise<InferOutput<any>> = sync ? safeParse(schema, values, { abortPipeEarly: false, ...schemaOptions }) : await safeParseAsync(schema, values, { abortPipeEarly: false, ...schemaOptions });
+            const result: InferOutput<any> | Promise<InferOutput<any>> = sync
+                ? safeParse(schema, values, { abortPipeEarly: false, ...schemaOptions })
+                : await safeParseAsync(schema, values, { abortPipeEarly: false, ...schemaOptions });
 
             if (result.success) {
                 return {

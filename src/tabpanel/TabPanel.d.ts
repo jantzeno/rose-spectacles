@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { AnchorHTMLAttributes, Component, HTMLAttributes, LiHTMLAttributes, VNode } from 'vue';
 
-export declare type TabPanelPassThroughOptionType = TabPanelPassThroughAttributes | ((options: TabPanelPassThroughMethodOptions) => TabPanelPassThroughAttributes | string) | string | null | undefined;
+export declare type TabPanelPassThroughOptionType =
+    | TabPanelPassThroughAttributes
+    | ((options: TabPanelPassThroughMethodOptions) => TabPanelPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

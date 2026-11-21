@@ -13,7 +13,12 @@ import type { ChipPassThroughOptions } from 'rose-spectacles/chip';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { InputHTMLAttributes, VNode } from 'vue';
 
-export declare type InputChipsPassThroughOptionType = InputChipsPassThroughAttributes | ((options: InputChipsPassThroughMethodOptions) => InputChipsPassThroughAttributes | string) | string | null | undefined;
+export declare type InputChipsPassThroughOptionType =
+    | InputChipsPassThroughAttributes
+    | ((options: InputChipsPassThroughMethodOptions) => InputChipsPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

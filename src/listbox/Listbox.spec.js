@@ -289,7 +289,14 @@ describe('Listbox.vue', () => {
         it('should render the selection correctly with the virtual scroller', async () => {
             const options = Array.from({ length: 1000 }, (_, i) => ({ name: `Item #${i}`, value: i }));
             const modelValue = options.filter((option) => option.value % 2 === 0).map((option) => option.value);
-            const wrapper = mountListbox({ multiple: true, options, optionValue: 'value', modelValue, virtualScrollerOptions: { itemSize: 38 }, listStyle: 'height:250px' });
+            const wrapper = mountListbox({
+                multiple: true,
+                options,
+                optionValue: 'value',
+                modelValue,
+                virtualScrollerOptions: { itemSize: 38 },
+                listStyle: 'height:250px'
+            });
 
             // jsdom has no layout, so the scroller can't work out its viewport. Set the rendered range by hand,
             // far down the list, as if the user had scrolled there.
@@ -322,7 +329,8 @@ describe('Listbox.vue', () => {
             }
         };
 
-        const mountCaseInsensitive = (props) => mount(CaseInsensitiveListbox, { props: { options: cities(), optionLabel: 'name', multiple: true, optionValue: 'code', ...props } });
+        const mountCaseInsensitive = (props) =>
+            mount(CaseInsensitiveListbox, { props: { options: cities(), optionLabel: 'name', multiple: true, optionValue: 'code', ...props } });
 
         it('should use the overridden isEquals to show selected options', () => {
             const wrapper = mountCaseInsensitive({ modelValue: ['rm', 'prs'] });

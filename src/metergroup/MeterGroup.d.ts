@@ -11,7 +11,12 @@ import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spe
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type MeterGroupPassThroughOptionType = MeterGroupPassThroughAttributes | ((options: MeterGroupPassThroughMethodOptions) => MeterGroupPassThroughAttributes | string) | string | null | undefined;
+export declare type MeterGroupPassThroughOptionType =
+    | MeterGroupPassThroughAttributes
+    | ((options: MeterGroupPassThroughMethodOptions) => MeterGroupPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

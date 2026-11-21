@@ -2,7 +2,16 @@
     <template v-if="isVertical">
         <template v-if="!asChild">
             <transition name="rs-collapsible" v-bind="ptm('transition')">
-                <component v-show="active" :is="as" :id="id" :class="cx('root')" role="tabpanel" :aria-labelledby="ariaLabelledby" :data-p="dataP" v-bind="getPTOptions('root')">
+                <component
+                    v-show="active"
+                    :is="as"
+                    :id="id"
+                    :class="cx('root')"
+                    role="tabpanel"
+                    :aria-labelledby="ariaLabelledby"
+                    :data-p="dataP"
+                    v-bind="getPTOptions('root')"
+                >
                     <div :class="cx('contentWrapper')" v-bind="ptm('contentWrapper', ptParams)">
                         <StepperSeparator v-if="isSeparatorVisible" :data-p="dataP" />
                         <div :class="cx('content')" :data-p="dataP" v-bind="getPTOptions('content')">

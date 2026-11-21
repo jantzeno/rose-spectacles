@@ -1,7 +1,15 @@
 <template>
     <Portal :appendTo="appendTo" :disabled="!popup">
         <transition name="rs-anchored-overlay" @enter="onEnter" @leave="onLeave" @after-leave="onAfterLeave" v-bind="ptm('transition')">
-            <div v-if="popup ? overlayVisible : true" :ref="containerRef" :id="$id" :class="cx('root')" @click="onOverlayClick" :data-p="dataP" v-bind="ptmi('root')">
+            <div
+                v-if="popup ? overlayVisible : true"
+                :ref="containerRef"
+                :id="$id"
+                :class="cx('root')"
+                @click="onOverlayClick"
+                :data-p="dataP"
+                v-bind="ptmi('root')"
+            >
                 <div v-if="$slots.start" :class="cx('start')" v-bind="ptm('start')">
                     <slot name="start"></slot>
                 </div>
@@ -37,10 +45,24 @@
                                     @item-mousemove="itemMouseMove"
                                     :pt="pt"
                                 />
-                                <li v-else-if="visible(child) && child.separator" :key="'separator' + i + j" :class="[cx('separator'), item.class]" :style="child.style" role="separator" v-bind="ptm('separator')"></li>
+                                <li
+                                    v-else-if="visible(child) && child.separator"
+                                    :key="'separator' + i + j"
+                                    :class="[cx('separator'), item.class]"
+                                    :style="child.style"
+                                    role="separator"
+                                    v-bind="ptm('separator')"
+                                ></li>
                             </template>
                         </template>
-                        <li v-else-if="visible(item) && item.separator" :key="'separator' + i.toString()" :class="[cx('separator'), item.class]" :style="item.style" role="separator" v-bind="ptm('separator')"></li>
+                        <li
+                            v-else-if="visible(item) && item.separator"
+                            :key="'separator' + i.toString()"
+                            :class="[cx('separator'), item.class]"
+                            :style="item.style"
+                            role="separator"
+                            v-bind="ptm('separator')"
+                        ></li>
                         <PVMenuitem
                             v-else
                             :key="label(item) + i.toString()"

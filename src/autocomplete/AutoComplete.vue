@@ -77,7 +77,12 @@
                         :pt="ptm('pcChip')"
                     >
                         <template #removeicon>
-                            <slot :name="$slots.chipicon ? 'chipicon' : 'removetokenicon'" :class="cx('chipIcon')" :index="i" :removeCallback="(event) => removeOption(event, i)" />
+                            <slot
+                                :name="$slots.chipicon ? 'chipicon' : 'removetokenicon'"
+                                :class="cx('chipIcon')"
+                                :index="i"
+                                :removeCallback="(event) => removeOption(event, i)"
+                            />
                         </template>
                     </Chip>
                 </slot>
@@ -112,7 +117,13 @@
             </li>
         </ul>
         <slot v-if="searching || loading" :class="cx('loader')" :name="$slots.loader ? 'loader' : 'loadingicon'">
-            <i v-if="loader || loadingIcon" :class="['pi-spin', cx('loader'), loader, loadingIcon]" aria-hidden="true" :data-p-has-dropdown="dropdown" v-bind="ptm('loader')" />
+            <i
+                v-if="loader || loadingIcon"
+                :class="['pi-spin', cx('loader'), loader, loadingIcon]"
+                aria-hidden="true"
+                :data-p-has-dropdown="dropdown"
+                v-bind="ptm('loader')"
+            />
             <SpinnerIcon v-else-if="loading" :class="cx('loader')" spin aria-hidden="true" :data-p-has-dropdown="dropdown" v-bind="ptm('loader')" />
         </slot>
         <slot :name="$slots.dropdown ? 'dropdown' : 'dropdownbutton'" :toggleCallback="(event) => onDropdownClick(event)">
@@ -133,11 +144,25 @@
                 </slot>
             </button>
         </slot>
-        <span v-if="typeahead" role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenSearchResult')" :data-p-hidden-accessible="true">
+        <span
+            v-if="typeahead"
+            role="status"
+            aria-live="polite"
+            class="rs-hidden-accessible"
+            v-bind="ptm('hiddenSearchResult')"
+            :data-p-hidden-accessible="true"
+        >
             {{ searchResultMessageText }}
         </span>
         <Portal :appendTo="appendTo">
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter" @after-enter="onOverlayAfterEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="ptm('transition')">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter"
+                @after-enter="onOverlayAfterEnter"
+                @leave="onOverlayLeave"
+                @after-leave="onOverlayAfterLeave"
+                v-bind="ptm('transition')"
+            >
                 <div
                     v-if="overlayVisible"
                     :ref="overlayRef"
@@ -151,9 +176,25 @@
                 >
                     <slot name="header" :value="d_value" :suggestions="visibleOptions"></slot>
                     <div :class="cx('listContainer')" :style="{ 'max-height': virtualScrollerDisabled ? scrollHeight : '' }" v-bind="ptm('listContainer')">
-                        <VirtualScroller :ref="virtualScrollerRef" v-bind="virtualScrollerOptions" :style="{ height: scrollHeight }" :items="visibleOptions" :tabindex="-1" :disabled="virtualScrollerDisabled" :pt="ptm('virtualScroller')">
+                        <VirtualScroller
+                            :ref="virtualScrollerRef"
+                            v-bind="virtualScrollerOptions"
+                            :style="{ height: scrollHeight }"
+                            :items="visibleOptions"
+                            :tabindex="-1"
+                            :disabled="virtualScrollerDisabled"
+                            :pt="ptm('virtualScroller')"
+                        >
                             <template v-slot:content="{ styleClass, contentRef, items, getItemOptions, contentStyle, itemSize }">
-                                <ul :ref="(el) => listRef(el, contentRef)" :id="$id + '_list'" :class="[cx('list'), styleClass]" :style="contentStyle" role="listbox" :aria-label="listAriaLabel" v-bind="ptm('list')">
+                                <ul
+                                    :ref="(el) => listRef(el, contentRef)"
+                                    :id="$id + '_list'"
+                                    :class="[cx('list'), styleClass]"
+                                    :style="contentStyle"
+                                    role="listbox"
+                                    :aria-label="listAriaLabel"
+                                    v-bind="ptm('list')"
+                                >
                                     <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
                                         <li
                                             v-if="isOptionGroup(option)"
@@ -163,7 +204,9 @@
                                             role="option"
                                             v-bind="ptm('optionGroup')"
                                         >
-                                            <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{ getOptionGroupLabel(option.optionGroup) }}</slot>
+                                            <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{
+                                                getOptionGroupLabel(option.optionGroup)
+                                            }}</slot>
                                         </li>
                                         <li
                                             v-else
@@ -187,7 +230,12 @@
                                             <slot name="option" :option="option" :index="getOptionIndex(i, getItemOptions)">{{ getOptionLabel(option) }}</slot>
                                         </li>
                                     </template>
-                                    <li v-if="showEmptyMessage && (!items || (items && items.length === 0))" :class="cx('emptyMessage')" role="option" v-bind="ptm('emptyMessage')">
+                                    <li
+                                        v-if="showEmptyMessage && (!items || (items && items.length === 0))"
+                                        :class="cx('emptyMessage')"
+                                        role="option"
+                                        v-bind="ptm('emptyMessage')"
+                                    >
                                         <slot name="empty">{{ searchResultMessageText }}</slot>
                                     </li>
                                 </ul>
@@ -234,7 +282,22 @@ export default {
     name: 'AutoComplete',
     extends: BaseAutoComplete,
     inheritAttrs: false,
-    emits: ['change', 'focus', 'blur', 'item-select', 'item-unselect', 'option-select', 'option-unselect', 'dropdown-click', 'clear', 'complete', 'before-show', 'before-hide', 'show', 'hide'],
+    emits: [
+        'change',
+        'focus',
+        'blur',
+        'item-select',
+        'item-unselect',
+        'option-select',
+        'option-unselect',
+        'dropdown-click',
+        'clear',
+        'complete',
+        'before-show',
+        'before-hide',
+        'show',
+        'hide'
+    ],
     inject: {
         $pcFluid: { default: null }
     },
@@ -372,7 +435,12 @@ export default {
             this.focused = true;
 
             if (this.overlayVisible) {
-                this.focusedOptionIndex = this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : this.overlayVisible && this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : -1;
+                this.focusedOptionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.focusedOptionIndex
+                        : this.overlayVisible && this.autoOptionFocus
+                          ? this.findFirstFocusedOptionIndex()
+                          : -1;
                 this.scrollInView(this.focusedOptionIndex);
             }
 
@@ -642,7 +710,12 @@ export default {
                 return;
             }
 
-            const optionIndex = this.focusedOptionIndex !== -1 ? this.findNextOptionIndex(this.focusedOptionIndex) : this.clicked ? this.findFirstOptionIndex() : this.findFirstFocusedOptionIndex();
+            const optionIndex =
+                this.focusedOptionIndex !== -1
+                    ? this.findNextOptionIndex(this.focusedOptionIndex)
+                    : this.clicked
+                      ? this.findFirstOptionIndex()
+                      : this.findFirstFocusedOptionIndex();
 
             if (this.multiple && event.shiftKey) {
                 this.onOptionSelectRange(event, this.startRangeIndex, optionIndex);
@@ -665,7 +738,12 @@ export default {
                 this.overlayVisible && this.hide();
                 event.preventDefault();
             } else {
-                const optionIndex = this.focusedOptionIndex !== -1 ? this.findPrevOptionIndex(this.focusedOptionIndex) : this.clicked ? this.findLastOptionIndex() : this.findLastFocusedOptionIndex();
+                const optionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.findPrevOptionIndex(this.focusedOptionIndex)
+                        : this.clicked
+                          ? this.findLastOptionIndex()
+                          : this.findLastFocusedOptionIndex();
 
                 if (this.multiple && event.shiftKey) {
                     this.onOptionSelectRange(event, optionIndex, this.startRangeIndex);
@@ -926,7 +1004,9 @@ export default {
             return this.$refs.dropdownButton ? event.target === this.$refs.dropdownButton || this.$refs.dropdownButton.contains(event.target) : false;
         },
         isOptionMatched(option, value) {
-            return this.isValidOption(option) && this.getOptionLabel(option)?.toLocaleLowerCase(this.searchLocale) === value.toLocaleLowerCase(this.searchLocale);
+            return (
+                this.isValidOption(option) && this.getOptionLabel(option)?.toLocaleLowerCase(this.searchLocale) === value.toLocaleLowerCase(this.searchLocale)
+            );
         },
         isValidOption(option) {
             return isNotEmpty(option) && !(this.isOptionDisabled(option) || this.isOptionGroup(option));
@@ -961,7 +1041,8 @@ export default {
             return findLastIndex(this.visibleOptions, (option) => this.isValidOption(option));
         },
         findNextOptionIndex(index) {
-            const matchedOptionIndex = index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
+            const matchedOptionIndex =
+                index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : index;
         },
@@ -1061,12 +1142,16 @@ export default {
             this.virtualScroller = el;
         },
         findNextSelectedOptionIndex(index) {
-            const matchedOptionIndex = this.$filled && index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidSelectedOption(option)) : -1;
+            const matchedOptionIndex =
+                this.$filled && index < this.visibleOptions.length - 1
+                    ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidSelectedOption(option))
+                    : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : -1;
         },
         findPrevSelectedOptionIndex(index) {
-            const matchedOptionIndex = this.$filled && index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidSelectedOption(option)) : -1;
+            const matchedOptionIndex =
+                this.$filled && index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (option) => this.isValidSelectedOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex : -1;
         },
@@ -1123,7 +1208,9 @@ export default {
             return new Set((this.d_value || []).map((value) => this.getSelectionKey(value)));
         },
         searchResultMessageText() {
-            return isNotEmpty(this.visibleOptions) && this.overlayVisible ? this.searchMessageText.replaceAll('{0}', this.visibleOptions.length) : this.emptySearchMessageText;
+            return isNotEmpty(this.visibleOptions) && this.overlayVisible
+                ? this.searchMessageText.replaceAll('{0}', this.visibleOptions.length)
+                : this.emptySearchMessageText;
         },
         searchMessageText() {
             return this.searchMessage || this.$primevue.config.locale.searchMessage || '';

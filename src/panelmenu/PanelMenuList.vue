@@ -238,7 +238,10 @@ export default {
             return panel && panel.contains(element);
         },
         isItemMatched(processedItem) {
-            return this.isValidItem(processedItem) && this.getItemLabel(processedItem)?.toLocaleLowerCase(this.searchLocale).startsWith(this.searchValue.toLocaleLowerCase(this.searchLocale));
+            return (
+                this.isValidItem(processedItem) &&
+                this.getItemLabel(processedItem)?.toLocaleLowerCase(this.searchLocale).startsWith(this.searchValue.toLocaleLowerCase(this.searchLocale))
+            );
         },
         isVisibleItem(processedItem) {
             return !!processedItem && (processedItem.level === 0 || this.isItemActive(processedItem)) && this.isItemVisible(processedItem);
@@ -274,7 +277,9 @@ export default {
                 const focusedItemIndex = this.visibleItems.findIndex((processedItem) => processedItem.key === this.focusedItem.key);
 
                 matchedItem = this.visibleItems.slice(focusedItemIndex).find((processedItem) => this.isItemMatched(processedItem));
-                matchedItem = isEmpty(matchedItem) ? this.visibleItems.slice(0, focusedItemIndex).find((processedItem) => this.isItemMatched(processedItem)) : matchedItem;
+                matchedItem = isEmpty(matchedItem)
+                    ? this.visibleItems.slice(0, focusedItemIndex).find((processedItem) => this.isItemMatched(processedItem))
+                    : matchedItem;
             } else {
                 matchedItem = this.visibleItems.find((processedItem) => this.isItemMatched(processedItem));
             }

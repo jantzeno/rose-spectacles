@@ -15,7 +15,9 @@ const classes = {
     input: ({ props, instance }: StyleContext) => [
         'rs-inputchips-input',
         {
-            'rs-variant-filled': props.variant ? props.variant === 'filled' : instance.$primevue.config.inputStyle === 'filled' || instance.$primevue.config.inputVariant === 'filled'
+            'rs-variant-filled': props.variant
+                ? props.variant === 'filled'
+                : instance.$primevue.config.inputStyle === 'filled' || instance.$primevue.config.inputVariant === 'filled'
         }
     ],
     chipItem: ({ state, index }: StyleContext) => ['rs-inputchips-chip-item', { 'rs-focus': state.focusedIndex === index }],

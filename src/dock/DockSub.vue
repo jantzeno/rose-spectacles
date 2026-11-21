@@ -46,7 +46,14 @@
                                 <component v-else :is="templates['icon'] || templates['itemicon']" :item="processedItem" :class="cx('itemIcon')"></component>
                             </a>
                         </template>
-                        <component v-else :is="templates['item']" :item="processedItem" :index="index" :label="processedItem.label" :props="getMenuItemProps(processedItem, index)"></component>
+                        <component
+                            v-else
+                            :is="templates['item']"
+                            :item="processedItem"
+                            :index="index"
+                            :label="processedItem.label"
+                            :props="getMenuItemProps(processedItem, index)"
+                        ></component>
                     </div>
                 </li>
             </template>
@@ -122,7 +129,10 @@ export default {
             });
         },
         isSameMenuItem(event) {
-            return event.currentTarget && (event.currentTarget.isSameNode(event.target) || event.currentTarget.isSameNode(event.target.closest('[data-pc-section="item"]')));
+            return (
+                event.currentTarget &&
+                (event.currentTarget.isSameNode(event.target) || event.currentTarget.isSameNode(event.target.closest('[data-pc-section="item"]')))
+            );
         },
         isItemActive(id) {
             return id === this.focusedOptionIndex;

@@ -80,8 +80,16 @@ describe('RadioButton.vue', () => {
     });
 
     it('resets the dot size with the selectors the base style sizes it with', () => {
-        const sizing = [...RadioButtonStyle.style.matchAll(/([^{}]+)\{[^}]*\bwidth:/g)].map((match) => match[1].trim()).filter((selector) => selector.includes('rs-radiobutton-icon'));
+        const sizing = [...RadioButtonStyle.style.matchAll(/([^{}]+)\{[^}]*\bwidth:/g)]
+            .map((match) => match[1].trim())
+            .filter((selector) => selector.includes('rs-radiobutton-icon'));
 
-        expect(sizing).toEqual(['.rs-radiobutton-icon', '.rs-radiobutton-sm .rs-radiobutton-icon', '.rs-radiobutton-lg .rs-radiobutton-icon', '.rs-radiobutton-icon', '.rs-radiobutton-sm .rs-radiobutton-icon,\n    .rs-radiobutton-lg .rs-radiobutton-icon']);
+        expect(sizing).toEqual([
+            '.rs-radiobutton-icon',
+            '.rs-radiobutton-sm .rs-radiobutton-icon',
+            '.rs-radiobutton-lg .rs-radiobutton-icon',
+            '.rs-radiobutton-icon',
+            '.rs-radiobutton-sm .rs-radiobutton-icon,\n    .rs-radiobutton-lg .rs-radiobutton-icon'
+        ]);
     });
 });

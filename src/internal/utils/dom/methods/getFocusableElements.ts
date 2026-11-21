@@ -15,7 +15,8 @@ export default function getFocusableElements(element: Element, selector: string 
     const visibleFocusableElements: Element[] = [];
 
     for (const focusableElement of focusableElements) {
-        if (getComputedStyle(focusableElement).display != 'none' && getComputedStyle(focusableElement).visibility != 'hidden') visibleFocusableElements.push(focusableElement);
+        if (getComputedStyle(focusableElement).display != 'none' && getComputedStyle(focusableElement).visibility != 'hidden')
+            visibleFocusableElements.push(focusableElement);
     }
 
     return visibleFocusableElements;

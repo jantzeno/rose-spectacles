@@ -100,7 +100,12 @@ export default {
                     this.$el.style.height = containerStyles['max-height'];
                 } else {
                     this.$el.style.height =
-                        this.$refs.content.offsetHeight + parseFloat(containerStyles.paddingTop) + parseFloat(containerStyles.paddingBottom) + parseFloat(containerStyles.borderTopWidth) + parseFloat(containerStyles.borderBottomWidth) + 'px';
+                        this.$refs.content.offsetHeight +
+                        parseFloat(containerStyles.paddingTop) +
+                        parseFloat(containerStyles.paddingBottom) +
+                        parseFloat(containerStyles.borderTopWidth) +
+                        parseFloat(containerStyles.borderBottomWidth) +
+                        'px';
                 }
             }
         },
@@ -132,7 +137,14 @@ export default {
                             this.$refs.xBar.setAttribute('data-p-scrollpanel-hidden', 'false');
                             !this.isUnstyled && removeClass(this.$refs.xBar, 'rs-scrollpanel-hidden');
 
-                            this.$refs.xBar.style.cssText = 'width:' + scrollBarWidth + '%; inset-inline-start:' + (Math.abs(this.$refs.content.scrollLeft) / (totalWidth - ownWidth)) * (100 - scrollBarWidth) + '%;bottom:' + bottom + 'px;';
+                            this.$refs.xBar.style.cssText =
+                                'width:' +
+                                scrollBarWidth +
+                                '%; inset-inline-start:' +
+                                (Math.abs(this.$refs.content.scrollLeft) / (totalWidth - ownWidth)) * (100 - scrollBarWidth) +
+                                '%;bottom:' +
+                                bottom +
+                                'px;';
                         }
                     }
 
@@ -145,7 +157,15 @@ export default {
                             !this.isUnstyled && removeClass(this.$refs.yBar, 'rs-scrollpanel-hidden');
 
                             this.$refs.yBar.style.cssText =
-                                'height:' + scrollBarHeight + '%; top: calc(' + (this.$refs.content.scrollTop / (totalHeight - ownHeight)) * (100 - scrollBarHeight) + '% - ' + this.$refs.xBar.clientHeight + 'px); inset-inline-end:' + right + 'px;';
+                                'height:' +
+                                scrollBarHeight +
+                                '%; top: calc(' +
+                                (this.$refs.content.scrollTop / (totalHeight - ownHeight)) * (100 - scrollBarHeight) +
+                                '% - ' +
+                                this.$refs.xBar.clientHeight +
+                                'px); inset-inline-end:' +
+                                right +
+                                'px;';
                         }
                     }
                 });

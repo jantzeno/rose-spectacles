@@ -99,12 +99,20 @@ export default {
         findNextTab(tabElement, selfCheck = false) {
             const element = selfCheck ? tabElement : tabElement.nextElementSibling;
 
-            return element ? (getAttribute(element, 'data-p-disabled') || getAttribute(element, 'data-pc-section') === 'activebar' ? this.findNextTab(element) : findSingle(element, '[data-pc-name="tab"]')) : null;
+            return element
+                ? getAttribute(element, 'data-p-disabled') || getAttribute(element, 'data-pc-section') === 'activebar'
+                    ? this.findNextTab(element)
+                    : findSingle(element, '[data-pc-name="tab"]')
+                : null;
         },
         findPrevTab(tabElement, selfCheck = false) {
             const element = selfCheck ? tabElement : tabElement.previousElementSibling;
 
-            return element ? (getAttribute(element, 'data-p-disabled') || getAttribute(element, 'data-pc-section') === 'activebar' ? this.findPrevTab(element) : findSingle(element, '[data-pc-name="tab"]')) : null;
+            return element
+                ? getAttribute(element, 'data-p-disabled') || getAttribute(element, 'data-pc-section') === 'activebar'
+                    ? this.findPrevTab(element)
+                    : findSingle(element, '[data-pc-name="tab"]')
+                : null;
         },
         findFirstTab() {
             return this.findNextTab(this.$pcTabList.$refs.tabs.firstElementChild, true);

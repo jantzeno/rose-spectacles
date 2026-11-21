@@ -8,18 +8,35 @@ import Stepper from './Stepper.vue';
 
 it('links each Step to its StepPanel and marks the active tab after activation', async () => {
     const wrapper = mount({
-        render: () => h(Stepper, { value: 'draft' }, {
-            default: () => [
-                h(StepList, {}, { default: () => [
-                    h(Step, { value: 'draft' }, { default: () => 'Draft' }),
-                    h(Step, { value: 'review' }, { default: () => 'Review' })
-                ] }),
-                h(StepPanels, {}, { default: () => [
-                    h(StepPanel, { value: 'draft' }, { default: () => 'Write the draft.' }),
-                    h(StepPanel, { value: 'review' }, { default: () => 'Review the draft.' })
-                ] })
-            ]
-        })
+        render: () =>
+            h(
+                Stepper,
+                { value: 'draft' },
+                {
+                    default: () => [
+                        h(
+                            StepList,
+                            {},
+                            {
+                                default: () => [
+                                    h(Step, { value: 'draft' }, { default: () => 'Draft' }),
+                                    h(Step, { value: 'review' }, { default: () => 'Review' })
+                                ]
+                            }
+                        ),
+                        h(
+                            StepPanels,
+                            {},
+                            {
+                                default: () => [
+                                    h(StepPanel, { value: 'draft' }, { default: () => 'Write the draft.' }),
+                                    h(StepPanel, { value: 'review' }, { default: () => 'Review the draft.' })
+                                ]
+                            }
+                        )
+                    ]
+                }
+            )
     });
 
     try {

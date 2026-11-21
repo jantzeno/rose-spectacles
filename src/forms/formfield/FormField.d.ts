@@ -11,7 +11,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import { Component, VNode } from 'vue';
 import type { PassThroughOptions } from '../types';
 
-export declare type FormFieldPassThroughOptionType = FormFieldPassThroughAttributes | ((options: FormFieldPassThroughMethodOptions) => FormFieldPassThroughAttributes | string) | string | null | undefined;
+export declare type FormFieldPassThroughOptionType =
+    | FormFieldPassThroughAttributes
+    | ((options: FormFieldPassThroughMethodOptions) => FormFieldPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

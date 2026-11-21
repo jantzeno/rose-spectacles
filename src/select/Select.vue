@@ -54,7 +54,14 @@
             <slot name="value" :value="d_value" :placeholder="placeholder">{{ label === 'rs-emptylabel' ? '&nbsp;' : (label ?? 'empty') }}</slot>
         </span>
         <slot v-if="isClearIconVisible" name="clearicon" :class="cx('clearIcon')" :clearCallback="onClearClick">
-            <component :is="clearIcon ? 'i' : 'TimesIcon'" ref="clearIcon" :class="[cx('clearIcon'), clearIcon]" @click="onClearClick" v-bind="ptm('clearIcon')" data-pc-section="clearicon" />
+            <component
+                :is="clearIcon ? 'i' : 'TimesIcon'"
+                ref="clearIcon"
+                :class="[cx('clearIcon'), clearIcon]"
+                @click="onClearClick"
+                v-bind="ptm('clearIcon')"
+                data-pc-section="clearicon"
+            />
         </slot>
         <div :class="cx('dropdown')" v-bind="ptm('dropdown')">
             <slot v-if="loading" name="loadingicon" :class="cx('loadingIcon')">
@@ -62,11 +69,24 @@
                 <SpinnerIcon v-else :class="cx('loadingIcon')" spin aria-hidden="true" v-bind="ptm('loadingIcon')" />
             </slot>
             <slot v-else name="dropdownicon" :class="cx('dropdownIcon')">
-                <component :is="dropdownIcon ? 'span' : 'ChevronDownIcon'" :class="[cx('dropdownIcon'), dropdownIcon]" aria-hidden="true" :data-p="dropdownIconDataP" v-bind="ptm('dropdownIcon')" />
+                <component
+                    :is="dropdownIcon ? 'span' : 'ChevronDownIcon'"
+                    :class="[cx('dropdownIcon'), dropdownIcon]"
+                    aria-hidden="true"
+                    :data-p="dropdownIconDataP"
+                    v-bind="ptm('dropdownIcon')"
+                />
             </slot>
         </div>
         <Portal :appendTo="appendTo">
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter" @after-enter="onOverlayAfterEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="ptm('transition')">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter"
+                @after-enter="onOverlayAfterEnter"
+                @leave="onOverlayLeave"
+                @after-leave="onOverlayAfterLeave"
+                v-bind="ptm('transition')"
+            >
                 <div
                     v-if="overlayVisible"
                     :ref="overlayRef"
@@ -124,9 +144,24 @@
                         </span>
                     </div>
                     <div :class="cx('listContainer')" :style="{ 'max-height': virtualScrollerDisabled ? scrollHeight : '' }" v-bind="ptm('listContainer')">
-                        <VirtualScroller :ref="virtualScrollerRef" v-bind="virtualScrollerOptions" :items="visibleOptions" :style="{ height: scrollHeight }" :tabindex="-1" :disabled="virtualScrollerDisabled" :pt="ptm('virtualScroller')">
+                        <VirtualScroller
+                            :ref="virtualScrollerRef"
+                            v-bind="virtualScrollerOptions"
+                            :items="visibleOptions"
+                            :style="{ height: scrollHeight }"
+                            :tabindex="-1"
+                            :disabled="virtualScrollerDisabled"
+                            :pt="ptm('virtualScroller')"
+                        >
                             <template v-slot:content="{ styleClass, contentRef, items, getItemOptions, contentStyle, itemSize }">
-                                <ul :ref="(el) => listRef(el, contentRef)" :id="$id + '_list'" :class="[cx('list'), styleClass]" :style="contentStyle" role="listbox" v-bind="ptm('list')">
+                                <ul
+                                    :ref="(el) => listRef(el, contentRef)"
+                                    :id="$id + '_list'"
+                                    :class="[cx('list'), styleClass]"
+                                    :style="contentStyle"
+                                    role="listbox"
+                                    v-bind="ptm('list')"
+                                >
                                     <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
                                         <li
                                             v-if="isOptionGroup(option)"
@@ -137,7 +172,9 @@
                                             v-bind="ptm('optionGroup')"
                                         >
                                             <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">
-                                                <span :class="cx('optionGroupLabel')" v-bind="ptm('optionGroupLabel')">{{ getOptionGroupLabel(option.optionGroup) }}</span>
+                                                <span :class="cx('optionGroupLabel')" v-bind="ptm('optionGroupLabel')">{{
+                                                    getOptionGroupLabel(option.optionGroup)
+                                                }}</span>
                                             </slot>
                                         </li>
                                         <li
@@ -169,10 +206,22 @@
                                             </slot>
                                         </li>
                                     </template>
-                                    <li v-if="filterValue && (!items || (items && items.length === 0))" :class="cx('emptyMessage')" role="option" v-bind="ptm('emptyMessage')" :data-p-hidden-accessible="true">
+                                    <li
+                                        v-if="filterValue && (!items || (items && items.length === 0))"
+                                        :class="cx('emptyMessage')"
+                                        role="option"
+                                        v-bind="ptm('emptyMessage')"
+                                        :data-p-hidden-accessible="true"
+                                    >
                                         <slot name="emptyfilter">{{ emptyFilterMessageText }}</slot>
                                     </li>
-                                    <li v-else-if="!options || (options && options.length === 0)" :class="cx('emptyMessage')" role="option" v-bind="ptm('emptyMessage')" :data-p-hidden-accessible="true">
+                                    <li
+                                        v-else-if="!options || (options && options.length === 0)"
+                                        :class="cx('emptyMessage')"
+                                        role="option"
+                                        v-bind="ptm('emptyMessage')"
+                                        :data-p-hidden-accessible="true"
+                                    >
                                         <slot name="empty">{{ emptyMessageText }}</slot>
                                     </li>
                                 </ul>
@@ -183,7 +232,14 @@
                         </VirtualScroller>
                     </div>
                     <slot name="footer" :value="d_value" :options="visibleOptions"></slot>
-                    <span v-if="!options || (options && options.length === 0)" role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenEmptyMessage')" :data-p-hidden-accessible="true">
+                    <span
+                        v-if="!options || (options && options.length === 0)"
+                        role="status"
+                        aria-live="polite"
+                        class="rs-hidden-accessible"
+                        v-bind="ptm('hiddenEmptyMessage')"
+                        :data-p-hidden-accessible="true"
+                    >
                         {{ emptyMessageText }}
                     </span>
                     <span role="status" aria-live="polite" class="rs-hidden-accessible" v-bind="ptm('hiddenSelectedMessage')" :data-p-hidden-accessible="true">
@@ -208,7 +264,20 @@
 
 <script>
 import { cn } from '../internal/utils/index';
-import { absolutePosition, addStyle, findSingle, focus, getFirstFocusableElement, getFocusableElements, getLastFocusableElement, getOuterWidth, isAndroid, isTouchDevice, isVisible, relativePosition } from '../internal/utils/dom/index';
+import {
+    absolutePosition,
+    addStyle,
+    findSingle,
+    focus,
+    getFirstFocusableElement,
+    getFocusableElements,
+    getLastFocusableElement,
+    getOuterWidth,
+    isAndroid,
+    isTouchDevice,
+    isVisible,
+    relativePosition
+} from '../internal/utils/dom/index';
 import { equals, findLastIndex, isNotEmpty, isPrintableCharacter, resolveFieldData } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { FilterService } from '../core/api/Api';
@@ -333,7 +402,14 @@ export default {
         show(isFocus) {
             this.$emit('before-show');
             this.overlayVisible = true;
-            this.focusedOptionIndex = this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : this.editable ? -1 : this.findSelectedOptionIndex();
+            this.focusedOptionIndex =
+                this.focusedOptionIndex !== -1
+                    ? this.focusedOptionIndex
+                    : this.autoOptionFocus
+                      ? this.findFirstFocusedOptionIndex()
+                      : this.editable
+                        ? -1
+                        : this.findSelectedOptionIndex();
 
             isFocus && focus(this.$refs.focusInput);
         },
@@ -362,7 +438,14 @@ export default {
             this.focused = true;
 
             if (this.overlayVisible) {
-                this.focusedOptionIndex = this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : this.autoOptionFocus ? this.findFirstFocusedOptionIndex() : this.editable ? -1 : this.findSelectedOptionIndex();
+                this.focusedOptionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.focusedOptionIndex
+                        : this.autoOptionFocus
+                          ? this.findFirstFocusedOptionIndex()
+                          : this.editable
+                            ? -1
+                            : this.findSelectedOptionIndex();
                 this.scrollInView(this.focusedOptionIndex);
             }
 
@@ -493,7 +576,11 @@ export default {
                 return;
             }
 
-            if (event.target.tagName === 'INPUT' || event.target.getAttribute('data-pc-section') === 'clearicon' || event.target.closest('[data-pc-section="clearicon"]')) {
+            if (
+                event.target.tagName === 'INPUT' ||
+                event.target.getAttribute('data-pc-section') === 'clearicon' ||
+                event.target.closest('[data-pc-section="clearicon"]')
+            ) {
                 return;
             } else if (!this.overlay || !this.overlay.contains(event.target)) {
                 this.overlayVisible ? this.hide(true) : this.show(true);
@@ -506,12 +593,18 @@ export default {
             this.resetFilterOnClear && (this.filterValue = null);
         },
         onFirstHiddenFocus(event) {
-            const focusableEl = event.relatedTarget === this.$refs.focusInput ? getFirstFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])') : this.$refs.focusInput;
+            const focusableEl =
+                event.relatedTarget === this.$refs.focusInput
+                    ? getFirstFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
+                    : this.$refs.focusInput;
 
             focus(focusableEl);
         },
         onLastHiddenFocus(event) {
-            const focusableEl = event.relatedTarget === this.$refs.focusInput ? getLastFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])') : this.$refs.focusInput;
+            const focusableEl =
+                event.relatedTarget === this.$refs.focusInput
+                    ? getLastFocusableElement(this.overlay, ':not([data-p-hidden-focusable="true"])')
+                    : this.$refs.focusInput;
 
             focus(focusableEl);
         },
@@ -612,7 +705,12 @@ export default {
                 this.show();
                 this.editable && this.changeFocusedOptionIndex(event, this.findSelectedOptionIndex());
             } else {
-                const optionIndex = this.focusedOptionIndex !== -1 ? this.findNextOptionIndex(this.focusedOptionIndex) : this.clicked ? this.findFirstOptionIndex() : this.findFirstFocusedOptionIndex();
+                const optionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.findNextOptionIndex(this.focusedOptionIndex)
+                        : this.clicked
+                          ? this.findFirstOptionIndex()
+                          : this.findFirstFocusedOptionIndex();
 
                 this.changeFocusedOptionIndex(event, optionIndex);
             }
@@ -628,7 +726,12 @@ export default {
                 this.overlayVisible && this.hide();
                 event.preventDefault();
             } else {
-                const optionIndex = this.focusedOptionIndex !== -1 ? this.findPrevOptionIndex(this.focusedOptionIndex) : this.clicked ? this.findLastOptionIndex() : this.findLastFocusedOptionIndex();
+                const optionIndex =
+                    this.focusedOptionIndex !== -1
+                        ? this.findPrevOptionIndex(this.focusedOptionIndex)
+                        : this.clicked
+                          ? this.findLastOptionIndex()
+                          : this.findLastFocusedOptionIndex();
 
                 this.changeFocusedOptionIndex(event, optionIndex);
 
@@ -869,10 +972,18 @@ export default {
             return getFocusableElements(this.overlay, ':not([data-p-hidden-focusable="true"])').length > 0;
         },
         isOptionExactMatched(option) {
-            return this.isValidOption(option) && typeof this.getOptionLabel(option) === 'string' && this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale) == this.searchValue.toLocaleLowerCase(this.filterLocale);
+            return (
+                this.isValidOption(option) &&
+                typeof this.getOptionLabel(option) === 'string' &&
+                this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale) == this.searchValue.toLocaleLowerCase(this.filterLocale)
+            );
         },
         isOptionStartsWith(option) {
-            return this.isValidOption(option) && typeof this.getOptionLabel(option) === 'string' && this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale));
+            return (
+                this.isValidOption(option) &&
+                typeof this.getOptionLabel(option) === 'string' &&
+                this.getOptionLabel(option)?.toLocaleLowerCase(this.filterLocale).startsWith(this.searchValue.toLocaleLowerCase(this.filterLocale))
+            );
         },
         isValidOption(option) {
             return isNotEmpty(option) && !(this.isOptionDisabled(option) || this.isOptionGroup(option));
@@ -890,7 +1001,8 @@ export default {
             return findLastIndex(this.visibleOptions, (option) => this.isValidOption(option));
         },
         findNextOptionIndex(index) {
-            const matchedOptionIndex = index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
+            const matchedOptionIndex =
+                index < this.visibleOptions.length - 1 ? this.visibleOptions.slice(index + 1).findIndex((option) => this.isValidOption(option)) : -1;
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : index;
         },
@@ -1021,7 +1133,11 @@ export default {
                         const groupChildren = this.getOptionGroupChildren(group);
                         const filteredItems = groupChildren.filter((item) => filteredOptions.includes(item));
 
-                        if (filteredItems.length > 0) filtered.push({ ...group, [typeof this.optionGroupChildren === 'string' ? this.optionGroupChildren : 'items']: [...filteredItems] });
+                        if (filteredItems.length > 0)
+                            filtered.push({
+                                ...group,
+                                [typeof this.optionGroupChildren === 'string' ? this.optionGroupChildren : 'items']: [...filteredItems]
+                            });
                     });
 
                     return this.flatOptions(filtered);

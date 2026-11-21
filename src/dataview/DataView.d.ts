@@ -13,7 +13,12 @@ import type { PaginatorPassThroughOptionType } from 'rose-spectacles/paginator';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type DataViewPassThroughOptionType = DataViewPassThroughAttributes | ((options: DataViewPassThroughMethodOptions) => DataViewPassThroughAttributes | string) | string | null | undefined;
+export declare type DataViewPassThroughOptionType =
+    | DataViewPassThroughAttributes
+    | ((options: DataViewPassThroughMethodOptions) => DataViewPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

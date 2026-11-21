@@ -11,7 +11,9 @@
             :aria-labelledby="ariaLabelledby"
             :aria-label="ariaLabel"
             :aria-expanded="overlayVisible"
-            :aria-controls="overlayVisible ? (overlayProps && overlayProps.id) || overlayId || (panelProps && panelProps.id) || panelId || overlayUniqueId : undefined"
+            :aria-controls="
+                overlayVisible ? (overlayProps && overlayProps.id) || overlayId || (panelProps && panelProps.id) || panelId || overlayUniqueId : undefined
+            "
             :aria-haspopup="feedback"
             :placeholder="placeholder"
             :required="required"
@@ -32,18 +34,54 @@
             :unstyled="unstyled"
         />
         <!-- TODO: hideicon and showicon slots are deprecated since v4.0-->
-        <slot v-if="toggleMask && unmasked" :name="$slots.maskicon ? 'maskicon' : 'hideicon'" :toggleCallback="onMaskToggle" :class="[cx('maskIcon'), maskIcon]" v-bind="ptm('maskIcon')">
-            <button ref="maskButton" type="button" :class="cx('maskIcon')" :style="sx('maskIcon')" :aria-label="hidePasswordText" @click="onMaskToggle" v-bind="ptm('maskIcon')">
+        <slot
+            v-if="toggleMask && unmasked"
+            :name="$slots.maskicon ? 'maskicon' : 'hideicon'"
+            :toggleCallback="onMaskToggle"
+            :class="[cx('maskIcon'), maskIcon]"
+            v-bind="ptm('maskIcon')"
+        >
+            <button
+                ref="maskButton"
+                type="button"
+                :class="cx('maskIcon')"
+                :style="sx('maskIcon')"
+                :aria-label="hidePasswordText"
+                @click="onMaskToggle"
+                v-bind="ptm('maskIcon')"
+            >
                 <component :is="maskIcon ? 'i' : 'EyeSlashIcon'" :class="maskIcon" aria-hidden="true" />
             </button>
         </slot>
-        <slot v-if="toggleMask && !unmasked" :name="$slots.unmaskicon ? 'unmaskicon' : 'showicon'" :toggleCallback="onMaskToggle" :class="[cx('unmaskIcon')]" v-bind="ptm('unmaskIcon')">
-            <button ref="unmaskButton" type="button" :class="cx('unmaskIcon')" :style="sx('unmaskIcon')" :aria-label="showPasswordText" @click="onMaskToggle" v-bind="ptm('unmaskIcon')">
+        <slot
+            v-if="toggleMask && !unmasked"
+            :name="$slots.unmaskicon ? 'unmaskicon' : 'showicon'"
+            :toggleCallback="onMaskToggle"
+            :class="[cx('unmaskIcon')]"
+            v-bind="ptm('unmaskIcon')"
+        >
+            <button
+                ref="unmaskButton"
+                type="button"
+                :class="cx('unmaskIcon')"
+                :style="sx('unmaskIcon')"
+                :aria-label="showPasswordText"
+                @click="onMaskToggle"
+                v-bind="ptm('unmaskIcon')"
+            >
                 <component :is="unmaskIcon ? 'i' : 'EyeIcon'" :class="unmaskIcon" aria-hidden="true" />
             </button>
         </slot>
         <slot v-if="isClearIconVisible" name="clearicon" :class="cx('clearIcon')" :clearCallback="onClearClick" v-bind="ptm('clearIcon')">
-            <button ref="clearButton" type="button" :class="cx('clearIcon')" :style="sx('clearIcon')" :aria-label="clearText" @click="onClearClick" v-bind="ptm('clearIcon')">
+            <button
+                ref="clearButton"
+                type="button"
+                :class="cx('clearIcon')"
+                :style="sx('clearIcon')"
+                :aria-label="clearText"
+                @click="onClearClick"
+                v-bind="ptm('clearIcon')"
+            >
                 <TimesIcon aria-hidden="true" />
             </button>
         </slot>
@@ -51,7 +89,13 @@
             {{ infoText }}
         </span>
         <Portal :appendTo="appendTo">
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter" @leave="onOverlayLeave" @after-leave="onOverlayAfterLeave" v-bind="ptm('transition')">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter"
+                @leave="onOverlayLeave"
+                @after-leave="onOverlayAfterLeave"
+                v-bind="ptm('transition')"
+            >
                 <div
                     v-if="overlayVisible"
                     :ref="overlayRef"
@@ -68,7 +112,12 @@
                     <slot name="content">
                         <div :class="cx('content')" v-bind="ptm('content')">
                             <div :class="cx('meter')" v-bind="ptm('meter')">
-                                <div :class="cx('meterLabel')" :style="{ width: meter ? meter.width : '' }" :data-p="meterDataP" v-bind="ptm('meterLabel')"></div>
+                                <div
+                                    :class="cx('meterLabel')"
+                                    :style="{ width: meter ? meter.width : '' }"
+                                    :data-p="meterDataP"
+                                    v-bind="ptm('meterLabel')"
+                                ></div>
                             </div>
                             <div :class="cx('meterText')" v-bind="ptm('meterText')">{{ infoText }}</div>
                         </div>

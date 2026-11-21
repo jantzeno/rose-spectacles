@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps } from 'vue';
 
-export declare type ColorPickerPassThroughOptionType = ColorPickerPassThroughAttributes | ((options: ColorPickerPassThroughMethodOptions) => ColorPickerPassThroughAttributes | string) | string | null | undefined;
+export declare type ColorPickerPassThroughOptionType =
+    | ColorPickerPassThroughAttributes
+    | ((options: ColorPickerPassThroughMethodOptions) => ColorPickerPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type ColorPickerPassThroughTransitionType = TransitionProps | ((options: ColorPickerPassThroughMethodOptions) => TransitionProps) | undefined;
 

@@ -15,3 +15,14 @@ Object.defineProperty(window, 'matchMedia', {
         removeEventListener: vi.fn()
     }))
 });
+
+if (typeof ResizeObserver === 'undefined') {
+    vi.stubGlobal(
+        'ResizeObserver',
+        class implements ResizeObserver {
+            observe() {}
+            unobserve() {}
+            disconnect() {}
+        }
+    );
+}

@@ -14,7 +14,12 @@ import type { ListboxPassThroughOptions } from 'rose-spectacles/listbox';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type OrderListPassThroughOptionType = OrderListPassThroughAttributes | ((options: OrderListPassThroughMethodOptions) => OrderListPassThroughAttributes | string) | string | null | undefined;
+export declare type OrderListPassThroughOptionType =
+    | OrderListPassThroughAttributes
+    | ((options: OrderListPassThroughMethodOptions) => OrderListPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type OrderListPassThroughTransitionType = TransitionProps | ((options: OrderListPassThroughMethodOptions) => TransitionProps) | undefined;
 

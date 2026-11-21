@@ -16,7 +16,12 @@ import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { VirtualScrollerItemOptions, VirtualScrollerPassThroughOptionType, VirtualScrollerProps } from 'rose-spectacles/virtualscroller';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type SelectPassThroughOptionType<T = any> = SelectPassThroughAttributes | ((options: SelectPassThroughMethodOptions<T>) => SelectPassThroughAttributes | string) | string | null | undefined;
+export declare type SelectPassThroughOptionType<T = any> =
+    | SelectPassThroughAttributes
+    | ((options: SelectPassThroughMethodOptions<T>) => SelectPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type SelectPassThroughTransitionType<T = any> = TransitionProps | ((options: SelectPassThroughMethodOptions<T>) => TransitionProps) | undefined;
 

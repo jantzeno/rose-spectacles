@@ -2,7 +2,12 @@ import getCSSVariableByRegex from './getCSSVariableByRegex';
 import getHiddenElementDimensions from './getHiddenElementDimensions';
 import getViewport from './getViewport';
 
-export default function relativePosition(element: HTMLElement, target: HTMLElement, gutter: boolean = true, fixedOrigin: 'top' | 'bottom' | undefined = undefined): void {
+export default function relativePosition(
+    element: HTMLElement,
+    target: HTMLElement,
+    gutter: boolean = true,
+    fixedOrigin: 'top' | 'bottom' | undefined = undefined
+): void {
     if (element) {
         const elementDimensions = element.offsetParent ? { width: element.offsetWidth, height: element.offsetHeight } : getHiddenElementDimensions(element);
         const targetHeight = target.offsetHeight;

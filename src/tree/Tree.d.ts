@@ -16,7 +16,12 @@ import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { TreeNode } from 'rose-spectacles/treenode';
 import { VNode } from 'vue';
 
-export declare type TreePassThroughOptionType<T = any> = TreePassThroughAttributes | ((options: TreePassThroughMethodOptions<T>) => TreePassThroughAttributes | string) | string | null | undefined;
+export declare type TreePassThroughOptionType<T = any> =
+    | TreePassThroughAttributes
+    | ((options: TreePassThroughMethodOptions<T>) => TreePassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

@@ -249,7 +249,9 @@ describe('DatePicker.vue', () => {
         const mousedownOnNestedOverlay = (emitterTarget) => {
             const event = new MouseEvent('mousedown', { bubbles: true });
 
-            nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), { once: true });
+            nestedOverlay.addEventListener('mousedown', (e) => OverlayEventBus.emit('overlay-click', { originalEvent: e, target: emitterTarget }), {
+                once: true
+            });
             nestedOverlay.dispatchEvent(event);
         };
 

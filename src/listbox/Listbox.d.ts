@@ -16,7 +16,12 @@ import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { VirtualScrollerItemOptions, VirtualScrollerPassThroughOptionType, VirtualScrollerProps } from 'rose-spectacles/virtualscroller';
 import { VNode } from 'vue';
 
-export declare type ListboxPassThroughOptionType<T = any> = ListboxPassThroughAttributes | ((options: ListboxPassThroughMethodOptions<T>) => ListboxPassThroughAttributes | string) | string | null | undefined;
+export declare type ListboxPassThroughOptionType<T = any> =
+    | ListboxPassThroughAttributes
+    | ((options: ListboxPassThroughMethodOptions<T>) => ListboxPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

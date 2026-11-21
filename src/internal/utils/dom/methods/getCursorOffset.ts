@@ -1,4 +1,9 @@
-export default function getCursorOffset(element: Element, prevText: string, nextText: string, currentText: string): { top: number | string; left: number | string } {
+export default function getCursorOffset(
+    element: Element,
+    prevText: string,
+    nextText: string,
+    currentText: string
+): { top: number | string; left: number | string } {
     if (element) {
         const style = getComputedStyle(element);
         const ghostDiv = document.createElement('div');

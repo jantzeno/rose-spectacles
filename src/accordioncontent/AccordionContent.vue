@@ -1,7 +1,13 @@
 <template>
     <template v-if="!asChild">
         <transition name="rs-collapsible" v-bind="ptm('transition', ptParams)">
-            <component v-if="$pcAccordion.lazy ? $pcAccordionPanel.active : true" v-show="$pcAccordion.lazy ? true : $pcAccordionPanel.active" :is="as" :class="cx('root')" v-bind="attrs">
+            <component
+                v-if="$pcAccordion.lazy ? $pcAccordionPanel.active : true"
+                v-show="$pcAccordion.lazy ? true : $pcAccordionPanel.active"
+                :is="as"
+                :class="cx('root')"
+                v-bind="attrs"
+            >
                 <div :class="cx('contentWrapper')" v-bind="ptm('contentWrapper', ptParams)">
                     <div :class="cx('content')" v-bind="ptm('content', ptParams)">
                         <slot></slot>

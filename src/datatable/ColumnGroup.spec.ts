@@ -7,12 +7,17 @@ import DataTable from './DataTable.vue';
 
 it('renders a grouped header whose render-function slot returns one row', () => {
     const table = mount({
-        render: () => h(DataTable, { value: [{ city: 'Oslo' }] }, {
-            default: () => [
-                h(ColumnGroup, { type: 'header' }, { default: () => h(Row, {}, { default: () => h(Column, { header: 'City' }) }) }),
-                h(Column, { field: 'city' })
-            ]
-        })
+        render: () =>
+            h(
+                DataTable,
+                { value: [{ city: 'Oslo' }] },
+                {
+                    default: () => [
+                        h(ColumnGroup, { type: 'header' }, { default: () => h(Row, {}, { default: () => h(Column, { header: 'City' }) }) }),
+                        h(Column, { field: 'city' })
+                    ]
+                }
+            )
     });
 
     try {

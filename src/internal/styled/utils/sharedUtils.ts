@@ -53,7 +53,13 @@ export function hasOddBraces(str: string = ''): boolean {
     return (openBraces + closeBraces) % 2 !== 0;
 }
 
-export function getVariableValue(value: any, variable: string = '', prefix: string = '', excludedKeyRegexes: RegExp[] = [], fallback?: string): string | undefined {
+export function getVariableValue(
+    value: any,
+    variable: string = '',
+    prefix: string = '',
+    excludedKeyRegexes: RegExp[] = [],
+    fallback?: string
+): string | undefined {
     if (isString(value)) {
         const val = value.trim();
 

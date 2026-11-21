@@ -1,7 +1,14 @@
 <template>
     <li v-if="visible()" :class="[cx('item'), item.class]" v-bind="ptm('item', ptmOptions)">
         <template v-if="!templates.item">
-            <a :href="item.url || '#'" :class="cx('itemLink')" :target="item.target" :aria-current="isCurrentUrl()" @click="onClick" v-bind="ptm('itemLink', ptmOptions)">
+            <a
+                :href="item.url || '#'"
+                :class="cx('itemLink')"
+                :target="item.target"
+                :aria-current="isCurrentUrl()"
+                @click="onClick"
+                v-bind="ptm('itemLink', ptmOptions)"
+            >
                 <component v-if="templates && templates.itemicon" :is="templates.itemicon" :item="item" :class="cx('itemIcon', ptmOptions)" />
                 <span v-else-if="item.icon" :class="[cx('itemIcon'), item.icon]" v-bind="ptm('itemIcon', ptmOptions)" />
                 <span v-if="item.label" :class="cx('itemLabel')" v-bind="ptm('itemLabel', ptmOptions)">{{ label() }}</span>

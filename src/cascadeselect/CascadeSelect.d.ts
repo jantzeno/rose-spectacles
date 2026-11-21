@@ -12,9 +12,17 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { HTMLAttributes, InputHTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type CascadeSelectPassThroughOptionType = CascadeSelectPassThroughAttributes | ((options: CascadeSelectPassThroughMethodOptions) => CascadeSelectPassThroughAttributes | string) | string | null | undefined;
+export declare type CascadeSelectPassThroughOptionType =
+    | CascadeSelectPassThroughAttributes
+    | ((options: CascadeSelectPassThroughMethodOptions) => CascadeSelectPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
-export declare type CascadeSelectPassThroughTransitionType = TransitionProps | ((options: CascadeSelectPassThroughMethodOptions) => TransitionProps) | undefined;
+export declare type CascadeSelectPassThroughTransitionType =
+    | TransitionProps
+    | ((options: CascadeSelectPassThroughMethodOptions) => TransitionProps)
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

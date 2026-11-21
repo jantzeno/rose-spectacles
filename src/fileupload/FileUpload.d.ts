@@ -16,7 +16,12 @@ import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { ProgressBarPassThroughOptions } from 'rose-spectacles/progressbar';
 import { VNode } from 'vue';
 
-export declare type FileUploadPassThroughOptionType = FileUploadPassThroughAttributes | ((options: FileUploadPassThroughMethodOptions) => FileUploadPassThroughAttributes | string) | string | null | undefined;
+export declare type FileUploadPassThroughOptionType =
+    | FileUploadPassThroughAttributes
+    | ((options: FileUploadPassThroughMethodOptions) => FileUploadPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

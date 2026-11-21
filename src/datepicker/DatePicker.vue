@@ -64,7 +64,14 @@
             </span>
         </template>
         <Portal :appendTo="appendTo" :disabled="inline">
-            <transition name="rs-anchored-overlay" @enter="onOverlayEnter($event)" @after-enter="onOverlayEnterComplete" @after-leave="onOverlayAfterLeave" @leave="onOverlayLeave" v-bind="ptm('transition')">
+            <transition
+                name="rs-anchored-overlay"
+                @enter="onOverlayEnter($event)"
+                @after-enter="onOverlayEnterComplete"
+                @after-leave="onOverlayAfterLeave"
+                @leave="onOverlayLeave"
+                v-bind="ptm('transition')"
+            >
                 <div
                     v-if="inline || overlayVisible"
                     :ref="overlayRef"
@@ -85,7 +92,12 @@
                             <div v-for="(month, groupIndex) of months" :key="month.month + month.year" :class="cx('calendar')" v-bind="ptm('calendar')">
                                 <div :class="cx('header')" v-bind="ptm('header')">
                                     <slot name="header"></slot>
-                                    <slot name="prevbutton" :actionCallback="(event) => onPrevButtonClick(event)" :keydownCallback="(event) => onContainerButtonKeydown(event)" :ariaLabel="prevButtonAriaLabel">
+                                    <slot
+                                        name="prevbutton"
+                                        :actionCallback="(event) => onPrevButtonClick(event)"
+                                        :keydownCallback="(event) => onContainerButtonKeydown(event)"
+                                        :ariaLabel="prevButtonAriaLabel"
+                                    >
                                         <Button
                                             v-show="groupIndex === 0"
                                             :ref="previousButtonRef"
@@ -101,7 +113,11 @@
                                         >
                                             <template #icon="slotProps">
                                                 <slot name="previcon">
-                                                    <component :is="prevIcon ? 'span' : 'ChevronLeftIcon'" :class="[prevIcon, slotProps.class]" v-bind="ptm('pcPrevButton')['icon']" />
+                                                    <component
+                                                        :is="prevIcon ? 'span' : 'ChevronLeftIcon'"
+                                                        :class="[prevIcon, slotProps.class]"
+                                                        v-bind="ptm('pcPrevButton')['icon']"
+                                                    />
                                                 </slot>
                                             </template>
                                         </Button>
@@ -164,10 +180,17 @@
                                             </button>
                                         </template>
                                         <span v-if="currentView === 'year'" :class="cx('decade')" v-bind="ptm('decade')">
-                                            <slot name="decade" :years="yearPickerValues"> {{ yearPickerValues[0].value }} - {{ yearPickerValues[yearPickerValues.length - 1].value }} </slot>
+                                            <slot name="decade" :years="yearPickerValues">
+                                                {{ yearPickerValues[0].value }} - {{ yearPickerValues[yearPickerValues.length - 1].value }}
+                                            </slot>
                                         </span>
                                     </div>
-                                    <slot name="nextbutton" :actionCallback="(event) => onNextButtonClick(event)" :keydownCallback="(event) => onContainerButtonKeydown(event)" :ariaLabel="nextButtonAriaLabel">
+                                    <slot
+                                        name="nextbutton"
+                                        :actionCallback="(event) => onNextButtonClick(event)"
+                                        :keydownCallback="(event) => onContainerButtonKeydown(event)"
+                                        :ariaLabel="nextButtonAriaLabel"
+                                    >
                                         <Button
                                             v-show="numberOfMonths === 1 ? true : groupIndex === numberOfMonths - 1"
                                             :ref="nextButtonRef"
@@ -183,7 +206,11 @@
                                         >
                                             <template #icon="slotProps">
                                                 <slot name="nexticon">
-                                                    <component :is="nextIcon ? 'span' : 'ChevronRightIcon'" :class="[nextIcon, slotProps.class]" v-bind="ptm('pcNextButton')['icon']" />
+                                                    <component
+                                                        :is="nextIcon ? 'span' : 'ChevronRightIcon'"
+                                                        :class="[nextIcon, slotProps.class]"
+                                                        v-bind="ptm('pcNextButton')['icon']"
+                                                    />
                                                 </slot>
                                             </template>
                                         </Button>
@@ -192,22 +219,47 @@
                                 <table v-if="currentView === 'date'" :class="cx('dayView')" role="grid" v-bind="ptm('dayView')">
                                     <thead v-bind="ptm('tableHeader')">
                                         <tr v-bind="ptm('tableHeaderRow')">
-                                            <th v-if="showWeek" scope="col" :class="cx('weekHeader')" v-bind="ptm('weekHeader', { context: { disabled: showWeek } })" :data-p-disabled="showWeek" data-pc-group-section="tableheadercell">
+                                            <th
+                                                v-if="showWeek"
+                                                scope="col"
+                                                :class="cx('weekHeader')"
+                                                v-bind="ptm('weekHeader', { context: { disabled: showWeek } })"
+                                                :data-p-disabled="showWeek"
+                                                data-pc-group-section="tableheadercell"
+                                            >
                                                 <slot name="weekheaderlabel">
-                                                    <span v-bind="ptm('weekHeaderLabel', { context: { disabled: showWeek } })" data-pc-group-section="tableheadercelllabel">
+                                                    <span
+                                                        v-bind="ptm('weekHeaderLabel', { context: { disabled: showWeek } })"
+                                                        data-pc-group-section="tableheadercelllabel"
+                                                    >
                                                         {{ weekHeaderLabel }}
                                                     </span>
                                                 </slot>
                                             </th>
-                                            <th v-for="weekDay of weekDays" :key="weekDay" scope="col" :abbr="weekDay" v-bind="ptm('tableHeaderCell')" data-pc-group-section="tableheadercell" :class="cx('weekDayCell')">
-                                                <span :class="cx('weekDay')" v-bind="ptm('weekDay')" data-pc-group-section="tableheadercelllabel">{{ weekDay }}</span>
+                                            <th
+                                                v-for="weekDay of weekDays"
+                                                :key="weekDay"
+                                                scope="col"
+                                                :abbr="weekDay"
+                                                v-bind="ptm('tableHeaderCell')"
+                                                data-pc-group-section="tableheadercell"
+                                                :class="cx('weekDayCell')"
+                                            >
+                                                <span :class="cx('weekDay')" v-bind="ptm('weekDay')" data-pc-group-section="tableheadercelllabel">{{
+                                                    weekDay
+                                                }}</span>
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody v-bind="ptm('tableBody')">
                                         <tr v-for="(week, i) of month.dates" :key="week[0].day + '' + week[0].month" v-bind="ptm('tableBodyRow')">
                                             <td v-if="showWeek" :class="cx('weekNumber')" v-bind="ptm('weekNumber')" data-pc-group-section="tablebodycell">
-                                                <span :class="cx('weekLabelContainer')" v-bind="ptm('weekLabelContainer', { context: { disabled: showWeek } })" :data-p-disabled="showWeek" data-pc-group-section="tablebodycelllabel">
+                                                <span
+                                                    :class="cx('weekLabelContainer')"
+                                                    v-bind="ptm('weekLabelContainer', { context: { disabled: showWeek } })"
+                                                    :data-p-disabled="showWeek"
+                                                    data-pc-group-section="tablebodycelllabel"
+                                                >
                                                     <slot name="weeklabel" :weekNumber="month.weekNumbers[i]">
                                                         <span v-if="month.weekNumbers[i] < 10" style="visibility: hidden" v-bind="ptm('weekLabel')">0</span>
                                                         {{ month.weekNumbers[i] }}
@@ -259,7 +311,13 @@
                                                 >
                                                     <slot name="date" :date="date">{{ date.day }}</slot>
                                                 </span>
-                                                <div v-if="isSelected(date)" class="rs-hidden-accessible" aria-live="polite" v-bind="ptm('hiddenSelectedDay')" :data-p-hidden-accessible="true">
+                                                <div
+                                                    v-if="isSelected(date)"
+                                                    class="rs-hidden-accessible"
+                                                    aria-live="polite"
+                                                    v-bind="ptm('hiddenSelectedDay')"
+                                                    :data-p-hidden-accessible="true"
+                                                >
                                                     {{ date.day }}
                                                 </div>
                                             </td>
@@ -290,7 +348,13 @@
                                 :data-p-selected="isMonthSelected(i)"
                             >
                                 {{ m.value }}
-                                <div v-if="isMonthSelected(i)" class="rs-hidden-accessible" aria-live="polite" v-bind="ptm('hiddenMonth')" :data-p-hidden-accessible="true">
+                                <div
+                                    v-if="isMonthSelected(i)"
+                                    class="rs-hidden-accessible"
+                                    aria-live="polite"
+                                    v-bind="ptm('hiddenMonth')"
+                                    :data-p-hidden-accessible="true"
+                                >
                                     {{ m.value }}
                                 </div>
                             </span>
@@ -316,7 +380,13 @@
                                 :data-p-selected="isYearSelected(y.value)"
                             >
                                 {{ y.value }}
-                                <div v-if="isYearSelected(y.value)" class="rs-hidden-accessible" aria-live="polite" v-bind="ptm('hiddenYear')" :data-p-hidden-accessible="true">
+                                <div
+                                    v-if="isYearSelected(y.value)"
+                                    class="rs-hidden-accessible"
+                                    aria-live="polite"
+                                    v-bind="ptm('hiddenYear')"
+                                    :data-p-hidden-accessible="true"
+                                >
                                     {{ y.value }}
                                 </div>
                             </span>
@@ -346,7 +416,12 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="incrementicon">
-                                            <component :is="incrementIcon ? 'span' : 'ChevronUpIcon'" :class="[incrementIcon, slotProps.class]" v-bind="ptm('pcIncrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="incrementIcon ? 'span' : 'ChevronUpIcon'"
+                                                :class="[incrementIcon, slotProps.class]"
+                                                v-bind="ptm('pcIncrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
@@ -371,7 +446,12 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="decrementicon">
-                                            <component :is="decrementIcon ? 'span' : 'ChevronDownIcon'" :class="[decrementIcon, slotProps.class]" v-bind="ptm('pcDecrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="decrementIcon ? 'span' : 'ChevronDownIcon'"
+                                                :class="[decrementIcon, slotProps.class]"
+                                                v-bind="ptm('pcDecrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
@@ -401,7 +481,12 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="incrementicon">
-                                            <component :is="incrementIcon ? 'span' : 'ChevronUpIcon'" :class="[incrementIcon, slotProps.class]" v-bind="ptm('pcIncrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="incrementIcon ? 'span' : 'ChevronUpIcon'"
+                                                :class="[incrementIcon, slotProps.class]"
+                                                v-bind="ptm('pcIncrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
@@ -427,13 +512,23 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="decrementicon">
-                                            <component :is="decrementIcon ? 'span' : 'ChevronDownIcon'" :class="[decrementIcon, slotProps.class]" v-bind="ptm('pcDecrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="decrementIcon ? 'span' : 'ChevronDownIcon'"
+                                                :class="[decrementIcon, slotProps.class]"
+                                                v-bind="ptm('pcDecrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
                             </slot>
                         </div>
-                        <div v-if="showSeconds" :class="cx('separatorContainer')" v-bind="ptm('separatorContainer')" data-pc-group-section="timepickerContainer">
+                        <div
+                            v-if="showSeconds"
+                            :class="cx('separatorContainer')"
+                            v-bind="ptm('separatorContainer')"
+                            data-pc-group-section="timepickerContainer"
+                        >
                             <span v-bind="ptm('separator')" data-pc-group-section="timepickerlabel">{{ timeSeparator }}</span>
                         </div>
                         <div v-if="showSeconds" :class="cx('secondPicker')" v-bind="ptm('secondPicker')" data-pc-group-section="timepickerContainer">
@@ -457,7 +552,12 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="incrementicon">
-                                            <component :is="incrementIcon ? 'span' : 'ChevronUpIcon'" :class="[incrementIcon, slotProps.class]" v-bind="ptm('pcIncrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="incrementIcon ? 'span' : 'ChevronUpIcon'"
+                                                :class="[incrementIcon, slotProps.class]"
+                                                v-bind="ptm('pcIncrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
@@ -483,17 +583,31 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="decrementicon">
-                                            <component :is="decrementIcon ? 'span' : 'ChevronDownIcon'" :class="[decrementIcon, slotProps.class]" v-bind="ptm('pcDecrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="decrementIcon ? 'span' : 'ChevronDownIcon'"
+                                                :class="[decrementIcon, slotProps.class]"
+                                                v-bind="ptm('pcDecrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
                             </slot>
                         </div>
-                        <div v-if="hourFormat == '12'" :class="cx('separatorContainer')" v-bind="ptm('separatorContainer')" data-pc-group-section="timepickerContainer">
+                        <div
+                            v-if="hourFormat == '12'"
+                            :class="cx('separatorContainer')"
+                            v-bind="ptm('separatorContainer')"
+                            data-pc-group-section="timepickerContainer"
+                        >
                             <span v-bind="ptm('separator')" data-pc-group-section="timepickerlabel">{{ timeSeparator }}</span>
                         </div>
                         <div v-if="hourFormat == '12'" :class="cx('ampmPicker')" v-bind="ptm('ampmPicker')">
-                            <slot name="ampmincrementbutton" :toggleCallback="(event) => toggleAMPM(event)" :keydownCallback="(event) => onContainerButtonKeydown(event)">
+                            <slot
+                                name="ampmincrementbutton"
+                                :toggleCallback="(event) => toggleAMPM(event)"
+                                :keydownCallback="(event) => onContainerButtonKeydown(event)"
+                            >
                                 <Button
                                     :class="cx('pcIncrementButton')"
                                     :aria-label="$primevue.config.locale.am"
@@ -507,13 +621,24 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="incrementicon" :class="cx('incrementIcon')">
-                                            <component :is="incrementIcon ? 'span' : 'ChevronUpIcon'" :class="[cx('incrementIcon'), slotProps.class]" v-bind="ptm('pcIncrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="incrementIcon ? 'span' : 'ChevronUpIcon'"
+                                                :class="[cx('incrementIcon'), slotProps.class]"
+                                                v-bind="ptm('pcIncrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
                             </slot>
-                            <span v-bind="ptm('ampm')" data-pc-group-section="timepickerlabel">{{ pm ? $primevue.config.locale.pm : $primevue.config.locale.am }}</span>
-                            <slot name="ampmdecrementbutton" :toggleCallback="(event) => toggleAMPM(event)" :keydownCallback="(event) => onContainerButtonKeydown(event)">
+                            <span v-bind="ptm('ampm')" data-pc-group-section="timepickerlabel">{{
+                                pm ? $primevue.config.locale.pm : $primevue.config.locale.am
+                            }}</span>
+                            <slot
+                                name="ampmdecrementbutton"
+                                :toggleCallback="(event) => toggleAMPM(event)"
+                                :keydownCallback="(event) => onContainerButtonKeydown(event)"
+                            >
                                 <Button
                                     :class="cx('pcDecrementButton')"
                                     :aria-label="$primevue.config.locale.pm"
@@ -526,7 +651,12 @@
                                 >
                                     <template #icon="slotProps">
                                         <slot name="decrementicon" :class="cx('decrementIcon')">
-                                            <component :is="decrementIcon ? 'span' : 'ChevronDownIcon'" :class="[cx('decrementIcon'), slotProps.class]" v-bind="ptm('pcDecrementButton')['icon']" data-pc-group-section="timepickerlabel" />
+                                            <component
+                                                :is="decrementIcon ? 'span' : 'ChevronDownIcon'"
+                                                :class="[cx('decrementIcon'), slotProps.class]"
+                                                v-bind="ptm('pcDecrementButton')['icon']"
+                                                data-pc-group-section="timepickerlabel"
+                                            />
                                         </slot>
                                     </template>
                                 </Button>
@@ -535,7 +665,11 @@
                     </div>
                     <div v-if="showButtonBar" :class="cx('buttonbar')" v-bind="ptm('buttonbar')">
                         <slot name="buttonbar" :todayCallback="(event) => onTodayButtonClick(event)" :clearCallback="(event) => onClearButtonClick(event)">
-                            <slot name="todaybutton" :actionCallback="(event) => onTodayButtonClick(event)" :keydownCallback="(event) => onContainerButtonKeydown(event)">
+                            <slot
+                                name="todaybutton"
+                                :actionCallback="(event) => onTodayButtonClick(event)"
+                                :keydownCallback="(event) => onContainerButtonKeydown(event)"
+                            >
                                 <Button
                                     :label="todayLabel"
                                     @click="onTodayButtonClick($event)"
@@ -547,7 +681,11 @@
                                     data-pc-group-section="button"
                                 />
                             </slot>
-                            <slot name="clearbutton" :actionCallback="(event) => onClearButtonClick(event)" :keydownCallback="(event) => onContainerButtonKeydown(event)">
+                            <slot
+                                name="clearbutton"
+                                :actionCallback="(event) => onClearButtonClick(event)"
+                                :keydownCallback="(event) => onContainerButtonKeydown(event)"
+                            >
                                 <Button
                                     :label="clearLabel"
                                     @click="onClearButtonClick($event)"
@@ -570,7 +708,19 @@
 
 <script>
 import { cn } from '../internal/utils/index';
-import { absolutePosition, addStyle, find, findSingle, getAttribute, getFocusableElements, getIndex, getOuterWidth, isTouchDevice, relativePosition, setAttribute } from '../internal/utils/dom/index';
+import {
+    absolutePosition,
+    addStyle,
+    find,
+    findSingle,
+    getAttribute,
+    getFocusableElements,
+    getIndex,
+    getOuterWidth,
+    isTouchDevice,
+    relativePosition,
+    setAttribute
+} from '../internal/utils/dom/index';
 import { isDate, isEmpty, isNotEmpty, localeComparator } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
@@ -1206,14 +1356,22 @@ export default {
         },
         isOutsideClicked(event) {
             const composedPath = event.composedPath();
-            return !(this.$el.isSameNode(event.target) || this.isNavIconClicked(event) || composedPath.includes(this.$el) || composedPath.includes(this.overlay));
+            return !(
+                this.$el.isSameNode(event.target) ||
+                this.isNavIconClicked(event) ||
+                composedPath.includes(this.$el) ||
+                composedPath.includes(this.overlay)
+            );
         },
         isNestedOverlayVisible() {
             // Issue: #571
             return !!this.overlay?.querySelector('[aria-expanded="true"]');
         },
         isNavIconClicked(event) {
-            return (this.previousButton && (this.previousButton.isSameNode(event.target) || this.previousButton.contains(event.target))) || (this.nextButton && (this.nextButton.isSameNode(event.target) || this.nextButton.contains(event.target)));
+            return (
+                (this.previousButton && (this.previousButton.isSameNode(event.target) || this.previousButton.contains(event.target))) ||
+                (this.nextButton && (this.nextButton.isSameNode(event.target) || this.nextButton.contains(event.target)))
+            );
         },
         alignOverlay() {
             if (this.overlay) {
@@ -1436,7 +1594,8 @@ export default {
                         formattedValue = this.formatDateTime(value);
                     } else if (this.isMultipleSelection()) {
                         for (let i = 0; i < value.length; i++) {
-                            let dateAsString = typeof value[i] === 'string' ? this.formatDateTime(this.parseValueForComparison(value[i])) : this.formatDateTime(value[i]);
+                            let dateAsString =
+                                typeof value[i] === 'string' ? this.formatDateTime(this.parseValueForComparison(value[i])) : this.formatDateTime(value[i]);
 
                             formattedValue += dateAsString;
 
@@ -1533,13 +1692,26 @@ export default {
                                 output += formatName('D', date.getDay(), this.$primevue.config.locale.dayNamesShort, this.$primevue.config.locale.dayNames);
                                 break;
                             case 'o':
-                                output += formatNumber('o', Math.round((new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 86400000), 3);
+                                output += formatNumber(
+                                    'o',
+                                    Math.round(
+                                        (new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime() -
+                                            new Date(date.getFullYear(), 0, 0).getTime()) /
+                                            86400000
+                                    ),
+                                    3
+                                );
                                 break;
                             case 'm':
                                 output += formatNumber('m', date.getMonth() + 1, 2);
                                 break;
                             case 'M':
-                                output += formatName('M', date.getMonth(), this.$primevue.config.locale.monthNamesShort, this.$primevue.config.locale.monthNames);
+                                output += formatName(
+                                    'M',
+                                    date.getMonth(),
+                                    this.$primevue.config.locale.monthNamesShort,
+                                    this.$primevue.config.locale.monthNames
+                                );
                                 break;
                             case 'y':
                                 output += lookAhead('y') ? date.getFullYear() : (date.getFullYear() % 100 < 10 ? '0' : '') + (date.getFullYear() % 100);
@@ -2072,7 +2244,8 @@ export default {
                 dim,
                 extra,
                 iValue = 0,
-                shortYearCutoff = typeof this.shortYearCutoff !== 'string' ? this.shortYearCutoff : (new Date().getFullYear() % 100) + parseInt(this.shortYearCutoff, 10),
+                shortYearCutoff =
+                    typeof this.shortYearCutoff !== 'string' ? this.shortYearCutoff : (new Date().getFullYear() % 100) + parseInt(this.shortYearCutoff, 10),
                 year = -1,
                 month = -1,
                 day = -1,
@@ -2973,7 +3146,9 @@ export default {
 
                 if (this.responsiveOptions) {
                     const comparer = localeComparator();
-                    let responsiveOptions = [...this.responsiveOptions].filter((o) => !!(o.breakpoint && o.numMonths)).sort((o1, o2) => -1 * comparer(o1.breakpoint, o2.breakpoint));
+                    let responsiveOptions = [...this.responsiveOptions]
+                        .filter((o) => !!(o.breakpoint && o.numMonths))
+                        .sort((o1, o2) => -1 * comparer(o1.breakpoint, o2.breakpoint));
 
                     for (let i = 0; i < responsiveOptions.length; i++) {
                         let { breakpoint, numMonths } = responsiveOptions[i];

@@ -13,7 +13,12 @@ import type { ButtonPassThroughOptions } from 'rose-spectacles/button';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type DrawerPassThroughOptionType = DrawerPassThroughAttributes | ((options: DrawerPassThroughMethodOptions) => DrawerPassThroughAttributes | string) | string | null | undefined;
+export declare type DrawerPassThroughOptionType =
+    | DrawerPassThroughAttributes
+    | ((options: DrawerPassThroughMethodOptions) => DrawerPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type DrawerPassThroughTransitionType = TransitionProps | ((options: DrawerPassThroughMethodOptions) => TransitionProps) | undefined;
 

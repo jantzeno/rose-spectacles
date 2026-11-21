@@ -6,9 +6,16 @@ interface NestedOverlayPress {
 }
 
 function isNestedOverlayPress(event: unknown): event is NestedOverlayPress {
-    return typeof event === 'object' && event !== null &&
-        'originalEvent' in event && typeof event.originalEvent === 'object' && event.originalEvent !== null && 'type' in event.originalEvent &&
-        'target' in event && event.target instanceof Node;
+    return (
+        typeof event === 'object' &&
+        event !== null &&
+        'originalEvent' in event &&
+        typeof event.originalEvent === 'object' &&
+        event.originalEvent !== null &&
+        'type' in event.originalEvent &&
+        'target' in event &&
+        event.target instanceof Node
+    );
 }
 
 export function listenForOutsideOverlayClick(trigger: HTMLElement, overlay: HTMLElement, dismiss: () => void) {

@@ -20,7 +20,12 @@ import type { SelectPassThroughOptionType } from 'rose-spectacles/select';
 import type { VirtualScrollerLoaderOptions } from 'rose-spectacles/virtualscroller';
 import { VNode } from 'vue';
 
-export declare type ColumnPassThroughOptionType = ColumnPassThroughAttributes | ((options: ColumnPassThroughMethodOptions) => ColumnPassThroughAttributes | string) | string | null | undefined;
+export declare type ColumnPassThroughOptionType =
+    | ColumnPassThroughAttributes
+    | ((options: ColumnPassThroughMethodOptions) => ColumnPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

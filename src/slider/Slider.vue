@@ -268,7 +268,10 @@ export default {
         },
         rangeStyle() {
             if (this.range) {
-                const rangeSliderWidth = this.rangeEndPosition > this.rangeStartPosition ? this.rangeEndPosition - this.rangeStartPosition : this.rangeStartPosition - this.rangeEndPosition;
+                const rangeSliderWidth =
+                    this.rangeEndPosition > this.rangeStartPosition
+                        ? this.rangeEndPosition - this.rangeStartPosition
+                        : this.rangeStartPosition - this.rangeEndPosition;
                 const rangeSliderPosition = this.rangeEndPosition > this.rangeStartPosition ? this.rangeStartPosition : this.rangeEndPosition;
 
                 if (this.horizontal) {

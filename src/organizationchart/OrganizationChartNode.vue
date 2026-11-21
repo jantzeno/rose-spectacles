@@ -5,10 +5,28 @@
                 <td :colspan="colspan" v-bind="ptm('cell')">
                     <div :class="[cx('node'), node.styleClass]" @click="onNodeClick" v-bind="getPTOptions('node')">
                         <component :is="templates[node.type] || templates['default']" :node="node" />
-                        <a v-if="toggleable" tabindex="0" :class="cx('nodeToggleButton')" @click="toggleNode" @keydown="onKeydown" v-bind="getPTOptions('nodeToggleButton')">
+                        <a
+                            v-if="toggleable"
+                            tabindex="0"
+                            :class="cx('nodeToggleButton')"
+                            @click="toggleNode"
+                            @keydown="onKeydown"
+                            v-bind="getPTOptions('nodeToggleButton')"
+                        >
                             <!--TODO: togglericon deprecated since v4.0-->
-                            <component v-if="templates.toggleicon || templates.togglericon" :is="templates.toggleicon || templates.togglericon" :expanded="expanded" :class="cx('nodeToggleButtonIcon')" v-bind="getPTOptions('nodeToggleButtonIcon')" />
-                            <component v-else :is="expanded ? 'ChevronDownIcon' : 'ChevronUpIcon'" :class="cx('nodeToggleButtonIcon')" v-bind="getPTOptions('nodeToggleButtonIcon')" />
+                            <component
+                                v-if="templates.toggleicon || templates.togglericon"
+                                :is="templates.toggleicon || templates.togglericon"
+                                :expanded="expanded"
+                                :class="cx('nodeToggleButtonIcon')"
+                                v-bind="getPTOptions('nodeToggleButtonIcon')"
+                            />
+                            <component
+                                v-else
+                                :is="expanded ? 'ChevronDownIcon' : 'ChevronUpIcon'"
+                                :class="cx('nodeToggleButtonIcon')"
+                                v-bind="getPTOptions('nodeToggleButtonIcon')"
+                            />
                         </a>
                     </div>
                 </td>
@@ -108,7 +126,10 @@ export default {
             });
         },
         onNodeClick(event) {
-            if (isAttributeEquals(event.target, 'data-pc-section', 'nodetogglebutton') || isAttributeEquals(event.target, 'data-pc-section', 'nodetogglebuttonicon')) {
+            if (
+                isAttributeEquals(event.target, 'data-pc-section', 'nodetogglebutton') ||
+                isAttributeEquals(event.target, 'data-pc-section', 'nodetogglebuttonicon')
+            ) {
                 return;
             }
 

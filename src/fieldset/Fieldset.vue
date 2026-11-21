@@ -25,7 +25,14 @@
             </slot>
         </legend>
         <transition name="rs-collapsible" v-bind="ptm('transition')">
-            <div v-show="!d_collapsed" :id="$id + '_content'" :class="cx('contentContainer')" role="region" :aria-labelledby="$id + '_header'" v-bind="ptm('contentContainer')">
+            <div
+                v-show="!d_collapsed"
+                :id="$id + '_content'"
+                :class="cx('contentContainer')"
+                role="region"
+                :aria-labelledby="$id + '_header'"
+                v-bind="ptm('contentContainer')"
+            >
                 <div :class="cx('contentWrapper')" v-bind="ptm('contentWrapper')">
                     <div :class="cx('content')" v-bind="ptm('content')">
                         <slot></slot>

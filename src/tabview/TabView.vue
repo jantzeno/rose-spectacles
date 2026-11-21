@@ -44,7 +44,9 @@
                             @keydown="onTabKeyDown($event, tab, index)"
                             v-bind="{ ...getTabProp(tab, 'headerActionProps'), ...getTabPT(tab, 'headerAction', index) }"
                         >
-                            <span v-if="tab.props && tab.props.header" :class="cx('tab.headerTitle')" v-bind="getTabPT(tab, 'headerTitle', index)">{{ tab.props.header }}</span>
+                            <span v-if="tab.props && tab.props.header" :class="cx('tab.headerTitle')" v-bind="getTabPT(tab, 'headerTitle', index)">{{
+                                tab.props.header
+                            }}</span>
                             <component v-if="tab.children && tab.children.header" :is="tab.children.header"></component>
                         </a>
                     </li>
@@ -164,7 +166,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`tabpanel.${key}`, { tabpanel: tabMetaData }), this.ptm(`tabpanel.${key}`, tabMetaData), this.ptmo(this.getTabProp(tab, 'pt'), key, tabMetaData));
+            return mergeProps(
+                this.ptm(`tabpanel.${key}`, { tabpanel: tabMetaData }),
+                this.ptm(`tabpanel.${key}`, tabMetaData),
+                this.ptmo(this.getTabProp(tab, 'pt'), key, tabMetaData)
+            );
         },
         onScroll(event) {
             this.scrollable && this.updateButtonState();

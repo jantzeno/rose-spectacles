@@ -14,7 +14,12 @@ import type { InputNumberPassThroughOptions } from 'rose-spectacles/inputnumber'
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type PaginatorPassThroughOptionType<T = any> = PaginatorPassThroughAttributes | ((options: PaginatorPassThroughMethodOptions<T>) => PaginatorPassThroughAttributes | string) | string | null | undefined;
+export declare type PaginatorPassThroughOptionType<T = any> =
+    | PaginatorPassThroughAttributes
+    | ((options: PaginatorPassThroughMethodOptions<T>) => PaginatorPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

@@ -18,7 +18,12 @@ import type { RowPassThroughOptionType } from 'rose-spectacles/row';
 import type { VirtualScrollerPassThroughOptionType, VirtualScrollerProps } from 'rose-spectacles/virtualscroller';
 import { InputHTMLAttributes, TableHTMLAttributes, TransitionProps, VNode } from 'vue';
 
-export declare type DataTablePassThroughOptionType = DataTablePassThroughAttributes | ((options: DataTablePassThroughMethodOptions) => DataTablePassThroughAttributes | string) | string | null | undefined;
+export declare type DataTablePassThroughOptionType =
+    | DataTablePassThroughAttributes
+    | ((options: DataTablePassThroughMethodOptions) => DataTablePassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type DataTablePassThroughTransitionType = TransitionProps | ((options: DataTablePassThroughMethodOptions) => TransitionProps) | undefined;
 
@@ -95,7 +100,26 @@ export interface DataTableFilterMetaData {
     /**
      * Filter match mode
      */
-    matchMode: HintedString<'startsWith' | 'contains' | 'notContains' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' | 'between' | 'dateIs' | 'dateIsNot' | 'dateBefore' | 'dateAfter'> | undefined;
+    matchMode:
+        | HintedString<
+              | 'startsWith'
+              | 'contains'
+              | 'notContains'
+              | 'endsWith'
+              | 'equals'
+              | 'notEquals'
+              | 'in'
+              | 'lt'
+              | 'lte'
+              | 'gt'
+              | 'gte'
+              | 'between'
+              | 'dateIs'
+              | 'dateIsNot'
+              | 'dateBefore'
+              | 'dateAfter'
+          >
+        | undefined;
 }
 
 /**
@@ -265,7 +289,26 @@ export interface DataTableSortEvent {
     /**
      * Match modes per field
      */
-    filterMatchModes: HintedString<'startsWith' | 'contains' | 'notContains' | 'endsWith' | 'equals' | 'notEquals' | 'in' | 'lt' | 'lte' | 'gt' | 'gte' | 'between' | 'dateIs' | 'dateIsNot' | 'dateBefore' | 'dateAfter'> | undefined;
+    filterMatchModes:
+        | HintedString<
+              | 'startsWith'
+              | 'contains'
+              | 'notContains'
+              | 'endsWith'
+              | 'equals'
+              | 'notEquals'
+              | 'in'
+              | 'lt'
+              | 'lte'
+              | 'gt'
+              | 'gte'
+              | 'between'
+              | 'dateIs'
+              | 'dateIsNot'
+              | 'dateBefore'
+              | 'dateAfter'
+          >
+        | undefined;
 }
 
 /**

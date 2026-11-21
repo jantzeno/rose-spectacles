@@ -479,7 +479,11 @@ describe('DataTable.vue', () => {
     });
 
     it('should filtered with menu display', async () => {
-        await wrapper.setProps({ filters: { name: { value: 'b', matchMode: FilterMatchMode.STARTS_WITH } }, filterDisplay: 'menu', globalFilterFields: ['name'] });
+        await wrapper.setProps({
+            filters: { name: { value: 'b', matchMode: FilterMatchMode.STARTS_WITH } },
+            filterDisplay: 'menu',
+            globalFilterFields: ['name']
+        });
 
         await wrapper.vm.filter(smallData);
 
@@ -488,7 +492,11 @@ describe('DataTable.vue', () => {
     });
 
     it('should filtered with row display', async () => {
-        await wrapper.setProps({ filters: { name: { value: 'b', matchMode: FilterMatchMode.STARTS_WITH } }, filterDisplay: 'row', globalFilterFields: ['name'] });
+        await wrapper.setProps({
+            filters: { name: { value: 'b', matchMode: FilterMatchMode.STARTS_WITH } },
+            filterDisplay: 'row',
+            globalFilterFields: ['name']
+        });
 
         await wrapper.vm.filter(smallData);
 
@@ -845,7 +853,12 @@ describe('DataTable.vue', () => {
 
         expect(wrapper.emitted()['update:editingRows'][0][0]).toEqual([smallData[0]]);
         expect(wrapper.emitted()['row-edit-init'][0][0].data).toEqual(smallData[0]);
-        expect(wrapper.findAll('.rs-datatable-tbody > tr > td')[wrapper.findAll('.rs-datatable-tbody > tr > td').length - 1].find('.rs-datatable-row-editor-init').exists()).toBe(true);
+        expect(
+            wrapper
+                .findAll('.rs-datatable-tbody > tr > td')
+                [wrapper.findAll('.rs-datatable-tbody > tr > td').length - 1].find('.rs-datatable-row-editor-init')
+                .exists()
+        ).toBe(true);
     });
 
     it('should save row editing', async () => {

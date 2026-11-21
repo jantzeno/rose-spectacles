@@ -1,13 +1,38 @@
 <template>
     <div :class="cx('itemsContainer')" v-bind="ptm('itemsContainer')">
         <div :class="cx('items')" v-bind="ptm('items')">
-            <button v-if="showItemNavigators" v-ripple type="button" :class="cx('prevButton')" @click="navBackward($event)" :disabled="isNavBackwardDisabled" v-bind="ptm('prevButton')" data-pc-group-section="itemnavigator">
+            <button
+                v-if="showItemNavigators"
+                v-ripple
+                type="button"
+                :class="cx('prevButton')"
+                @click="navBackward($event)"
+                :disabled="isNavBackwardDisabled"
+                v-bind="ptm('prevButton')"
+                data-pc-group-section="itemnavigator"
+            >
                 <component :is="templates.previousitemicon || 'ChevronLeftIcon'" :class="cx('prevIcon')" v-bind="ptm('prevIcon')" />
             </button>
-            <div :id="id + '_item_' + activeIndex" :class="cx('item')" role="group" :aria-label="ariaSlideNumber(activeIndex + 1)" :aria-roledescription="ariaSlideLabel" v-bind="ptm('item')">
+            <div
+                :id="id + '_item_' + activeIndex"
+                :class="cx('item')"
+                role="group"
+                :aria-label="ariaSlideNumber(activeIndex + 1)"
+                :aria-roledescription="ariaSlideLabel"
+                v-bind="ptm('item')"
+            >
                 <component v-if="templates.item" :is="templates.item" :item="activeItem" />
             </div>
-            <button v-if="showItemNavigators" v-ripple type="button" :class="cx('nextButton')" @click="navForward($event)" :disabled="isNavForwardDisabled" v-bind="ptm('nextButton')" data-pc-group-section="itemnavigator">
+            <button
+                v-if="showItemNavigators"
+                v-ripple
+                type="button"
+                :class="cx('nextButton')"
+                @click="navForward($event)"
+                :disabled="isNavForwardDisabled"
+                v-bind="ptm('nextButton')"
+                data-pc-group-section="itemnavigator"
+            >
                 <component :is="templates.nextitemicon || 'ChevronRightIcon'" :class="cx('nextIcon')" v-bind="ptm('nextIcon')" />
             </button>
             <div v-if="templates['caption']" :class="cx('caption')" v-bind="ptm('caption')">
@@ -28,8 +53,20 @@
                 v-bind="ptm('indicator', getIndicatorPTOptions(index))"
                 :data-p-active="isIndicatorItemActive(index)"
             >
-                <button v-if="!templates['indicator']" type="button" :tabindex="activeIndex === index ? '0' : '-1'" :class="cx('indicatorButton')" v-bind="ptm('indicatorButton', getIndicatorPTOptions(index))"></button>
-                <component v-if="templates.indicator" :is="templates.indicator" :index="index" :activeIndex="activeIndex" :tabindex="activeIndex === index ? '0' : '-1'" />
+                <button
+                    v-if="!templates['indicator']"
+                    type="button"
+                    :tabindex="activeIndex === index ? '0' : '-1'"
+                    :class="cx('indicatorButton')"
+                    v-bind="ptm('indicatorButton', getIndicatorPTOptions(index))"
+                ></button>
+                <component
+                    v-if="templates.indicator"
+                    :is="templates.indicator"
+                    :index="index"
+                    :activeIndex="activeIndex"
+                    :tabindex="activeIndex === index ? '0' : '-1'"
+                />
             </li>
         </ul>
     </div>

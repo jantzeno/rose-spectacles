@@ -14,7 +14,12 @@ import type { MenuItem } from 'rose-spectacles/menuitem';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type ContextMenuPassThroughOptionType = ContextMenuPassThroughAttributes | ((options: ContextMenuPassThroughMethodOptions) => ContextMenuPassThroughAttributes | string) | string | null | undefined;
+export declare type ContextMenuPassThroughOptionType =
+    | ContextMenuPassThroughAttributes
+    | ((options: ContextMenuPassThroughMethodOptions) => ContextMenuPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type ContextMenuPassThroughTransitionType = TransitionProps | ((options: ContextMenuPassThroughMethodOptions) => TransitionProps) | undefined;
 

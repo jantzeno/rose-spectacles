@@ -14,7 +14,12 @@ import type { InputTextPassThroughOptions } from 'rose-spectacles/inputtext';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type DatePickerPassThroughOptionType = DatePickerPassThroughAttributes | ((options: DatePickerPassThroughMethodOptions) => DatePickerPassThroughAttributes | string) | string | null | undefined;
+export declare type DatePickerPassThroughOptionType =
+    | DatePickerPassThroughAttributes
+    | ((options: DatePickerPassThroughMethodOptions) => DatePickerPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 export declare type DatePickerPassThroughTransitionType = TransitionProps | ((options: DatePickerPassThroughMethodOptions) => TransitionProps) | undefined;
 

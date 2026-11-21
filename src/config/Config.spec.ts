@@ -6,7 +6,7 @@ it('provides app configuration to components and merges locale overrides with de
     const consumer = defineComponent({
         setup() {
             const { config } = usePrimeVue();
-            return () => h('div', [config.locale.emptyMessage, h('span', config.locale.accept)]);
+            return () => h('div', [config.locale?.emptyMessage, h('span', config.locale?.accept)]);
         }
     });
     const wrapper = mount(consumer, {

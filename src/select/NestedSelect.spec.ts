@@ -4,8 +4,12 @@ import CascadeSelect from '../cascadeselect/CascadeSelect.vue';
 import TreeSelect from '../treeselect/TreeSelect.vue';
 import Select from './Select.vue';
 
-beforeEach(() => { vi.useFakeTimers(); });
-afterEach(() => { vi.useRealTimers(); });
+beforeEach(() => {
+    vi.useFakeTimers();
+});
+afterEach(() => {
+    vi.useRealTimers();
+});
 
 async function finishPointerSequence() {
     vi.runAllTimers();
@@ -20,11 +24,19 @@ const cases = [
 
 for (const { name, outer, ...props } of cases) {
     function fixture() {
-        const host = mount({
-            render: () => h(outer, { ...props, appendTo: 'self', inputId: 'outer-select' }, {
-                footer: () => h(Select, { inputId: 'inner-select', options: ['Inner option'] })
-            })
-        }, { attachTo: document.body });
+        const host = mount(
+            {
+                render: () =>
+                    h(
+                        outer,
+                        { ...props, appendTo: 'self', inputId: 'outer-select' },
+                        {
+                            footer: () => h(Select, { inputId: 'inner-select', options: ['Inner option'] })
+                        }
+                    )
+            },
+            { attachTo: document.body }
+        );
 
         return { host, trigger: host.get('#outer-select') };
     }

@@ -12,7 +12,12 @@ import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { VNode } from 'vue';
 
-export declare type BadgePassThroughOptionType<T = any> = BadgePassThroughAttributes | ((options: BadgePassThroughMethodOptions<T>) => BadgePassThroughAttributes | string) | string | null | undefined;
+export declare type BadgePassThroughOptionType<T = any> =
+    | BadgePassThroughAttributes
+    | ((options: BadgePassThroughMethodOptions<T>) => BadgePassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

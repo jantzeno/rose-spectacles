@@ -1,5 +1,11 @@
 <template>
-    <td :style="containerStyle" :class="containerClass" role="cell" v-bind="{ ...getColumnPT('root'), ...getColumnPT('footerCell') }" :data-p-frozen-column="columnProp('frozen')">
+    <td
+        :style="containerStyle"
+        :class="containerClass"
+        role="cell"
+        v-bind="{ ...getColumnPT('root'), ...getColumnPT('footerCell') }"
+        :data-p-frozen-column="columnProp('frozen')"
+    >
         <component v-if="column.children && column.children.footer" :is="column.children.footer" :column="column" />
         <span v-if="columnProp('footer')" :class="cx('columnFooter')" v-bind="getColumnPT('columnFooter')">{{ columnProp('footer') }}</span>
     </td>
@@ -59,7 +65,11 @@ export default {
                 }
             };
 
-            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData), this.ptmo(this.getColumnProp(), key, columnMetaData));
+            return mergeProps(
+                this.ptm(`column.${key}`, { column: columnMetaData }),
+                this.ptm(`column.${key}`, columnMetaData),
+                this.ptmo(this.getColumnProp(), key, columnMetaData)
+            );
         },
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined;

@@ -13,9 +13,17 @@ import type { MenuItem } from 'rose-spectacles/menuitem';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import { TransitionProps, VNode } from 'vue';
 
-export declare type TieredMenuPassThroughOptionType<T = any> = TieredMenuPassThroughAttributes | ((options: TieredMenuPassThroughMethodOptions<T>) => TieredMenuPassThroughAttributes | string) | string | null | undefined;
+export declare type TieredMenuPassThroughOptionType<T = any> =
+    | TieredMenuPassThroughAttributes
+    | ((options: TieredMenuPassThroughMethodOptions<T>) => TieredMenuPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
-export declare type TieredMenuPassThroughTransitionType<T = any> = TransitionProps | ((options: TieredMenuPassThroughMethodOptions<T>) => TransitionProps) | undefined;
+export declare type TieredMenuPassThroughTransitionType<T = any> =
+    | TransitionProps
+    | ((options: TieredMenuPassThroughMethodOptions<T>) => TransitionProps)
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.

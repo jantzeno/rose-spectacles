@@ -22,7 +22,11 @@ const BaseDirective = {
         const self = BaseDirective._usePT(instance, BaseDirective._getPT(obj, instance.$name), getValue, key, { ...params, global: global || {} });
         const datasets = BaseDirective._getPTDatasets(instance, key);
 
-        return mergeSections || (!mergeSections && self) ? (useMergeProps ? BaseDirective._mergeProps(instance, useMergeProps, global, self, datasets) : { ...global, ...self, ...datasets }) : { ...self, ...datasets };
+        return mergeSections || (!mergeSections && self)
+            ? useMergeProps
+                ? BaseDirective._mergeProps(instance, useMergeProps, global, self, datasets)
+                : { ...global, ...self, ...datasets }
+            : { ...self, ...datasets };
     },
     _getPTDatasets(instance = {}, key = '') {
         const datasetPrefix = 'data-pc-';
@@ -60,7 +64,11 @@ const BaseDirective = {
             else if (isString(value)) return value;
             else if (isString(originalValue)) return originalValue;
 
-            return mergeSections || (!mergeSections && value) ? (useMergeProps ? BaseDirective._mergeProps(instance, useMergeProps, originalValue, value) : { ...originalValue, ...value }) : value;
+            return mergeSections || (!mergeSections && value)
+                ? useMergeProps
+                    ? BaseDirective._mergeProps(instance, useMergeProps, originalValue, value)
+                    : { ...originalValue, ...value }
+                : value;
         }
 
         return fn(pt);
@@ -146,7 +154,12 @@ const BaseDirective = {
         const name = `on${toCapitalCase(hookName)}`;
         const config = BaseDirective._getConfig(binding, vnode);
         const instance = el?.$instance;
-        const selfHook = BaseDirective._usePT(instance, BaseDirective._getPT(binding?.value?.pt, directiveName), BaseDirective._getOptionValue, `hooks.${name}`);
+        const selfHook = BaseDirective._usePT(
+            instance,
+            BaseDirective._getPT(binding?.value?.pt, directiveName),
+            BaseDirective._getOptionValue,
+            `hooks.${name}`
+        );
         const defaultHook = BaseDirective._useDefaultPT(instance, config?.pt?.directives?.[directiveName], BaseDirective._getOptionValue, `hooks.${name}`);
         const options = { el, binding, vnode, prevVnode };
 
@@ -179,14 +192,17 @@ const BaseDirective = {
                 $attrSelector: el.$pd?.[name]?.attrSelector,
                 /* computed instance variables */
                 defaultPT: () => BaseDirective._getPT(config?.pt, undefined, (value) => value?.directives?.[name]),
-                isUnstyled: () => (el._$instances[name]?.$binding?.value?.unstyled !== undefined ? el._$instances[name]?.$binding?.value?.unstyled : config?.unstyled),
+                isUnstyled: () =>
+                    el._$instances[name]?.$binding?.value?.unstyled !== undefined ? el._$instances[name]?.$binding?.value?.unstyled : config?.unstyled,
                 theme: () => el._$instances[name]?.$primevueConfig?.theme,
                 preset: () => el._$instances[name]?.$binding?.value?.dt,
                 /* instance's methods */
                 ptm: (key = '', params = {}) => BaseDirective._getPTValue(el._$instances[name], el._$instances[name]?.$binding?.value?.pt, key, { ...params }),
                 ptmo: (obj = {}, key = '', params = {}) => BaseDirective._getPTValue(el._$instances[name], obj, key, params, false),
-                cx: (key = '', params = {}) => (!el._$instances[name]?.isUnstyled() ? BaseDirective._getOptionValue(el._$instances[name]?.$style?.classes, key, { ...params }) : undefined),
-                sx: (key = '', when = true, params = {}) => (when ? BaseDirective._getOptionValue(el._$instances[name]?.$style?.inlineStyles, key, { ...params }) : undefined),
+                cx: (key = '', params = {}) =>
+                    !el._$instances[name]?.isUnstyled() ? BaseDirective._getOptionValue(el._$instances[name]?.$style?.classes, key, { ...params }) : undefined,
+                sx: (key = '', when = true, params = {}) =>
+                    when ? BaseDirective._getOptionValue(el._$instances[name]?.$style?.inlineStyles, key, { ...params }) : undefined,
                 ...$options
             };
 

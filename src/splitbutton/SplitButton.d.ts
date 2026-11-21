@@ -15,7 +15,12 @@ import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { TieredMenuPassThroughOptions, TieredMenuRouterBindProps } from 'rose-spectacles/tieredmenu';
 import { ButtonHTMLAttributes, VNode } from 'vue';
 
-export declare type SplitButtonPassThroughOptionType = SplitButtonPassThroughAttributes | ((options: SplitButtonPassThroughMethodOptions) => SplitButtonPassThroughAttributes | string) | string | null | undefined;
+export declare type SplitButtonPassThroughOptionType =
+    | SplitButtonPassThroughAttributes
+    | ((options: SplitButtonPassThroughMethodOptions) => SplitButtonPassThroughAttributes | string)
+    | string
+    | null
+    | undefined;
 
 /**
  * Custom passthrough(pt) option method.
