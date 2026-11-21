@@ -44,7 +44,7 @@ export const inputs: Example[] = [
     control('ToggleButton', false, { onLabel: 'Bookmarked', offLabel: 'Bookmark' }),
     control('SelectButton', 'Day', { options: ['Day', 'Week', 'Month'] }),
     control('Checkbox', true, { binary: true }),
-    control('Select', 'Oslo', { ...cities, filter: true }),
+    control('Select', 'Oslo', { ...cities, filter: true, showClear: true }),
     control('Dropdown', 'Kyoto', cities),
     control('MultiSelect', ['Oslo', 'Kyoto'], { ...cities, display: 'chip' }),
     control('Listbox', 'Lima', { ...cities, filter: true }),

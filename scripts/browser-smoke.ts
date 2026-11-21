@@ -39,6 +39,26 @@ try {
 
         console.log(`${examples.length} gallery examples render`);
 
+        await show('#select');
+        const select = '[data-example="select"]';
+        assert.equal(
+            await browser.evaluate(`(() => {
+                const combobox = document.querySelector('${select} [role="combobox"]');
+                combobox.focus();
+                return document.activeElement === combobox;
+            })()`),
+            true
+        );
+        await browser.keys(['Tab']);
+        await wait(`document.activeElement === document.querySelector('${select} button[aria-label="Clear"]')`, 'Tab reaches the Select clear button');
+        await browser.click(`${select} button[aria-label="Clear"]`);
+        await wait(
+            `document.querySelector('${select} output').textContent === 'null' &&
+                document.activeElement === document.querySelector('${select} [role="combobox"]')`,
+            'The Select clear button clears the value and restores focus after activation'
+        );
+        console.log('Tab reaches the Select clear button, and activating it clears the value and restores focus');
+
         await show('#chips');
         await browser.evaluate(`(() => {
             const root = document.querySelector('[data-example="chips"] .rs-inputchips');
