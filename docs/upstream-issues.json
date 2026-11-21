@@ -1800,9 +1800,15 @@
             "title": "TreeTable lazy loading - loading-mode \"icon\" only works for root items",
             "labels": ["bug"],
             "component": "TreeTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: TreeTable lazy loading - loading-mode \"icon\" only works for root items."
+            "disposition": "fixed",
+            "evidence": [
+                "Mounted a lazy TreeTable with loading set on both a parent and a child. The root spinner rendered before the fix, while the child spinner appeared only after loading mode was passed to recursive rows."
+            ],
+            "resolvingCommit": "4a621f413e7163fd535f8cd16bbfee103c033e8d",
+            "test": {
+                "path": "src/treetable/TreeTable.spec.ts",
+                "name": "shows loading icons on root and nested loading nodes"
+            }
         },
         {
             "number": 195,
