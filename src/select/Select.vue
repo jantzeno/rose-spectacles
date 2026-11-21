@@ -61,14 +61,16 @@
             <slot name="value" :value="d_value" :placeholder="placeholder">{{ label === 'rs-emptylabel' ? '&nbsp;' : (label ?? 'empty') }}</slot>
         </span>
         <slot v-if="isClearIconVisible" name="clearicon" :class="cx('clearIcon')" :clearCallback="onClearClick">
-            <component
-                :is="clearIcon ? 'i' : 'TimesIcon'"
-                ref="clearIcon"
-                :class="[cx('clearIcon'), clearIcon]"
-                @click="onClearClick"
-                v-bind="getPTOptions('clearIcon')"
-                data-pc-section="clearicon"
-            />
+            <button type="button" :class="cx('clearButton')" :tabindex="tabindex < 0 ? -1 : 0" :aria-label="clearButtonLabel" @click.stop="onClearClick">
+                <component
+                    :is="clearIcon ? 'i' : 'TimesIcon'"
+                    ref="clearIcon"
+                    :class="[cx('clearIcon'), clearIcon]"
+                    aria-hidden="true"
+                    v-bind="getPTOptions('clearIcon')"
+                    data-pc-section="clearicon"
+                />
+            </button>
         </slot>
         <div :class="cx('dropdown')" v-bind="getPTOptions('dropdown')">
             <slot v-if="loading" name="loadingicon" :class="cx('loadingIcon')">
@@ -630,6 +632,7 @@ export default {
         onClearClick(event) {
             this.updateModel(event, null);
             this.resetFilterOnClear && (this.filterValue = null);
+            focus(this.$refs.focusInput);
         },
         onFirstHiddenFocus(event) {
             const focusableEl =
@@ -1248,6 +1251,9 @@ export default {
         },
         isClearIconVisible() {
             return this.showClear && this.d_value != null && !this.disabled && !this.loading;
+        },
+        clearButtonLabel() {
+            return this.$primevue?.config.locale?.aria?.clear || 'Clear';
         },
         virtualScrollerDisabled() {
             return !this.virtualScrollerOptions;

@@ -18,6 +18,10 @@ export enum SelectClasses {
      */
     label = 'rs-select-label',
     /**
+     * Class name of the clear button element
+     */
+    clearButton = 'rs-select-clear-button',
+    /**
      * Class name of the clear icon element
      */
     clearIcon = 'rs-select-clear-icon',

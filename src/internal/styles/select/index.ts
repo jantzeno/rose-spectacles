@@ -49,6 +49,18 @@ export const style = /*css*/ `
         background: dt('select.disabled.background');
     }
 
+    .rs-select-clear-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        align-self: center;
+        flex-shrink: 0;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+    }
+
     .rs-select-clear-icon {
         align-self: center;
         color: dt('select.clear.icon.color');

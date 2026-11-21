@@ -36,6 +36,30 @@ it('dismisses a Select overlay when its containing ScrollPanel scrolls', async (
     }
 });
 
+it('provides a focusable clear button and returns focus to the combobox after clearing', async () => {
+    const wrapper = mount(Select, {
+        props: { options: ['Berlin', 'Oslo'], modelValue: 'Berlin', showClear: true, appendTo: 'self' },
+        attachTo: document.body,
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        const clear = wrapper.get<HTMLButtonElement>('button[aria-label="Clear"]');
+
+        clear.element.focus();
+        expect(document.activeElement).toBe(clear.element);
+
+        await clear.trigger('click');
+
+        expect(wrapper.emitted('update:modelValue')).toEqual([[null]]);
+        expect(wrapper.find('button[aria-label="Clear"]').exists()).toBe(false);
+        expect(document.activeElement).toBe(wrapper.get('[role="combobox"]').element);
+        expect(wrapper.get('[role="combobox"]').attributes('aria-expanded')).toBe('false');
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('Select.vue', () => {
     let wrapper: VueWrapper<any>;
 

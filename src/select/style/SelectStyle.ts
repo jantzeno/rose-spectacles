@@ -24,6 +24,7 @@ const classes = {
             'rs-select-label-empty': !props.editable && !instance.$slots['value'] && (instance.label === 'rs-emptylabel' || instance.label?.length === 0)
         }
     ],
+    clearButton: 'rs-select-clear-button',
     clearIcon: 'rs-select-clear-icon',
     dropdown: 'rs-select-dropdown',
     loadingicon: 'rs-select-loading-icon',
