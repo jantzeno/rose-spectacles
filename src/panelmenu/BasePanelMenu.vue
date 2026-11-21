@@ -1,5 +1,7 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
+import type { PanelMenuExpandedKeys } from 'rose-spectacles/panelmenu';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import PanelMenuStyle from './style/PanelMenuStyle';
 
@@ -8,11 +10,11 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         model: {
-            type: Array,
+            type: Array as PropType<MenuItem[]>,
             default: null
         },
         expandedKeys: {
-            type: Object,
+            type: Object as PropType<PanelMenuExpandedKeys>,
             default: null
         },
         multiple: {

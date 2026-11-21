@@ -83,34 +83,41 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import type { MenuItem } from 'rose-spectacles/menuitem';
 import { findSingle, focus, getAttribute } from '../internal/utils/dom/index';
 import { equals, isNotEmpty, resolve } from '../internal/utils/object/index';
 import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
 import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 import BasePanelMenu from './BasePanelMenu.vue';
 import PanelMenuList from './PanelMenuList.vue';
 
-export default {
+interface HeaderFocusRequest {
+    originalEvent: KeyboardEvent;
+    focusOnNext?: boolean;
+    selfCheck?: boolean;
+}
+
+export default defineComponent({
     name: 'PanelMenu',
     extends: BasePanelMenu,
     inheritAttrs: false,
     emits: ['update:expandedKeys', 'panel-open', 'panel-close'],
     data() {
         return {
-            activeItem: null,
-            activeItems: []
+            activeItem: null as MenuItem | null,
+            activeItems: [] as MenuItem[]
         };
     },
     methods: {
-        getItemProp(item, name) {
+        getItemProp(item: MenuItem, name: string) {
             return item ? resolve(item[name]) : undefined;
         },
-        getItemLabel(item) {
+        getItemLabel(item: MenuItem) {
             return this.getItemProp(item, 'label');
         },
-        getPTOptions(key, item, index) {
+        getPTOptions(key: string, item: MenuItem, index: number) {
             return this.ptm(key, {
                 context: {
                     index,
@@ -120,38 +127,38 @@ export default {
                 }
             });
         },
-        isItemActive(item) {
+        isItemActive(item: MenuItem) {
             return this.expandedKeys
                 ? this.expandedKeys[this.getItemProp(item, 'key')]
                 : this.multiple
                   ? this.activeItems.some((subItem) => equals(item, subItem))
                   : equals(item, this.activeItem);
         },
-        isItemVisible(item) {
+        isItemVisible(item: MenuItem) {
             return this.getItemProp(item, 'visible') !== false;
         },
-        isItemDisabled(item) {
+        isItemDisabled(item: MenuItem) {
             return this.getItemProp(item, 'disabled');
         },
-        isItemFocused(item) {
+        isItemFocused(item: MenuItem) {
             return equals(item, this.activeItem);
         },
-        isItemGroup(item) {
+        isItemGroup(item: MenuItem) {
             return isNotEmpty(item.items);
         },
-        getPanelId(index) {
+        getPanelId(index: number) {
             return `${this.$id}_${index}`;
         },
-        getPanelKey(index) {
+        getPanelKey(index: number) {
             return this.getPanelId(index);
         },
-        getHeaderId(index) {
+        getHeaderId(index: number) {
             return `${this.getPanelId(index)}_header`;
         },
-        getContentId(index) {
+        getContentId(index: number) {
             return `${this.getPanelId(index)}_content`;
         },
-        onHeaderClick(event, item) {
+        onHeaderClick(event: Event, item: MenuItem) {
             if (this.isItemDisabled(item)) {
                 event.preventDefault();
 
@@ -163,9 +170,9 @@ export default {
             }
 
             this.changeActiveItem(event, item);
-            focus(event.currentTarget);
+            if (event.currentTarget instanceof HTMLElement) focus(event.currentTarget);
         },
-        onHeaderKeyDown(event, item) {
+        onHeaderKeyDown(event: KeyboardEvent, item: MenuItem) {
             switch (event.code) {
                 case 'ArrowDown':
                     this.onHeaderArrowDownKey(event);
@@ -193,46 +200,46 @@ export default {
                     break;
             }
         },
-        onHeaderArrowDownKey(event) {
-            const rootList =
-                getAttribute(event.currentTarget, 'data-p-active') === true
-                    ? findSingle(event.currentTarget.nextElementSibling, '[data-pc-section="rootlist"]')
-                    : null;
+        onHeaderArrowDownKey(event: KeyboardEvent) {
+            const header = event.currentTarget as HTMLElement;
+            const region = header.nextElementSibling;
+            const rootList = region && getAttribute(header, 'data-p-active') === true ? findSingle(region, '[data-pc-section="rootlist"]') : null;
 
-            rootList ? focus(rootList) : this.updateFocusedHeader({ originalEvent: event, focusOnNext: true });
+            rootList instanceof HTMLElement ? focus(rootList) : this.updateFocusedHeader({ originalEvent: event, focusOnNext: true });
             event.preventDefault();
         },
-        onHeaderArrowUpKey(event) {
-            const prevHeader = this.findPrevHeader(event.currentTarget.parentElement) || this.findLastHeader();
+        onHeaderArrowUpKey(event: KeyboardEvent) {
+            const prevHeader = this.findPrevHeader((event.currentTarget as HTMLElement).parentElement) || this.findLastHeader();
+            const region = prevHeader?.nextElementSibling;
             const rootList =
-                getAttribute(prevHeader, 'data-p-active') === true ? findSingle(prevHeader.nextElementSibling, '[data-pc-section="rootlist"]') : null;
+                prevHeader && region && getAttribute(prevHeader, 'data-p-active') === true ? findSingle(region, '[data-pc-section="rootlist"]') : null;
 
-            rootList ? focus(rootList) : this.updateFocusedHeader({ originalEvent: event, focusOnNext: false });
+            rootList instanceof HTMLElement ? focus(rootList) : this.updateFocusedHeader({ originalEvent: event, focusOnNext: false });
             event.preventDefault();
         },
-        onHeaderHomeKey(event) {
+        onHeaderHomeKey(event: KeyboardEvent) {
             this.changeFocusedHeader(event, this.findFirstHeader());
             event.preventDefault();
         },
-        onHeaderEndKey(event) {
+        onHeaderEndKey(event: KeyboardEvent) {
             this.changeFocusedHeader(event, this.findLastHeader());
             event.preventDefault();
         },
-        onHeaderEnterKey(event, item) {
-            const headerAction = findSingle(event.currentTarget, '[data-pc-section="headerlink"]');
+        onHeaderEnterKey(event: KeyboardEvent, item: MenuItem) {
+            const headerAction = findSingle(event.currentTarget as HTMLElement, '[data-pc-section="headerlink"]');
 
-            headerAction ? headerAction.click() : this.onHeaderClick(event, item);
+            headerAction instanceof HTMLElement ? headerAction.click() : this.onHeaderClick(event, item);
             event.preventDefault();
         },
-        findNextHeader(panelElement, selfCheck = false) {
-            const nextPanelElement = selfCheck ? panelElement : panelElement.nextElementSibling;
-            const headerElement = findSingle(nextPanelElement, '[data-pc-section="header"]');
+        findNextHeader(panelElement: Element | null, selfCheck = false): Element | null {
+            const nextPanelElement = selfCheck ? panelElement : panelElement?.nextElementSibling;
+            const headerElement = nextPanelElement && findSingle(nextPanelElement, '[data-pc-section="header"]');
 
             return headerElement ? (getAttribute(headerElement, 'data-p-disabled') ? this.findNextHeader(headerElement.parentElement) : headerElement) : null;
         },
-        findPrevHeader(panelElement, selfCheck = false) {
-            const prevPanelElement = selfCheck ? panelElement : panelElement.previousElementSibling;
-            const headerElement = findSingle(prevPanelElement, '[data-pc-section="header"]');
+        findPrevHeader(panelElement: Element | null, selfCheck = false): Element | null {
+            const prevPanelElement = selfCheck ? panelElement : panelElement?.previousElementSibling;
+            const headerElement = prevPanelElement && findSingle(prevPanelElement, '[data-pc-section="header"]');
 
             return headerElement ? (getAttribute(headerElement, 'data-p-disabled') ? this.findPrevHeader(headerElement.parentElement) : headerElement) : null;
         },
@@ -242,18 +249,18 @@ export default {
         findLastHeader() {
             return this.findPrevHeader(this.$el.lastElementChild, true);
         },
-        updateFocusedHeader(event) {
+        updateFocusedHeader(event: HeaderFocusRequest) {
             const { originalEvent, focusOnNext, selfCheck } = event;
-            const panelElement = originalEvent.currentTarget.closest('[data-pc-section="panel"]');
+            const panelElement = (originalEvent.currentTarget as HTMLElement).closest('[data-pc-section="panel"]');
             const header = selfCheck
-                ? findSingle(panelElement, '[data-pc-section="header"]')
+                ? panelElement && findSingle(panelElement, '[data-pc-section="header"]')
                 : focusOnNext
                   ? this.findNextHeader(panelElement)
                   : this.findPrevHeader(panelElement);
 
             header ? this.changeFocusedHeader(originalEvent, header) : focusOnNext ? this.onHeaderHomeKey(originalEvent) : this.onHeaderEndKey(originalEvent);
         },
-        changeActiveItem(event, item, selfActive = false) {
+        changeActiveItem(event: Event, item: MenuItem, selfActive = false) {
             if (!this.isItemDisabled(item)) {
                 const active = this.isItemActive(item);
                 const eventName = !active ? 'panel-open' : 'panel-close';
@@ -273,20 +280,20 @@ export default {
                 this.$emit(eventName, { originalEvent: event, item });
             }
         },
-        changeExpandedKeys({ item, expanded = false }) {
+        changeExpandedKeys({ item, expanded = false }: { item: MenuItem; expanded?: boolean }) {
             if (this.expandedKeys) {
                 let _keys = { ...this.expandedKeys };
 
-                if (expanded) _keys[item.key] = true;
-                else delete _keys[item.key];
+                if (expanded) _keys[String(item.key)] = true;
+                else delete _keys[String(item.key)];
 
                 this.$emit('update:expandedKeys', _keys);
             }
         },
-        changeFocusedHeader(event, element) {
-            element && focus(element);
+        changeFocusedHeader(_event: Event, element: Element | null) {
+            if (element instanceof HTMLElement) focus(element);
         },
-        getMenuItemProps(item, index) {
+        getMenuItemProps(item: MenuItem, index: number) {
             return {
                 icon: mergeProps(
                     {
@@ -308,5 +315,5 @@ export default {
         ChevronRightIcon: ChevronRightIcon,
         ChevronDownIcon: ChevronDownIcon
     }
-};
+});
 </script>

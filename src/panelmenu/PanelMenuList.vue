@@ -21,13 +21,33 @@
     />
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType, type Slots } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
+import type { PanelMenuExpandedKeys } from 'rose-spectacles/panelmenu';
+import type { ProcessedMenuItem } from '../internal/processed-menu-item';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { findSingle, focus } from '../internal/utils/dom/index';
 import { resolve, isNotEmpty, isPrintableCharacter, findLast, isEmpty } from '../internal/utils/object/index';
 import PanelMenuSub from './PanelMenuSub.vue';
 
-export default {
+interface PanelListItem extends ProcessedMenuItem {
+    level: number;
+    index: number;
+    parent?: PanelListItem;
+    parentKey: string;
+    items: PanelListItem[];
+}
+
+interface FocusedItemChange {
+    originalEvent: KeyboardEvent;
+    processedItem?: PanelListItem;
+    focusOnNext?: boolean;
+    selfCheck?: boolean;
+    allowHeaderFocus?: boolean;
+}
+
+export default defineComponent({
     name: 'PanelMenuList',
     hostName: 'PanelMenu',
     extends: BaseComponent,
@@ -38,25 +58,25 @@ export default {
             default: null
         },
         items: {
-            type: Array,
-            default: null
+            type: Array as PropType<MenuItem[]>,
+            default: () => []
         },
         templates: {
-            type: Object,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         expandedKeys: {
-            type: Object,
+            type: Object as PropType<PanelMenuExpandedKeys>,
             default: null
         }
     },
-    searchTimeout: null,
-    searchValue: null,
     data() {
         return {
             focused: false,
-            focusedItem: null,
-            activeItemPath: []
+            focusedItem: null as PanelListItem | null,
+            activeItemPath: [] as PanelListItem[],
+            searchTimeout: null as ReturnType<typeof setTimeout> | null,
+            searchValue: ''
         };
     },
     watch: {
@@ -67,35 +87,38 @@ export default {
     created() {
         this.autoUpdateActiveItemPath(this.expandedKeys);
     },
+    beforeUnmount() {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    },
     methods: {
-        getItemProp(processedItem, name) {
+        getItemProp(processedItem: PanelListItem, name: string) {
             return processedItem && processedItem.item ? resolve(processedItem.item[name]) : undefined;
         },
-        getItemLabel(processedItem) {
+        getItemLabel(processedItem: PanelListItem) {
             return this.getItemProp(processedItem, 'label');
         },
-        isItemVisible(processedItem) {
+        isItemVisible(processedItem: PanelListItem) {
             return this.getItemProp(processedItem, 'visible') !== false;
         },
-        isItemDisabled(processedItem) {
+        isItemDisabled(processedItem: PanelListItem) {
             return this.getItemProp(processedItem, 'disabled');
         },
-        isItemActive(processedItem) {
+        isItemActive(processedItem: PanelListItem) {
             return this.activeItemPath.some((path) => path.key === processedItem.parentKey);
         },
-        isItemGroup(processedItem) {
+        isItemGroup(processedItem: PanelListItem) {
             return isNotEmpty(processedItem.items);
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.focused = true;
-            this.focusedItem = this.focusedItem || (this.isElementInPanel(event, event.relatedTarget) ? this.findFirstItem() : this.findLastItem());
+            this.focusedItem = this.focusedItem ?? (this.isElementInPanel(event, event.relatedTarget) ? this.findFirstItem() : this.findLastItem()) ?? null;
         },
         onBlur() {
             this.focused = false;
             this.focusedItem = null;
             this.searchValue = '';
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             const metaKey = event.metaKey || event.ctrlKey;
 
             switch (event.code) {
@@ -150,71 +173,77 @@ export default {
                     break;
             }
         },
-        onArrowDownKey(event) {
-            const processedItem = isNotEmpty(this.focusedItem) ? this.findNextItem(this.focusedItem) : this.findFirstItem();
+        onArrowDownKey(event: KeyboardEvent) {
+            const processedItem = this.focusedItem ? this.findNextItem(this.focusedItem) : this.findFirstItem();
 
             this.changeFocusedItem({ originalEvent: event, processedItem, focusOnNext: true });
             event.preventDefault();
         },
-        onArrowUpKey(event) {
-            const processedItem = isNotEmpty(this.focusedItem) ? this.findPrevItem(this.focusedItem) : this.findLastItem();
+        onArrowUpKey(event: KeyboardEvent) {
+            const processedItem = this.focusedItem ? this.findPrevItem(this.focusedItem) : this.findLastItem();
 
             this.changeFocusedItem({ originalEvent: event, processedItem, selfCheck: true });
             event.preventDefault();
         },
-        onArrowLeftKey(event) {
-            if (isNotEmpty(this.focusedItem)) {
-                const matched = this.activeItemPath.some((p) => p.key === this.focusedItem.key);
+        onArrowLeftKey(event: KeyboardEvent) {
+            const focused = this.focusedItem;
+
+            if (focused) {
+                const matched = this.activeItemPath.some((p) => p.key === focused.key);
 
                 if (matched) {
-                    this.activeItemPath = this.activeItemPath.filter((p) => p.key !== this.focusedItem.key);
+                    this.activeItemPath = this.activeItemPath.filter((p) => p.key !== focused.key);
                 } else {
-                    this.focusedItem = isNotEmpty(this.focusedItem.parent) ? this.focusedItem.parent : this.focusedItem;
+                    this.focusedItem = focused.parent ?? focused;
                 }
 
                 event.preventDefault();
             }
         },
-        onArrowRightKey(event) {
-            if (isNotEmpty(this.focusedItem)) {
-                const grouped = this.isItemGroup(this.focusedItem);
+        onArrowRightKey(event: KeyboardEvent) {
+            const focused = this.focusedItem;
+
+            if (focused) {
+                const grouped = this.isItemGroup(focused);
 
                 if (grouped) {
-                    const matched = this.activeItemPath.some((p) => p.key === this.focusedItem.key);
+                    const matched = this.activeItemPath.some((p) => p.key === focused.key);
 
                     if (matched) {
                         this.onArrowDownKey(event);
                     } else {
-                        this.activeItemPath = this.activeItemPath.filter((p) => p.parentKey !== this.focusedItem.parentKey);
-                        this.activeItemPath.push(this.focusedItem);
+                        this.activeItemPath = this.activeItemPath.filter((p) => p.parentKey !== focused.parentKey);
+                        this.activeItemPath.push(focused);
                     }
                 }
 
                 event.preventDefault();
             }
         },
-        onHomeKey(event) {
+        onHomeKey(event: KeyboardEvent) {
             this.changeFocusedItem({ originalEvent: event, processedItem: this.findFirstItem(), allowHeaderFocus: false });
             event.preventDefault();
         },
-        onEndKey(event) {
+        onEndKey(event: KeyboardEvent) {
             this.changeFocusedItem({ originalEvent: event, processedItem: this.findLastItem(), focusOnNext: true, allowHeaderFocus: false });
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEnterKey(event: KeyboardEvent) {
             if (isNotEmpty(this.focusedItem)) {
                 const element = findSingle(this.$el, `li[id="${`${this.focusedItemId}`}"]`);
                 const anchorElement = element && (findSingle(element, '[data-pc-section="itemlink"]') || findSingle(element, 'a,button'));
 
-                anchorElement ? anchorElement.click() : element && element.click();
+                const target = anchorElement ?? element;
+
+                if (target instanceof HTMLElement) target.click();
             }
 
             event.preventDefault();
         },
-        onSpaceKey(event) {
+        onSpaceKey(event: KeyboardEvent) {
             this.onEnterKey(event);
         },
-        onItemToggle(event) {
+        onItemToggle(event: { processedItem: PanelListItem; expanded: boolean }) {
             const { processedItem, expanded } = event;
 
             if (this.expandedKeys) {
@@ -227,26 +256,23 @@ export default {
             this.focusedItem = processedItem;
             focus(this.$el);
         },
-        onItemMouseMove(event) {
+        onItemMouseMove(event: { processedItem: PanelListItem }) {
             if (this.focused) {
                 this.focusedItem = event.processedItem;
             }
         },
-        isElementInPanel(event, element) {
-            const panel = event.currentTarget.closest('[data-pc-section="panel"]');
+        isElementInPanel(event: FocusEvent, element: EventTarget | null) {
+            const panel = (event.currentTarget as HTMLElement).closest('[data-pc-section="panel"]');
 
-            return panel && panel.contains(element);
+            return panel && element instanceof Node && panel.contains(element);
         },
-        isItemMatched(processedItem) {
-            return (
-                this.isValidItem(processedItem) &&
-                this.getItemLabel(processedItem)?.toLocaleLowerCase(this.searchLocale).startsWith(this.searchValue.toLocaleLowerCase(this.searchLocale))
-            );
+        isItemMatched(processedItem: PanelListItem) {
+            return this.isValidItem(processedItem) && this.getItemLabel(processedItem)?.toLocaleLowerCase().startsWith(this.searchValue.toLocaleLowerCase());
         },
-        isVisibleItem(processedItem) {
+        isVisibleItem(processedItem: PanelListItem) {
             return !!processedItem && (processedItem.level === 0 || this.isItemActive(processedItem)) && this.isItemVisible(processedItem);
         },
-        isValidItem(processedItem) {
+        isValidItem(processedItem: PanelListItem) {
             return !!processedItem && !this.isItemDisabled(processedItem) && !this.getItemProp(processedItem, 'separator');
         },
         findFirstItem() {
@@ -255,26 +281,28 @@ export default {
         findLastItem() {
             return findLast(this.visibleItems, (processedItem) => this.isValidItem(processedItem));
         },
-        findNextItem(processedItem) {
+        findNextItem(processedItem: PanelListItem) {
             const index = this.visibleItems.findIndex((item) => item.key === processedItem.key);
             const matchedItem = index < this.visibleItems.length - 1 ? this.visibleItems.slice(index + 1).find((pItem) => this.isValidItem(pItem)) : undefined;
 
             return matchedItem || processedItem;
         },
-        findPrevItem(processedItem) {
+        findPrevItem(processedItem: PanelListItem) {
             const index = this.visibleItems.findIndex((item) => item.key === processedItem.key);
             const matchedItem = index > 0 ? findLast(this.visibleItems.slice(0, index), (pItem) => this.isValidItem(pItem)) : undefined;
 
             return matchedItem || processedItem;
         },
-        searchItems(event, char) {
+        searchItems(event: KeyboardEvent, char: string) {
+            const focused = this.focusedItem;
+
             this.searchValue = (this.searchValue || '') + char;
 
-            let matchedItem = null;
+            let matchedItem: PanelListItem | undefined;
             let matched = false;
 
-            if (isNotEmpty(this.focusedItem)) {
-                const focusedItemIndex = this.visibleItems.findIndex((processedItem) => processedItem.key === this.focusedItem.key);
+            if (focused) {
+                const focusedItemIndex = this.visibleItems.findIndex((processedItem) => processedItem.key === focused.key);
 
                 matchedItem = this.visibleItems.slice(focusedItemIndex).find((processedItem) => this.isItemMatched(processedItem));
                 matchedItem = isEmpty(matchedItem)
@@ -311,10 +339,10 @@ export default {
 
             return matched;
         },
-        changeFocusedItem(event) {
+        changeFocusedItem(event: FocusedItemChange) {
             const { originalEvent, processedItem, focusOnNext, selfCheck, allowHeaderFocus = true } = event;
 
-            if (isNotEmpty(this.focusedItem) && this.focusedItem.key !== processedItem.key) {
+            if (this.focusedItem && processedItem && this.focusedItem.key !== processedItem.key) {
                 this.focusedItem = processedItem;
                 this.scrollInView();
             } else if (allowHeaderFocus) {
@@ -328,8 +356,8 @@ export default {
                 element.scrollIntoView && element.scrollIntoView({ block: 'nearest', inline: 'start' });
             }
         },
-        autoUpdateActiveItemPath(expandedKeys) {
-            this.activeItemPath = Object.entries(expandedKeys || {}).reduce((acc, [key, val]) => {
+        autoUpdateActiveItemPath(expandedKeys?: PanelMenuExpandedKeys | null) {
+            this.activeItemPath = Object.entries(expandedKeys || {}).reduce<PanelListItem[]>((acc, [key, val]) => {
                 if (val) {
                     const processedItem = this.findProcessedItemByItemKey(key);
 
@@ -339,8 +367,8 @@ export default {
                 return acc;
             }, []);
         },
-        findProcessedItemByItemKey(key, processedItems, level = 0) {
-            processedItems = processedItems || (level === 0 && this.processedItems);
+        findProcessedItemByItemKey(key: string, processedItems?: PanelListItem[], level = 0): PanelListItem | undefined | null {
+            processedItems = processedItems ?? (level === 0 ? this.processedItems : undefined);
 
             if (!processedItems) return null;
 
@@ -354,28 +382,29 @@ export default {
                 if (matchedItem) return matchedItem;
             }
         },
-        createProcessedItems(items, level = 0, parent = {}, parentKey = '') {
-            const processedItems = [];
+        createProcessedItems(items: MenuItem[] | null | undefined, level = 0, parent?: PanelListItem, parentKey = ''): PanelListItem[] {
+            const processedItems: PanelListItem[] = [];
 
             items &&
                 items.forEach((item, index) => {
                     const key = (parentKey !== '' ? parentKey + '_' : '') + index;
-                    const newItem = {
+                    const newItem: PanelListItem = {
                         item,
                         index,
                         level,
                         key,
                         parent,
-                        parentKey
+                        parentKey,
+                        items: []
                     };
 
-                    newItem['items'] = this.createProcessedItems(item.items, level + 1, newItem, key);
+                    newItem.items = this.createProcessedItems(item.items, level + 1, newItem, key);
                     processedItems.push(newItem);
                 });
 
             return processedItems;
         },
-        flatItems(processedItems, processedFlattenItems = []) {
+        flatItems(processedItems: PanelListItem[] | undefined, processedFlattenItems: PanelListItem[] = []): PanelListItem[] {
             processedItems &&
                 processedItems.forEach((processedItem) => {
                     if (this.isVisibleItem(processedItem)) {
@@ -395,11 +424,11 @@ export default {
             return this.flatItems(this.processedItems);
         },
         focusedItemId() {
-            return isNotEmpty(this.focusedItem) ? `${this.panelId}_${this.focusedItem.key}` : null;
+            return this.focusedItem ? `${this.panelId}_${this.focusedItem.key}` : undefined;
         }
     },
     components: {
         PanelMenuSub: PanelMenuSub
     }
-};
+});
 </script>
