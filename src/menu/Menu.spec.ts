@@ -1,9 +1,11 @@
-import { mount } from '@vue/test-utils';
+import { vi } from 'vitest';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import Menu from './Menu.vue';
 
 describe('Menu.vue', () => {
-    let wrapper;
+    const toast = { add: vi.fn() };
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Menu, {
@@ -23,14 +25,14 @@ describe('Menu.vue', () => {
                                 label: 'Update',
                                 icon: 'pi pi-refresh',
                                 command: () => {
-                                    this.$toast.add({ severity: 'success', summary: 'Updated', detail: 'Data Updated', life: 3000 });
+                                    toast.add({ severity: 'success', summary: 'Updated', detail: 'Data Updated', life: 3000 });
                                 }
                             },
                             {
                                 label: 'Delete',
                                 icon: 'pi pi-times',
                                 command: () => {
-                                    this.$toast.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000 });
+                                    toast.add({ severity: 'warn', summary: 'Delete', detail: 'Data Deleted', life: 3000 });
                                 }
                             }
                         ]

@@ -50,7 +50,7 @@ describe('FileUpload.vue', () => {
 
             expect(wrapper.find('input[type="file"]').attributes('id')).toBe('second');
 
-            await wrapper.setProps({ inputId: null });
+            await wrapper.setProps({ inputId: null as unknown as undefined });
 
             expect(wrapper.find('input[type="file"]').attributes('id')).toBeUndefined();
         });
@@ -64,10 +64,9 @@ describe('FileUpload.vue', () => {
                 attachTo: document.body
             });
 
-            const label = wrapper.find('label[for="logo-upload"]');
+            const label = wrapper.get<HTMLLabelElement>('label[for="logo-upload"]');
             const input = wrapper.find('input[type="file"]');
 
-            expect(label.exists()).toBe(true);
             expect(label.element.control).toBe(input.element);
 
             wrapper.unmount();

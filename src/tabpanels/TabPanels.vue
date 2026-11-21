@@ -4,12 +4,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseTabPanels from './BaseTabPanels.vue';
 
-export default {
+export default defineComponent({
     name: 'TabPanels',
     extends: BaseTabPanels,
     inheritAttrs: false
-};
+});
 </script>

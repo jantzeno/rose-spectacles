@@ -4,12 +4,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseFluid from './BaseFluid.vue';
 
-export default {
+export default defineComponent({
     name: 'Fluid',
     extends: BaseFluid,
     inheritAttrs: false
-};
+});
 </script>

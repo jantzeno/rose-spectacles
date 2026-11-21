@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils';
 import { expect } from 'vitest';
 import Badge from './Badge.vue';
 
-let wrapper = null;
+let wrapper: ReturnType<typeof mount<typeof Badge>>;
 
 describe('Badge.vue', () => {
     beforeEach(() => {
@@ -20,6 +20,6 @@ describe('Badge.vue', () => {
         expect(wrapper.find('.rs-badge-lg').exists()).toBe(true);
         expect(wrapper.find('.rs-badge-no-gutter').exists()).toBe(false);
 
-        expect(wrapper.vm.containerClass).not.toBe('rs-overlay-badge');
+        expect(wrapper.classes()).not.toContain('rs-overlay-badge');
     });
 });

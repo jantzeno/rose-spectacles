@@ -1,10 +1,10 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import { expect, it } from 'vitest';
 import AccordionTab from '../accordiontab/AccordionTab.vue';
 import Accordion from './Accordion.vue';
 
 describe('Accordion.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Accordion, {
@@ -59,6 +59,6 @@ describe('Accordion.vue', () => {
         await firstHeader.trigger('click');
 
         expect(wrapper.emitted()['update:activeIndex'][0]).toEqual([0]);
-        expect(wrapper.emitted()['tab-click'][0][0].index).toEqual(0);
+        expect(wrapper.emitted('tab-click')?.[0]?.[0]).toMatchObject({ index: 0 });
     });
 });

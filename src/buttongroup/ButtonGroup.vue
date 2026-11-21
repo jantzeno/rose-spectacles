@@ -4,12 +4,13 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseButtonGroup from './BaseButtonGroup.vue';
 
-export default {
+export default defineComponent({
     name: 'ButtonGroup',
     extends: BaseButtonGroup,
     inheritAttrs: false
-};
+});
 </script>

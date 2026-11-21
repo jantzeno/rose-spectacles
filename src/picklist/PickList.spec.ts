@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PickList from './PickList.vue';
 
 describe('PickList.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(PickList, {
@@ -102,7 +102,7 @@ describe('PickList.vue', () => {
         await sourceListItem.trigger('click');
 
         expect(sourceListItem.classes()).toContain('rs-listbox-option-selected');
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual([[wrapper.vm.modelValue[0][0]], []]);
+        expect(wrapper.emitted('update:selection')?.[0]?.[0]).toEqual([[wrapper.vm.modelValue[0][0]], []]);
     });
 
     it('should dblclick an item from source list', async () => {
@@ -110,9 +110,9 @@ describe('PickList.vue', () => {
 
         wrapper.vm.onItemDblClick({}, 0);
 
-        expect(wrapper.emitted()['update:modelValue'][0][0][1]).toEqual([wrapper.vm.modelValue[0][0]]);
+        expect(wrapper.emitted<[unknown[][]]>('update:modelValue')?.[0]?.[0]?.[1]).toEqual([wrapper.vm.modelValue[0][0]]);
         expect(wrapper.emitted()['move-to-target'][0]).toEqual([{ originalEvent: {}, items: [wrapper.vm.modelValue[0][0]] }]);
-        expect(wrapper.emitted()['update:selection'][0][0]).toEqual([[], []]);
+        expect(wrapper.emitted('update:selection')?.[0]?.[0]).toEqual([[], []]);
     });
 
     it('should move item up', async () => {
@@ -120,7 +120,7 @@ describe('PickList.vue', () => {
 
         await wrapper.vm.moveUp({}, 0);
 
-        expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual([
+        expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual([
             [
                 {
                     id: '1001',
@@ -154,7 +154,7 @@ describe('PickList.vue', () => {
     it('should should move all to target', async () => {
         await wrapper.vm.moveAllToTarget({});
 
-        expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual([
+        expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual([
             [],
             [
                 {

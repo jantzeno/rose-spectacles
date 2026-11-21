@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils';
-import { h, nextTick } from 'vue';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import { h, nextTick, type Component } from 'vue';
 import CascadeSelect from '../cascadeselect/CascadeSelect.vue';
 import TreeSelect from '../treeselect/TreeSelect.vue';
 import Select from './Select.vue';
@@ -16,6 +16,11 @@ async function finishPointerSequence() {
     await nextTick();
 }
 
+function finishEnter(host: VueWrapper, refName: string) {
+    const instance = host.getComponent({ ref: refName }).vm as unknown as { onOverlayAfterEnter: () => void };
+    instance.onOverlayAfterEnter();
+}
+
 const cases = [
     { name: 'Select', outer: Select, options: ['Outer option'] },
     { name: 'CascadeSelect', outer: CascadeSelect, options: [{ name: 'Outer option' }], optionLabel: 'name', optionGroupChildren: [] },
@@ -28,10 +33,10 @@ for (const { name, outer, ...props } of cases) {
             {
                 render: () =>
                     h(
-                        outer,
-                        { ...props, appendTo: 'self', inputId: 'outer-select' },
+                        outer as Component,
+                        { ...props, appendTo: 'self', inputId: 'outer-select', ref: 'outer' },
                         {
-                            footer: () => h(Select, { inputId: 'inner-select', options: ['Inner option'] })
+                            footer: () => h(Select, { inputId: 'inner-select', ref: 'inner', options: ['Inner option'] })
                         }
                     )
             },
@@ -47,7 +52,7 @@ for (const { name, outer, ...props } of cases) {
         try {
             await trigger.trigger('keydown', { key: 'ArrowDown', code: 'ArrowDown' });
             // The transition is stubbed in jsdom. The outside-click handler is attached after enter.
-            host.findComponent(outer).vm.onOverlayAfterEnter();
+            finishEnter(host, 'outer');
             const inner = host.get('#inner-select');
             await inner.trigger('keydown', { key: 'ArrowDown', code: 'ArrowDown' });
             expect(inner.attributes('aria-expanded')).toBe('true');
@@ -82,11 +87,10 @@ for (const { name, outer, ...props } of cases) {
 
         try {
             await trigger.trigger('keydown', { key: 'ArrowDown', code: 'ArrowDown' });
-            host.findComponent(outer).vm.onOverlayAfterEnter();
+            finishEnter(host, 'outer');
             const inner = host.get('#inner-select');
             await inner.trigger('keydown', { key: 'ArrowDown', code: 'ArrowDown' });
-            // For an outer Select the first matching component is the outer instance.
-            host.findAllComponents(Select).at(-1)?.vm.onOverlayAfterEnter();
+            finishEnter(host, 'inner');
 
             document.body.click();
             await finishPointerSequence();

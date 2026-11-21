@@ -4,12 +4,13 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseFloatLabel from './BaseFloatLabel.vue';
 
-export default {
+export default defineComponent({
     name: 'FloatLabel',
     extends: BaseFloatLabel,
     inheritAttrs: false
-};
+});
 </script>

@@ -8,11 +8,12 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseTag from './BaseTag.vue';
 
-export default {
+export default defineComponent({
     name: 'Tag',
     extends: BaseTag,
     inheritAttrs: false,
@@ -24,5 +25,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

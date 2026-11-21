@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import RadioButton from './RadioButton.vue';
 import RadioButtonStyle from './style/RadioButtonStyle';
 
 describe('RadioButton.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(RadioButton, {
@@ -37,7 +37,7 @@ describe('RadioButton.vue', () => {
         await wrapper.setProps({ modelValue: 'test', value: 'test' });
         await wrapper.vm.onChange({});
 
-        expect(wrapper.emitted()['change'][0][0]).toEqual({});
+        expect(wrapper.emitted('change')?.[0]?.[0]).toEqual({});
     });
 
     it('When modelValue changed, Checked should be effected', async () => {
@@ -80,7 +80,7 @@ describe('RadioButton.vue', () => {
     });
 
     it('resets the dot size with the selectors the base style sizes it with', () => {
-        const sizing = [...RadioButtonStyle.style.matchAll(/([^{}]+)\{[^}]*\bwidth:/g)]
+        const sizing = [...String(RadioButtonStyle.style).matchAll(/([^{}]+)\{[^}]*\bwidth:/g)]
             .map((match) => match[1].trim())
             .filter((selector) => selector.includes('rs-radiobutton-icon'));
 

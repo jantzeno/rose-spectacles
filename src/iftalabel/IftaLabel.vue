@@ -4,12 +4,13 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseIftaLabel from './BaseIftaLabel.vue';
 
-export default {
+export default defineComponent({
     name: 'IftaLabel',
     extends: BaseIftaLabel,
     inheritAttrs: false
-};
+});
 </script>

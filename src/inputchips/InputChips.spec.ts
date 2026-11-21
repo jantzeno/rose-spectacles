@@ -1,13 +1,13 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import InputChips from './InputChips.vue';
 
 describe('InputChips.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(InputChips, {
             props: {
-                modelValue: null
+                modelValue: null as unknown as unknown[]
             }
         });
     });

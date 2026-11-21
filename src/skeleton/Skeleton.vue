@@ -2,11 +2,12 @@
     <div :class="cx('root')" :style="[sx('root'), containerStyle]" aria-hidden="true" v-bind="ptmi('root')" :data-p="dataP"></div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseSkeleton from './BaseSkeleton.vue';
 
-export default {
+export default defineComponent({
     name: 'Skeleton',
     extends: BaseSkeleton,
     inheritAttrs: false,
@@ -21,5 +22,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

@@ -4,11 +4,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { uuid } from '../internal/utils/index';
 import BaseRadioButtonGroup from './BaseRadioButtonGroup.vue';
 
-export default {
+export default defineComponent({
     name: 'RadioButtonGroup',
     extends: BaseRadioButtonGroup,
     inheritAttrs: false,
@@ -25,5 +26,5 @@ export default {
     mounted() {
         this.groupName = this.groupName || uuid('radiobutton-group-');
     }
-};
+});
 </script>

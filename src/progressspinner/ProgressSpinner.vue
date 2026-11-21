@@ -6,10 +6,11 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseProgressSpinner from './BaseProgressSpinner.vue';
 
-export default {
+export default defineComponent({
     name: 'ProgressSpinner',
     extends: BaseProgressSpinner,
     inheritAttrs: false,
@@ -20,5 +21,5 @@ export default {
             };
         }
     }
-};
+});
 </script>

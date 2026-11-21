@@ -4,12 +4,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInputGroupAddon from './BaseInputGroupAddon.vue';
 
-export default {
+export default defineComponent({
     name: 'InputGroupAddon',
     extends: BaseInputGroupAddon,
     inheritAttrs: false
-};
+});
 </script>

@@ -4,12 +4,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInputGroup from './BaseInputGroup.vue';
 
-export default {
+export default defineComponent({
     name: 'InputGroup',
     extends: BaseInputGroup,
     inheritAttrs: false
-};
+});
 </script>

@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Timeline from './Timeline.vue';
 
 describe('Timeline.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Timeline, {
@@ -50,7 +50,7 @@ describe('Timeline.vue', () => {
 });
 
 describe('customized timeline', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Timeline, {
@@ -82,6 +82,6 @@ describe('customized timeline', () => {
     it('should have templating', () => {
         const firstItem = wrapper.findAll('.rs-timeline-event')[0];
 
-        expect(firstItem.find('.custom-marker').attributes().style.backgroundColor).not.toBe('');
+        expect(firstItem.get<HTMLElement>('.custom-marker').element.style.backgroundColor).toBe('rgb(156, 39, 176)');
     });
 });

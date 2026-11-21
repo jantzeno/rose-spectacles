@@ -4,11 +4,12 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseBadge from './BaseBadge.vue';
 
-export default {
+export default defineComponent({
     name: 'Badge',
     extends: BaseBadge,
     inheritAttrs: false,
@@ -22,5 +23,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

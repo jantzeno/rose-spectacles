@@ -22,12 +22,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseCard from './BaseCard.vue';
 
-export default {
+export default defineComponent({
     name: 'Card',
     extends: BaseCard,
     inheritAttrs: false
-};
+});
 </script>

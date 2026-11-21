@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import SplitterPanel from '../splitterpanel/SplitterPanel.vue';
 import Splitter from './Splitter.vue';
 
 describe('Splitter.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Splitter, {
@@ -60,7 +60,7 @@ it('sizes a newly inserted panel after the splitter DOM updates', async () => {
     try {
         await host.setProps({ showPreview: true });
 
-        const panels = host.findAll('.rs-splitterpanel');
+        const panels = host.findAll<HTMLElement>('.rs-splitterpanel');
 
         expect(panels.map((panel) => panel.text())).toEqual(['Main', 'Preview']);
         expect(panels.map((panel) => panel.element.style.flexBasis)).toEqual(['calc(60% - 4px)', 'calc(40% - 4px)']);

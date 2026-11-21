@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import OrderList from './OrderList.vue';
 
 describe('OrderList.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(OrderList, {
@@ -139,6 +139,6 @@ describe('OrderList.vue', () => {
 
         await wrapper.vm.moveUp({});
 
-        expect(wrapper.emitted()['update:modelValue'][0][0][1]).toEqual(wrapper.vm.modelValue[2]);
+        expect(wrapper.emitted<[unknown[]]>('update:modelValue')?.[0]?.[0]?.[1]).toEqual(wrapper.vm.modelValue[2]);
     });
 });

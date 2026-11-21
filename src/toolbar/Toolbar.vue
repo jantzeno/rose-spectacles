@@ -12,12 +12,13 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseToolbar from './BaseToolbar.vue';
 
-export default {
+export default defineComponent({
     name: 'Toolbar',
     extends: BaseToolbar,
     inheritAttrs: false
-};
+});
 </script>

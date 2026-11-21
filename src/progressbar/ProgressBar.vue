@@ -9,11 +9,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseProgressBar from './BaseProgressBar.vue';
 
-export default {
+export default defineComponent({
     name: 'ProgressBar',
     extends: BaseProgressBar,
     inheritAttrs: false,
@@ -37,5 +38,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

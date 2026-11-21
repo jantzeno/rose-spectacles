@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Knob from './Knob.vue';
 
 describe('Knob.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Knob, {
@@ -52,7 +52,7 @@ describe('Knob.vue', () => {
     });
 
     it('should work with function valueTemplate', async () => {
-        await wrapper.setProps({ valueTemplate: (val) => val * 10 });
+        await wrapper.setProps({ valueTemplate: (val: number) => val * 10 });
 
         expect(wrapper.find('.rs-knob-text').text()).toBe('200');
     });

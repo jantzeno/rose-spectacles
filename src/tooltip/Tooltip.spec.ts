@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { h, withDirectives } from 'vue';
+import { defineComponent, h, withDirectives } from 'vue';
 import Tooltip from './Tooltip';
 
 beforeEach(() => {
@@ -13,13 +13,16 @@ const shown = () => document.querySelector<HTMLElement>('[role="tooltip"]');
 
 function fixture() {
     return mount(
-        {
+        defineComponent({
             props: { mode: String },
-            render() {
-                const trigger = h('button', { type: 'button', 'aria-describedby': 'existing-description' }, 'Open note');
-                return withDirectives(trigger, [[Tooltip, 'Stored locally', this.mode ? { event: this.mode } : undefined]]);
+            setup(props) {
+                return () => {
+                    const trigger = h('button', { type: 'button', 'aria-describedby': 'existing-description' }, 'Open note');
+                    const arg = props.mode ? ({ event: props.mode } as unknown as string) : undefined;
+                    return withDirectives(trigger, [[Tooltip, 'Stored locally', arg]]);
+                };
             }
-        },
+        }),
         { attachTo: document.body }
     );
 }

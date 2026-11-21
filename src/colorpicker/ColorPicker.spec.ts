@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import ColorPicker from './ColorPicker.vue';
 
 describe('ColorPicker.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(ColorPicker, {
@@ -49,11 +49,11 @@ describe('ColorPicker.vue', () => {
         wrapper.vm.onColorMousedown(event);
 
         expect(onColorMousedown).toHaveBeenCalled();
-        expect(wrapper.find('input.rs-colorpicker-preview').element.style.backgroundColor).not.toBe('rgb(255, 0, 0)');
+        expect(wrapper.get<HTMLInputElement>('input.rs-colorpicker-preview').element.style.backgroundColor).not.toBe('rgb(255, 0, 0)');
 
         wrapper.vm.onHueMousedown(event2);
 
         expect(onHueMousedown).toHaveBeenCalled();
-        expect(wrapper.find('input.rs-colorpicker-preview').element.style.backgroundColor).not.toBe('rgb(255, 0, 0)');
+        expect(wrapper.get<HTMLInputElement>('input.rs-colorpicker-preview').element.style.backgroundColor).not.toBe('rgb(255, 0, 0)');
     });
 });

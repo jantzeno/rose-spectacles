@@ -9,10 +9,11 @@
     </template>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { isClient } from '../internal/utils/dom/index';
 
-export default {
+export default defineComponent({
     name: 'Portal',
     props: {
         appendTo: {
@@ -37,5 +38,5 @@ export default {
             return this.disabled || this.appendTo === 'self';
         }
     }
-};
+});
 </script>

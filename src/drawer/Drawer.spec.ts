@@ -1,10 +1,10 @@
 import { addClass } from '../internal/utils/dom/index';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import { describe, expect, it, vi } from 'vitest';
 import Drawer from './Drawer.vue';
 vi.mock('../internal/utils/dom/index', async (getModule) => {
-    const original = await getModule();
+    const original = await getModule<typeof import('../internal/utils/dom/index')>();
 
     return {
         ...original,
@@ -13,7 +13,7 @@ vi.mock('../internal/utils/dom/index', async (getModule) => {
     };
 });
 describe('Drawer.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Drawer, {
