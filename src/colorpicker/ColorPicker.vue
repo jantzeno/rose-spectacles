@@ -61,44 +61,60 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { absolutePosition, addClass, isTouchDevice, relativePosition, removeClass } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import Portal from '../portal/Portal.vue';
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 import BaseColorPicker from './BaseColorPicker.vue';
 
-export default {
+interface HSB {
+    h: number;
+    s: number;
+    b: number;
+}
+
+interface RGB {
+    r: number;
+    g: number;
+    b: number;
+}
+
+type PickerRef = Element | ComponentPublicInstance | null;
+type DragEvent = MouseEvent | TouchEvent;
+
+export default defineComponent({
     name: 'ColorPicker',
     extends: BaseColorPicker,
     inheritAttrs: false,
     emits: ['change', 'show', 'hide'],
     data() {
         return {
-            overlayVisible: false
+            overlayVisible: false,
+            hsbValue: { h: 0, s: 100, b: 100 } as HSB,
+            localHue: 0,
+            outsideClickListener: null as ((event: MouseEvent) => void) | null,
+            documentMouseMoveListener: null as ((event: MouseEvent) => void) | null,
+            documentMouseUpListener: null as (() => void) | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            resizeListener: null as (() => void) | null,
+            hueDragging: false,
+            colorDragging: false,
+            selfUpdate: false,
+            picker: null as HTMLElement | null,
+            colorSelector: null as HTMLElement | null,
+            colorHandle: null as HTMLElement | null,
+            hueView: null as HTMLElement | null,
+            hueHandle: null as HTMLElement | null
         };
     },
-    hsbValue: null,
-    localHue: null,
-    outsideClickListener: null,
-    documentMouseMoveListener: null,
-    documentMouseUpListener: null,
-    scrollHandler: null,
-    resizeListener: null,
-    hueDragging: null,
-    colorDragging: null,
-    selfUpdate: null,
-    picker: null,
-    colorSelector: null,
-    colorHandle: null,
-    hueView: null,
-    hueHandle: null,
     watch: {
         d_value: {
             immediate: true,
             deep: true,
-            handler(newValue) {
+            handler(newValue: unknown) {
                 this.hsbValue = this.toHSB(newValue);
                 if (this.selfUpdate) this.selfUpdate = false;
                 else this.updateUI();
@@ -125,8 +141,10 @@ export default {
         this.updateUI();
     },
     methods: {
-        pickColor(event) {
+        pickColor(event: DragEvent) {
             const pointer = 'changedTouches' in event ? event.changedTouches[0] : event;
+            if (!pointer || !this.colorSelector) return;
+
             const { left, top } = this.colorSelector.getBoundingClientRect();
             const saturation = Math.floor((100 * Math.max(0, Math.min(150, pointer.clientX - left))) / 150);
             const brightness = Math.floor((100 * (150 - Math.max(0, Math.min(150, pointer.clientY - top)))) / 150);
@@ -142,8 +160,10 @@ export default {
             this.updateInput();
             this.updateModel(event);
         },
-        pickHue(event) {
+        pickHue(event: DragEvent) {
             const pointer = 'changedTouches' in event ? event.changedTouches[0] : event;
+            if (!pointer || !this.hueView) return;
+
             const { top } = this.hueView.getBoundingClientRect();
             this.localHue = Math.floor((360 * (150 - Math.max(0, Math.min(150, pointer.clientY - top)))) / 150);
 
@@ -159,7 +179,7 @@ export default {
             this.updateModel(event);
             this.updateInput();
         },
-        updateModel(event) {
+        updateModel(event: DragEvent) {
             let value = this.d_value;
 
             switch (this.format) {
@@ -206,9 +226,8 @@ export default {
             }
         },
         updateInput() {
-            if (this.$refs.input) {
-                this.$refs.input.style.backgroundColor = '#' + this.HSBtoHEX(this.hsbValue);
-            }
+            const input = this.$refs.input;
+            if (input instanceof HTMLElement) input.style.backgroundColor = '#' + this.HSBtoHEX(this.hsbValue);
         },
         updateUI() {
             this.updateHue();
@@ -216,21 +235,21 @@ export default {
             this.updateInput();
             this.updateColorSelector();
         },
-        validateHSB(hsb) {
+        validateHSB(hsb: HSB): HSB {
             return {
                 h: Math.min(360, Math.max(0, hsb.h)),
                 s: Math.min(100, Math.max(0, hsb.s)),
                 b: Math.min(100, Math.max(0, hsb.b))
             };
         },
-        validateRGB(rgb) {
+        validateRGB(rgb: RGB): RGB {
             return {
                 r: Math.min(255, Math.max(0, rgb.r)),
                 g: Math.min(255, Math.max(0, rgb.g)),
                 b: Math.min(255, Math.max(0, rgb.b))
             };
         },
-        validateHEX(hex) {
+        validateHEX(hex: string): string {
             var len = 6 - hex.length;
 
             if (len > 0) {
@@ -246,15 +265,15 @@ export default {
 
             return hex;
         },
-        HEXtoRGB(hex) {
+        HEXtoRGB(hex: string): RGB {
             let hexValue = parseInt(hex.indexOf('#') > -1 ? hex.substring(1) : hex, 16);
 
             return { r: hexValue >> 16, g: (hexValue & 0x00ff00) >> 8, b: hexValue & 0x0000ff };
         },
-        HEXtoHSB(hex) {
+        HEXtoHSB(hex: string): HSB {
             return this.RGBtoHSB(this.HEXtoRGB(hex));
         },
-        RGBtoHSB(rgb) {
+        RGBtoHSB(rgb: RGB): HSB {
             var hsb = {
                 h: 0,
                 s: 0,
@@ -290,11 +309,11 @@ export default {
 
             return hsb;
         },
-        HSBtoRGB(hsb) {
-            var rgb = {
-                r: null,
-                g: null,
-                b: null
+        HSBtoRGB(hsb: HSB): RGB {
+            let rgb: RGB = {
+                r: 0,
+                g: 0,
+                b: 0
             };
             var h = Math.round(hsb.h);
             var s = Math.round((hsb.s * 255) / 100);
@@ -346,7 +365,7 @@ export default {
 
             return { r: Math.round(rgb.r), g: Math.round(rgb.g), b: Math.round(rgb.b) };
         },
-        RGBtoHEX(rgb) {
+        RGBtoHEX(rgb: RGB): string {
             var hex = [rgb.r.toString(16), rgb.g.toString(16), rgb.b.toString(16)];
 
             for (var key in hex) {
@@ -357,31 +376,20 @@ export default {
 
             return hex.join('');
         },
-        HSBtoHEX(hsb) {
+        HSBtoHEX(hsb: HSB): string {
             return this.RGBtoHEX(this.HSBtoRGB(hsb));
         },
-        toHSB(value) {
-            let hsb;
+        toHSB(value: unknown): HSB {
+            let hsb: HSB;
 
-            if (value) {
-                switch (this.format) {
-                    case 'hex':
-                        hsb = this.HEXtoHSB(value);
-                        break;
-
-                    case 'rgb':
-                        hsb = this.RGBtoHSB(value);
-                        break;
-
-                    case 'hsb':
-                        hsb = value;
-                        break;
-
-                    default:
-                        break;
-                }
+            if (this.format === 'hex' && typeof value === 'string' && value) {
+                hsb = this.HEXtoHSB(value);
+            } else if (this.format === 'rgb' && value && typeof value === 'object' && 'r' in value && 'g' in value && 'b' in value) {
+                hsb = this.RGBtoHSB(value as RGB);
+            } else if (this.format === 'hsb' && value && typeof value === 'object' && 'h' in value && 's' in value && 'b' in value) {
+                hsb = { ...(value as HSB) };
             } else {
-                hsb = this.HEXtoHSB(this.defaultColor);
+                hsb = this.HEXtoHSB(typeof this.defaultColor === 'string' ? this.defaultColor : 'ff0000');
             }
 
             if (hsb.s === 0 || hsb.b === 0) {
@@ -392,7 +400,9 @@ export default {
 
             return hsb;
         },
-        onOverlayEnter(el) {
+        onOverlayEnter(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
             this.updateUI();
             this.alignOverlay();
             this.bindOutsideClickListener();
@@ -400,7 +410,7 @@ export default {
             this.bindResizeListener();
 
             if (this.autoZIndex) {
-                ZIndex.set('overlay', el, this.baseZIndex || this.$primevue.config.zIndex.overlay);
+                ZIndex.set('overlay', el, this.baseZIndex || this.$primevue?.config.zIndex?.overlay);
             }
 
             // Issue: #7508
@@ -415,14 +425,17 @@ export default {
             this.clearRefs();
             this.$emit('hide');
         },
-        onOverlayAfterLeave(el) {
-            if (this.autoZIndex) {
+        onOverlayAfterLeave(el: Element) {
+            if (this.autoZIndex && el instanceof HTMLElement) {
                 ZIndex.clear(el);
             }
         },
         alignOverlay() {
-            if (this.appendTo === 'self') relativePosition(this.picker, this.$refs.input);
-            else absolutePosition(this.picker, this.$refs.input);
+            const input = this.$refs.input;
+            if (!this.picker || !(input instanceof HTMLElement)) return;
+
+            if (this.appendTo === 'self') relativePosition(this.picker, input);
+            else absolutePosition(this.picker, input);
         },
         onInputClick() {
             if (this.disabled) {
@@ -431,7 +444,7 @@ export default {
 
             this.overlayVisible = !this.overlayVisible;
         },
-        onInputKeydown(event) {
+        onInputKeydown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'Space':
                 case 'Enter':
@@ -457,10 +470,10 @@ export default {
                     break;
             }
         },
-        onInputBlur(event) {
+        onInputBlur() {
             this.formField.onBlur?.();
         },
-        onColorMousedown(event) {
+        onColorMousedown(event: MouseEvent) {
             if (this.disabled) {
                 return;
             }
@@ -468,7 +481,7 @@ export default {
             this.bindDragListeners();
             this.onColorDragStart(event);
         },
-        onColorDragStart(event) {
+        onColorDragStart(event: DragEvent) {
             if (this.disabled) {
                 return;
             }
@@ -479,7 +492,7 @@ export default {
             !this.isUnstyled && addClass(this.$el, 'rs-colorpicker-dragging');
             event.preventDefault();
         },
-        onDrag(event) {
+        onDrag(event: DragEvent) {
             if (this.colorDragging) {
                 this.pickColor(event);
                 event.preventDefault();
@@ -497,7 +510,7 @@ export default {
             !this.isUnstyled && removeClass(this.$el, 'rs-colorpicker-dragging');
             this.unbindDragListeners();
         },
-        onHueMousedown(event) {
+        onHueMousedown(event: MouseEvent) {
             if (this.disabled) {
                 return;
             }
@@ -505,7 +518,7 @@ export default {
             this.bindDragListeners();
             this.onHueDragStart(event);
         },
-        onHueDragStart(event) {
+        onHueDragStart(event: DragEvent) {
             if (this.disabled) {
                 return;
             }
@@ -515,8 +528,8 @@ export default {
             !this.isUnstyled && addClass(this.$el, 'rs-colorpicker-dragging');
             event.preventDefault();
         },
-        isInputClicked(event) {
-            return this.$refs.input && this.$refs.input.isSameNode(event.target);
+        isInputClicked(event: MouseEvent) {
+            return this.$refs.input === event.target;
         },
         bindDragListeners() {
             this.bindDocumentMouseMoveListener();
@@ -529,7 +542,13 @@ export default {
         bindOutsideClickListener() {
             if (!this.outsideClickListener) {
                 this.outsideClickListener = (event) => {
-                    if (this.overlayVisible && this.picker && !this.picker.contains(event.target) && !this.isInputClicked(event)) {
+                    if (
+                        this.overlayVisible &&
+                        this.picker &&
+                        event.target instanceof Node &&
+                        !this.picker.contains(event.target) &&
+                        !this.isInputClicked(event)
+                    ) {
                         this.overlayVisible = false;
                     }
                 };
@@ -545,7 +564,7 @@ export default {
         },
         bindScrollListener() {
             if (!this.scrollHandler) {
-                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.container, () => {
+                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.container as HTMLElement, () => {
                     if (this.overlayVisible) {
                         this.overlayVisible = false;
                     }
@@ -600,20 +619,20 @@ export default {
                 this.documentMouseUpListener = null;
             }
         },
-        pickerRef(el) {
-            this.picker = el;
+        pickerRef(el: PickerRef) {
+            this.picker = el instanceof HTMLElement ? el : null;
         },
-        colorSelectorRef(el) {
-            this.colorSelector = el;
+        colorSelectorRef(el: PickerRef) {
+            this.colorSelector = el instanceof HTMLElement ? el : null;
         },
-        colorHandleRef(el) {
-            this.colorHandle = el;
+        colorHandleRef(el: PickerRef) {
+            this.colorHandle = el instanceof HTMLElement ? el : null;
         },
-        hueViewRef(el) {
-            this.hueView = el;
+        hueViewRef(el: PickerRef) {
+            this.hueView = el instanceof HTMLElement ? el : null;
         },
-        hueHandleRef(el) {
-            this.hueHandle = el;
+        hueHandleRef(el: PickerRef) {
+            this.hueHandle = el instanceof HTMLElement ? el : null;
         },
         clearRefs() {
             this.picker = null;
@@ -622,7 +641,7 @@ export default {
             this.hueView = null;
             this.hueHandle = null;
         },
-        onOverlayClick(event) {
+        onOverlayClick(event: MouseEvent) {
             OverlayEventBus.emit('overlay-click', {
                 originalEvent: event,
                 target: this.$el
@@ -632,5 +651,5 @@ export default {
     components: {
         Portal: Portal
     }
-};
+});
 </script>
