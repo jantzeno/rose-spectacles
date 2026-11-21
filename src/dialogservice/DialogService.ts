@@ -1,12 +1,15 @@
+import type { DynamicDialogInstance } from 'rose-spectacles/dynamicdialogoptions';
+import type { DialogServiceMethods } from 'rose-spectacles/dialogservice';
+import type { App } from 'vue';
 import DynamicDialogEventBus from '../dynamicdialogeventbus/DynamicDialogEventBus';
 import { PrimeVueDialogSymbol } from '../usedialog/UseDialog';
 import { markRaw } from 'vue';
 
 export default {
-    install: (app) => {
-        const DialogService = {
+    install: (app: App) => {
+        const DialogService: DialogServiceMethods = {
             open: (content, options) => {
-                const instance = {
+                const instance: DynamicDialogInstance = {
                     content: content && markRaw(content),
                     options: options || {},
                     data: options && options.data,
@@ -21,7 +24,6 @@ export default {
             }
         };
 
-        // app.config.unwrapInjectedRef = true; // Remove it after Vue 3.3. Details: https://vuejs.org/guide/components/provide-inject.html#working-with-reactivity
         app.config.globalProperties.$dialog = DialogService;
         app.provide(PrimeVueDialogSymbol, DialogService);
     }

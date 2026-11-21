@@ -1,16 +1,32 @@
+import type { TreeNode } from 'rose-spectacles/treenode';
 import { reactive } from 'vue';
 
-const dragState = reactive({
+type DragScope = string | string[] | null;
+
+interface DragStart {
+    node: TreeNode;
+    subNodes: TreeNode[];
+    index: number;
+    scope: DragScope;
+}
+
+interface DragStop {
+    node: TreeNode;
+    subNodes?: TreeNode[];
+    index?: number;
+}
+
+const dragState = reactive<{ isDragging: boolean; dragNode: TreeNode | null; dragScope: DragScope }>({
     isDragging: false,
     dragNode: null,
     dragScope: null
 });
 
-const dragStartHandlers = new Set();
-const dragStopHandlers = new Set();
+const dragStartHandlers = new Set<(event: DragStart) => void>();
+const dragStopHandlers = new Set<(event: DragStop) => void>();
 
 export function useTreeDragDropService() {
-    const startDrag = (event) => {
+    const startDrag = (event: DragStart) => {
         dragState.isDragging = true;
         dragState.dragNode = event.node;
         dragState.dragScope = event.scope;
@@ -18,7 +34,7 @@ export function useTreeDragDropService() {
         dragStartHandlers.forEach((handler) => handler(event));
     };
 
-    const stopDrag = (event) => {
+    const stopDrag = (event: DragStop) => {
         dragState.isDragging = false;
         dragState.dragNode = null;
         dragState.dragScope = null;
@@ -26,13 +42,13 @@ export function useTreeDragDropService() {
         dragStopHandlers.forEach((handler) => handler(event));
     };
 
-    const onDragStart = (handler) => {
+    const onDragStart = (handler: (event: DragStart) => void) => {
         dragStartHandlers.add(handler);
 
         return () => dragStartHandlers.delete(handler);
     };
 
-    const onDragStop = (handler) => {
+    const onDragStop = (handler: (event: DragStop) => void) => {
         dragStopHandlers.add(handler);
 
         return () => dragStopHandlers.delete(handler);

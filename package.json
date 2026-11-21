@@ -20,15 +20,15 @@
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
-      "default": "./src/index.js"
+      "default": "./src/index.ts"
     },
     "./icons": {
       "types": "./src/icons/index.d.ts",
-      "default": "./src/icons/index.js"
+      "default": "./src/icons/index.ts"
     },
     "./core": {
       "types": "./src/core/index.d.ts",
-      "default": "./src/core/index.js"
+      "default": "./src/core/index.ts"
     },
     "./accordion": {
       "types": "./src/accordion/Accordion.d.ts",
@@ -248,15 +248,15 @@
     },
     "./config": {
       "types": "./src/config/Config.d.ts",
-      "default": "./src/config/Config.js"
+      "default": "./src/config/Config.ts"
     },
     "./confirmationeventbus": {
       "types": "./src/confirmationeventbus/ConfirmationEventBus.d.ts",
-      "default": "./src/confirmationeventbus/ConfirmationEventBus.js"
+      "default": "./src/confirmationeventbus/ConfirmationEventBus.ts"
     },
     "./confirmationservice": {
       "types": "./src/confirmationservice/ConfirmationService.d.ts",
-      "default": "./src/confirmationservice/ConfirmationService.js"
+      "default": "./src/confirmationservice/ConfirmationService.ts"
     },
     "./confirmdialog": {
       "types": "./src/confirmdialog/ConfirmDialog.d.ts",
@@ -324,7 +324,7 @@
     },
     "./dialogservice": {
       "types": "./src/dialogservice/DialogService.d.ts",
-      "default": "./src/dialogservice/DialogService.js"
+      "default": "./src/dialogservice/DialogService.ts"
     },
     "./divider": {
       "types": "./src/divider/Divider.d.ts",
@@ -368,7 +368,7 @@
     },
     "./dynamicdialogeventbus": {
       "types": "./src/dynamicdialogeventbus/DynamicDialogEventBus.d.ts",
-      "default": "./src/dynamicdialogeventbus/DynamicDialogEventBus.js"
+      "default": "./src/dynamicdialogeventbus/DynamicDialogEventBus.ts"
     },
     "./editor": {
       "types": "./src/editor/Editor.d.ts",
@@ -644,7 +644,7 @@
     },
     "./overlayeventbus": {
       "types": "./src/overlayeventbus/OverlayEventBus.d.ts",
-      "default": "./src/overlayeventbus/OverlayEventBus.js"
+      "default": "./src/overlayeventbus/OverlayEventBus.ts"
     },
     "./overlaypanel": {
       "types": "./src/overlaypanel/OverlayPanel.d.ts",
@@ -992,7 +992,7 @@
     },
     "./terminalservice": {
       "types": "./src/terminalservice/TerminalService.d.ts",
-      "default": "./src/terminalservice/TerminalService.js"
+      "default": "./src/terminalservice/TerminalService.ts"
     },
     "./textarea": {
       "types": "./src/textarea/Textarea.d.ts",
@@ -1028,11 +1028,11 @@
     },
     "./toasteventbus": {
       "types": "./src/toasteventbus/ToastEventBus.d.ts",
-      "default": "./src/toasteventbus/ToastEventBus.js"
+      "default": "./src/toasteventbus/ToastEventBus.ts"
     },
     "./toastservice": {
       "types": "./src/toastservice/ToastService.d.ts",
-      "default": "./src/toastservice/ToastService.js"
+      "default": "./src/toastservice/ToastService.ts"
     },
     "./togglebutton": {
       "types": "./src/togglebutton/ToggleButton.d.ts",
@@ -1092,11 +1092,11 @@
     },
     "./useconfirm": {
       "types": "./src/useconfirm/UseConfirm.d.ts",
-      "default": "./src/useconfirm/UseConfirm.js"
+      "default": "./src/useconfirm/UseConfirm.ts"
     },
     "./usedialog": {
       "types": "./src/usedialog/UseDialog.d.ts",
-      "default": "./src/usedialog/UseDialog.js"
+      "default": "./src/usedialog/UseDialog.ts"
     },
     "./usestyle": {
       "types": "./src/usestyle/UseStyle.d.ts",
@@ -1104,11 +1104,11 @@
     },
     "./usetoast": {
       "types": "./src/usetoast/UseToast.d.ts",
-      "default": "./src/usetoast/UseToast.js"
+      "default": "./src/usetoast/UseToast.ts"
     },
     "./utils": {
       "types": "./src/utils/Utils.d.ts",
-      "default": "./src/utils/Utils.js"
+      "default": "./src/utils/Utils.ts"
     },
     "./virtualscroller": {
       "types": "./src/virtualscroller/VirtualScroller.d.ts",
@@ -1120,11 +1120,11 @@
     },
     "./core/api": {
       "types": "./src/core/api/Api.d.ts",
-      "default": "./src/core/api/Api.js"
+      "default": "./src/core/api/Api.ts"
     },
     "./core/useid": {
       "types": "./src/core/useid/UseId.d.ts",
-      "default": "./src/core/useid/UseId.js"
+      "default": "./src/core/useid/UseId.ts"
     },
     "./core/base/style": {
       "types": "./src/core/base/style/BaseStyle.d.ts",
@@ -1132,7 +1132,7 @@
     },
     "./core/base": {
       "types": "./src/core/base/Base.d.ts",
-      "default": "./src/core/base/Base.js"
+      "default": "./src/core/base/Base.ts"
     },
     "./core/basecomponent/style": {
       "types": "./src/core/basecomponent/style/BaseComponentStyle.d.ts",
@@ -1160,11 +1160,11 @@
     },
     "./core/service": {
       "types": "./src/core/service/PrimeVueService.d.ts",
-      "default": "./src/core/service/PrimeVueService.js"
+      "default": "./src/core/service/PrimeVueService.ts"
     },
     "./core/useattrselector": {
       "types": "./src/core/useattrselector/UseAttrSelector.d.ts",
-      "default": "./src/core/useattrselector/UseAttrSelector.js"
+      "default": "./src/core/useattrselector/UseAttrSelector.ts"
     },
     "./core/usestyle": {
       "types": "./src/core/usestyle/UseStyle.d.ts",
@@ -1372,7 +1372,7 @@
     },
     "./forms": {
       "types": "./src/forms/index.d.ts",
-      "default": "./src/forms/index.js"
+      "default": "./src/forms/index.ts"
     },
     "./forms/form": {
       "types": "./src/forms/form/Form.d.ts",
@@ -1397,23 +1397,23 @@
     "./package.json": "./package.json",
     "./forms/resolvers/joi": {
       "types": "./src/forms/resolvers/joi/index.d.ts",
-      "default": "./src/forms/resolvers/joi/index.js"
+      "default": "./src/forms/resolvers/joi/index.ts"
     },
     "./forms/resolvers/superstruct": {
       "types": "./src/forms/resolvers/superstruct/index.d.ts",
-      "default": "./src/forms/resolvers/superstruct/index.js"
+      "default": "./src/forms/resolvers/superstruct/index.ts"
     },
     "./forms/resolvers/valibot": {
       "types": "./src/forms/resolvers/valibot/index.d.ts",
-      "default": "./src/forms/resolvers/valibot/index.js"
+      "default": "./src/forms/resolvers/valibot/index.ts"
     },
     "./forms/resolvers/yup": {
       "types": "./src/forms/resolvers/yup/index.d.ts",
-      "default": "./src/forms/resolvers/yup/index.js"
+      "default": "./src/forms/resolvers/yup/index.ts"
     },
     "./forms/resolvers/zod": {
       "types": "./src/forms/resolvers/zod/index.d.ts",
-      "default": "./src/forms/resolvers/zod/index.js"
+      "default": "./src/forms/resolvers/zod/index.ts"
     },
     "./passthrough": {
       "types": "./src/passthrough/index.d.ts",

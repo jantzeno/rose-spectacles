@@ -1,11 +1,13 @@
+import type { ToastServiceMethods } from 'rose-spectacles/toastservice';
+import type { App } from 'vue';
 import ToastEventBus from '../toasteventbus/ToastEventBus';
 import { PrimeVueToastSymbol } from '../usetoast/UseToast';
 
-var messageIdx = 0;
+let messageIdx = 0;
 
 export default {
-    install: (app) => {
-        const ToastService = {
+    install: (app: App) => {
+        const ToastService: ToastServiceMethods = {
             add: (message) => {
                 if (message.id == null) {
                     message.id = messageIdx++;

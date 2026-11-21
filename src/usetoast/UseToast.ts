@@ -1,6 +1,7 @@
-import { inject } from 'vue';
+import type { ToastServiceMethods } from 'rose-spectacles/toastservice';
+import { inject, type InjectionKey } from 'vue';
 
-export const PrimeVueToastSymbol = Symbol();
+export const PrimeVueToastSymbol: InjectionKey<ToastServiceMethods> = Symbol();
 
 export function useToast() {
     const PrimeVueToast = inject(PrimeVueToastSymbol);

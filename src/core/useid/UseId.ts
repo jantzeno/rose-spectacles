@@ -1,6 +1,6 @@
 import { ref, toValue, useId as vueUseId } from 'vue';
 
-export function useId(initialValue) {
+export function useId(initialValue?: string) {
     const idx = vueUseId();
     const id = ref(initialValue);
 

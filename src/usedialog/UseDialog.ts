@@ -1,6 +1,7 @@
-import { inject } from 'vue';
+import type { DialogServiceMethods } from 'rose-spectacles/dialogservice';
+import { inject, type InjectionKey } from 'vue';
 
-export const PrimeVueDialogSymbol = Symbol();
+export const PrimeVueDialogSymbol: InjectionKey<DialogServiceMethods> = Symbol();
 
 export function useDialog() {
     const PrimeVueDialog = inject(PrimeVueDialogSymbol);

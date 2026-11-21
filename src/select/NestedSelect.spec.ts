@@ -4,8 +4,8 @@ import CascadeSelect from '../cascadeselect/CascadeSelect.vue';
 import TreeSelect from '../treeselect/TreeSelect.vue';
 import Select from './Select.vue';
 
-beforeEach(() => vi.useFakeTimers());
-afterEach(() => vi.useRealTimers());
+beforeEach(() => { vi.useFakeTimers(); });
+afterEach(() => { vi.useRealTimers(); });
 
 async function finishPointerSequence() {
     vi.runAllTimers();
@@ -39,7 +39,9 @@ for (const { name, outer, ...props } of cases) {
             const inner = host.get('#inner-select');
             await inner.trigger('keydown', { key: 'ArrowDown', code: 'ArrowDown' });
             expect(inner.attributes('aria-expanded')).toBe('true');
-            const list = document.getElementById(inner.attributes('aria-controls'));
+            const listId = inner.attributes('aria-controls');
+            expect(listId).toBeTruthy();
+            const list = document.getElementById(listId ?? '');
             const option = list?.querySelector<HTMLElement>('[role="option"]');
             expect(option?.textContent).toContain('Inner option');
 
