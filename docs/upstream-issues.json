@@ -652,10 +652,16 @@
             "title": "TreeTable: Doesn't render when using wrapped Column components",
             "labels": ["bug"],
             "component": "TreeTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A TreeTable with keyed column wrappers threw before registered columns were available. The regression passed with the expected header and data-cell order once the table tolerated the empty registration phase. The test uses the same explicit wrapper keys as DataTable."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-kqa5w2im?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: TreeTable: Doesn't render when using wrapped Column components."
+            "resolvingCommit": "94025dc9e9cfa76e7468f449ceabacc91af9f72c",
+            "test": {
+                "path": "src/treetable/TreeTable.spec.ts",
+                "name": "renders columns supplied by keyed wrapper components"
+            }
         },
         {
             "number": 87,
@@ -1343,10 +1349,16 @@
             "title": "ColorPicker in Forms ignores initial color value and is always initially red",
             "labels": ["bug"],
             "component": "ColorPicker",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "With a green hex value supplied through Form initialValues, the preview was red before the patch and rendered green once ColorPicker rendered from its editable form value."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-btmctjmw",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: ColorPicker in Forms ignores initial color value and is always initially red."
+            "resolvingCommit": "991b82b14c3d9951e1db3acf05d6a2f8a6155712",
+            "test": {
+                "path": "src/colorpicker/ColorPicker.spec.ts",
+                "name": "starts with the initial Form value in the preview"
+            }
         },
         {
             "number": 155,
@@ -2446,10 +2458,16 @@
             "title": "Escape key on ColorPicker overview inside a drawer closes the drawer + Enter key won't work",
             "labels": ["bug", "accessibility"],
             "component": "ColorPicker, Drawer",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A ColorPicker inside an open Drawer previously ignored Enter and allowed Escape to close the drawer. Enter and Space now open the picker, the first Escape closes the picker alone, and a second Escape reaches the containing Drawer."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-kcbrfoyp",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Escape key on ColorPicker overview inside a drawer closes the drawer + Enter key won't work."
+            "resolvingCommit": "991b82b14c3d9951e1db3acf05d6a2f8a6155712",
+            "test": {
+                "path": "src/colorpicker/ColorPicker.spec.ts",
+                "name": "opens on Enter and keeps the containing drawer open when Escape dismisses the picker"
+            }
         },
         {
             "number": 253,
@@ -2823,10 +2841,14 @@
             "title": "3 digits hex support for ColorPicker",
             "labels": ["bug"],
             "component": "ColorPicker",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": ["The preview was rgb(0, 15, 12) with either f0c or #f0c. Both normalize to the expected rgb(255, 0, 204)."],
             "reproducer": "https://stackblitz.com/edit/7jkkufqp?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: 3 digits hex support for ColorPicker."
+            "resolvingCommit": "8ee4107196fd156f97854f21638e205f8c7ca571",
+            "test": {
+                "path": "src/colorpicker/ColorPicker.spec.ts",
+                "name": "displays the matching color for shorthand hex f0c"
+            }
         },
         {
             "number": 289,
