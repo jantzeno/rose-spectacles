@@ -1,7 +1,7 @@
 import type { TreeNode } from 'rose-spectacles/treenode';
 import { reactive } from 'vue';
 
-type DragScope = string | string[] | null;
+export type DragScope = string | string[] | null;
 
 interface DragStart {
     node: TreeNode;

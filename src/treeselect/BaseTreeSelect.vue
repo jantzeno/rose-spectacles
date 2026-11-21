@@ -74,7 +74,7 @@ export default defineComponent({
             default: false
         },
         filterBy: {
-            type: [String, Function],
+            type: [String, Function] as PropType<string | ((node: TreeNode) => unknown)>,
             default: 'label'
         },
         filterMode: {

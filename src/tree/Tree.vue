@@ -40,7 +40,7 @@
                     v-for="(node, index) of valueToRender"
                     :key="node.key"
                     :node="node"
-                    :rootNodes="valueToRender"
+                    :rootNodes="valueToRender ?? []"
                     :templates="$slots"
                     :level="level + 1"
                     :index="index"
@@ -53,7 +53,7 @@
                     :loadingMode="loadingMode"
                     :draggableNodes="draggableNodes"
                     :droppableNodes="droppableNodes"
-                    :draggableScope="draggableScope"
+                    :draggableScope="draggableScope ?? undefined"
                     :validateDrop="validateDrop"
                     @node-drop="onNodeDrop"
                     @node-dragenter="onNodeDragEnter"
@@ -63,7 +63,7 @@
                     :pt="pt"
                 ></TreeNode>
             </ul>
-            <div v-else-if="empty && (!$pcTreeSelect || $slots.empty)" :class="cx('emptyMessage')" v-bind="ptm('emptyMessage')">
+            <div v-else-if="empty && (!treeSelect || $slots.empty)" :class="cx('emptyMessage')" v-bind="ptm('emptyMessage')">
                 <slot name="empty">
                     {{ emptyMessageText }}
                 </slot>
@@ -73,19 +73,40 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { cn } from '../internal/utils/index';
-import { isFunction, resolveFieldData } from '../internal/utils/object/index';
+import { resolveFieldData } from '../internal/utils/object/index';
 import SearchIcon from '../icons/search/SearchIcon.vue';
 import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
 import IconField from '../iconfield/IconField.vue';
 import InputIcon from '../inputicon/InputIcon.vue';
 import InputText from '../inputtext/InputText.vue';
 import BaseTree from './BaseTree.vue';
-import { useTreeDragDropService } from './TreeDragDropService';
+import { defineComponent, inject } from 'vue';
+import type { TreeNode as TreeNodeData } from '../treenode/TreeNode';
+import type { TreeExpandedKeys, TreeSelectionKeys } from './Tree';
+import { useTreeDragDropService, type DragScope } from './TreeDragDropService';
 import TreeNode from './TreeNode.vue';
 
-export default {
+interface TreeNodeClick {
+    originalEvent: MouseEvent | KeyboardEvent;
+    node: TreeNodeData;
+    nodeTouched?: boolean;
+}
+
+interface TreeCheckboxChange {
+    selectionKeys: TreeSelectionKeys;
+    check: boolean;
+    node: TreeNodeData;
+}
+
+interface TreeFilter {
+    searchFields: Array<string | ((node: TreeNodeData) => unknown)>;
+    filterText: string;
+    strict: boolean;
+}
+
+export default defineComponent({
     name: 'Tree',
     extends: BaseTree,
     inheritAttrs: false,
@@ -106,24 +127,24 @@ export default {
     ],
     data() {
         return {
-            d_expandedKeys: this.expandedKeys || {},
-            filterValue: null,
-            dragNode: null,
-            dragNodeSubNodes: null,
-            dragNodeIndex: null,
-            dragNodeScope: null,
-            dragHover: null
+            d_expandedKeys: (this.expandedKeys || {}) as TreeExpandedKeys,
+            filterValue: '',
+            dragNode: null as TreeNodeData | null,
+            dragNodeSubNodes: null as TreeNodeData[] | null,
+            dragNodeIndex: null as number | null,
+            dragNodeScope: null as DragScope,
+            dragHover: false,
+            dragDropService: null as ReturnType<typeof useTreeDragDropService> | null,
+            dragStartCleanup: null as (() => void) | null,
+            dragStopCleanup: null as (() => void) | null
         };
     },
-    inject: {
-        $pcTreeSelect: { default: null }
+    setup() {
+        return { treeSelect: inject('$pcTreeSelect', null) };
     },
-    dragDropService: null,
-    dragStartCleanup: null,
-    dragStopCleanup: null,
     watch: {
         expandedKeys(newValue) {
-            this.d_expandedKeys = newValue;
+            this.d_expandedKeys = newValue ?? {};
         },
         droppableNodes(newValue) {
             if (newValue) {
@@ -175,7 +196,7 @@ export default {
 
             this.dragDropService = null;
         },
-        onNodeToggle(node) {
+        onNodeToggle(node: TreeNodeData) {
             const key = node.key;
             const sourceNode = this.valueToRender === this.value ? node : this.findNodeByKey(this.value, key) || node;
 
@@ -190,7 +211,7 @@ export default {
             this.d_expandedKeys = { ...this.d_expandedKeys };
             this.$emit('update:expandedKeys', this.d_expandedKeys);
         },
-        onNodeClick(event) {
+        onNodeClick(event: TreeNodeClick) {
             if (this.selectionMode != null && event.node.selectable !== false) {
                 const metaSelection = event.nodeTouched ? false : this.metaKeySelection;
                 const _selectionKeys = metaSelection ? this.handleSelectionWithMetaKey(event) : this.handleSelectionWithoutMetaKey(event);
@@ -198,18 +219,18 @@ export default {
                 this.$emit('update:selectionKeys', _selectionKeys);
             }
         },
-        onCheckboxChange(event) {
+        onCheckboxChange(event: TreeCheckboxChange) {
             this.$emit('update:selectionKeys', event.selectionKeys);
 
             if (event.check) this.$emit('node-select', event.node);
             else this.$emit('node-unselect', event.node);
         },
-        handleSelectionWithMetaKey(event) {
+        handleSelectionWithMetaKey(event: TreeNodeClick) {
             const originalEvent = event.originalEvent;
             const node = event.node;
             const metaKey = originalEvent.metaKey || originalEvent.ctrlKey;
             const selected = this.isNodeSelected(node);
-            let _selectionKeys;
+            let _selectionKeys: TreeSelectionKeys = {};
 
             if (selected && metaKey) {
                 if (this.isSingleSelectionMode()) {
@@ -233,10 +254,10 @@ export default {
 
             return _selectionKeys;
         },
-        handleSelectionWithoutMetaKey(event) {
+        handleSelectionWithoutMetaKey(event: TreeNodeClick) {
             const node = event.node;
             const selected = this.isNodeSelected(node);
-            let _selectionKeys;
+            let _selectionKeys: TreeSelectionKeys = {};
 
             if (this.isSingleSelectionMode()) {
                 if (selected) {
@@ -269,23 +290,23 @@ export default {
         isMultipleSelectionMode() {
             return this.selectionMode === 'multiple';
         },
-        isNodeSelected(node) {
+        isNodeSelected(node: TreeNodeData) {
             return this.selectionMode && this.selectionKeys ? this.selectionKeys[node.key] === true : false;
         },
-        isChecked(node) {
+        isChecked(node: TreeNodeData) {
             return this.selectionKeys ? this.selectionKeys[node.key] && this.selectionKeys[node.key].checked : false;
         },
-        isNodeLeaf(node) {
+        isNodeLeaf(node: TreeNodeData) {
             return node.leaf === false ? false : !(node.children && node.children.length);
         },
-        onFilterKeyup(event) {
+        onFilterKeyup(event: KeyboardEvent) {
             if (event.code === 'Enter' || event.code === 'NumpadEnter') {
                 event.preventDefault();
             }
 
-            this.$emit('filter', { originalEvent: event, value: event.target.value, filteredNodes: this.valueToRender });
+            this.$emit('filter', { originalEvent: event, value: (event.target as HTMLInputElement).value, filteredNodes: this.valueToRender });
         },
-        findFilteredNodes(node, paramsWithoutNode) {
+        findFilteredNodes(node: TreeNodeData, paramsWithoutNode: TreeFilter): true | undefined {
             if (node) {
                 let matched = false;
 
@@ -309,7 +330,7 @@ export default {
                 }
             }
         },
-        isFilterMatched(node, { searchFields, filterText, strict }) {
+        isFilterMatched(node: TreeNodeData, { searchFields, filterText, strict }: TreeFilter): boolean {
             let matched = false;
 
             for (let field of searchFields) {
@@ -326,20 +347,20 @@ export default {
 
             return matched;
         },
-        onNodeDrop(event) {
+        onNodeDrop(event: unknown) {
             this.$emit('node-drop', event);
         },
-        onNodeDragEnter(event) {
+        onNodeDragEnter(event: unknown) {
             this.$emit('node-dragenter', event);
         },
-        onNodeDragLeave(event) {
+        onNodeDragLeave(event: unknown) {
             this.$emit('node-dragleave', event);
         },
-        onValueChanged(event) {
-            this.dragNodeSubNodes.splice(this.dragNodeIndex, 1);
+        onValueChanged(event: { nodes: TreeNodeData[] }) {
+            if (this.dragNodeIndex != null) this.dragNodeSubNodes?.splice(this.dragNodeIndex, 1);
             this.$emit('update:value', event.nodes);
         },
-        findNodeByKey(nodes, key) {
+        findNodeByKey(nodes: TreeNodeData[] | undefined | null, key: string): TreeNodeData | null {
             for (let node of nodes || []) {
                 if (node.key === key) return node;
 
@@ -350,7 +371,7 @@ export default {
 
             return null;
         },
-        isDescendantOf(node, target) {
+        isDescendantOf(node: TreeNodeData, target: TreeNodeData): boolean {
             if (!node || !node.children) {
                 return false;
             }
@@ -363,7 +384,7 @@ export default {
 
             return false;
         },
-        allowDrop(dragNode, dropNode, dragNodeScope) {
+        allowDrop(dragNode: TreeNodeData | null, dropNode: TreeNodeData | null, dragNodeScope: DragScope) {
             if (!dragNode) {
                 return false;
             }
@@ -378,10 +399,10 @@ export default {
 
             return true;
         },
-        allowNodeDrop(dropNode) {
+        allowNodeDrop(dropNode: TreeNodeData) {
             return this.allowDrop(this.dragNode, dropNode, this.dragNodeScope);
         },
-        hasCommonScope(dragScope, dropScope) {
+        hasCommonScope(dragScope: DragScope, dropScope: DragScope) {
             if (dragScope === null && dropScope === null) {
                 return true;
             } else if (dragScope === null || dropScope === null) {
@@ -409,17 +430,19 @@ export default {
 
             return false;
         },
-        isValidDragScope(dragScope) {
+        isValidDragScope(dragScope: DragScope) {
             if (this.droppableScope === null) {
                 return true;
             }
 
             return this.hasCommonScope(dragScope, this.droppableScope);
         },
-        isSameTreeScope(dragScope) {
+        isSameTreeScope(dragScope: DragScope) {
             return this.hasCommonScope(dragScope, this.draggableScope);
         },
-        onDragOver(event) {
+        onDragOver(event: DragEvent) {
+            if (!event.dataTransfer) return;
+
             if (this.droppableNodes && this.allowDrop(this.dragNode, null, this.dragNodeScope)) {
                 event.dataTransfer.dropEffect = 'copy';
             } else {
@@ -428,7 +451,7 @@ export default {
 
             event.preventDefault();
         },
-        onDragEnter(event) {
+        onDragEnter(event: DragEvent) {
             if (this.droppableNodes && this.allowDrop(this.dragNode, null, this.dragNodeScope)) {
                 this.dragHover = true;
 
@@ -440,11 +463,16 @@ export default {
                 });
             }
         },
-        onDragLeave(event) {
-            if (this.droppableNodes) {
-                let rect = event.currentTarget.getBoundingClientRect();
+        onDragLeave(event: DragEvent) {
+            if (this.droppableNodes && event.currentTarget instanceof Element) {
+                const rect = event.currentTarget.getBoundingClientRect();
 
-                if (event.x >= parseInt(rect.right) || event.x <= parseInt(rect.left) || event.y >= parseInt(rect.bottom) || event.y <= parseInt(rect.top)) {
+                if (
+                    event.x >= Math.trunc(rect.right) ||
+                    event.x <= Math.trunc(rect.left) ||
+                    event.y >= Math.trunc(rect.bottom) ||
+                    event.y <= Math.trunc(rect.top)
+                ) {
                     this.dragHover = false;
                 }
 
@@ -456,25 +484,23 @@ export default {
                 });
             }
         },
-        processTreeDrop(dragNode, dragNodeIndex) {
-            this.dragNodeSubNodes.splice(dragNodeIndex, 1);
+        processTreeDrop(dragNode: TreeNodeData, dragNodeIndex: number) {
+            this.dragNodeSubNodes?.splice(dragNodeIndex, 1);
             const newValue = [...(this.value || []), dragNode];
             this.$emit('update:value', newValue);
 
-            this.dragDropService.stopDrag({
+            this.dragDropService?.stopDrag({
                 node: dragNode
             });
         },
-        onDrop(event) {
+        onDrop(event: DragEvent) {
             if (this.droppableNodes) {
                 event.preventDefault();
-                let dragNode = this.dragNode;
+                const { dragNode, dragNodeIndex } = this;
 
-                if (this.allowDrop(dragNode, null, this.dragNodeScope)) {
-                    let dragNodeIndex = this.dragNodeIndex;
-
+                if (dragNode && dragNodeIndex != null && this.allowDrop(dragNode, null, this.dragNodeScope)) {
                     if (this.isSameTreeScope(this.dragNodeScope)) {
-                        this.dragDropService.stopDrag({
+                        this.dragDropService?.stopDrag({
                             node: dragNode
                         });
 
@@ -508,13 +534,13 @@ export default {
         }
     },
     computed: {
-        filteredValue() {
-            let filteredNodes = [];
-            const searchFields = isFunction(this.filterBy) ? [this.filterBy] : this.filterBy.split(',');
+        filteredValue(): TreeNodeData[] {
+            const filteredNodes: TreeNodeData[] = [];
+            const searchFields = typeof this.filterBy === 'function' ? [this.filterBy] : this.filterBy.split(',');
             const filterText = this.filterValue.trim().toLocaleLowerCase(this.filterLocale);
             const strict = this.filterMode === 'strict';
 
-            for (let node of this.value) {
+            for (const node of this.value ?? []) {
                 let _node = { ...node };
                 let paramsWithoutNode = { searchFields, filterText, strict };
 
@@ -528,7 +554,7 @@ export default {
 
             return filteredNodes;
         },
-        valueToRender() {
+        valueToRender(): TreeNodeData[] | null {
             if (this.filterValue && this.filterValue.trim().length > 0) return this.filteredValue;
             else return this.value;
         },
@@ -536,7 +562,7 @@ export default {
             return !this.valueToRender || this.valueToRender.length === 0;
         },
         emptyMessageText() {
-            return this.$primevue.config?.locale?.emptyMessage || '';
+            return this.$primevue?.config.locale?.emptyMessage || '';
         },
         containerDataP() {
             return cn({
@@ -558,5 +584,5 @@ export default {
         SearchIcon,
         SpinnerIcon
     }
-};
+});
 </script>

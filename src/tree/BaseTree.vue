@@ -1,5 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { TreeNode } from '../treenode/TreeNode';
+import type { DragScope } from './TreeDragDropService';
+import type { TreeExpandedKeys, TreeSelectionKeys } from './Tree';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TreeStyle from './style/TreeStyle';
 
@@ -8,15 +11,15 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         value: {
-            type: null,
+            type: Array as PropType<TreeNode[]>,
             default: null
         },
         expandedKeys: {
-            type: null,
+            type: Object as PropType<TreeExpandedKeys>,
             default: null
         },
         selectionKeys: {
-            type: null,
+            type: Object as PropType<TreeSelectionKeys>,
             default: null
         },
         selectionMode: {
@@ -44,7 +47,7 @@ export default defineComponent({
             default: false
         },
         filterBy: {
-            type: [String, Function],
+            type: [String, Function] as PropType<string | ((node: TreeNode) => unknown)>,
             default: 'label'
         },
         filterMode: {
@@ -80,11 +83,11 @@ export default defineComponent({
             default: null
         },
         draggableScope: {
-            type: [String, Array],
+            type: [String, Array] as PropType<DragScope>,
             default: null
         },
         droppableScope: {
-            type: [String, Array],
+            type: [String, Array] as PropType<DragScope>,
             default: null
         },
         validateDrop: {
