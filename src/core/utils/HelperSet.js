@@ -1,4 +1,5 @@
 import { isNotEmpty } from '../../internal/utils/object/index';
+import { isVNode } from 'vue';
 
 export default class {
     helpers;
@@ -31,13 +32,19 @@ export default class {
         return parent?.vnode?.key === key || (parent && this._isMatched(parent, key)) || false;
     }
     _get(parentInstance, slots) {
-        return (slots || parentInstance?.$slots)?.default?.() || null;
+        const value = (slots || parentInstance?.$slots)?.default?.();
+
+        return Array.isArray(value) ? value : isVNode(value) ? [value] : null;
     }
     _recursive(helpers = [], children = []) {
         let components = [];
 
         children.forEach((child) => {
-            if (child.children instanceof Array) {
+            if (Array.isArray(child)) {
+                components = components.concat(this._recursive(helpers, child));
+            } else if (!isVNode(child)) {
+                return;
+            } else if (Array.isArray(child.children)) {
                 components = components.concat(this._recursive(helpers, child.children));
             } else if (child.type.name === this.type) {
                 components.push(child);
