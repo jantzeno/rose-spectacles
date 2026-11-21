@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import InputNumberStyle from './style/InputNumberStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseInputNumber',
     extends: BaseInput,
     props: {
@@ -85,8 +86,11 @@ export default {
         roundingMode: {
             type: String,
             default: 'halfExpand',
-            validator(value) {
-                return ['ceil', 'floor', 'expand', 'trunc', 'halfCeil', 'halfFloor', 'halfExpand', 'halfTrunc', 'halfEven'].includes(value);
+            validator(value: unknown) {
+                return (
+                    typeof value === 'string' &&
+                    ['ceil', 'floor', 'expand', 'trunc', 'halfCeil', 'halfFloor', 'halfExpand', 'halfTrunc', 'halfEven'].includes(value)
+                );
             }
         },
         min: {
@@ -153,5 +157,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

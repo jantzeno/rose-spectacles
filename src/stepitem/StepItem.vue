@@ -4,18 +4,19 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseStepItem from './BaseStepItem.vue';
 
-export default {
+export default defineComponent({
     name: 'StepItem',
     extends: BaseStepItem,
     inheritAttrs: false,
     inject: ['$pcStepper'],
     computed: {
         isActive() {
-            return this.$pcStepper?.d_value === this.value;
+            return (this.$pcStepper as { d_value?: string | number } | undefined)?.d_value === this.value;
         }
     }
-};
+});
 </script>

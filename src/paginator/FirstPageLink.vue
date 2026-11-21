@@ -4,12 +4,13 @@
     </button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import AngleDoubleLeftIcon from '../icons/angledoubleleft/AngleDoubleLeftIcon.vue';
 import Ripple from '../ripple/Ripple';
 
-export default {
+export default defineComponent({
     name: 'FirstPageLink',
     hostName: 'Paginator',
     extends: BaseComponent,
@@ -20,7 +21,7 @@ export default {
         }
     },
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             return this.ptm(key, {
                 context: {
                     disabled: this.$attrs.disabled
@@ -34,5 +35,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

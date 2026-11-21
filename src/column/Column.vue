@@ -1,19 +1,21 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import type HelperSet from '../core/utils/HelperSet';
 import BaseColumn from './BaseColumn.vue';
 
-export default {
+export default defineComponent({
     name: 'Column',
     extends: BaseColumn,
     inheritAttrs: false,
     inject: ['$columns'],
     mounted() {
-        this.$columns?.add(this.$);
+        (this.$columns as HelperSet | undefined)?.add(this.$);
     },
     unmounted() {
-        this.$columns?.delete(this.$);
+        (this.$columns as HelperSet | undefined)?.delete(this.$);
     },
     render() {
         return null;
     }
-};
+});
 </script>

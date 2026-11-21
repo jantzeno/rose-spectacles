@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DividerStyle from './style/DividerStyle';
 
@@ -12,7 +12,7 @@ export default defineComponent({
             default: null
         },
         layout: {
-            type: String,
+            type: String as PropType<'horizontal' | 'vertical'>,
             default: 'horizontal'
         },
         type: {

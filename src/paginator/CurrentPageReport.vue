@@ -2,10 +2,11 @@
     <span :class="cx('current')" v-bind="ptm('current')">{{ text }}</span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 
-export default {
+export default defineComponent({
     name: 'CurrentPageReport',
     hostName: 'Paginator',
     extends: BaseComponent,
@@ -42,15 +43,15 @@ export default {
     computed: {
         text() {
             let text = this.template
-                .replace('{currentPage}', this.currentPage)
-                .replace('{totalPages}', this.pageCount)
-                .replace('{first}', this.pageCount > 0 ? this.first + 1 : 0)
-                .replace('{last}', Math.min(this.first + this.rows, this.totalRecords))
-                .replace('{rows}', this.rows)
-                .replace('{totalRecords}', this.totalRecords);
+                .replace('{currentPage}', String(this.currentPage))
+                .replace('{totalPages}', String(this.pageCount))
+                .replace('{first}', String(this.pageCount > 0 ? this.first + 1 : 0))
+                .replace('{last}', String(Math.min(this.first + this.rows, this.totalRecords)))
+                .replace('{rows}', String(this.rows))
+                .replace('{totalRecords}', String(this.totalRecords));
 
             return text;
         }
     }
-};
+});
 </script>

@@ -12,18 +12,18 @@
     />
 </template>
 
-<script>
+<script lang="ts">
 import { cn } from '../internal/utils/index';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 import BaseInputText from './BaseInputText.vue';
 
-export default {
+export default defineComponent({
     name: 'InputText',
     extends: BaseInputText,
     inheritAttrs: false,
     methods: {
-        onInput(event) {
-            this.writeValue(event.target.value, event);
+        onInput(event: Event) {
+            this.writeValue((event.target as HTMLInputElement).value, event);
         }
     },
     computed: {
@@ -47,5 +47,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

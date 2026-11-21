@@ -9,17 +9,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseAvatar from './BaseAvatar.vue';
 
-export default {
+export default defineComponent({
     name: 'Avatar',
     extends: BaseAvatar,
     inheritAttrs: false,
     emits: ['error'],
     methods: {
-        onError(event) {
+        onError(event?: Event) {
             this.$emit('error', event);
         }
     },
@@ -31,5 +32,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

@@ -5,18 +5,18 @@
     <slot v-else :class="cx('root')" :active="active" :a11yAttrs="a11yAttrs"></slot>
 </template>
 
-<script>
-import { mergeProps } from 'vue';
+<script lang="ts">
+import { defineComponent, mergeProps } from 'vue';
 import BaseAccordionPanel from './BaseAccordionPanel.vue';
 
-export default {
+export default defineComponent({
     name: 'AccordionPanel',
     extends: BaseAccordionPanel,
     inheritAttrs: false,
     inject: ['$pcAccordion'],
     computed: {
         active() {
-            return this.$pcAccordion.isItemActive(this.value);
+            return (this.$pcAccordion as { isItemActive: (value: string | number | undefined) => boolean }).isItemActive(this.value);
         },
         attrs() {
             return mergeProps(this.a11yAttrs, this.ptmi('root', this.ptParams));
@@ -36,5 +36,5 @@ export default {
             };
         }
     }
-};
+});
 </script>

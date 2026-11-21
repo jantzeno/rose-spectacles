@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import BreadcrumbStyle from './style/BreadcrumbStyle';
 
@@ -8,7 +9,7 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         model: {
-            type: Array,
+            type: Array as PropType<MenuItem[]>,
             default: null
         },
         home: {

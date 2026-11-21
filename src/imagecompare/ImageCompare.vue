@@ -6,21 +6,23 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { $dt } from '../internal/styled/index';
 import { setCSSProperty } from '../internal/utils/dom/index';
 import BaseImageCompare from './BaseImageCompare.vue';
 
-export default {
+export default defineComponent({
     name: 'ImageCompare',
     extends: BaseImageCompare,
     methods: {
-        onSlide(event) {
-            const value = event.target.value;
-            const image = event.target.previousElementSibling;
+        onSlide(event: Event) {
+            const slider = event.target as HTMLInputElement;
+            const value = slider.value;
+            const image = slider.previousElementSibling as HTMLElement;
 
             setCSSProperty(image, $dt('imagecompare.scope.x').name, `${value}%`);
         }
     }
-};
+});
 </script>

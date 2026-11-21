@@ -43,14 +43,15 @@
     </fieldset>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import MinusIcon from '../icons/minus/MinusIcon.vue';
 import PlusIcon from '../icons/plus/PlusIcon.vue';
 import Ripple from '../ripple/Ripple';
 import BaseFieldset from './BaseFieldset.vue';
 
-export default {
+export default defineComponent({
     name: 'Fieldset',
     extends: BaseFieldset,
     inheritAttrs: false,
@@ -66,7 +67,7 @@ export default {
         }
     },
     methods: {
-        toggle(event) {
+        toggle(event: Event) {
             this.d_collapsed = !this.d_collapsed;
             this.$emit('update:collapsed', this.d_collapsed);
             this.$emit('toggle', {
@@ -74,7 +75,7 @@ export default {
                 value: this.d_collapsed
             });
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (event.code === 'Enter' || event.code === 'NumpadEnter' || event.code === 'Space') {
                 this.toggle(event);
                 event.preventDefault();
@@ -98,5 +99,5 @@ export default {
         PlusIcon,
         MinusIcon
     }
-};
+});
 </script>

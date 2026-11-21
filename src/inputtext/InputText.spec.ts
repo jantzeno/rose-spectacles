@@ -20,9 +20,8 @@ describe('InputText.vue', () => {
 
     it('input event', async () => {
         const wrapper = mount(InputText);
-        const event = { target: { value: 'a' } };
 
-        await wrapper.vm.onInput(event);
+        await wrapper.get('input').setValue('a');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual(['a']);
     });

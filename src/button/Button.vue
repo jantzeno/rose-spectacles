@@ -15,16 +15,16 @@
     <slot v-else :class="cx('root')" :a11yAttrs="a11yAttrs"></slot>
 </template>
 
-<script>
+<script lang="ts">
 import { cn } from '../internal/utils/index';
 import { isEmpty } from '../internal/utils/object/index';
 import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
 import Badge from '../badge/Badge.vue';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps } from 'vue';
 import BaseButton from './BaseButton.vue';
 
-export default {
+export default defineComponent({
     name: 'Button',
     extends: BaseButton,
     inheritAttrs: false,
@@ -32,7 +32,7 @@ export default {
         $pcFluid: { default: null }
     },
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             const _ptm = key === 'root' ? this.ptmi : this.ptm;
 
             return _ptm(key, {
@@ -56,7 +56,7 @@ export default {
             return mergeProps(this.asAttrs, this.a11yAttrs, this.getPTOptions('root'));
         },
         asAttrs() {
-            return this.as === 'BUTTON' ? { type: 'button', disabled: this.disabled } : undefined;
+            return this.as === 'BUTTON' ? { type: 'button', disabled: this.disabled } : {};
         },
         a11yAttrs() {
             return {
@@ -103,5 +103,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

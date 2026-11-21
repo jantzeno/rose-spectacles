@@ -17,11 +17,12 @@
     </JTPSelect>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import Select from '../select/Select.vue';
 
-export default {
+export default defineComponent({
     name: 'JumpToPageDropdown',
     hostName: 'Paginator',
     extends: BaseComponent,
@@ -33,7 +34,7 @@ export default {
         templates: null
     },
     methods: {
-        onChange(value) {
+        onChange(value: number) {
             this.$emit('page-change', value);
         }
     },
@@ -41,7 +42,7 @@ export default {
         pageOptions() {
             let opts = [];
 
-            for (let i = 0; i < this.pageCount; i++) {
+            for (let i = 0; i < (this.pageCount ?? 0); i++) {
                 opts.push({ label: String(i + 1), value: i });
             }
 
@@ -51,5 +52,5 @@ export default {
     components: {
         JTPSelect: Select
     }
-};
+});
 </script>

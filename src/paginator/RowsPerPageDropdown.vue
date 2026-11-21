@@ -17,11 +17,12 @@
     </RPPSelect>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import Select from '../select/Select.vue';
 
-export default {
+export default defineComponent({
     name: 'RowsPerPageDropdown',
     hostName: 'Paginator',
     extends: BaseComponent,
@@ -33,7 +34,7 @@ export default {
         templates: null
     },
     methods: {
-        onChange(value) {
+        onChange(value: number) {
             this.$emit('rows-change', value);
         }
     },
@@ -53,5 +54,5 @@ export default {
     components: {
         RPPSelect: Select
     }
-};
+});
 </script>

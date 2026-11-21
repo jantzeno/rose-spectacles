@@ -6,17 +6,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseStepper from './BaseStepper.vue';
 
-export default {
+export default defineComponent({
     name: 'Stepper',
     extends: BaseStepper,
     inheritAttrs: false,
     emits: ['update:value'],
     data() {
         return {
-            d_value: this.value
+            d_value: this.value as string | number | undefined
         };
     },
     watch: {
@@ -25,18 +26,18 @@ export default {
         }
     },
     methods: {
-        updateValue(newValue) {
+        updateValue(newValue: string | number | undefined) {
             if (this.d_value !== newValue) {
                 this.d_value = newValue;
                 this.$emit('update:value', newValue);
             }
         },
-        isStepActive(value) {
+        isStepActive(value: string | number | undefined) {
             return this.d_value === value;
         },
         isStepDisabled() {
             return this.linear;
         }
     }
-};
+});
 </script>

@@ -6,11 +6,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import BaseDivider from './BaseDivider.vue';
 
-export default {
+export default defineComponent({
     name: 'Divider',
     extends: BaseDivider,
     inheritAttrs: false,
@@ -23,5 +24,5 @@ export default {
             });
         }
     }
-};
+});
 </script>
