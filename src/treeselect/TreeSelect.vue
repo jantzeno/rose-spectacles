@@ -108,6 +108,9 @@
                             <template v-if="$slots.itemcheckboxicon" #checkboxicon="iconSlotProps">
                                 <slot name="itemcheckboxicon" :checked="iconSlotProps.checked" :partialChecked="iconSlotProps.partialChecked" :class="iconSlotProps.class" />
                             </template>
+                            <template #empty>
+                                <slot name="empty">{{ emptyMessageText }}</slot>
+                            </template>
                         </TSTree>
                         <div v-if="emptyOptions && !loading" :class="cx('emptyMessage')" v-bind="ptm('emptyMessage')">
                             <slot name="empty">{{ emptyMessageText }}</slot>
@@ -182,7 +185,6 @@ export default {
     scrollHandler: null,
     overlay: null,
     selfChange: false,
-    selfClick: false,
     beforeUnmount() {
         this.unbindOutsideClickListener();
         this.unbindResizeListener();
@@ -386,11 +388,9 @@ export default {
         bindOutsideClickListener() {
             if (!this.outsideClickListener) {
                 this.outsideClickListener = (event) => {
-                    if (this.overlayVisible && !this.selfClick && this.isOutsideClicked(event)) {
+                    if (this.overlayVisible && this.isOutsideClicked(event)) {
                         this.hide();
                     }
-
-                    this.selfClick = false;
                 };
 
                 document.addEventListener('click', this.outsideClickListener, true);
@@ -436,7 +436,9 @@ export default {
             }
         },
         isOutsideClicked(event) {
-            return !(this.$el.isSameNode(event.target) || this.$el.contains(event.target) || (this.overlay && this.overlay.contains(event.target)));
+            const path = event.composedPath();
+
+            return !path.includes(this.$el) && !path.includes(this.overlay);
         },
         overlayRef(el) {
             this.overlay = el;
@@ -446,8 +448,6 @@ export default {
                 originalEvent: event,
                 target: this.$el
             });
-
-            this.selfClick = true;
         },
         onOverlayKeydown(event) {
             if (event.code === 'Escape') this.hide();

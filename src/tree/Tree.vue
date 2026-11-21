@@ -47,7 +47,7 @@
                     :pt="pt"
                 ></TreeNode>
             </ul>
-            <div v-else-if="empty && !$pcTreeSelect" :class="cx('emptyMessage')" v-bind="ptm('emptyMessage')">
+            <div v-else-if="empty && (!$pcTreeSelect || $slots.empty)" :class="cx('emptyMessage')" v-bind="ptm('emptyMessage')">
                 <slot name="empty">
                     {{ emptyMessageText }}
                 </slot>
