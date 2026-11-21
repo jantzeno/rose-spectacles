@@ -122,22 +122,22 @@
     </nav>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import type { PrimeVueLocaleAriaOptions } from 'rose-spectacles/core/config';
 import { setAttribute } from '../internal/utils/dom/index';
-import BasePaginator from './BasePaginator.vue';
+import BasePaginator, { defaultTemplate } from './BasePaginator.vue';
 import CurrrentPageReport from './CurrentPageReport.vue';
 import FirstPageLink from './FirstPageLink.vue';
 import JumpToPageDropdown from './JumpToPageDropdown.vue';
 import JumpToPageInput from './JumpToPageInput.vue';
 import LastPageLink from './LastPageLink.vue';
 import NextPageLink from './NextPageLink.vue';
-import PageLinks from './PageLinks.vue';
+import PageLinks, { type PageLinkClickEvent } from './PageLinks.vue';
 import PrevPageLink from './PrevPageLink.vue';
 import RowsPerPageDropdown from './RowsPerPageDropdown.vue';
 
-const defaultTemplate = 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown';
-
-export default {
+export default defineComponent({
     name: 'Paginator',
     extends: BasePaginator,
     inheritAttrs: false,
@@ -145,7 +145,8 @@ export default {
     data() {
         return {
             d_first: this.first,
-            d_rows: this.rows
+            d_rows: this.rows,
+            styleElement: null as HTMLStyleElement | null
         };
     },
     watch: {
@@ -165,7 +166,7 @@ export default {
         this.createStyle();
     },
     methods: {
-        changePage(p) {
+        changePage(p: number) {
             const pc = this.pageCount;
 
             if (p >= 0 && p < pc) {
@@ -183,33 +184,33 @@ export default {
             }
         },
 
-        changePageToFirst(event) {
+        changePageToFirst(event: Event) {
             if (!this.isFirstPage) {
                 this.changePage(0);
             }
 
             event.preventDefault();
         },
-        changePageToPrev(event) {
+        changePageToPrev(event: Event) {
             this.changePage(this.page - 1);
             event.preventDefault();
         },
-        changePageLink(event) {
+        changePageLink(event: PageLinkClickEvent) {
             this.changePage(event.value - 1);
             event.originalEvent.preventDefault();
         },
-        changePageToNext(event) {
+        changePageToNext(event: Event) {
             this.changePage(this.page + 1);
             event.preventDefault();
         },
-        changePageToLast(event) {
+        changePageToLast(event: Event) {
             if (!this.isLastPage) {
                 this.changePage(this.pageCount - 1);
             }
 
             event.preventDefault();
         },
-        onRowChange(value) {
+        onRowChange(value: number) {
             this.d_rows = value;
             this.changePage(this.page);
         },
@@ -222,23 +223,12 @@ export default {
 
                 let innerHTML = '';
 
-                const keys = Object.keys(this.templateItems);
-                const sortedBreakpoints = {};
+                const sortedBreakpoints = Object.keys(this.templateItems).sort((a, b) => parseInt(a) - parseInt(b));
 
-                keys.sort((a, b) => parseInt(a) - parseInt(b)).forEach((key) => {
-                    sortedBreakpoints[key] = this.templateItems[key];
-                });
-
-                for (const [index, [key]] of Object.entries(Object.entries(sortedBreakpoints))) {
-                    let minValue, calculatedMinValue;
-
-                    if (key !== 'default' && typeof Object.keys(sortedBreakpoints)[index - 1] === 'string') {
-                        calculatedMinValue = Number(Object.keys(sortedBreakpoints)[index - 1].slice(0, -2)) + 1 + 'px';
-                    } else {
-                        calculatedMinValue = Object.keys(sortedBreakpoints)[index - 1];
-                    }
-
-                    minValue = Object.entries(sortedBreakpoints)[index - 1] ? `and (min-width:${calculatedMinValue})` : '';
+                for (const [index, key] of sortedBreakpoints.entries()) {
+                    const previous = sortedBreakpoints[index - 1];
+                    const minimumWidth = key !== 'default' && previous ? `${Number(previous.slice(0, -2)) + 1}px` : previous;
+                    const minValue = previous ? `and (min-width:${minimumWidth})` : '';
 
                     if (key === 'default') {
                         innerHTML += `
@@ -272,8 +262,8 @@ export default {
         hasBreakpoints() {
             return typeof this.template === 'object';
         },
-        getAriaLabel(labelType) {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria[labelType] : undefined;
+        getAriaLabel(labelType: keyof PrimeVueLocaleAriaOptions) {
+            return this.$primevue?.config.locale?.aria?.[labelType];
         }
     },
     computed: {
@@ -311,7 +301,7 @@ export default {
             return [start, end];
         },
         pageLinks() {
-            let pageLinks = [];
+            const pageLinks: number[] = [];
             let boundaries = this.calculatePageLinkBoundaries;
             let start = boundaries[0];
             let end = boundaries[1];
@@ -350,5 +340,5 @@ export default {
         JumpToPageDropdown: JumpToPageDropdown,
         JumpToPageInput: JumpToPageInput
     }
-};
+});
 </script>

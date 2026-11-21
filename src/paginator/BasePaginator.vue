@@ -1,7 +1,9 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import PaginatorStyle from './style/PaginatorStyle';
+
+export const defaultTemplate = 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown';
 
 export default defineComponent({
     name: 'BasePaginator',
@@ -24,12 +26,12 @@ export default defineComponent({
             default: 5
         },
         rowsPerPageOptions: {
-            type: Array,
+            type: Array as PropType<number[]>,
             default: null
         },
         template: {
-            type: [Object, String],
-            default: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'
+            type: [Object, String] as PropType<string | Record<string, string>>,
+            default: defaultTemplate
         },
         currentPageReportTemplate: {
             type: null,

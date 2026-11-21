@@ -17,40 +17,48 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import Ripple from '../ripple/Ripple';
 
-export default {
+export interface PageLinkClickEvent {
+    originalEvent: MouseEvent;
+    value: number;
+}
+
+export default defineComponent({
     name: 'PageLinks',
     hostName: 'Paginator',
     extends: BaseComponent,
     inheritAttrs: false,
     emits: ['click'],
     props: {
-        value: Array,
+        value: Array as PropType<number[]>,
         page: Number
     },
     methods: {
-        getPTOptions(pageLink, key) {
+        getPTOptions(pageLink: number, key: string) {
             return this.ptm(key, {
                 context: {
                     active: pageLink === this.page
                 }
             });
         },
-        onPageLinkClick(event, pageLink) {
-            this.$emit('click', {
+        onPageLinkClick(event: MouseEvent, pageLink: number) {
+            const linkEvent: PageLinkClickEvent = {
                 originalEvent: event,
                 value: pageLink
-            });
+            };
+
+            this.$emit('click', linkEvent);
         },
-        ariaPageLabel(value) {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.pageLabel.replace(/{page}/g, value) : undefined;
+        ariaPageLabel(value: number) {
+            return this.$primevue?.config.locale?.aria?.pageLabel?.replace(/{page}/g, String(value));
         }
     },
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
