@@ -78,19 +78,7 @@ import { getVNodeProp } from '../core/utils/Utils';
 import { defineComponent, inject, type PropType, type Slots, type VNode } from 'vue';
 import type { TreeNode } from '../treenode/TreeNode';
 import BodyCell from './BodyCell.vue';
-
-interface CheckboxState {
-    checked: boolean;
-    partialChecked: boolean;
-}
-
-type RowSelection = Record<string, boolean | CheckboxState>;
-
-interface CheckboxChange {
-    node: TreeNode;
-    check: boolean;
-    selectionKeys: RowSelection;
-}
+import type { TreeTableCheckboxChange, TreeTableSelection } from './selection';
 
 interface TreeTableParent {
     rowHover?: boolean;
@@ -125,7 +113,7 @@ export default defineComponent({
             default: null
         },
         selectionKeys: {
-            type: Object as PropType<RowSelection>,
+            type: Object as PropType<TreeTableSelection>,
             default: null
         },
         selectionMode: {
@@ -410,13 +398,13 @@ export default defineComponent({
                 selectionKeys: _selectionKeys
             });
         },
-        allSelectableNodesChecked(node: TreeNode, selectionKeys: RowSelection): boolean {
+        allSelectableNodesChecked(node: TreeNode, selectionKeys: TreeTableSelection): boolean {
             const state = selectionKeys[this.nodeKey(node)];
             const selected = node.selectable === false || (typeof state === 'object' && (state.checked || state.partialChecked));
 
             return selected && (node.children?.every((child) => this.allSelectableNodesChecked(child, selectionKeys)) ?? true);
         },
-        propagateDown(node: TreeNode, check: boolean, selectionKeys: RowSelection): boolean {
+        propagateDown(node: TreeNode, check: boolean, selectionKeys: TreeTableSelection): boolean {
             let fullySelectable = node.selectable !== false;
 
             for (const child of node.children ?? []) {
@@ -432,7 +420,7 @@ export default defineComponent({
 
             return fullySelectable;
         },
-        onCheckboxChange(event: CheckboxChange) {
+        onCheckboxChange(event: TreeTableCheckboxChange) {
             let check = event.check;
             let _selectionKeys = { ...event.selectionKeys };
             let checkedChildCount = 0;
@@ -464,7 +452,7 @@ export default defineComponent({
                 selectionKeys: _selectionKeys
             });
         },
-        hasSelectedCheckboxDescendant(node: TreeNode, selectionKeys: RowSelection): boolean {
+        hasSelectedCheckboxDescendant(node: TreeNode, selectionKeys: TreeTableSelection): boolean {
             return (
                 node.children?.some((child) => {
                     if (child.selectable === false) return this.hasSelectedCheckboxDescendant(child, selectionKeys);

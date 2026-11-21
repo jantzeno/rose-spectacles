@@ -1,5 +1,8 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { TreeNode } from '../treenode/TreeNode';
+import type { TreeTableFilterButtonPropsOptions, TreeTableFilterMeta, TreeTableSortMeta } from './TreeTable';
+import type { TreeTableSelection } from './selection';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TreeTableStyle from './style/TreeTableStyle';
 
@@ -8,19 +11,19 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         value: {
-            type: null,
+            type: null as unknown as PropType<TreeNode[] | null>,
             default: null
         },
         dataKey: {
-            type: [String, Function],
+            type: [String, Function] as PropType<string | ((node: TreeNode) => string)>,
             default: 'key'
         },
         expandedKeys: {
-            type: null,
+            type: null as unknown as PropType<Record<string, boolean> | null>,
             default: null
         },
         selectionKeys: {
-            type: null,
+            type: null as unknown as PropType<TreeTableSelection>,
             default: null
         },
         selectionMode: {
@@ -36,7 +39,7 @@ export default defineComponent({
             default: false
         },
         contextMenuSelection: {
-            type: Object,
+            type: Object as PropType<TreeNode>,
             default: null
         },
         rows: {
@@ -72,7 +75,7 @@ export default defineComponent({
             default: 5
         },
         rowsPerPageOptions: {
-            type: Array,
+            type: Array as PropType<number[]>,
             default: null
         },
         currentPageReportTemplate: {
@@ -104,19 +107,19 @@ export default defineComponent({
             default: false
         },
         sortField: {
-            type: [String, Function],
+            type: [String, Function] as PropType<string | ((data: TreeNode['data']) => string) | null>,
             default: null
         },
         sortOrder: {
-            type: Number,
+            type: Number as PropType<number | null>,
             default: null
         },
         defaultSortOrder: {
-            type: Number,
+            type: Number as PropType<NonNullable<TreeTableSortMeta['order']>>,
             default: 1
         },
         multiSortMeta: {
-            type: Array,
+            type: Array as PropType<TreeTableSortMeta[] | null>,
             default: null
         },
         sortMode: {
@@ -128,7 +131,7 @@ export default defineComponent({
             default: false
         },
         filters: {
-            type: Object,
+            type: Object as PropType<TreeTableFilterMeta | null>,
             default: null
         },
         filterMode: {
@@ -144,7 +147,7 @@ export default defineComponent({
             default: null
         },
         globalFilterFields: {
-            type: Array,
+            type: Array as PropType<string[]>,
             default: null
         },
         filterInputProps: {
@@ -152,7 +155,7 @@ export default defineComponent({
             default: null
         },
         filterButtonProps: {
-            type: Object,
+            type: Object as PropType<Partial<TreeTableFilterButtonPropsOptions>>,
             default() {
                 return {
                     filter: { severity: 'secondary', text: true, rounded: true },

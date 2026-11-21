@@ -80,12 +80,12 @@
                                 v-if="!columnProp(col, 'hidden')"
                                 :column="col"
                                 :resizableColumns="resizableColumns"
-                                :sortField="d_sortField"
+                                :sortField="d_sortField ?? undefined"
                                 :sortOrder="d_sortOrder"
                                 :multiSortMeta="d_multiSortMeta"
                                 :sortMode="sortMode"
                                 :filters="d_filters"
-                                :filtersStore="filters"
+                                :filtersStore="filters ?? undefined"
                                 :filterDisplay="filterDisplay"
                                 :filterInputProps="filterInputProps"
                                 :filterButtonProps="headerFilterButtonProps"
@@ -107,7 +107,7 @@
                                 :index="i"
                                 display="row"
                                 :filters="d_filters"
-                                :filtersStore="filters"
+                                :filtersStore="filters ?? undefined"
                                 :filterInputProps="filterInputProps"
                                 :filterButtonProps="headerFilterButtonProps"
                                 @filter-change="onFilterChange"
@@ -122,7 +122,7 @@
                                 :data-p-frozen-column="columnProp(col, 'frozen')"
                                 v-bind="ptm('headerCell', ptHeaderCellOptions(col))"
                             >
-                                <component v-if="col.children && col.children.filter" :is="col.children.filter" :column="col" :index="i" />
+                                <component v-if="columnSlots(col).filter" :is="columnSlots(col).filter" :column="col" :index="i" />
                             </th>
                         </template>
                     </tr>
@@ -235,7 +235,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type Slots, type VNode } from 'vue';
 import { cn } from '../internal/utils/index';
 import {
     addStyle,
@@ -254,13 +255,56 @@ import { FilterMatchMode, FilterOperator, FilterService } from '../core/api/Api'
 import { getVNodeProp, HelperSet } from '../core/utils/Utils';
 import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
 import Paginator from '../paginator/Paginator.vue';
+import type { PageState } from '../paginator/Paginator';
+import type { TreeNode } from '../treenode/TreeNode';
 import BaseTreeTable from './BaseTreeTable.vue';
 import FilterHeaderCell from './FilterHeaderCell.vue';
 import FooterCell from './FooterCell.vue';
 import HeaderCell from './HeaderCell.vue';
 import TreeTableRow from './TreeTableRow.vue';
 
-export default {
+import type { TreeTableFilterMeta, TreeTableFilterMetaData, TreeTableOperatorFilterMetaData, TreeTableSortMeta } from './TreeTable';
+import type { TreeTableCheckboxChange, TreeTableSelection } from './selection';
+
+type FilterValue = TreeTableFilterMeta[string];
+type FilterRule = (value: unknown, filter: unknown, locale?: string) => boolean;
+
+interface NodeFilter {
+    filterField: string;
+    filterValue: unknown;
+    filterConstraint: FilterRule;
+    strict: boolean;
+}
+
+interface RowEvent {
+    originalEvent: MouseEvent | KeyboardEvent;
+    node: TreeNode;
+}
+
+interface NodeClick extends RowEvent {
+    nodeTouched: boolean;
+}
+
+interface ColumnClick {
+    originalEvent: MouseEvent | KeyboardEvent;
+    column: VNode;
+}
+
+interface LazyLoadEvent {
+    originalEvent?: MouseEvent | KeyboardEvent | PageState;
+    first: number;
+    rows: number;
+    sortField: string | ((data: TreeNode['data']) => string) | null;
+    sortOrder: number | null;
+    multiSortMeta: TreeTableSortMeta[];
+    filters: TreeTableFilterMeta | null;
+    filterMatchModes?: Record<string, string>;
+    page?: number;
+    pageCount?: number;
+    filteredValue?: TreeNode[];
+}
+
+export default defineComponent({
     name: 'TreeTable',
     extends: BaseTreeTable,
     inheritAttrs: false,
@@ -299,35 +343,37 @@ export default {
             d_multiSortMeta: this.multiSortMeta ? [...this.multiSortMeta] : [],
             d_filters: this.cloneFilters(this.filters),
             hasASelectedNode: false,
-            d_columns: new HelperSet({ type: 'Column' })
+            d_columns: new HelperSet({ type: 'Column' }),
+            documentColumnResizeListener: null as ((event: MouseEvent) => void) | null,
+            documentColumnResizeEndListener: null as (() => void) | null,
+            lastResizeHelperX: 0,
+            resizeColumnElement: null as HTMLElement | null,
+            columnResizing: false,
+            styleElement: null as HTMLStyleElement | null
         };
     },
-    documentColumnResizeListener: null,
-    documentColumnResizeEndListener: null,
-    lastResizeHelperX: null,
-    resizeColumnElement: null,
     watch: {
-        expandedKeys(newValue) {
-            this.d_expandedKeys = newValue;
+        expandedKeys(newValue: Record<string, boolean> | null) {
+            this.d_expandedKeys = newValue ?? {};
         },
-        first(newValue) {
+        first(newValue: number) {
             this.d_first = newValue;
         },
-        rows(newValue) {
+        rows(newValue: number) {
             this.d_rows = newValue;
         },
-        sortField(newValue) {
+        sortField(newValue: LazyLoadEvent['sortField']) {
             this.d_sortField = newValue;
         },
-        sortOrder(newValue) {
+        sortOrder(newValue: number | null) {
             this.d_sortOrder = newValue;
         },
-        multiSortMeta(newValue) {
-            this.d_multiSortMeta = newValue;
+        multiSortMeta(newValue: TreeTableSortMeta[] | null) {
+            this.d_multiSortMeta = newValue ?? [];
         },
         filters: {
             deep: true,
-            handler: function (newValue) {
+            handler(newValue: TreeTableFilterMeta | null) {
                 this.d_filters = this.cloneFilters(newValue);
             }
         }
@@ -338,17 +384,20 @@ export default {
         this.d_columns.clear();
     },
     methods: {
-        columnProp(col, prop) {
+        columnSlots(col: VNode): Slots {
+            return (col.children as Slots | null) ?? {};
+        },
+        columnProp(col: VNode, prop: string) {
             return getVNodeProp(col, prop);
         },
-        ptHeaderCellOptions(column) {
+        ptHeaderCellOptions(column: VNode) {
             return {
                 context: {
                     frozen: this.columnProp(column, 'frozen')
                 }
             };
         },
-        onNodeToggle(node) {
+        onNodeToggle(node: TreeNode) {
             const key = this.nodeKey(node);
 
             if (this.d_expandedKeys[key]) {
@@ -362,7 +411,7 @@ export default {
             this.d_expandedKeys = { ...this.d_expandedKeys };
             this.$emit('update:expandedKeys', this.d_expandedKeys);
         },
-        onNodeClick(event) {
+        onNodeClick(event: NodeClick) {
             if (this.rowSelectionMode && event.node.selectable !== false) {
                 const metaSelection = event.nodeTouched ? false : this.metaKeySelection;
                 const _selectionKeys = metaSelection ? this.handleSelectionWithMetaKey(event) : this.handleSelectionWithoutMetaKey(event);
@@ -370,16 +419,16 @@ export default {
                 this.$emit('update:selectionKeys', _selectionKeys);
             }
         },
-        nodeKey(node) {
+        nodeKey(node: TreeNode): string {
             return resolveFieldData(node, this.dataKey);
         },
-        handleSelectionWithMetaKey(event) {
+        handleSelectionWithMetaKey(event: NodeClick) {
             const originalEvent = event.originalEvent;
             const node = event.node;
             const nodeKey = this.nodeKey(node);
             const metaKey = originalEvent.metaKey || originalEvent.ctrlKey;
             const selected = this.isNodeSelected(node);
-            let _selectionKeys;
+            let _selectionKeys: TreeTableSelection = {};
 
             if (selected && metaKey) {
                 if (this.isSingleSelectionMode()) {
@@ -403,11 +452,11 @@ export default {
 
             return _selectionKeys;
         },
-        handleSelectionWithoutMetaKey(event) {
+        handleSelectionWithoutMetaKey(event: NodeClick) {
             const node = event.node;
             const nodeKey = this.nodeKey(node);
             const selected = this.isNodeSelected(node);
-            let _selectionKeys;
+            let _selectionKeys: TreeTableSelection = {};
 
             if (this.isSingleSelectionMode()) {
                 if (selected) {
@@ -434,16 +483,16 @@ export default {
 
             return _selectionKeys;
         },
-        onCheckboxChange(event) {
+        onCheckboxChange(event: TreeTableCheckboxChange) {
             this.$emit('update:selectionKeys', event.selectionKeys);
 
             if (event.check) this.$emit('node-select', event.node);
             else this.$emit('node-unselect', event.node);
         },
-        onRowRightClick(event) {
+        onRowRightClick(event: RowEvent) {
             if (this.contextMenu) {
                 clearSelection();
-                event.originalEvent.target.focus();
+                if (event.originalEvent.target instanceof HTMLElement) event.originalEvent.target.focus();
             }
 
             this.$emit('update:contextMenuSelection', event.node);
@@ -455,7 +504,7 @@ export default {
         isMultipleSelectionMode() {
             return this.selectionMode === 'multiple';
         },
-        onPage(event) {
+        onPage(event: PageState) {
             this.d_first = event.first;
             this.d_rows = event.rows;
 
@@ -474,15 +523,16 @@ export default {
             this.d_first = 0;
             this.$emit('update:first', this.d_first);
         },
-        getFilterColumnHeaderClass(column) {
+        getFilterColumnHeaderClass(column: VNode) {
             return [this.cx('headerCell', { filterCell: true, frozen: !!this.columnProp(column, 'frozen') }), this.columnProp(column, 'filterHeaderClass')];
         },
-        onColumnHeaderClick(e) {
+        onColumnHeaderClick(e: ColumnClick) {
             let event = e.originalEvent;
             let column = e.column;
 
             if (this.columnProp(column, 'sortable')) {
                 const targetNode = event.target;
+                if (!(targetNode instanceof Element)) return;
                 const columnField = this.columnProp(column, 'sortField') || this.columnProp(column, 'field');
 
                 if (
@@ -490,21 +540,21 @@ export default {
                     getAttribute(targetNode, 'data-pc-section') === 'columntitle' ||
                     getAttribute(targetNode, 'data-pc-section') === 'columnheadercontent' ||
                     getAttribute(targetNode, 'data-pc-section') === 'sorticon' ||
-                    getAttribute(targetNode.parentElement, 'data-pc-section') === 'sorticon' ||
-                    getAttribute(targetNode.parentElement.parentElement, 'data-pc-section') === 'sorticon' ||
+                    (targetNode.parentElement && getAttribute(targetNode.parentElement, 'data-pc-section') === 'sorticon') ||
+                    (targetNode.parentElement?.parentElement && getAttribute(targetNode.parentElement.parentElement, 'data-pc-section') === 'sorticon') ||
                     (targetNode.closest('[data-p-sortable-column="true"]') &&
                         !targetNode.closest('[data-pc-section="columnfilterbutton"]') &&
-                        !isClickable(event.target))
+                        !isClickable(targetNode))
                 ) {
                     clearSelection();
 
                     if (this.sortMode === 'single') {
                         if (this.d_sortField === columnField) {
-                            if (this.removableSort && this.d_sortOrder * -1 === this.defaultSortOrder) {
+                            if (this.removableSort && -Number(this.d_sortOrder) === this.defaultSortOrder) {
                                 this.d_sortOrder = null;
                                 this.d_sortField = null;
                             } else {
-                                this.d_sortOrder = this.d_sortOrder * -1;
+                                this.d_sortOrder = -Number(this.d_sortOrder);
                             }
                         } else {
                             this.d_sortOrder = this.defaultSortOrder;
@@ -529,22 +579,22 @@ export default {
                 }
             }
         },
-        addMultiSortField(field) {
+        addMultiSortField(field: string) {
             let index = this.d_multiSortMeta.findIndex((meta) => meta.field === field);
 
             if (index >= 0) {
-                if (this.removableSort && this.d_multiSortMeta[index].order * -1 === this.defaultSortOrder) this.d_multiSortMeta.splice(index, 1);
-                else this.d_multiSortMeta[index] = { field: field, order: this.d_multiSortMeta[index].order * -1 };
+                if (this.removableSort && -Number(this.d_multiSortMeta[index].order) === this.defaultSortOrder) this.d_multiSortMeta.splice(index, 1);
+                else this.d_multiSortMeta[index] = { field: field, order: -Number(this.d_multiSortMeta[index].order) as TreeTableSortMeta['order'] };
             } else {
                 this.d_multiSortMeta.push({ field: field, order: this.defaultSortOrder });
             }
 
             this.d_multiSortMeta = [...this.d_multiSortMeta];
         },
-        sortSingle(nodes) {
+        sortSingle(nodes: TreeNode[]) {
             return this.sortNodesSingle(nodes);
         },
-        sortNodesSingle(nodes) {
+        sortNodesSingle(nodes: TreeNode[]): TreeNode[] {
             const comparer = localeComparator();
 
             return [...nodes]
@@ -552,21 +602,21 @@ export default {
                     const value1 = resolveFieldData(node1.data, this.d_sortField);
                     const value2 = resolveFieldData(node2.data, this.d_sortField);
 
-                    return sort(value1, value2, this.d_sortOrder, comparer);
+                    return sort(value1, value2, this.d_sortOrder ?? 0, comparer);
                 })
                 .map((node) => (node.children && node.children.length ? { ...node, children: this.sortNodesSingle(node.children) } : node));
         },
-        sortMultiple(nodes) {
+        sortMultiple(nodes: TreeNode[]) {
             return this.sortNodesMultiple(nodes);
         },
-        sortNodesMultiple(nodes) {
+        sortNodesMultiple(nodes: TreeNode[]): TreeNode[] {
             return [...nodes]
                 .sort((node1, node2) => {
                     return this.multisortField(node1, node2, 0);
                 })
                 .map((node) => (node.children && node.children.length ? { ...node, children: this.sortNodesMultiple(node.children) } : node));
         },
-        multisortField(node1, node2, index) {
+        multisortField(node1: TreeNode, node2: TreeNode, index: number): number {
             const value1 = resolveFieldData(node1.data, this.d_multiSortMeta[index].field);
             const value2 = resolveFieldData(node2.data, this.d_multiSortMeta[index].field);
             const comparer = localeComparator();
@@ -575,9 +625,11 @@ export default {
                 return this.d_multiSortMeta.length - 1 > index ? this.multisortField(node1, node2, index + 1) : 0;
             }
 
-            return sort(value1, value2, this.d_multiSortMeta[index].order, comparer);
+            const order = this.d_multiSortMeta[index].order;
+
+            return sort(value1, value2, order === null ? 0 : order, comparer);
         },
-        filter(value) {
+        filter(value: TreeNode[]) {
             const strict = this.filterMode === 'strict';
             const activeFilters = this.getActiveFilters(this.filters);
             const hasGlobalFilter = Object.prototype.hasOwnProperty.call(activeFilters, 'global');
@@ -612,10 +664,9 @@ export default {
                     //global
                     if (localMatch && hasGlobalFilter) {
                         const globalFilterMeta = activeFilters['global'];
-                        const filterValue = this.isFilterMetaObject(globalFilterMeta) ? globalFilterMeta.value : globalFilterMeta;
-                        const filterConstraint = this.resolveFilterConstraint(
-                            this.isFilterMetaObject(globalFilterMeta) ? globalFilterMeta.matchMode || FilterMatchMode.CONTAINS : FilterMatchMode.CONTAINS
-                        );
+                        const meta = this.isFilterMetaObject(globalFilterMeta) ? (globalFilterMeta as TreeTableFilterMetaData) : null;
+                        const filterValue = meta ? meta.value : globalFilterMeta;
+                        const filterConstraint = this.resolveFilterConstraint(meta?.matchMode || FilterMatchMode.CONTAINS);
 
                         for (let filterField of globalFilterFields) {
                             let copyNodeForGlobal = { ...copyNode };
@@ -641,13 +692,13 @@ export default {
 
             return filteredNodes;
         },
-        isFilterMetaObject(filterMeta) {
+        isFilterMetaObject(filterMeta: FilterValue): filterMeta is TreeTableFilterMetaData | TreeTableOperatorFilterMetaData {
             return filterMeta !== null && typeof filterMeta === 'object';
         },
-        resolveFilterConstraint(matchMode) {
+        resolveFilterConstraint(matchMode: string | null | undefined): FilterRule {
             return FilterService.filters[matchMode || FilterMatchMode.STARTS_WITH];
         },
-        isColumnFilterMatched(node, col, filterField, filterMeta, strict) {
+        isColumnFilterMatched(node: TreeNode, col: VNode, filterField: string, filterMeta: FilterValue, strict: boolean) {
             if (!this.isFilterMetaObject(filterMeta)) {
                 // legacy flat value, the match mode comes from the column
                 return this.isNodeFilterMatched(node, {
@@ -658,12 +709,12 @@ export default {
                 });
             }
 
-            if (filterMeta.operator) {
+            if ('operator' in filterMeta && filterMeta.operator) {
                 const constraints = filterMeta.constraints;
 
                 if (filterMeta.operator === FilterOperator.OR) {
                     // single pass with a combined predicate, keeps every branch matching any constraint
-                    const filterConstraint = (dataFieldValue, filterValue, filterLocale) =>
+                    const filterConstraint: FilterRule = (dataFieldValue, _filterValue, filterLocale) =>
                         constraints.some((constraint) => this.resolveFilterConstraint(constraint.matchMode)(dataFieldValue, constraint.value, filterLocale));
 
                     return this.isNodeFilterMatched(node, { filterField, filterValue: null, filterConstraint, strict });
@@ -682,51 +733,50 @@ export default {
 
             return this.isNodeFilterMatched(node, {
                 filterField,
-                filterValue: filterMeta.value,
-                filterConstraint: this.resolveFilterConstraint(filterMeta.matchMode || this.columnProp(col, 'filterMatchMode')),
+                filterValue: (filterMeta as TreeTableFilterMetaData).value,
+                filterConstraint: this.resolveFilterConstraint((filterMeta as TreeTableFilterMetaData).matchMode || this.columnProp(col, 'filterMatchMode')),
                 strict
             });
         },
-        isNodeFilterMatched(node, paramsWithoutNode) {
+        isNodeFilterMatched(node: TreeNode, paramsWithoutNode: NodeFilter) {
             // evaluation order matters, findFilteredNodes prunes the children of the node copy
             return paramsWithoutNode.strict
                 ? !!(this.findFilteredNodes(node, paramsWithoutNode) || this.isFilterMatched(node, paramsWithoutNode))
                 : !!(this.isFilterMatched(node, paramsWithoutNode) || this.findFilteredNodes(node, paramsWithoutNode));
         },
-        getActiveFilters(filters) {
-            const removeEmptyFilters = ([key, value]) => {
+        getActiveFilters(filters: TreeTableFilterMeta | null): TreeTableFilterMeta {
+            const removeEmptyFilters = ([key, value]: [string, FilterValue]): [string, FilterValue] | undefined => {
                 if (!this.isFilterMetaObject(value)) {
                     return [key, value];
                 }
 
-                if (value.constraints) {
+                if ('constraints' in value && value.constraints) {
                     const filteredConstraints = value.constraints.filter((constraint) => constraint.value !== null);
 
                     if (filteredConstraints.length > 0) {
                         return [key, { ...value, constraints: filteredConstraints }];
                     }
-                } else if (value.value !== null) {
+                } else if ((value as TreeTableFilterMetaData).value !== null) {
                     return [key, value];
                 }
 
                 return undefined;
             };
 
-            const filterValidEntries = (entry) => entry !== undefined;
             const entries = Object.entries(filters || {})
                 .map(removeEmptyFilters)
-                .filter(filterValidEntries);
+                .filter((entry) => entry !== undefined);
 
             return Object.fromEntries(entries);
         },
-        cloneFilters(filters) {
-            let cloned = {};
+        cloneFilters(filters: TreeTableFilterMeta | null): TreeTableFilterMeta {
+            const cloned: TreeTableFilterMeta = {};
 
             if (filters) {
                 Object.entries(filters).forEach(([prop, value]) => {
                     if (!this.isFilterMetaObject(value)) {
                         cloned[prop] = value;
-                    } else if (value.operator) {
+                    } else if ('operator' in value && value.operator) {
                         cloned[prop] = {
                             operator: value.operator,
                             constraints: value.constraints.map((constraint) => {
@@ -741,7 +791,7 @@ export default {
 
             return cloned;
         },
-        onFilterChange(filters) {
+        onFilterChange(filters: TreeTableFilterMeta) {
             this.d_filters = filters;
         },
         onFilterApply() {
@@ -756,7 +806,7 @@ export default {
                 this.$emit('filter', filterEvent);
             }
         },
-        findFilteredNodes(node, paramsWithoutNode) {
+        findFilteredNodes(node: TreeNode, paramsWithoutNode: NodeFilter): true | undefined {
             if (node) {
                 let matched = false;
 
@@ -780,7 +830,7 @@ export default {
                 }
             }
         },
-        isFilterMatched(node, { filterField, filterValue, filterConstraint, strict }) {
+        isFilterMatched(node: TreeNode, { filterField, filterValue, filterConstraint, strict }: NodeFilter): boolean {
             let matched = false;
             let dataFieldValue = resolveFieldData(node.data, filterField);
 
@@ -794,22 +844,22 @@ export default {
 
             return matched;
         },
-        isNodeSelected(node) {
+        isNodeSelected(node: TreeNode) {
             return this.selectionMode && this.selectionKeys ? this.selectionKeys[this.nodeKey(node)] === true : false;
         },
-        isNodeLeaf(node) {
+        isNodeLeaf(node: TreeNode) {
             return node.leaf === false ? false : !(node.children && node.children.length);
         },
-        createLazyLoadEvent(event) {
-            let filterMatchModes;
+        createLazyLoadEvent(event?: LazyLoadEvent['originalEvent']): LazyLoadEvent {
+            let filterMatchModes: Record<string, string> | undefined;
 
             if (this.hasFilters()) {
                 filterMatchModes = {};
-                this.columns.forEach((col) => {
-                    if (this.columnProp(col, 'field')) {
-                        filterMatchModes[col.props.field] = this.columnProp(col, 'filterMatchMode');
-                    }
-                });
+                for (const col of this.columns) {
+                    const field = this.columnProp(col, 'field');
+
+                    if (field) filterMatchModes[field] = this.columnProp(col, 'filterMatchMode');
+                }
             }
 
             return {
@@ -823,8 +873,10 @@ export default {
                 filterMatchModes: filterMatchModes
             };
         },
-        onColumnResizeStart(event) {
+        onColumnResizeStart(event: MouseEvent) {
             let containerLeft = getOffset(this.$el).left;
+
+            if (!(event.target instanceof Element) || !event.target.parentElement) return;
 
             this.resizeColumnElement = event.target.parentElement;
             this.columnResizing = true;
@@ -832,43 +884,47 @@ export default {
 
             this.bindColumnResizeEvents();
         },
-        onColumnResize(event) {
+        onColumnResize(event: MouseEvent) {
+            const resizeHelper = this.$refs.resizeHelper as HTMLDivElement;
             let containerLeft = getOffset(this.$el).left;
 
             this.$el.setAttribute('data-p-unselectable-text', 'true');
             !this.isUnstyled && addStyle(this.$el, { 'user-select': 'none' });
-            this.$refs.resizeHelper.style.height = this.$el.offsetHeight + 'px';
-            this.$refs.resizeHelper.style.top = 0 + 'px';
-            this.$refs.resizeHelper.style.left = event.pageX - containerLeft + this.$el.scrollLeft + 'px';
+            resizeHelper.style.height = this.$el.offsetHeight + 'px';
+            resizeHelper.style.top = 0 + 'px';
+            resizeHelper.style.left = event.pageX - containerLeft + this.$el.scrollLeft + 'px';
 
-            this.$refs.resizeHelper.style.display = 'block';
+            resizeHelper.style.display = 'block';
         },
         onColumnResizeEnd() {
-            let delta = isRTL(this.$el)
-                ? this.lastResizeHelperX - this.$refs.resizeHelper.offsetLeft
-                : this.$refs.resizeHelper.offsetLeft - this.lastResizeHelperX;
-            let columnWidth = this.resizeColumnElement.offsetWidth;
-            let newColumnWidth = columnWidth + delta;
-            let minWidth = this.resizeColumnElement.style.minWidth || 15;
+            const resizeHelper = this.$refs.resizeHelper as HTMLDivElement;
+            const resizeColumnElement = this.resizeColumnElement;
+            const table = this.$refs.table as HTMLTableElement;
 
-            if (columnWidth + delta > parseInt(minWidth, 10)) {
+            if (!resizeColumnElement) return;
+            let delta = isRTL(this.$el) ? this.lastResizeHelperX - resizeHelper.offsetLeft : resizeHelper.offsetLeft - this.lastResizeHelperX;
+            let columnWidth = resizeColumnElement.offsetWidth;
+            let newColumnWidth = columnWidth + delta;
+            let minWidth = resizeColumnElement.style.minWidth || 15;
+
+            if (columnWidth + delta > parseInt(String(minWidth), 10)) {
                 if (this.columnResizeMode === 'fit') {
-                    let nextColumn = this.resizeColumnElement.nextElementSibling;
-                    let nextColumnWidth = nextColumn.offsetWidth - delta;
+                    let nextColumn = resizeColumnElement.nextElementSibling;
+                    let nextColumnWidth = (nextColumn instanceof HTMLElement ? nextColumn.offsetWidth : 0) - delta;
 
                     if (newColumnWidth > 15 && nextColumnWidth > 15) {
                         this.resizeTableCells(newColumnWidth, nextColumnWidth);
                     }
                 } else if (this.columnResizeMode === 'expand') {
-                    const tableWidth = this.$refs.table.offsetWidth + delta + 'px';
+                    const tableWidth = table.offsetWidth + delta + 'px';
 
-                    const updateTableWidth = (el) => {
+                    const updateTableWidth = (el: HTMLTableElement) => {
                         !!el && (el.style.width = el.style.minWidth = tableWidth);
                     };
 
                     // Reasoning: resize table cells before updating the table width so that it can use existing computed cell widths and adjust only the one column.
                     this.resizeTableCells(newColumnWidth);
-                    updateTableWidth(this.$refs.table);
+                    updateTableWidth(table);
                 }
 
                 this.$emit('column-resize-end', {
@@ -877,17 +933,19 @@ export default {
                 });
             }
 
-            this.$refs.resizeHelper.style.display = 'none';
+            resizeHelper.style.display = 'none';
             this.resizeColumnElement = null;
             this.$el.removeAttribute('data-p-unselectable-text');
             !this.isUnstyled && (this.$el.style['user-select'] = '');
 
             this.unbindColumnResizeEvents();
         },
-        resizeTableCells(newColumnWidth, nextColumnWidth) {
-            let colIndex = getIndex(this.resizeColumnElement);
-            let widths = [];
-            let headers = find(this.$refs.table, 'thead[data-pc-section="thead"] > tr > th');
+        resizeTableCells(newColumnWidth: number, nextColumnWidth?: number) {
+            if (!this.resizeColumnElement) return;
+
+            const colIndex = getIndex(this.resizeColumnElement);
+            const widths: number[] = [];
+            let headers = find(this.$refs.table as HTMLTableElement, 'thead[data-pc-section="thead"] > tr > th');
 
             headers.forEach((header) => widths.push(getOuterWidth(header)));
 
@@ -910,7 +968,7 @@ export default {
                 `;
             });
 
-            this.styleElement.innerHTML = innerHTML;
+            if (this.styleElement) this.styleElement.innerHTML = innerHTML;
         },
         bindColumnResizeEvents() {
             if (!this.documentColumnResizeListener) {
@@ -943,19 +1001,19 @@ export default {
                 this.documentColumnResizeEndListener = null;
             }
         },
-        onColumnKeyDown(event, col) {
+        onColumnKeyDown(event: KeyboardEvent, col: VNode) {
             if (
                 (event.code === 'Enter' || event.code === 'NumpadEnter') &&
-                event.currentTarget.nodeName === 'TH' &&
+                event.currentTarget instanceof HTMLTableCellElement &&
                 getAttribute(event.currentTarget, 'data-p-sortable-column')
             ) {
-                this.onColumnHeaderClick(event, col);
+                this.onColumnHeaderClick({ originalEvent: event, column: col });
             }
         },
         hasColumnFilter() {
             if (this.columns) {
                 for (let col of this.columns) {
-                    if (col.children && col.children.filter) {
+                    if (this.columnSlots(col).filter) {
                         return true;
                     }
                 }
@@ -969,7 +1027,7 @@ export default {
         hasGlobalFilter() {
             return this.filters && Object.prototype.hasOwnProperty.call(this.filters, 'global');
         },
-        getItemLabel(node) {
+        getItemLabel(node: TreeNode) {
             return node.data.name;
         },
         createStyleElement() {
@@ -984,7 +1042,7 @@ export default {
                 this.styleElement = null;
             }
         },
-        setTabindex(node, index) {
+        setTabindex(node: TreeNode, index: number) {
             if (this.isNodeSelected(node)) {
                 this.hasASelectedNode = true;
 
@@ -1021,7 +1079,7 @@ export default {
                 }
             };
         },
-        processedData() {
+        processedData(): TreeNode[] | null {
             if (this.lazy) {
                 return this.value;
             } else {
@@ -1044,7 +1102,7 @@ export default {
             }
         },
         dataToRender() {
-            const data = this.processedData;
+            const data = this.processedData ?? [];
 
             if (this.paginator) {
                 const first = this.lazy ? 0 : this.d_first;
@@ -1066,7 +1124,7 @@ export default {
             let hasFooter = false;
 
             for (let col of this.columns) {
-                if (this.columnProp(col, 'footer') || (col.children && col.children.footer)) {
+                if (this.columnProp(col, 'footer') || this.columnSlots(col).footer) {
                     hasFooter = true;
                     break;
                 }
@@ -1075,10 +1133,10 @@ export default {
             return hasFooter;
         },
         paginatorTop() {
-            return this.paginator && (this.paginatorPosition !== 'bottom' || this.paginatorPosition === 'both');
+            return this.paginator && this.paginatorPosition !== 'bottom';
         },
         paginatorBottom() {
-            return this.paginator && (this.paginatorPosition !== 'top' || this.paginatorPosition === 'both');
+            return this.paginator && this.paginatorPosition !== 'top';
         },
         singleSelectionMode() {
             return this.selectionMode && this.selectionMode === 'single';
@@ -1116,5 +1174,5 @@ export default {
         TTFooterCell: FooterCell,
         SpinnerIcon: SpinnerIcon
     }
-};
+});
 </script>

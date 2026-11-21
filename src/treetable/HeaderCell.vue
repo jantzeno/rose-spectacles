@@ -117,7 +117,7 @@ export default defineComponent({
             default: null
         },
         sortOrder: {
-            type: Number,
+            type: Number as PropType<number | null>,
             default: null
         },
         multiSortMeta: {

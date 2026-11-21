@@ -7,20 +7,20 @@
         :data-p-frozen-column="columnProp('frozen')"
     >
         <TTColumnFilter
-            v-if="column.children && column.children.filter"
+            v-if="columnSlots.filter"
             :field="columnProp('filterField') || columnProp('field')"
             :type="columnProp('dataType')"
             display="row"
             :showMenu="columnProp('showFilterMenu')"
-            :filterElement="column.children && column.children.filter"
-            :filterHeaderTemplate="column.children && column.children.filterheader"
-            :filterFooterTemplate="column.children && column.children.filterfooter"
-            :filterClearTemplate="column.children && column.children.filterclear"
-            :filterApplyTemplate="column.children && column.children.filterapply"
-            :filterIconTemplate="column.children && column.children.filtericon"
-            :filterAddIconTemplate="column.children && column.children.filteraddicon"
-            :filterRemoveIconTemplate="column.children && column.children.filterremoveicon"
-            :filterClearIconTemplate="column.children && column.children.filterclearicon"
+            :filterElement="columnSlots.filter"
+            :filterHeaderTemplate="columnSlots.filterheader"
+            :filterFooterTemplate="columnSlots.filterfooter"
+            :filterClearTemplate="columnSlots.filterclear"
+            :filterApplyTemplate="columnSlots.filterapply"
+            :filterIconTemplate="columnSlots.filtericon"
+            :filterAddIconTemplate="columnSlots.filteraddicon"
+            :filterRemoveIconTemplate="columnSlots.filterremoveicon"
+            :filterClearIconTemplate="columnSlots.filterclearicon"
             :filters="filters"
             :filtersStore="filtersStore"
             :filterInputProps="filterInputProps"
@@ -53,7 +53,7 @@ import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { getNextElementSibling, getOuterWidth, getPreviousElementSibling } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
-import { defineComponent, mergeProps, type CSSProperties, type VNode } from 'vue';
+import { defineComponent, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 import ColumnFilter from './ColumnFilter.vue';
 
 export default defineComponent({
@@ -63,7 +63,7 @@ export default defineComponent({
     emits: ['filter-change', 'filter-apply', 'operator-change', 'matchmode-change', 'constraint-add', 'constraint-remove', 'apply-click'],
     props: {
         column: {
-            type: Object,
+            type: Object as PropType<VNode>,
             default: null
         },
         index: {
@@ -108,13 +108,13 @@ export default defineComponent({
     },
     methods: {
         columnProp(prop: string) {
-            return getVNodeProp(this.column as VNode, prop);
+            return getVNodeProp(this.column, prop);
         },
         getColumnPT(key: string) {
             if (!this.column) return null;
 
             const columnMetaData = {
-                props: getColumnPassThroughProps(this.column as VNode),
+                props: getColumnPassThroughProps(this.column),
                 parent: {
                     instance: this,
                     props: this.$props,
@@ -161,6 +161,9 @@ export default defineComponent({
         }
     },
     computed: {
+        columnSlots(): Slots {
+            return (this.column.children as Slots | null) ?? {};
+        },
         getFilterColumnHeaderClass() {
             return [this.cx('headerCell', { filterCell: true }), this.columnProp('filterHeaderClass'), this.columnProp('class')];
         },

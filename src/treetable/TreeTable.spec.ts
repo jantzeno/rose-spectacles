@@ -42,9 +42,9 @@ const createNodes = () => [
     }
 ];
 
-const keys = (nodes?: TreeNode[]) => (nodes || []).map((node) => node.key);
+const keys = (nodes?: TreeNode[] | null) => (nodes || []).map((node) => node.key);
 
-const findNode = (nodes: TreeNode[] | undefined, key: string): TreeNode | undefined => {
+const findNode = (nodes: TreeNode[] | null | undefined, key: string): TreeNode | undefined => {
     for (const node of nodes || []) {
         if (node.key === key) return node;
 
