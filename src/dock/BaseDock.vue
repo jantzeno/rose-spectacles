@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DockStyle from './style/DockStyle';
 
@@ -11,7 +12,7 @@ export default defineComponent({
             type: String,
             default: 'bottom'
         },
-        model: null,
+        model: null as unknown as PropType<MenuItem[]>,
         class: null,
         style: null,
         tooltipOptions: null,

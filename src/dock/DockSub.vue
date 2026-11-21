@@ -21,7 +21,7 @@
                     :id="getItemId(index)"
                     :class="cx('item', { processedItem, id: getItemId(index) })"
                     role="menuitem"
-                    :aria-label="processedItem.label"
+                    :aria-label="itemLabel(processedItem)"
                     :aria-disabled="disabled(processedItem)"
                     @click="onItemClick($event, processedItem)"
                     @mouseenter="onItemMouseEnter(index)"
@@ -32,7 +32,7 @@
                     <div :class="cx('itemContent')" v-bind="getPTOptions('itemContent', processedItem, index)">
                         <template v-if="!templates['item']">
                             <a
-                                v-tooltip:[tooltipOptions]="{ value: processedItem.label, disabled: !tooltipOptions }"
+                                v-tooltip:[tooltipOptions]="{ value: itemLabel(processedItem), disabled: !tooltipOptions }"
                                 :href="processedItem.url"
                                 :class="cx('itemLink')"
                                 :target="processedItem.target"
@@ -51,7 +51,7 @@
                             :is="templates['item']"
                             :item="processedItem"
                             :index="index"
-                            :label="processedItem.label"
+                            :label="itemLabel(processedItem)"
                             :props="getMenuItemProps(processedItem, index)"
                         ></component>
                     </div>
@@ -61,14 +61,17 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
 import { find, findSingle } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import Ripple from '../ripple/Ripple';
 import Tooltip from '../tooltip/Tooltip';
-import { mergeProps } from 'vue';
 
-export default {
+type DockItem = MenuItem & { item?: MenuItem };
+
+export default defineComponent({
     name: 'DockSub',
     hostName: 'Dock',
     extends: BaseComponent,
@@ -79,12 +82,12 @@ export default {
             default: 'bottom'
         },
         model: {
-            type: Array,
-            default: null
+            type: Array as PropType<DockItem[]>,
+            default: () => []
         },
         templates: {
-            type: null,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         tooltipOptions: null,
         menuId: {
@@ -108,14 +111,14 @@ export default {
         return {
             currentIndex: -3,
             focused: false,
-            focusedOptionIndex: -1
+            focusedOptionIndex: -1 as string | -1
         };
     },
     methods: {
-        getItemId(index) {
+        getItemId(index: number) {
             return `${this.idx}_${index}`;
         },
-        getPTOptions(key, item, index) {
+        getPTOptions(key: string, item: DockItem, index: number) {
             return this.ptm(key, {
                 context: {
                     index,
@@ -124,39 +127,42 @@ export default {
                 }
             });
         },
-        isSameMenuItem(event) {
+        isSameMenuItem(event: MouseEvent) {
+            const { currentTarget, target } = event;
+
             return (
-                event.currentTarget &&
-                (event.currentTarget.isSameNode(event.target) || event.currentTarget.isSameNode(event.target.closest('[data-pc-section="item"]')))
+                currentTarget instanceof Element &&
+                target instanceof Element &&
+                (currentTarget === target || currentTarget === target.closest('[data-pc-section="item"]'))
             );
         },
-        isItemActive(id) {
+        isItemActive(id: string) {
             return id === this.focusedOptionIndex;
         },
         onListMouseLeave() {
             this.currentIndex = -3;
         },
-        onItemMouseEnter(index) {
+        onItemMouseEnter(index: number) {
             this.currentIndex = index;
         },
-        onItemClick(event, processedItem) {
+        onItemClick(event: MouseEvent, processedItem: DockItem) {
             if (this.isSameMenuItem(event) && !this.disabled(processedItem)) {
                 const item = processedItem.item ?? processedItem;
 
                 item.command?.({ originalEvent: event, item });
             }
         },
-        onListFocus(event) {
+        onListFocus(event: FocusEvent) {
             this.focused = true;
             this.changeFocusedOptionIndex(0);
             this.$emit('focus', event);
         },
-        onListBlur(event) {
+        onListBlur(event: FocusEvent) {
             this.focused = false;
             this.focusedOptionIndex = -1;
             this.$emit('blur', event);
         },
-        onListKeyDown(event) {
+        onListKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown': {
                     if (this.position === 'left' || this.position === 'right') this.onArrowDownKey();
@@ -198,7 +204,7 @@ export default {
                 case 'NumpadEnter':
 
                 case 'Space': {
-                    this.onSpaceKey(event);
+                    this.onSpaceKey();
                     event.preventDefault();
                     break;
                 }
@@ -221,37 +227,45 @@ export default {
             this.changeFocusedOptionIndex(0);
         },
         onEndKey() {
-            this.changeFocusedOptionIndex(find(this.$refs.list, 'li[data-pc-section="item"][data-p-disabled="false"]').length - 1);
+            this.changeFocusedOptionIndex(this.getFocusableItems().length - 1);
         },
         onSpaceKey() {
-            const element = findSingle(this.$refs.list, `li[id="${`${this.focusedOptionIndex}`}"]`);
+            const element = findSingle(this.$refs.list as HTMLElement, `li[id="${`${this.focusedOptionIndex}`}"]`);
             const anchorElement = element && findSingle(element, '[data-pc-section="itemlink"]');
 
-            anchorElement ? anchorElement.click() : element && element.click();
+            const target = anchorElement ?? element;
+
+            if (target instanceof HTMLElement) target.click();
         },
-        findNextOptionIndex(index) {
-            const menuitems = find(this.$refs.list, 'li[data-pc-section="item"][data-p-disabled="false"]');
+        getFocusableItems() {
+            return find(this.$refs.list as HTMLElement, 'li[data-pc-section="item"][data-p-disabled="false"]');
+        },
+        findNextOptionIndex(index: string | -1) {
+            const menuitems = this.getFocusableItems();
             const matchedOptionIndex = [...menuitems].findIndex((link) => link.id === index);
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + 1 : 0;
         },
-        findPrevOptionIndex(index) {
-            const menuitems = find(this.$refs.list, 'li[data-pc-section="item"][data-p-disabled="false"]');
+        findPrevOptionIndex(index: string | -1) {
+            const menuitems = this.getFocusableItems();
             const matchedOptionIndex = [...menuitems].findIndex((link) => link.id === index);
 
             return matchedOptionIndex > -1 ? matchedOptionIndex - 1 : 0;
         },
-        changeFocusedOptionIndex(index) {
-            const menuitems = find(this.$refs.list, 'li[data-pc-section="item"][data-p-disabled="false"]');
+        changeFocusedOptionIndex(index: number) {
+            const menuitems = this.getFocusableItems();
 
-            let order = index >= menuitems.length ? menuitems.length - 1 : index < 0 ? 0 : index;
+            const order = Math.max(0, Math.min(index, menuitems.length - 1));
 
-            this.focusedOptionIndex = menuitems[order].getAttribute('id');
+            this.focusedOptionIndex = menuitems[order]?.id ?? -1;
         },
-        disabled(item) {
+        itemLabel(item: DockItem) {
+            return typeof item.label === 'function' ? item.label() : item.label;
+        },
+        disabled(item: DockItem) {
             return typeof item.disabled === 'function' ? item.disabled() : item.disabled;
         },
-        getMenuItemProps(item, index) {
+        getMenuItemProps(item: DockItem, index: number) {
             return {
                 action: mergeProps(
                     {
@@ -271,7 +285,7 @@ export default {
     },
     computed: {
         focusedOptionId() {
-            return this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : null;
+            return this.focusedOptionIndex !== -1 ? this.focusedOptionIndex : undefined;
         },
         idx() {
             return this.menuId || this.$id;
@@ -281,5 +295,5 @@ export default {
         ripple: Ripple,
         tooltip: Tooltip
     }
-};
+});
 </script>
