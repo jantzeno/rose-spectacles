@@ -51,6 +51,13 @@ export const style = /*css*/ `
         gap: dt('listbox.list.gap');
     }
 
+    .rs-listbox-group,
+    .rs-listbox-group > ul {
+        display: flex;
+        flex-direction: column;
+        gap: inherit;
+    }
+
     .rs-listbox-option {
         display: flex;
         align-items: center;
@@ -69,7 +76,7 @@ export const style = /*css*/ `
             outline-color dt('listbox.transition.duration');
     }
 
-    .rs-listbox-striped li:nth-child(even of .rs-listbox-option) {
+    .rs-listbox-striped .rs-listbox-option[data-p-even-option="true"] {
         background: dt('listbox.option.striped.background');
     }
 

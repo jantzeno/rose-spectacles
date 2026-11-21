@@ -71,22 +71,30 @@
                         @keydown="onListKeyDown"
                         v-bind="ptm('list')"
                     >
-                        <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
+                        <ListboxOptionGroup
+                            v-for="group of renderedGroups(items, getItemOptions)"
+                            :key="group.heading?.index ?? group.firstIndex"
+                            :grouped="!!group.heading && group.options.length > 0"
+                            :groupClass="cx('group')"
+                            :labelledby="group.heading && group.showHeading ? $id + '_' + group.heading.index : undefined"
+                            :label="group.heading && !group.showHeading ? getOptionGroupLabel(group.heading.option.optionGroup)?.toString() : undefined"
+                        >
                             <li
-                                v-if="isOptionGroup(option)"
-                                :id="$id + '_' + getOptionIndex(i, getItemOptions)"
+                                v-if="group.heading && group.showHeading"
+                                :id="$id + '_' + group.heading.index"
                                 :style="{ height: itemSize ? itemSize + 'px' : undefined }"
                                 :class="cx('optionGroup')"
-                                role="option"
+                                role="presentation"
                                 v-bind="ptm('optionGroup')"
                             >
-                                <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{
-                                    getOptionGroupLabel(option.optionGroup)
+                                <slot name="optiongroup" :option="group.heading.option.optionGroup" :index="group.heading.index">{{
+                                    getOptionGroupLabel(group.heading.option.optionGroup)
                                 }}</slot>
                             </li>
                             <li
-                                v-else
-                                :id="$id + '_' + getOptionIndex(i, getItemOptions)"
+                                v-for="{ option, slotIndex: i, index, position } of group.options"
+                                :key="getOptionRenderKey(option, index)"
+                                :id="$id + '_' + index"
                                 v-ripple
                                 :style="{ height: itemSize ? itemSize + 'px' : undefined }"
                                 :class="cx('option', { option, index: i, getItemOptions })"
@@ -95,26 +103,25 @@
                                 :aria-selected="isSelected(option)"
                                 :aria-disabled="isOptionDisabled(option)"
                                 :aria-setsize="ariaSetSize"
-                                :aria-posinset="getAriaPosInset(getOptionIndex(i, getItemOptions))"
-                                @click="onOptionSelect($event, option, getOptionIndex(i, getItemOptions))"
-                                @mousedown="onOptionMouseDown($event, getOptionIndex(i, getItemOptions))"
-                                @mousemove="onOptionMouseMove($event, getOptionIndex(i, getItemOptions))"
+                                :aria-posinset="position"
+                                @click="onOptionSelect($event, option, index)"
+                                @mousedown="onOptionMouseDown($event, index)"
+                                @mousemove="onOptionMouseMove($event, index)"
                                 @touchend="onOptionTouchEnd()"
                                 @dblclick="onOptionDblClick($event, option)"
                                 v-bind="getPTOptions(option, getItemOptions, i, 'option')"
+                                :data-p-even-option="position % 2 === 0"
                                 :data-p-selected="!checkmark && isSelected(option)"
-                                :data-p-focused="focusedOptionIndex === getOptionIndex(i, getItemOptions)"
+                                :data-p-focused="focusedOptionIndex === index"
                                 :data-p-disabled="isOptionDisabled(option)"
                             >
                                 <template v-if="checkmark">
                                     <CheckIcon v-if="isSelected(option)" :class="cx('optionCheckIcon')" v-bind="ptm('optionCheckIcon')" />
                                     <BlankIcon v-else :class="cx('optionBlankIcon')" v-bind="ptm('optionBlankIcon')" />
                                 </template>
-                                <slot name="option" :option="option" :selected="isSelected(option)" :index="getOptionIndex(i, getItemOptions)">{{
-                                    getOptionLabel(option)
-                                }}</slot>
+                                <slot name="option" :option="option" :selected="isSelected(option)" :index="index">{{ getOptionLabel(option) }}</slot>
                             </li>
-                        </template>
+                        </ListboxOptionGroup>
                         <li
                             v-if="filterValue && (!items || (items && items.length === 0))"
                             :class="cx('emptyMessage')"
@@ -178,10 +185,23 @@ import type { VirtualScrollerItemOptions, VirtualScrollerMethods } from '../virt
 import type { ChoiceOptionGroup } from '../internal/choice-options';
 import { defineComponent, toRaw, type ComponentPublicInstance } from 'vue';
 import BaseListbox from './BaseListbox.vue';
+import ListboxOptionGroup from './ListboxOptionGroup.vue';
 
 type ElementRef = Element | ComponentPublicInstance | null;
 type ItemOptionsGetter = (index: number) => VirtualScrollerItemOptions;
 type OptionEvent = MouseEvent | KeyboardEvent;
+
+interface GroupHeading {
+    index: number;
+    option: ChoiceOptionGroup<unknown>;
+}
+
+interface RenderedGroup {
+    firstIndex: number;
+    heading?: GroupHeading;
+    showHeading: boolean;
+    options: { option: unknown; index: number; slotIndex: number; position: number }[];
+}
 
 // Named so usesCustomEquality can tell whether a component that extends Listbox replaced it.
 function isEquals(this: { equalityKey?: string }, value1: unknown, value2: unknown) {
@@ -263,8 +283,27 @@ export default defineComponent({
         getOptionGroupChildren(optionGroup: unknown): unknown[] | undefined {
             return resolveFieldData(optionGroup, this.optionGroupChildren);
         },
+        renderedGroups(items: unknown[] | undefined, getItemOptions?: ItemOptionsGetter): RenderedGroup[] {
+            const groups: RenderedGroup[] = [];
+            let group: RenderedGroup | undefined;
+
+            items?.forEach((option, slotIndex) => {
+                const index = this.getOptionIndex(slotIndex, getItemOptions);
+                const heading = this.optionGroupLabel ? this.groupedOptions.headings.get(index) : undefined;
+
+                if (!group || group.heading !== heading) {
+                    group = { firstIndex: index, heading, showHeading: false, options: [] };
+                    groups.push(group);
+                }
+
+                if (heading?.index === index) group.showHeading = true;
+                else group.options.push({ option, index, slotIndex, position: this.getAriaPosInset(index) });
+            });
+
+            return groups;
+        },
         getAriaPosInset(index: number) {
-            return (this.optionGroupLabel ? index - this.visibleOptions.slice(0, index).filter((option) => this.isOptionGroup(option)).length : index) + 1;
+            return (this.optionGroupLabel ? index - (this.groupedOptions.headingsBefore[index] ?? 0) : index) + 1;
         },
         onFirstHiddenFocus() {
             focus(this.list);
@@ -835,24 +874,46 @@ export default defineComponent({
                 ? FilterService.filter(this.options, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale)
                 : (this.options ?? []);
         },
-        optionsListGroup(): unknown[] {
-            const filteredOptions: unknown[] = [];
+        groupedOptions() {
+            const items: unknown[] = [];
+            const headings = new Map<number, GroupHeading>();
+            const headingsBefore: number[] = [];
+            let headingCount = 0;
+            const applyFilter = (options: unknown[]) =>
+                this.filterValue ? FilterService.filter(options, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale) : options;
 
-            (this.options || []).forEach((optionGroup) => {
-                const optionGroupChildren = this.getOptionGroupChildren(optionGroup) || [];
-                const filteredChildren = this.filterValue
-                    ? FilterService.filter(optionGroupChildren, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale)
-                    : optionGroupChildren;
+            for (const option of this.options ?? []) {
+                const children = this.getOptionGroupChildren(option);
 
-                if (filteredChildren?.length) {
-                    filteredOptions.push({ optionGroup, group: true }, ...filteredChildren);
+                if (!Array.isArray(children)) {
+                    if (applyFilter([option]).length) {
+                        items.push(option);
+                        headingsBefore.push(headingCount);
+                    }
+                    continue;
                 }
-            });
 
-            return filteredOptions;
+                const visibleChildren = applyFilter(children);
+
+                if (visibleChildren.length) {
+                    const heading: GroupHeading = { index: items.length, option: { optionGroup: option, group: true } };
+
+                    headings.set(items.length, heading);
+                    items.push(heading.option);
+                    headingsBefore.push(headingCount++);
+
+                    for (const child of visibleChildren) {
+                        headings.set(items.length, heading);
+                        items.push(child);
+                        headingsBefore.push(headingCount);
+                    }
+                }
+            }
+
+            return { items, headings, headingsBefore };
         },
         visibleOptions(): unknown[] {
-            return this.optionGroupLabel ? this.optionsListGroup : this.optionsListFlat;
+            return this.optionGroupLabel ? this.groupedOptions.items : this.optionsListFlat;
         },
         // @deprecated use $filled instead
         hasSelectedOption() {
@@ -921,6 +982,7 @@ export default defineComponent({
         ripple: Ripple
     },
     components: {
+        ListboxOptionGroup,
         InputText,
         VirtualScroller,
         InputIcon,

@@ -49,6 +49,67 @@ const selectedLabels = (wrapper: ListboxWrapper) =>
 
 const lastEmittedValue = <T = unknown>(wrapper: ListboxWrapper) => wrapper.emitted<[T]>('update:modelValue')?.at(-1)?.[0];
 
+it('labels each option group and places its options inside the group', () => {
+    const wrapper = mountListbox({ options: groupedCities(), optionGroupLabel: 'label', optionGroupChildren: 'items', optionLabel: 'label' });
+
+    try {
+        const groups = wrapper.findAll('[role="listbox"] [role="group"]');
+
+        expect(groups).toHaveLength(2);
+        expect(groups.map((group) => group.get(`[id="${group.attributes('aria-labelledby')}"]`).text())).toEqual(['Germany', 'USA']);
+        expect(groups[0].findAll('[role="option"]').map((option) => option.text())).toEqual(['Berlin', 'Frankfurt', 'Hamburg', 'Munich']);
+        expect(groups[1].findAll('[role="option"]').map((option) => option.text())).toEqual(['Chicago', 'Los Angeles', 'New York', 'San Francisco']);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('renders and filters standalone options alongside groups', async () => {
+    const wrapper = mountListbox({
+        options: [{ label: 'Oslo' }, groupedCities()[0], { label: 'Paris' }],
+        optionGroupLabel: 'label',
+        optionGroupChildren: 'items',
+        optionLabel: 'label',
+        filter: true
+    });
+
+    try {
+        expect(wrapper.findAll('.rs-listbox-option').map((row) => row.text())).toEqual(['Oslo', 'Berlin', 'Frankfurt', 'Hamburg', 'Munich', 'Paris']);
+
+        await wrapper.get('input').setValue('ar');
+
+        expect(wrapper.findAll('.rs-listbox-option').map((row) => row.text())).toEqual(['Paris']);
+        expect(wrapper.find('[role="group"]').exists()).toBe(false);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('labels a virtualized group when its heading is outside the rendered range', async () => {
+    const wrapper = mountListbox({
+        options: groupedCities(),
+        optionGroupLabel: 'label',
+        optionGroupChildren: 'items',
+        optionLabel: 'label',
+        virtualScrollerOptions: { itemSize: 24 }
+    });
+
+    try {
+        const scroller = wrapper.getComponent(VirtualScroller).vm;
+
+        scroller.first = 2;
+        scroller.last = 4;
+        await nextTick();
+
+        const group = wrapper.get('[role="group"]');
+
+        expect(group.attributes('aria-label')).toBe('Germany');
+        expect(group.findAll('[role="option"]').map((option) => option.text())).toEqual(['Frankfurt', 'Hamburg']);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('Listbox.vue', () => {
     let wrapper: ListboxWrapper;
 

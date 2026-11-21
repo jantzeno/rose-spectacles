@@ -15,6 +15,7 @@ const classes = {
     pcFilter: 'rs-listbox-filter',
     listContainer: 'rs-listbox-list-container',
     list: 'rs-listbox-list',
+    group: 'rs-listbox-group',
     optionGroup: 'rs-listbox-option-group',
     option: ({ instance, props, option, index, getItemOptions }: StyleContext) => [
         'rs-listbox-option',

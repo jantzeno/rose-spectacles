@@ -30,6 +30,10 @@ export enum ListboxClasses {
      */
     list = 'rs-listbox-list',
     /**
+     * Class name of the group container.
+     */
+    group = 'rs-listbox-group',
+    /**
      * Class name of the option group element
      */
     optionGroup = 'rs-listbox-option-group',
