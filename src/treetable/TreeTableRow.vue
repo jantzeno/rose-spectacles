@@ -10,7 +10,7 @@
         :aria-setsize="ariaSetSize"
         :aria-posinset="ariaPosInset"
         :aria-selected="getAriaSelected"
-        :aria-checked="checked || undefined"
+        :aria-checked="partialChecked ? 'mixed' : checked || undefined"
         @click="onClick"
         @keydown="onKeyDown"
         @touchend="onTouchEnd"
@@ -397,8 +397,10 @@ export default defineComponent({
             return null;
         },
         toggleCheckbox() {
-            let _selectionKeys = this.selectionKeys ? { ...this.selectionKeys } : {};
-            const _check = !this.checked;
+            if (this.node.selectable === false) return;
+
+            const _selectionKeys = { ...this.selectionKeys };
+            const _check = !this.checked && !(this.partialChecked && this.allSelectableNodesChecked(this.node, _selectionKeys));
 
             this.propagateDown(this.node, _check, _selectionKeys);
 
@@ -408,15 +410,27 @@ export default defineComponent({
                 selectionKeys: _selectionKeys
             });
         },
-        propagateDown(node: TreeNode, check: boolean, selectionKeys: RowSelection) {
-            if (check) selectionKeys[this.nodeKey(node)] = { checked: true, partialChecked: false };
-            else delete selectionKeys[this.nodeKey(node)];
+        allSelectableNodesChecked(node: TreeNode, selectionKeys: RowSelection): boolean {
+            const state = selectionKeys[this.nodeKey(node)];
+            const selected = node.selectable === false || (typeof state === 'object' && (state.checked || state.partialChecked));
 
-            if (node.children && node.children.length) {
-                for (let child of node.children) {
-                    this.propagateDown(child, check, selectionKeys);
-                }
+            return selected && (node.children?.every((child) => this.allSelectableNodesChecked(child, selectionKeys)) ?? true);
+        },
+        propagateDown(node: TreeNode, check: boolean, selectionKeys: RowSelection): boolean {
+            let fullySelectable = node.selectable !== false;
+
+            for (const child of node.children ?? []) {
+                if (!this.propagateDown(child, check, selectionKeys)) fullySelectable = false;
             }
+
+            if (node.selectable !== false) {
+                const key = this.nodeKey(node);
+
+                if (check) selectionKeys[key] = { checked: fullySelectable, partialChecked: !fullySelectable };
+                else delete selectionKeys[key];
+            }
+
+            return fullySelectable;
         },
         onCheckboxChange(event: CheckboxChange) {
             let check = event.check;
@@ -427,22 +441,21 @@ export default defineComponent({
             const children = this.node.children ?? [];
 
             for (const child of children) {
-                const state = _selectionKeys[this.nodeKey(child)];
+                if (child.selectable === false) {
+                    if (this.hasSelectedCheckboxDescendant(child, _selectionKeys)) childPartialSelected = true;
+                } else {
+                    const state = _selectionKeys[this.nodeKey(child)];
 
-                if (typeof state === 'object' && state?.checked) checkedChildCount++;
-                else if (typeof state === 'object' && state?.partialChecked) childPartialSelected = true;
+                    if (typeof state === 'object' && state?.checked) checkedChildCount++;
+                    else if (typeof state === 'object' && state?.partialChecked) childPartialSelected = true;
+                }
             }
 
-            if (check && checkedChildCount === children.length) {
-                _selectionKeys[this.nodeKey(this.node)] = { checked: true, partialChecked: false };
-            } else {
-                if (!check) {
-                    delete _selectionKeys[this.nodeKey(this.node)];
-                }
+            if (this.node.selectable !== false) {
+                const checked = check && checkedChildCount === children.length;
+                const partialChecked = childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== children.length);
 
-                if (childPartialSelected || (checkedChildCount > 0 && checkedChildCount !== children.length))
-                    _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: true };
-                else _selectionKeys[this.nodeKey(this.node)] = { checked: false, partialChecked: false };
+                _selectionKeys[this.nodeKey(this.node)] = { checked, partialChecked };
             }
 
             this.$emit('checkbox-change', {
@@ -450,6 +463,17 @@ export default defineComponent({
                 check: event.check,
                 selectionKeys: _selectionKeys
             });
+        },
+        hasSelectedCheckboxDescendant(node: TreeNode, selectionKeys: RowSelection): boolean {
+            return (
+                node.children?.some((child) => {
+                    if (child.selectable === false) return this.hasSelectedCheckboxDescendant(child, selectionKeys);
+
+                    const state = selectionKeys[this.nodeKey(child)];
+
+                    return typeof state === 'object' && (state.checked || state.partialChecked);
+                }) ?? false
+            );
         },
         setTabIndexForSelectionMode(event: MouseEvent | KeyboardEvent, nodeTouched: boolean) {
             if (this.selectionMode !== null && event.currentTarget instanceof HTMLElement) {

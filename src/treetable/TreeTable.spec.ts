@@ -210,6 +210,47 @@ describe('TreeTable', () => {
         }
     });
 
+    it('keeps non-selectable descendants unchecked when toggling their parent', async () => {
+        const nodes = [
+            {
+                key: 'root',
+                children: [{ key: 'disabled', selectable: false, children: [{ key: 'disabled-leaf', selectable: false }] }, { key: 'enabled' }]
+            }
+        ];
+        const wrapper = mount({
+            components: { TreeTable, Column },
+            data: () => ({ nodes, selection: {} }),
+            template: `
+                <TreeTable :value="nodes" :expandedKeys="{ root: true, disabled: true }" selectionMode="checkbox" v-model:selectionKeys="selection">
+                    <Column field="name" expander />
+                </TreeTable>
+            `
+        });
+
+        try {
+            const [parent, disabled] = wrapper.findAll('tbody tr');
+
+            await parent.get('input[type="checkbox"]').trigger('change');
+            expect(wrapper.vm.selection).toEqual({
+                root: { checked: false, partialChecked: true },
+                enabled: { checked: true, partialChecked: false }
+            });
+            expect(parent.attributes('aria-checked')).toBe('mixed');
+            expect(disabled.get('input[type="checkbox"]').element).toHaveProperty('checked', false);
+
+            await disabled.trigger('keydown', { code: 'Enter' });
+            expect(wrapper.vm.selection).toEqual({
+                root: { checked: false, partialChecked: true },
+                enabled: { checked: true, partialChecked: false }
+            });
+
+            await parent.get('input[type="checkbox"]').trigger('change');
+            expect(wrapper.vm.selection).toEqual({});
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     describe('legacy filtering (flat filters, filterMatchMode on Column)', () => {
         it('keeps a basic filter in the frozen TreeTable column', async () => {
             const wrapper = mount({
