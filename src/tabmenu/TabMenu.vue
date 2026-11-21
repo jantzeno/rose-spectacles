@@ -18,7 +18,7 @@
                             ref="tabLink"
                             v-ripple
                             role="menuitem"
-                            :href="item.url"
+                            :href="menuItemHref(item.url)"
                             :class="cx('itemLink')"
                             :target="item.target"
                             :aria-label="label(item)"
@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts">
+import { menuItemHref } from '../internal/menu-item-href';
 import { getAttribute, find, findSingle, getWidth, getOffset } from '../internal/utils/dom/index';
 import Ripple from '../ripple/Ripple';
 import { defineComponent, mergeProps } from 'vue';
@@ -86,6 +87,7 @@ export default defineComponent({
         this.updateInkBar();
     },
     methods: {
+        menuItemHref,
         getPTOptions(key: string, item: MenuItem, index: number) {
             return this.ptm(key, {
                 context: {

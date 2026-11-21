@@ -2,7 +2,7 @@
     <li v-if="visible()" :class="[cx('item'), item.class]" v-bind="ptm('item', ptmOptions)">
         <template v-if="!templates.item">
             <a
-                :href="item.url || '#'"
+                :href="menuItemHref(item.url || '#')"
                 :class="cx('itemLink')"
                 :target="item.target"
                 :aria-current="isCurrentUrl()"
@@ -19,6 +19,7 @@
 </template>
 
 <script lang="ts">
+import { menuItemHref } from '../internal/menu-item-href';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { defineComponent, mergeProps } from 'vue';
 
@@ -32,6 +33,7 @@ export default defineComponent({
         index: null
     },
     methods: {
+        menuItemHref,
         onClick(event: MouseEvent) {
             if (this.item.command) {
                 this.item.command({

@@ -14,7 +14,7 @@
     >
         <div :class="cx('itemContent')" @click="onItemClick($event)" @mousemove="onItemMouseMove($event)" :data-p="dataP" v-bind="getPTOptions('itemContent')">
             <template v-if="!templates.item">
-                <a v-ripple :href="item.url" :class="cx('itemLink')" :target="item.target" tabindex="-1" v-bind="getPTOptions('itemLink')">
+                <a v-ripple :href="menuItemHref(item.url)" :class="cx('itemLink')" :target="item.target" tabindex="-1" v-bind="getPTOptions('itemLink')">
                     <component v-if="templates.itemicon" :is="templates.itemicon" :item="item" :class="cx('itemIcon')" />
                     <span v-else-if="item.icon" :class="[cx('itemIcon'), item.icon]" :data-p="dataP" v-bind="getPTOptions('itemIcon')" />
                     <span :class="cx('itemLabel')" :data-p="dataP" v-bind="getPTOptions('itemLabel')">{{ label() }}</span>
@@ -26,6 +26,7 @@
 </template>
 
 <script lang="ts">
+import { menuItemHref } from '../internal/menu-item-href';
 import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
 import type { MenuItem } from 'rose-spectacles/menuitem';
 import { cn } from '../internal/utils/index';
@@ -55,6 +56,7 @@ export default defineComponent({
         index: Number
     },
     methods: {
+        menuItemHref,
         getItemProp(processedItem: MenuEntry, name: string): unknown {
             return processedItem && processedItem.item ? resolve(processedItem.item[name]) : undefined;
         },

@@ -19,7 +19,12 @@
                 >
                     <div :class="cx('headerContent')" v-bind="getPTOptions('headerContent', item, index)">
                         <template v-if="!$slots.item">
-                            <a :href="getItemProp(item, 'url')" :class="cx('headerLink')" :tabindex="-1" v-bind="getPTOptions('headerLink', item, index)">
+                            <a
+                                :href="menuItemHref(getItemProp(item, 'url'))"
+                                :class="cx('headerLink')"
+                                :tabindex="-1"
+                                v-bind="getPTOptions('headerLink', item, index)"
+                            >
                                 <slot v-if="getItemProp(item, 'items')" name="submenuicon" :active="isItemActive(item)">
                                     <component
                                         :is="isItemActive(item) ? 'ChevronDownIcon' : 'ChevronRightIcon'"
@@ -84,6 +89,7 @@
 </template>
 
 <script lang="ts">
+import { menuItemHref } from '../internal/menu-item-href';
 import type { MenuItem } from 'rose-spectacles/menuitem';
 import { findSingle, focus, getAttribute } from '../internal/utils/dom/index';
 import { equals, isNotEmpty, resolve } from '../internal/utils/object/index';
@@ -111,6 +117,7 @@ export default defineComponent({
         };
     },
     methods: {
+        menuItemHref,
         getItemProp(item: MenuItem, name: string) {
             return item ? resolve(item[name]) : undefined;
         },

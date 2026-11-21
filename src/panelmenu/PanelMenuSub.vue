@@ -25,7 +25,7 @@
                     <template v-if="!templates.item">
                         <a
                             v-ripple
-                            :href="getItemProp(processedItem, 'url')"
+                            :href="menuItemHref(getItemProp(processedItem, 'url'))"
                             :class="cx('itemLink')"
                             :target="getItemProp(processedItem, 'target')"
                             tabindex="-1"
@@ -101,6 +101,7 @@
 </template>
 
 <script lang="ts">
+import { menuItemHref } from '../internal/menu-item-href';
 import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
 import type { ProcessedMenuItem } from '../internal/processed-menu-item';
 import { isNotEmpty, resolve } from '../internal/utils/object/index';
@@ -145,6 +146,7 @@ export default defineComponent({
         }
     },
     methods: {
+        menuItemHref,
         getItemId(processedItem: ProcessedMenuItem) {
             return `${this.panelId}_${processedItem.key}`;
         },

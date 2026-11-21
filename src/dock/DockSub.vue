@@ -33,7 +33,7 @@
                         <template v-if="!templates['item']">
                             <a
                                 v-tooltip:[tooltipOptions]="{ value: itemLabel(processedItem), disabled: !tooltipOptions }"
-                                :href="processedItem.url"
+                                :href="menuItemHref(processedItem.url)"
                                 :class="cx('itemLink')"
                                 :target="processedItem.target"
                                 tabindex="-1"
@@ -62,6 +62,7 @@
 </template>
 
 <script lang="ts">
+import { menuItemHref } from '../internal/menu-item-href';
 import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
 import type { MenuItem } from 'rose-spectacles/menuitem';
 import { find, findSingle } from '../internal/utils/dom/index';
@@ -115,6 +116,7 @@ export default defineComponent({
         };
     },
     methods: {
+        menuItemHref,
         getItemId(index: number) {
             return `${this.idx}_${index}`;
         },
