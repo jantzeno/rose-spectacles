@@ -183,11 +183,12 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/48",
             "title": "PanelMenu with one panel doesn't have a top border",
             "labels": ["bug", "styling"],
-            "component": "PanelMenu, Panel",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/mcsq56vu?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: PanelMenu with one panel doesn't have a top border."
+            "component": "PanelMenu, Lara and Nora presets",
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The reported border differences occur only with the retired Lara and Nora presets. Rose Spectacles retains the PanelMenu layout and exposes a class hook for app-owned borders."
+            ],
+            "reproducer": "https://stackblitz.com/edit/mcsq56vu?file=src%2FApp.vue"
         },
         {
             "number": 49,
@@ -382,10 +383,16 @@
             "title": "FileUpload allows queueing up `fileLimit`+1 files",
             "labels": ["bug"],
             "component": "FileUpload",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A drop after reaching the limit entered the queue on the baseline. It is now rejected with the configured limit message, and the accepted files can still be uploaded."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-rdahuh4y?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: FileUpload allows queueing up `fileLimit`+1 files."
+            "resolvingCommit": "b002421a365fe9bc95ab0cff446a80f9954ddb95",
+            "test": {
+                "path": "src/fileupload/FileUploadLimit.spec.ts",
+                "name": "rejects extra dropped files at the queue limit and still allows uploading the accepted batch"
+            }
         },
         {
             "number": 70,
@@ -791,10 +798,16 @@
             "title": "Autocomplete: forceSelection throws an error when the value of the optionLabel key is a number.",
             "labels": ["bug"],
             "component": "AutoComplete",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A numeric option label threw from toLocaleLowerCase. The test now verifies the original option object is emitted on a match and the input is cleared on a non-match."
+            ],
             "reproducer": "https://stackblitz.com/edit/j7uyknsf?file=src%2Fservice%2FCountryService.js",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Autocomplete: forceSelection throws an error when the value of the optionLabel key is a number."
+            "resolvingCommit": "44011244d7ed36e8cbb8a8883d086fc82a818703",
+            "test": {
+                "path": "src/autocomplete/ForceSelection.spec.ts",
+                "name": "matches a numeric option label against the text input when forceSelection is enabled"
+            }
         },
         {
             "number": 109,
@@ -1564,8 +1577,9 @@
             "title": "PrimeUX Nuxt module imports all component styles into <head> #7959",
             "labels": ["performance", "ssr"],
             "component": "Nuxt module and its build and style registration",
-            "disposition": "out-of-scope",
-            "evidence": ["The report targets the Nuxt module and its build and style registration. The migration plan removes that integration."]
+            "disposition": "duplicate",
+            "evidence": ["The subject, report body, and StackBlitz fixture match #186. Both report unused stylesheet injection by the same Nuxt integration."],
+            "primaryIssue": 186
         },
         {
             "number": 186,
@@ -5942,7 +5956,7 @@
             ],
             "reproducer": "https://stackblitz.com/edit/github-ekawlmuq?file=src%2FApp.vue",
             "test": {
-                "path": "src/splitter/Splitter.spec.js",
+                "path": "src/splitter/Splitter.spec.ts",
                 "name": "sizes a newly inserted panel after the splitter DOM updates"
             },
             "resolvingCommit": "ad0a22f54aea6ed1427541fd186d22952fd69419"
