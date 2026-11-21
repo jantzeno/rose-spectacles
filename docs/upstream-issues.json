@@ -85,10 +85,17 @@
             "title": "Tree-family components: generic T not inferred from value/options prop",
             "labels": ["enhancement"],
             "component": "Tree",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The consumer proved that customLabel and department from extended model interfaces were unchecked in Tree, TreeSelect, and OrganizationChart before the fix.",
+                "All three consumer slots now infer the declared string fields. The underlying node index signatures still support dynamic fields."
+            ],
             "reproducer": "https://stackblitz.com/github/YevheniiKotyrlo/primevue-generic-type-repro?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using N/A (type-checking only). Verify the reported behavior: Tree-family components: generic T not inferred from value/options prop."
+            "resolvingCommit": "d392214698761c03b9042dabd4e204669473577f",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "Menu and tree slots preserve the declared types of extended models"
+            }
         },
         {
             "number": 38,
@@ -245,9 +252,16 @@
             "title": "Menu-family components: generic T not inferred from model prop",
             "labels": ["typescript"],
             "component": "Menu",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: Menu-family components: generic T not inferred from model prop."
+            "disposition": "fixed",
+            "evidence": [
+                "The packed consumer checks a declared route field on an extended MenuItem in all ten reported menu components.",
+                "The type assertion failed before the generic constructors and passes in all ten slots with the fix."
+            ],
+            "resolvingCommit": "d392214698761c03b9042dabd4e204669473577f",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "Menu and tree slots preserve the declared types of extended models"
+            }
         },
         {
             "number": 53,
@@ -255,10 +269,18 @@
             "title": "VirtualScroller, SelectButton, InputChips: generic type not inferred from items/options/modelValue",
             "labels": ["typescript"],
             "component": "VirtualScroller, SelectButton, InputChips",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The consumer accepted an unknown field in each reported slot before the fix.",
+                "InputChips, SelectButton, and VirtualScroller now infer the selected item or rendered row from the bound array and reject the unknown field."
+            ],
             "reproducer": "https://stackblitz.com/github/YevheniiKotyrlo/primevue-generic-type-repro?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using N/A (type-level issue). Verify the reported behavior: VirtualScroller, SelectButton, InputChips: generic type not inferred from items/options/modelValue."
+            "resolvingCommit": "fe95e81627d0c28eb51652b52f420d9d7b44f0e9",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "InputChips, SelectButton, and VirtualScroller slots reject unknown properties on their items"
+            },
+            "upstreamPullRequest": "https://github.com/primefaces/primevue/pull/8493"
         },
         {
             "number": 54,
@@ -266,9 +288,17 @@
             "title": "OrderList, PickList: modelValue generic type not inferred in slots",
             "labels": ["typescript"],
             "component": "OrderList, PickList",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case for N/A (type-level issue) that exercises the reported behavior: OrderList, PickList: modelValue generic type not inferred in slots."
+            "disposition": "fixed",
+            "evidence": [
+                "The consumer accepted unknown fields on option slots in both lists before the fix.",
+                "The packed declarations infer slot item types from the OrderList array and both PickList arrays. The consumer rejects the invalid fields."
+            ],
+            "resolvingCommit": "fe95e81627d0c28eb51652b52f420d9d7b44f0e9",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "OrderList and PickList slots reject unknown properties on model items"
+            },
+            "upstreamPullRequest": "https://github.com/primefaces/primevue/pull/8491"
         },
         {
             "number": 55,
@@ -4285,10 +4315,17 @@
             "title": "InputChips: error thrown by null inputValue on left keydown if user does not add their own chip to input beforehand",
             "labels": ["bug"],
             "component": "InputChips, Chip",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The retained InputChips threw while reading length from the unset draft after the first ArrowLeft with prefilled chips.",
+                "The regression now checks focus and the aria-activedescendant after initializing the empty draft."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-xnfuwd?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: InputChips: error thrown by null inputValue on left keydown if user does not add their own chip to input beforehand."
+            "resolvingCommit": "eb0376ffedf778807f7a69b4046d47ef00e2f7da",
+            "test": {
+                "path": "src/inputchips/InputChips.spec.ts",
+                "name": "focuses a prefilled chip on the first ArrowLeft before any input"
+            }
         },
         {
             "number": 437,
@@ -4980,11 +5017,18 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/503",
             "title": "Chips: Chips extend past their container, and thus can't be closed",
             "labels": ["bug", "styling"],
-            "component": "Chips",
-            "disposition": "unverified",
-            "evidence": [],
+            "component": "Chips, InputChips",
+            "disposition": "fixed",
+            "evidence": [
+                "Firefox mounted the retained Chips alias at a constrained width and found that a long label pushed its remove control past the input bounds.",
+                "The same check passes with truncated labels and clickable remove controls. The long chip is removed in the browser."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-create-vue-typescript-issue-template-dkklnw?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome 123. Verify the reported behavior: Chips: Chips extend past their container, and thus can't be closed."
+            "resolvingCommit": "b66f6972de512f5db0ebb3cbb8593eaca0be4a0d",
+            "test": {
+                "path": "scripts/browser-smoke.ts",
+                "name": "Long chips keep their remove controls inside the input"
+            }
         },
         {
             "number": 504,
@@ -5100,11 +5144,18 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/514",
             "title": "Chips component seperator option bug with typing Korean Language",
             "labels": ["bug"],
-            "component": "Chips",
-            "disposition": "unverified",
-            "evidence": [],
+            "component": "Chips, InputChips",
+            "disposition": "fixed",
+            "evidence": [
+                "A local Korean composition sequence showed the retained InputChips immediately consumed a comma while the input method was composing.",
+                "The composing key now leaves the draft intact. The test ends composition and verifies that the following comma adds the whole Korean token and clears the input."
+            ],
             "reproducer": "https://stackblitz.com/edit/ryusmn?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Edge. Verify the reported behavior: Chips component seperator option bug with typing Korean Language."
+            "resolvingCommit": "182b3af66f66c4f40c0e055f96772a20fc2fba8a",
+            "test": {
+                "path": "src/inputchips/InputChips.spec.ts",
+                "name": "waits for text composition to finish before adding a chip"
+            }
         },
         {
             "number": 515,
