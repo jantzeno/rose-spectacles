@@ -390,7 +390,6 @@ import type {
     DataTableExportCSVOptions,
     DataTableFilterMeta,
     DataTableFilterMetaData,
-    DataTableOperatorFilterMetaData,
     DataTableRowEditInitEvent,
     DataTableSortMeta
 } from './DataTable';

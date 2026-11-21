@@ -1,5 +1,5 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { h, nextTick } from 'vue';
+import { nextTick } from 'vue';
 import RoseSpectacles from 'rose-spectacles/config';
 import ConfirmationService from 'rose-spectacles/confirmationservice';
 import DialogService from 'rose-spectacles/dialogservice';
