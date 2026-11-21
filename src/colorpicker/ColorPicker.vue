@@ -95,8 +95,9 @@ export default {
     hueView: null,
     hueHandle: null,
     watch: {
-        modelValue: {
+        d_value: {
             immediate: true,
+            deep: true,
             handler(newValue) {
                 this.hsbValue = this.toHSB(newValue);
                 if (this.selfUpdate) this.selfUpdate = false;
@@ -125,11 +126,10 @@ export default {
     },
     methods: {
         pickColor(event) {
-            let rect = this.colorSelector.getBoundingClientRect();
-            let top = rect.top + (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0);
-            let left = rect.left + document.body.scrollLeft;
-            let saturation = Math.floor((100 * Math.max(0, Math.min(150, (event.pageX || event.changedTouches[0].pageX) - left))) / 150);
-            let brightness = Math.floor((100 * (150 - Math.max(0, Math.min(150, (event.pageY || event.changedTouches[0].pageY) - top)))) / 150);
+            const pointer = 'changedTouches' in event ? event.changedTouches[0] : event;
+            const { left, top } = this.colorSelector.getBoundingClientRect();
+            const saturation = Math.floor((100 * Math.max(0, Math.min(150, pointer.clientX - left))) / 150);
+            const brightness = Math.floor((100 * (150 - Math.max(0, Math.min(150, pointer.clientY - top)))) / 150);
 
             this.hsbValue = this.validateHSB({
                 h: this.localHue,
@@ -143,8 +143,9 @@ export default {
             this.updateModel(event);
         },
         pickHue(event) {
-            let top = this.hueView.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0);
-            this.localHue = Math.floor((360 * (150 - Math.max(0, Math.min(150, (event.pageY || event.changedTouches[0].pageY) - top)))) / 150);
+            const pointer = 'changedTouches' in event ? event.changedTouches[0] : event;
+            const { top } = this.hueView.getBoundingClientRect();
+            this.localHue = Math.floor((360 * (150 - Math.max(0, Math.min(150, pointer.clientY - top)))) / 150);
 
             this.hsbValue = this.validateHSB({
                 h: this.localHue,
@@ -433,11 +434,20 @@ export default {
         onInputKeydown(event) {
             switch (event.code) {
                 case 'Space':
-                    this.overlayVisible = !this.overlayVisible;
+                case 'Enter':
+                case 'NumpadEnter':
+                    this.onInputClick();
                     event.preventDefault();
                     break;
 
                 case 'Escape':
+                    if (this.overlayVisible) {
+                        this.overlayVisible = false;
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    break;
+
                 case 'Tab':
                     this.overlayVisible = false;
                     break;
