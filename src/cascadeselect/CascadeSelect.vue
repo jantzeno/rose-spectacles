@@ -111,9 +111,10 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { absolutePosition, addStyle, findSingle, focus, getOuterWidth, isTouchDevice, relativePosition } from '../internal/utils/dom/index';
-import { equals, findLastIndex, isEmpty, isNotEmpty, isPrintableCharacter, isString, resolveFieldData } from '../internal/utils/object/index';
+import { equals, findLastIndex, isEmpty, isNotEmpty, isPrintableCharacter, resolveFieldData } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
 import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
@@ -125,29 +126,31 @@ import { listenForOutsideOverlayClick } from '../internal/overlay-dismissal';
 import Portal from '../portal/Portal.vue';
 import BaseCascadeSelect from './BaseCascadeSelect.vue';
 import CascadeSelectSub from './CascadeSelectSub.vue';
+import type { CascadeSelectFocusedOptionInfo } from './CascadeSelect';
+import type { ProcessedOption, ProcessedOptionEvent } from './processed-option';
 
-export default {
+export default defineComponent({
     name: 'CascadeSelect',
     extends: BaseCascadeSelect,
     inheritAttrs: false,
     emits: ['change', 'focus', 'blur', 'click', 'group-change', 'before-show', 'before-hide', 'hide', 'show'],
-    stopOutsideClickListener: null,
-    matchMediaListener: null,
-    scrollHandler: null,
-    resizeListener: null,
-    overlay: null,
-    searchTimeout: null,
-    searchValue: null,
     data() {
         return {
             clicked: false,
             focused: false,
-            focusedOptionInfo: { index: -1, level: 0, parentKey: '' },
-            activeOptionPath: [],
+            focusedOptionInfo: { index: -1, level: 0, parentKey: '' } as CascadeSelectFocusedOptionInfo,
+            activeOptionPath: [] as ProcessedOption[],
             overlayVisible: false,
             dirty: false,
             mobileActive: false,
-            query: null,
+            stopOutsideClickListener: null as (() => void) | null,
+            matchMediaListener: null as (() => void) | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            resizeListener: null as (() => void) | null,
+            overlay: null as HTMLElement | null,
+            searchTimeout: null as ReturnType<typeof setTimeout> | null,
+            searchValue: '',
+            query: null as MediaQueryList | null,
             queryMatches: false
         };
     },
@@ -165,6 +168,8 @@ export default {
         this.unbindResizeListener();
         this.unbindMatchMediaListener();
 
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
         if (this.scrollHandler) {
             this.scrollHandler.destroy();
             this.scrollHandler = null;
@@ -180,35 +185,33 @@ export default {
         }
     },
     methods: {
-        getOptionLabel(option) {
+        getOptionLabel(option: unknown) {
             return this.optionLabel ? resolveFieldData(option, this.optionLabel) : option;
         },
-        getOptionValue(option) {
+        getOptionValue(option: unknown) {
             return this.optionValue ? resolveFieldData(option, this.optionValue) : option;
         },
-        isOptionDisabled(option) {
+        isOptionDisabled(option: unknown) {
             return this.optionDisabled ? resolveFieldData(option, this.optionDisabled) : false;
         },
-        getOptionGroupLabel(optionGroup) {
+        getOptionGroupLabel(optionGroup: unknown) {
             return this.optionGroupLabel ? resolveFieldData(optionGroup, this.optionGroupLabel) : null;
         },
-        getOptionGroupChildren(optionGroup, level) {
-            return isString(this.optionGroupChildren)
-                ? resolveFieldData(optionGroup, this.optionGroupChildren)
-                : resolveFieldData(optionGroup, this.optionGroupChildren[level]);
-        },
-        isOptionGroup(option, level) {
-            return Object.prototype.hasOwnProperty.call(option, this.optionGroupChildren[level]);
-        },
-        getProccessedOptionLabel(processedOption = {}) {
-            const grouped = this.isProccessedOptionGroup(processedOption);
+        getOptionGroupChildren(optionGroup: unknown, level: number): unknown[] | undefined {
+            const field = Array.isArray(this.optionGroupChildren) ? this.optionGroupChildren[level] : this.optionGroupChildren;
+            const children = resolveFieldData(optionGroup, field);
 
-            return grouped ? this.getOptionGroupLabel(processedOption.option, processedOption.level) : this.getOptionLabel(processedOption.option);
+            return Array.isArray(children) ? children : undefined;
         },
-        isProccessedOptionGroup(processedOption) {
-            return isNotEmpty(processedOption?.children);
+        getProccessedOptionLabel(processedOption?: ProcessedOption) {
+            return this.isProccessedOptionGroup(processedOption)
+                ? this.getOptionGroupLabel(processedOption?.option)
+                : this.getOptionLabel(processedOption?.option);
         },
-        show(isFocus) {
+        isProccessedOptionGroup(processedOption?: ProcessedOption) {
+            return !!processedOption?.children.length;
+        },
+        show(isFocus?: boolean) {
             this.$emit('before-show');
             this.overlayVisible = true;
             this.activeOptionPath = this.$filled ? (this.findOptionPathByValue(this.d_value) ?? []) : this.activeOptionPath;
@@ -225,9 +228,9 @@ export default {
                 };
             }
 
-            isFocus && focus(this.$refs.focusInput);
+            isFocus && focus(this.$refs.focusInput as HTMLInputElement);
         },
-        hide(isFocus) {
+        hide(isFocus?: boolean) {
             const _hide = () => {
                 this.$emit('before-hide');
                 this.overlayVisible = false;
@@ -235,14 +238,14 @@ export default {
                 this.activeOptionPath = [];
                 this.focusedOptionInfo = { index: -1, level: 0, parentKey: '' };
 
-                isFocus && focus(this.$refs.focusInput);
+                isFocus && focus(this.$refs.focusInput as HTMLInputElement);
             };
 
             setTimeout(() => {
                 _hide();
             }, 0); // For ScreenReaders
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             if (this.disabled) {
                 // For ScreenReaders
                 return;
@@ -251,14 +254,14 @@ export default {
             this.focused = true;
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.focused = false;
             this.focusedOptionInfo = { index: -1, level: 0, parentKey: '' };
             this.searchValue = '';
             this.$emit('blur', event);
             this.formField.onBlur?.();
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (this.disabled || this.loading) {
                 event.preventDefault();
 
@@ -328,10 +331,10 @@ export default {
 
             this.clicked = false;
         },
-        onOptionChange(event) {
+        onOptionChange(event: ProcessedOptionEvent) {
             const { processedOption, type } = event;
 
-            if (isEmpty(processedOption)) return;
+            if (!processedOption) return;
 
             const { index, key, level, parentKey, children } = processedOption;
             const grouped = isNotEmpty(children);
@@ -349,8 +352,11 @@ export default {
 
             this.activeOptionPath = activeOptionPath;
         },
-        onOptionClick(event) {
+        onOptionClick(event: ProcessedOptionEvent) {
             const { originalEvent, processedOption, isFocus, isHide, preventSelection } = event;
+
+            if (!processedOption) return;
+
             const { index, key, level, parentKey } = processedOption;
             const grouped = this.isProccessedOptionGroup(processedOption);
             const selected = this.isSelected(processedOption);
@@ -376,10 +382,10 @@ export default {
                 }
             }
 
-            isFocus && focus(this.$refs.focusInput);
+            isFocus && focus(this.$refs.focusInput as HTMLInputElement);
         },
-        onOptionMouseEnter(event) {
-            if (this.focusOnHover) {
+        onOptionMouseEnter(event: ProcessedOptionEvent) {
+            if (this.focusOnHover && event.processedOption) {
                 if (event.processedOption.level === 0) {
                     this.dirty = true;
                 }
@@ -391,47 +397,51 @@ export default {
                 }
             }
         },
-        onOptionMouseMove(event) {
-            if (this.focused && this.focusOnHover) {
-                this.changeFocusedOptionIndex(event, event.processedOption.index);
+        onOptionMouseMove(event: ProcessedOptionEvent) {
+            if (this.focused && this.focusOnHover && event.processedOption) {
+                this.changeFocusedOptionIndex(event.originalEvent, event.processedOption.index);
             }
         },
-        onOptionSelect(event, processedOption, isHide = true) {
+        onOptionSelect(event: Event | undefined, processedOption: ProcessedOption, isHide = true) {
             const value = this.getOptionValue(processedOption?.option);
 
             this.activeOptionPath.forEach((p) => (p.selected = true));
             this.updateModel(event, value);
             isHide && this.hide(true);
         },
-        onOptionGroupSelect(event, processedOption) {
+        onOptionGroupSelect(event: Event | undefined, processedOption: ProcessedOption) {
             this.dirty = true;
             this.$emit('group-change', { originalEvent: event, value: processedOption.option });
         },
-        onContainerClick(event) {
+        onContainerClick(event: MouseEvent) {
             if (this.disabled || this.loading) {
                 return;
             }
 
-            if (event.target.getAttribute('data-pc-section') === 'clearicon' || event.target.closest('[data-pc-section="clearicon"]')) {
+            const target = event.target;
+
+            if (!(target instanceof Element)) return;
+
+            if (target.getAttribute('data-pc-section') === 'clearicon' || target.closest('[data-pc-section="clearicon"]')) {
                 return;
-            } else if (!this.overlay || !this.overlay.contains(event.target)) {
+            } else if (!this.overlay || !this.overlay.contains(target)) {
                 this.overlayVisible ? this.hide() : this.show();
-                focus(this.$refs.focusInput);
+                focus(this.$refs.focusInput as HTMLInputElement);
             }
 
             this.clicked = true;
             this.$emit('click', event);
         },
-        onClearClick(event) {
+        onClearClick(event: MouseEvent) {
             this.updateModel(event, null);
         },
-        onOverlayClick(event) {
+        onOverlayClick(event: MouseEvent) {
             OverlayEventBus.emit('overlay-click', {
                 originalEvent: event,
                 target: this.$el
             });
         },
-        onOverlayKeyDown(event) {
+        onOverlayKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'Escape':
                     this.onEscapeKey(event);
@@ -441,7 +451,7 @@ export default {
                     break;
             }
         },
-        onArrowDownKey(event) {
+        onArrowDownKey(event: KeyboardEvent) {
             if (!this.overlayVisible) {
                 this.show();
             } else {
@@ -457,7 +467,7 @@ export default {
 
             event.preventDefault();
         },
-        onArrowUpKey(event) {
+        onArrowUpKey(event: KeyboardEvent) {
             if (event.altKey) {
                 if (this.focusedOptionInfo.index !== -1) {
                     const processedOption = this.visibleOptions[this.focusedOptionInfo.index];
@@ -482,7 +492,7 @@ export default {
                 event.preventDefault();
             }
         },
-        onArrowLeftKey(event) {
+        onArrowLeftKey(event: KeyboardEvent) {
             if (this.overlayVisible) {
                 const processedOption = this.visibleOptions[this.focusedOptionInfo.index];
                 const parentOption = this.activeOptionPath.find((p) => p.key === processedOption?.parentKey);
@@ -494,7 +504,7 @@ export default {
                 }
 
                 if (!root) {
-                    this.focusedOptionInfo = { index: -1, parentKey: parentOption ? parentOption.parentKey : '' };
+                    this.focusedOptionInfo = { index: -1, level: parentOption?.level ?? 0, parentKey: parentOption?.parentKey ?? '' };
                     this.searchValue = '';
                     this.onArrowDownKey(event);
                 }
@@ -502,16 +512,16 @@ export default {
                 event.preventDefault();
             }
         },
-        onArrowRightKey(event) {
+        onArrowRightKey(event: KeyboardEvent) {
             if (this.overlayVisible) {
                 const processedOption = this.visibleOptions[this.focusedOptionInfo.index];
                 const grouped = this.isProccessedOptionGroup(processedOption);
 
-                if (grouped) {
+                if (processedOption && grouped) {
                     const matched = this.activeOptionPath.some((p) => processedOption?.key === p.key);
 
                     if (matched) {
-                        this.focusedOptionInfo = { index: -1, parentKey: processedOption?.key };
+                        this.focusedOptionInfo = { index: -1, level: processedOption.level + 1, parentKey: processedOption.key };
                         this.searchValue = '';
                         this.onArrowDownKey(event);
                     } else {
@@ -522,21 +532,21 @@ export default {
                 event.preventDefault();
             }
         },
-        onHomeKey(event) {
+        onHomeKey(event: KeyboardEvent) {
             this.changeFocusedOptionIndex(event, this.findFirstOptionIndex());
 
             !this.overlayVisible && this.show();
             event.preventDefault();
         },
-        onEndKey(event) {
+        onEndKey(event: KeyboardEvent) {
             this.changeFocusedOptionIndex(event, this.findLastOptionIndex());
 
             !this.overlayVisible && this.show();
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEnterKey(event: KeyboardEvent) {
             if (!this.overlayVisible) {
-                this.focusedOptionInfo.index !== -1; // reset
+                this.focusedOptionInfo.index = -1;
                 this.onArrowDownKey(event);
             } else {
                 if (this.focusedOptionInfo.index !== -1) {
@@ -550,14 +560,14 @@ export default {
 
             event.preventDefault();
         },
-        onSpaceKey(event) {
+        onSpaceKey(event: KeyboardEvent) {
             this.onEnterKey(event);
         },
-        onEscapeKey(event) {
+        onEscapeKey(event: KeyboardEvent) {
             this.overlayVisible && this.hide(true);
             event.preventDefault();
         },
-        onTabKey(event) {
+        onTabKey(event: KeyboardEvent) {
             if (this.focusedOptionInfo.index !== -1) {
                 const processedOption = this.visibleOptions[this.focusedOptionInfo.index];
                 const grouped = this.isProccessedOptionGroup(processedOption);
@@ -567,8 +577,10 @@ export default {
 
             this.overlayVisible && this.hide();
         },
-        onOverlayEnter(el) {
-            ZIndex.set('overlay', el, this.$primevue.config.zIndex.overlay);
+        onOverlayEnter(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
+            ZIndex.set('overlay', el, this.$primevue?.config.zIndex?.overlay);
 
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
@@ -584,7 +596,9 @@ export default {
 
             this.$emit('show');
         },
-        onOverlayLeave(el) {
+        onOverlayLeave(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
             el.style.pointerEvents = 'none';
             this.unbindOutsideClickListener();
             this.unbindScrollListener();
@@ -594,10 +608,14 @@ export default {
             this.overlay = null;
             this.dirty = false;
         },
-        onOverlayAfterLeave(el) {
+        onOverlayAfterLeave(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
             ZIndex.clear(el);
         },
         alignOverlay() {
+            if (!this.overlay) return;
+
             if (this.appendTo === 'self') {
                 relativePosition(this.overlay, this.$el);
             } else {
@@ -618,7 +636,7 @@ export default {
         },
         bindScrollListener() {
             if (!this.scrollHandler) {
-                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.container, () => {
+                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.container as HTMLElement, () => {
                     if (this.overlayVisible) {
                         this.hide();
                     }
@@ -666,26 +684,27 @@ export default {
         },
         unbindMatchMediaListener() {
             if (this.matchMediaListener) {
-                this.query.removeEventListener('change', this.matchMediaListener);
+                this.query?.removeEventListener('change', this.matchMediaListener);
                 this.matchMediaListener = null;
             }
         },
-        isOptionMatched(processedOption) {
+        isOptionMatched(processedOption: ProcessedOption) {
+            const label = this.getProccessedOptionLabel(processedOption);
+
             return (
                 this.isValidOption(processedOption) &&
-                this.getProccessedOptionLabel(processedOption)
-                    ?.toLocaleLowerCase(this.searchLocale)
-                    .startsWith(this.searchValue.toLocaleLowerCase(this.searchLocale))
+                typeof label === 'string' &&
+                label.toLocaleLowerCase(this.searchLocale).startsWith(this.searchValue.toLocaleLowerCase(this.searchLocale))
             );
         },
-        isValidOption(processedOption) {
-            return isNotEmpty(processedOption) && !this.isOptionDisabled(processedOption.option);
+        isValidOption(processedOption: ProcessedOption | undefined): processedOption is ProcessedOption {
+            return !!processedOption && !this.isOptionDisabled(processedOption.option);
         },
-        isValidSelectedOption(processedOption) {
+        isValidSelectedOption(processedOption: ProcessedOption) {
             return this.isValidOption(processedOption) && this.isSelected(processedOption);
         },
-        isSelected(processedOption) {
-            return this.activeOptionPath && this.activeOptionPath.some((p) => p.key === processedOption.key);
+        isSelected(processedOption: ProcessedOption) {
+            return this.activeOptionPath.some((p) => p.key === processedOption.key);
         },
         findFirstOptionIndex() {
             return this.visibleOptions.findIndex((processedOption) => this.isValidOption(processedOption));
@@ -693,7 +712,7 @@ export default {
         findLastOptionIndex() {
             return findLastIndex(this.visibleOptions, (processedOption) => this.isValidOption(processedOption));
         },
-        findNextOptionIndex(index) {
+        findNextOptionIndex(index: number) {
             const matchedOptionIndex =
                 index < this.visibleOptions.length - 1
                     ? this.visibleOptions.slice(index + 1).findIndex((processedOption) => this.isValidOption(processedOption))
@@ -701,7 +720,7 @@ export default {
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + index + 1 : index;
         },
-        findPrevOptionIndex(index) {
+        findPrevOptionIndex(index: number) {
             const matchedOptionIndex =
                 index > 0 ? findLastIndex(this.visibleOptions.slice(0, index), (processedOption) => this.isValidOption(processedOption)) : -1;
 
@@ -720,20 +739,15 @@ export default {
 
             return selectedIndex < 0 ? this.findLastOptionIndex() : selectedIndex;
         },
-        findOptionPathByValue(value, processedOptions, level = 0) {
-            processedOptions = processedOptions || (level === 0 && this.processedOptions);
-
-            if (!processedOptions) return null;
+        findOptionPathByValue(value: unknown, processedOptions?: ProcessedOption[]): ProcessedOption[] | undefined {
             if (isEmpty(value)) return [];
 
-            for (let i = 0; i < processedOptions.length; i++) {
-                const processedOption = processedOptions[i];
-
+            for (const processedOption of processedOptions ?? this.processedOptions) {
                 if (equals(value, this.getOptionValue(processedOption.option), this.equalityKey)) {
                     return [processedOption];
                 }
 
-                const matchedOptions = this.findOptionPathByValue(value, processedOption.children, level + 1);
+                const matchedOptions = this.findOptionPathByValue(value, processedOption.children);
 
                 if (matchedOptions) {
                     matchedOptions.unshift(processedOption);
@@ -742,7 +756,7 @@ export default {
                 }
             }
         },
-        searchOptions(event, char) {
+        searchOptions(event: KeyboardEvent, char: string) {
             this.searchValue = (this.searchValue || '') + char;
 
             let optionIndex = -1;
@@ -783,7 +797,7 @@ export default {
 
             return matched;
         },
-        changeFocusedOptionIndex(event, index, preventSelection) {
+        changeFocusedOptionIndex(event: Event | undefined, index: number, preventSelection?: boolean) {
             if (this.focusedOptionInfo.index !== index) {
                 this.focusedOptionInfo.index = index;
                 this.scrollInView();
@@ -800,7 +814,7 @@ export default {
         scrollInView(index = -1) {
             this.$nextTick(() => {
                 const id = index !== -1 ? `${this.$id}_${index}` : this.focusedOptionId;
-                const element = findSingle(this.list, `li[id="${id}"]`);
+                const element = findSingle(this.overlay, `li[id="${id}"]`);
 
                 if (element) {
                     element.scrollIntoView && element.scrollIntoView({ block: 'nearest', inline: 'start' });
@@ -815,33 +829,34 @@ export default {
                 !this.overlayVisible && (this.focusedOptionInfo = { index: -1, level: 0, parentKey: '' });
             }
         },
-        updateModel(event, value) {
+        updateModel(event: Event | undefined, value: unknown) {
             this.writeValue(value, event);
             this.$emit('change', { originalEvent: event, value });
         },
-        createProcessedOptions(options, level = 0, parent = {}, parentKey = '') {
-            const processedOptions = [];
+        createProcessedOptions(options: unknown[] | undefined, level = 0, parent: ProcessedOption['parent'] = {}, parentKey = ''): ProcessedOption[] {
+            const processedOptions: ProcessedOption[] = [];
 
             options &&
                 options.forEach((option, index) => {
                     const key = (parentKey !== '' ? parentKey + '_' : '') + index;
-                    const newOption = {
+                    const newOption: ProcessedOption = {
                         option,
                         index,
                         level,
                         key,
                         parent,
-                        parentKey
+                        parentKey,
+                        children: []
                     };
 
-                    newOption['children'] = this.createProcessedOptions(this.getOptionGroupChildren(option, level), level + 1, newOption, key);
+                    newOption.children = this.createProcessedOptions(this.getOptionGroupChildren(option, level), level + 1, newOption, key);
                     processedOptions.push(newOption);
                 });
 
             return processedOptions;
         },
-        overlayRef(el) {
-            this.overlay = el;
+        overlayRef(el: Element | ComponentPublicInstance | null) {
+            this.overlay = el instanceof HTMLElement ? el : null;
         }
     },
     computed: {
@@ -854,7 +869,7 @@ export default {
 
             if (this.$filled) {
                 const activeOptionPath = this.findOptionPathByValue(this.d_value);
-                const processedOption = isNotEmpty(activeOptionPath) ? activeOptionPath[activeOptionPath.length - 1] : null;
+                const processedOption = activeOptionPath?.[activeOptionPath.length - 1];
 
                 return processedOption ? this.getOptionLabel(processedOption.option) : label;
             }
@@ -870,25 +885,25 @@ export default {
             return processedOption ? processedOption.children : this.processedOptions;
         },
         equalityKey() {
-            return this.optionValue ? null : this.dataKey;
+            return this.optionValue ? undefined : this.dataKey;
         },
         searchResultMessageText() {
-            return isNotEmpty(this.visibleOptions) ? this.searchMessageText.replaceAll('{0}', this.visibleOptions.length) : this.emptySearchMessageText;
+            return isNotEmpty(this.visibleOptions) ? this.searchMessageText.replaceAll('{0}', String(this.visibleOptions.length)) : this.emptySearchMessageText;
         },
         searchMessageText() {
-            return this.searchMessage || this.$primevue.config.locale.searchMessage || '';
+            return this.searchMessage || this.$primevue?.config.locale?.searchMessage || '';
         },
         emptySearchMessageText() {
-            return this.emptySearchMessage || this.$primevue.config.locale.emptySearchMessage || '';
+            return this.emptySearchMessage || this.$primevue?.config.locale?.emptySearchMessage || '';
         },
         emptyMessageText() {
-            return this.emptyMessage || this.$primevue.config.locale.emptyMessage || '';
+            return this.emptyMessage || this.$primevue?.config.locale?.emptyMessage || '';
         },
         selectionMessageText() {
-            return this.selectionMessage || this.$primevue.config.locale.selectionMessage || '';
+            return this.selectionMessage || this.$primevue?.config.locale?.selectionMessage || '';
         },
         emptySelectionMessageText() {
-            return this.emptySelectionMessage || this.$primevue.config.locale.emptySelectionMessage || '';
+            return this.emptySelectionMessage || this.$primevue?.config.locale?.emptySelectionMessage || '';
         },
         selectedMessageText() {
             return this.$filled ? this.selectionMessageText.replaceAll('{0}', '1') : this.emptySelectionMessageText;
@@ -910,5 +925,5 @@ export default {
         AngleRightIcon,
         TimesIcon
     }
-};
+});
 </script>

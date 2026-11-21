@@ -5,7 +5,7 @@
                 :id="getOptionId(processedOption)"
                 :class="cx('option', { processedOption })"
                 role="treeitem"
-                :aria-label="getOptionLabelToRender(processedOption)"
+                :aria-label="getOptionLabelToRender(processedOption) as string"
                 :aria-selected="isOptionGroup(processedOption) ? undefined : isOptionSelected(processedOption)"
                 :aria-expanded="isOptionGroup(processedOption) ? isOptionActive(processedOption) : undefined"
                 :aria-level="level + 1"
@@ -82,13 +82,7 @@ import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
 import Ripple from '../ripple/Ripple';
 
-interface ProcessedOption {
-    key: string;
-    option: unknown;
-    children?: ProcessedOption[];
-}
-
-type OptionResolver = string | ((option: unknown) => unknown);
+import type { OptionResolver, ProcessedOption } from './processed-option';
 
 export default defineComponent({
     name: 'CascadeSelectSub',
@@ -102,7 +96,7 @@ export default defineComponent({
     },
     props: {
         selectId: String,
-        focusedOptionId: String,
+        focusedOptionId: String as PropType<string | null>,
         options: { type: Array as PropType<ProcessedOption[]>, default: () => [] },
         optionLabel: [String, Function] as PropType<OptionResolver>,
         optionValue: [String, Function] as PropType<OptionResolver>,
@@ -110,7 +104,7 @@ export default defineComponent({
         optionGroupIcon: String,
         optionGroupLabel: [String, Function] as PropType<OptionResolver>,
         optionGroupChildren: {
-            type: [String, Array],
+            type: [String, Array, Function] as PropType<string | string[] | ((option: unknown) => unknown[])>,
             default: null
         },
         activeOptionPath: Array as PropType<ProcessedOption[]>,

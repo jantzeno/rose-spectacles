@@ -1,24 +1,25 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import CascadeSelectStyle from './style/CascadeSelectStyle';
+import type { OptionResolver } from './processed-option';
 
 export default defineComponent({
     name: 'BaseCascadeSelect',
     extends: BaseInput,
     props: {
         options: Array,
-        optionLabel: null,
-        optionValue: null,
-        optionDisabled: null,
-        optionGroupLabel: null,
-        optionGroupChildren: null,
+        optionLabel: null as unknown as PropType<OptionResolver>,
+        optionValue: null as unknown as PropType<OptionResolver>,
+        optionDisabled: null as unknown as PropType<OptionResolver>,
+        optionGroupLabel: null as unknown as PropType<OptionResolver>,
+        optionGroupChildren: null as unknown as PropType<string | string[] | ((option: unknown) => unknown[])>,
         placeholder: String,
         breakpoint: {
             type: String,
             default: '960px'
         },
-        dataKey: null,
+        dataKey: null as unknown as PropType<string>,
         showClear: {
             type: Boolean,
             default: false
