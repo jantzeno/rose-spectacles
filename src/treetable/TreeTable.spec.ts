@@ -251,6 +251,33 @@ describe('TreeTable', () => {
         }
     });
 
+    it('removes document resize listeners when unmounted during a drag', async () => {
+        const wrapper = mount({
+            components: { TreeTable, Column },
+            template: '<TreeTable resizableColumns><Column field="name" /><Column field="size" /></TreeTable>'
+        });
+        const addListener = vi.spyOn(document, 'addEventListener');
+        const removeListener = vi.spyOn(document, 'removeEventListener');
+
+        try {
+            await wrapper.get('.rs-treetable-column-resizer').trigger('mousedown');
+        } finally {
+            wrapper.unmount();
+        }
+
+        try {
+            for (const type of ['mousemove', 'mouseup']) {
+                const listener = addListener.mock.calls.find(([name]) => name === type)?.[1];
+
+                expect(listener).toBeTypeOf('function');
+                expect(removeListener).toHaveBeenCalledWith(type, listener);
+            }
+        } finally {
+            addListener.mockRestore();
+            removeListener.mockRestore();
+        }
+    });
+
     describe('legacy filtering (flat filters, filterMatchMode on Column)', () => {
         it('keeps a basic filter in the frozen TreeTable column', async () => {
             const wrapper = mount({

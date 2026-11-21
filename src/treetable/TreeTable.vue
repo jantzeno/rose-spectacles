@@ -333,6 +333,7 @@ export default {
         }
     },
     beforeUnmount() {
+        this.unbindColumnResizeEvents();
         this.destroyStyleElement();
         this.d_columns.clear();
     },
@@ -877,7 +878,7 @@ export default {
             }
 
             this.$refs.resizeHelper.style.display = 'none';
-            this.resizeColumn = null;
+            this.resizeColumnElement = null;
             this.$el.removeAttribute('data-p-unselectable-text');
             !this.isUnstyled && (this.$el.style['user-select'] = '');
 
@@ -913,30 +914,32 @@ export default {
         },
         bindColumnResizeEvents() {
             if (!this.documentColumnResizeListener) {
-                this.documentColumnResizeListener = document.addEventListener('mousemove', (event) => {
+                this.documentColumnResizeListener = (event) => {
                     if (this.columnResizing) {
                         this.onColumnResize(event);
                     }
-                });
+                };
+                document.addEventListener('mousemove', this.documentColumnResizeListener);
             }
 
             if (!this.documentColumnResizeEndListener) {
-                this.documentColumnResizeEndListener = document.addEventListener('mouseup', () => {
+                this.documentColumnResizeEndListener = () => {
                     if (this.columnResizing) {
                         this.columnResizing = false;
                         this.onColumnResizeEnd();
                     }
-                });
+                };
+                document.addEventListener('mouseup', this.documentColumnResizeEndListener);
             }
         },
         unbindColumnResizeEvents() {
             if (this.documentColumnResizeListener) {
-                document.removeEventListener('document', this.documentColumnResizeListener);
+                document.removeEventListener('mousemove', this.documentColumnResizeListener);
                 this.documentColumnResizeListener = null;
             }
 
             if (this.documentColumnResizeEndListener) {
-                document.removeEventListener('document', this.documentColumnResizeEndListener);
+                document.removeEventListener('mouseup', this.documentColumnResizeEndListener);
                 this.documentColumnResizeEndListener = null;
             }
         },
