@@ -223,6 +223,7 @@ import IconField from '../iconfield/IconField.vue';
 import InputIcon from '../inputicon/InputIcon.vue';
 import InputText from '../inputtext/InputText.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
+import { listenForOutsideOverlayClick } from '../internal/overlay-dismissal';
 import Portal from '../portal/Portal.vue';
 import Ripple from '../ripple/Ripple';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
@@ -233,7 +234,7 @@ export default {
     extends: BaseSelect,
     inheritAttrs: false,
     emits: ['change', 'focus', 'blur', 'before-show', 'before-hide', 'show', 'hide', 'filter'],
-    outsideClickListener: null,
+    stopOutsideClickListener: null,
     scrollHandler: null,
     resizeListener: null,
     labelClickListener: null,
@@ -779,22 +780,15 @@ export default {
             }
         },
         bindOutsideClickListener() {
-            if (!this.outsideClickListener) {
-                this.outsideClickListener = (event) => {
-                    const composedPath = event.composedPath();
-                    if (this.overlayVisible && this.overlay && !composedPath.includes(this.$el) && !composedPath.includes(this.overlay)) {
-                        this.hide();
-                    }
-                };
-
-                document.addEventListener('click', this.outsideClickListener, true);
+            if (!this.stopOutsideClickListener && this.overlay) {
+                this.stopOutsideClickListener = listenForOutsideOverlayClick(this.$el, this.overlay, () => {
+                    if (this.overlayVisible) this.hide();
+                });
             }
         },
         unbindOutsideClickListener() {
-            if (this.outsideClickListener) {
-                document.removeEventListener('click', this.outsideClickListener, true);
-                this.outsideClickListener = null;
-            }
+            this.stopOutsideClickListener?.();
+            this.stopOutsideClickListener = null;
         },
         bindScrollListener() {
             if (!this.scrollHandler) {

@@ -142,6 +142,7 @@ import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
 import TimesIcon from '../icons/times/TimesIcon.vue';
 import Chip from '../chip/Chip.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
+import { listenForOutsideOverlayClick } from '../internal/overlay-dismissal';
 import Portal from '../portal/Portal.vue';
 import Ripple from '../ripple/Ripple';
 import Tree from '../tree/Tree.vue';
@@ -180,7 +181,7 @@ export default {
             this.d_expandedKeys = value;
         }
     },
-    outsideClickListener: null,
+    stopOutsideClickListener: null,
     resizeListener: null,
     scrollHandler: null,
     overlay: null,
@@ -386,21 +387,15 @@ export default {
             }
         },
         bindOutsideClickListener() {
-            if (!this.outsideClickListener) {
-                this.outsideClickListener = (event) => {
-                    if (this.overlayVisible && this.isOutsideClicked(event)) {
-                        this.hide();
-                    }
-                };
-
-                document.addEventListener('click', this.outsideClickListener, true);
+            if (!this.stopOutsideClickListener && this.overlay) {
+                this.stopOutsideClickListener = listenForOutsideOverlayClick(this.$el, this.overlay, () => {
+                    if (this.overlayVisible) this.hide();
+                });
             }
         },
         unbindOutsideClickListener() {
-            if (this.outsideClickListener) {
-                document.removeEventListener('click', this.outsideClickListener, true);
-                this.outsideClickListener = null;
-            }
+            this.stopOutsideClickListener?.();
+            this.stopOutsideClickListener = null;
         },
         bindScrollListener() {
             if (!this.scrollHandler) {
@@ -434,11 +429,6 @@ export default {
                 window.removeEventListener('resize', this.resizeListener);
                 this.resizeListener = null;
             }
-        },
-        isOutsideClicked(event) {
-            const path = event.composedPath();
-
-            return !path.includes(this.$el) && !path.includes(this.overlay);
         },
         overlayRef(el) {
             this.overlay = el;

@@ -102,6 +102,7 @@ import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
 import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
 import TimesIcon from '../icons/times/TimesIcon.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
+import { listenForOutsideOverlayClick } from '../internal/overlay-dismissal';
 import Portal from '../portal/Portal.vue';
 import BaseCascadeSelect from './BaseCascadeSelect.vue';
 import CascadeSelectSub from './CascadeSelectSub.vue';
@@ -111,7 +112,7 @@ export default {
     extends: BaseCascadeSelect,
     inheritAttrs: false,
     emits: ['change', 'focus', 'blur', 'click', 'group-change', 'before-show', 'before-hide', 'hide', 'show'],
-    outsideClickListener: null,
+    stopOutsideClickListener: null,
     matchMediaListener: null,
     scrollHandler: null,
     resizeListener: null,
@@ -570,21 +571,15 @@ export default {
             }
         },
         bindOutsideClickListener() {
-            if (!this.outsideClickListener) {
-                this.outsideClickListener = (event) => {
-                    if (this.overlayVisible && this.overlay && !this.$el.contains(event.target) && !this.overlay.contains(event.target)) {
-                        this.hide();
-                    }
-                };
-
-                document.addEventListener('click', this.outsideClickListener, true);
+            if (!this.stopOutsideClickListener && this.overlay) {
+                this.stopOutsideClickListener = listenForOutsideOverlayClick(this.$el, this.overlay, () => {
+                    if (this.overlayVisible) this.hide();
+                });
             }
         },
         unbindOutsideClickListener() {
-            if (this.outsideClickListener) {
-                document.removeEventListener('click', this.outsideClickListener, true);
-                this.outsideClickListener = null;
-            }
+            this.stopOutsideClickListener?.();
+            this.stopOutsideClickListener = null;
         },
         bindScrollListener() {
             if (!this.scrollHandler) {
