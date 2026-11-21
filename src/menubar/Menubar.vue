@@ -351,6 +351,8 @@ export default {
         },
         onArrowUpKey(event) {
             const processedItem = this.visibleItems[this.focusedItemInfo.index];
+            if (!processedItem) return;
+
             const root = isEmpty(processedItem.parent);
 
             if (root) {

@@ -87,6 +87,20 @@ describe('Menubar.vue', () => {
     });
 });
 
+it('handles ArrowUp without a focusable menu item', async () => {
+    const wrapper = mount(Menubar, { props: { model: [{ label: 'Disabled', disabled: true }] } });
+
+    try {
+        await wrapper.get('[role="menubar"]').trigger('focus');
+        const event = new KeyboardEvent('keydown', { code: 'ArrowUp' });
+
+        expect(() => wrapper.vm.onKeyDown(event)).not.toThrow();
+        expect(wrapper.get('[role="menubar"]').attributes('aria-activedescendant')).toBeUndefined();
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('Menubar.vue safe triangle', () => {
     let wrapper: VueWrapper<InstanceType<typeof Menubar>>;
 
