@@ -71,18 +71,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type ComponentPublicInstance, type CSSProperties, type PropType, type StyleValue, type VNode } from 'vue';
+import { defineComponent, type ComponentPublicInstance, type CSSProperties, type PropType, type VNode } from 'vue';
 import { cn } from '../internal/utils/index';
 import { getOuterHeight } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import BodyRow from './BodyRow.vue';
+import type { VirtualScrollerContent } from './virtual-scroller-content';
 
 type TableBodyRef = Element | ComponentPublicInstance | null;
-type VirtualScrollerBody = {
-    contentRef?: (element: TableBodyRef) => void;
-    contentStyle?: StyleValue;
-};
 
 export default defineComponent({
     name: 'TableBody',
@@ -234,7 +231,7 @@ export default defineComponent({
             default: null
         },
         virtualScrollerContentProps: {
-            type: Object as PropType<VirtualScrollerBody>,
+            type: Object as PropType<VirtualScrollerContent>,
             default: null
         },
         isVirtualScrollerDisabled: {
@@ -281,7 +278,7 @@ export default defineComponent({
 
             this.rowGroupHeaderStyleObject.top = tableHeaderHeight + 'px';
         },
-        getVirtualScrollerProp<K extends keyof VirtualScrollerBody>(option: K, options?: VirtualScrollerBody) {
+        getVirtualScrollerProp<K extends keyof VirtualScrollerContent>(option: K, options?: VirtualScrollerContent) {
             return (options ?? this.virtualScrollerContentProps)?.[option];
         },
         bodyRef(el: TableBodyRef) {

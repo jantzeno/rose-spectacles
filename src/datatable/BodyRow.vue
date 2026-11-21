@@ -34,7 +34,7 @@
             :style="rowStyles"
             :tabindex="rowTabindex"
             role="row"
-            :aria-selected="selectionMode ? isSelected : null"
+            :aria-selected="selectionMode ? isSelected : undefined"
             @click="onRowClick"
             @dblclick="onRowDblClick"
             @contextmenu="onRowRightClick"
@@ -117,16 +117,21 @@
     </tr>
 </template>
 
-<script>
+<script lang="ts">
 import { equals, isNotEmpty, resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
 import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
 import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type PropType, type Slots, type StyleValue, type VNode } from 'vue';
 import BodyCell from './BodyCell.vue';
+import type { VirtualScrollerContent } from './virtual-scroller-content';
 
-export default {
+type ExpandedRows = unknown[] | Record<PropertyKey, unknown>;
+
+type BodyRowParent = { $parentInstance?: { rowHover?: boolean; selectionMode?: string; stripedRows?: boolean } };
+
+export default defineComponent({
     name: 'BodyRow',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -172,7 +177,7 @@ export default {
             default: null
         },
         columns: {
-            type: null,
+            type: Array as PropType<VNode[]>,
             default: null
         },
         frozenRow: {
@@ -216,7 +221,7 @@ export default {
             default: null
         },
         expandedRows: {
-            type: [Array, Object],
+            type: [Array, Object] as PropType<ExpandedRows>,
             default: null
         },
         selection: {
@@ -224,7 +229,7 @@ export default {
             default: null
         },
         selectionKeys: {
-            type: null,
+            type: Object as PropType<Record<PropertyKey, unknown>>,
             default: null
         },
         selectionMode: {
@@ -240,15 +245,15 @@ export default {
             default: null
         },
         rowClass: {
-            type: null,
+            type: Function as PropType<(row: unknown) => unknown>,
             default: null
         },
         rowStyle: {
-            type: null,
+            type: Function as PropType<(row: unknown) => StyleValue>,
             default: null
         },
         rowGroupHeaderStyle: {
-            type: null,
+            type: [String, Array, Object] as PropType<StyleValue>,
             default: null
         },
         editMode: {
@@ -264,7 +269,7 @@ export default {
             default: null
         },
         editingRowKeys: {
-            type: null,
+            type: Object as PropType<Record<PropertyKey, unknown>>,
             default: null
         },
         editingMeta: {
@@ -272,8 +277,8 @@ export default {
             default: null
         },
         templates: {
-            type: null,
-            default: null
+            type: Object as PropType<Slots>,
+            default: () => ({})
         },
         scrollable: {
             type: Boolean,
@@ -284,7 +289,7 @@ export default {
             default: null
         },
         virtualScrollerContentProps: {
-            type: Object,
+            type: Object as PropType<VirtualScrollerContent>,
             default: null
         },
         isVirtualScrollerDisabled: {
@@ -309,24 +314,27 @@ export default {
         expandedRows: {
             deep: true,
             immediate: true,
-            handler(newValue) {
-                this.d_rowExpanded = this.dataKey
-                    ? newValue?.[resolveFieldData(this.rowData, this.dataKey)] !== undefined
-                    : newValue?.some((d) => this.equals(this.rowData, d));
+            handler(newValue: ExpandedRows | null) {
+                this.d_rowExpanded = this.isExpanded(this.rowData, newValue);
             }
         },
         rowData(newValue) {
-            this.d_rowExpanded = this.dataKey
-                ? this.expandedRows?.[resolveFieldData(newValue, this.dataKey)] !== undefined
-                : this.expandedRows?.some((d) => this.equals(newValue, d));
+            this.d_rowExpanded = this.isExpanded(newValue, this.expandedRows);
         }
     },
     methods: {
-        columnProp(col, prop) {
+        isExpanded(row: unknown, expandedRows: ExpandedRows | null) {
+            if (this.dataKey) {
+                const key: PropertyKey = resolveFieldData(row, this.dataKey);
+                return (expandedRows as Record<PropertyKey, unknown> | null)?.[key] !== undefined;
+            }
+
+            return Array.isArray(expandedRows) && expandedRows.some((entry) => this.equals(row, entry));
+        },
+        columnProp(col: VNode, prop: string) {
             return getVNodeProp(col, prop);
         },
-        //@todo - update this method
-        getColumnPT(key) {
+        getColumnPT(key: string) {
             const columnMetaData = {
                 parent: {
                     instance: this,
@@ -335,15 +343,11 @@ export default {
                 }
             };
 
-            return mergeProps(
-                this.ptm(`column.${key}`, { column: columnMetaData }),
-                this.ptm(`column.${key}`, columnMetaData),
-                this.ptmo(this.columnProp({}, 'pt'), key, columnMetaData)
-            );
+            return mergeProps(this.ptm(`column.${key}`, { column: columnMetaData }), this.ptm(`column.${key}`, columnMetaData));
         },
-        //@todo - update this method
-        getBodyRowPTOptions(key) {
-            const datatable = this.$parentInstance?.$parentInstance;
+        getBodyRowPTOptions(key: string) {
+            const { $parentInstance: parent } = this as typeof this & { $parentInstance?: BodyRowParent };
+            const datatable = parent?.$parentInstance;
 
             return this.ptm(key, {
                 context: {
@@ -354,7 +358,7 @@ export default {
                 }
             });
         },
-        shouldRenderBodyCell(column) {
+        shouldRenderBodyCell(column: VNode) {
             const isHidden = this.columnProp(column, 'hidden');
 
             if (this.rowGroupMode && !isHidden) {
@@ -382,7 +386,7 @@ export default {
                 return !isHidden;
             }
         },
-        calculateRowGroupSize(column) {
+        calculateRowGroupSize(column: VNode) {
             if (this.isGrouped(column)) {
                 let index = this.rowIndex;
                 const field = this.columnProp(column, 'field');
@@ -408,7 +412,7 @@ export default {
                 return null;
             }
         },
-        isGrouped(column) {
+        isGrouped(column: VNode) {
             const field = this.columnProp(column, 'field');
 
             if (this.groupRowsBy && field) {
@@ -418,10 +422,10 @@ export default {
                 return false;
             }
         },
-        findIndexInSelection(data) {
-            return this.findIndex(data, this.selection);
+        findIndexInSelection(data: unknown) {
+            return Array.isArray(this.selection) ? this.findIndex(data, this.selection) : -1;
         },
-        findIndex(data, collection) {
+        findIndex(data: unknown, collection: unknown[] | null) {
             let index = -1;
 
             if (collection && collection.length) {
@@ -435,81 +439,82 @@ export default {
 
             return index;
         },
-        equals(data1, data2) {
-            return this.compareSelectionBy === 'equals' ? data1 === data2 : equals(data1, data2, this.dataKey);
+        equals(data1: unknown, data2: unknown) {
+            if (this.compareSelectionBy === 'equals') return data1 === data2;
+            if (typeof this.dataKey === 'function') return resolveFieldData(data1, this.dataKey) === resolveFieldData(data2, this.dataKey);
+
+            return equals(data1, data2, this.dataKey ?? undefined);
         },
-        onRowGroupToggle(event) {
+        onRowGroupToggle(event: MouseEvent) {
             this.$emit('rowgroup-toggle', { originalEvent: event, data: this.rowData });
         },
-        onRowClick(event) {
+        onRowClick(event: MouseEvent) {
             this.$emit('row-click', { originalEvent: event, data: this.rowData, index: this.rowIndex });
         },
-        onRowDblClick(event) {
+        onRowDblClick(event: MouseEvent) {
             this.$emit('row-dblclick', { originalEvent: event, data: this.rowData, index: this.rowIndex });
         },
-        onRowRightClick(event) {
+        onRowRightClick(event: MouseEvent) {
             this.$emit('row-rightclick', { originalEvent: event, data: this.rowData, index: this.rowIndex });
         },
-        onRowTouchEnd(event) {
+        onRowTouchEnd(event: TouchEvent) {
             this.$emit('row-touchend', event);
         },
-        onRowKeyDown(event) {
+        onRowKeyDown(event: KeyboardEvent) {
             this.$emit('row-keydown', { originalEvent: event, data: this.rowData, index: this.rowIndex });
         },
-        onRowMouseDown(event) {
+        onRowMouseDown(event: MouseEvent) {
             this.$emit('row-mousedown', event);
         },
-        onRowDragStart(event) {
+        onRowDragStart(event: DragEvent) {
             this.$emit('row-dragstart', { originalEvent: event, index: this.rowIndex });
         },
-        onRowDragOver(event) {
+        onRowDragOver(event: DragEvent) {
             this.$emit('row-dragover', { originalEvent: event, index: this.rowIndex });
         },
-        onRowDragLeave(event) {
+        onRowDragLeave(event: DragEvent) {
             this.$emit('row-dragleave', event);
         },
-        onRowDragEnd(event) {
+        onRowDragEnd(event: DragEvent) {
             this.$emit('row-dragend', event);
         },
-        onRowDrop(event) {
+        onRowDrop(event: DragEvent) {
             this.$emit('row-drop', event);
         },
-        onRowToggle(event) {
+        onRowToggle(event: { originalEvent: Event; data: unknown }) {
             this.d_rowExpanded = !this.d_rowExpanded;
 
             this.$emit('row-toggle', { ...event, expanded: this.d_rowExpanded });
         },
-        onRadioChange(event) {
+        onRadioChange(event: unknown) {
             this.$emit('radio-change', event);
         },
-        onCheckboxChange(event) {
+        onCheckboxChange(event: unknown) {
             this.$emit('checkbox-change', event);
         },
-        onCellEditInit(event) {
+        onCellEditInit(event: unknown) {
             this.$emit('cell-edit-init', event);
         },
-        onCellEditComplete(event) {
+        onCellEditComplete(event: unknown) {
             this.$emit('cell-edit-complete', event);
         },
-        onCellEditCancel(event) {
+        onCellEditCancel(event: unknown) {
             this.$emit('cell-edit-cancel', event);
         },
-        onRowEditInit(event) {
+        onRowEditInit(event: unknown) {
             this.$emit('row-edit-init', event);
         },
-        onRowEditSave(event) {
+        onRowEditSave(event: unknown) {
             this.$emit('row-edit-save', event);
         },
-        onRowEditCancel(event) {
+        onRowEditCancel(event: unknown) {
             this.$emit('row-edit-cancel', event);
         },
-        onEditingMetaChange(event) {
+        onEditingMetaChange(event: unknown) {
             this.$emit('editing-meta-change', event);
         },
-        getVirtualScrollerProp(option, options) {
-            options = options || this.virtualScrollerContentProps;
-
-            return options ? options[option] : null;
+        getVirtualScrollerProp(option: 'getItemOptions', options?: VirtualScrollerContent) {
+            return (options ?? this.virtualScrollerContentProps)?.[option];
         }
     },
     computed: {
@@ -522,7 +527,7 @@ export default {
             return this.rowStyle?.(this.rowData);
         },
         rowClasses() {
-            let rowStyleClass = [];
+            const rowStyleClass: unknown[] = [];
             let columnSelectionMode = null;
 
             if (this.rowClass) {
@@ -587,7 +592,7 @@ export default {
         },
         isSelectedWithContextMenu() {
             if (this.rowData && this.contextMenuSelection) {
-                return this.equals(this.rowData, this.contextMenuSelection, this.dataKey);
+                return this.equals(this.rowData, this.contextMenuSelection);
             }
 
             return false;
@@ -641,5 +646,5 @@ export default {
         ChevronDownIcon: ChevronDownIcon,
         ChevronRightIcon: ChevronRightIcon
     }
-};
+});
 </script>
