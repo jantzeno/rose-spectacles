@@ -145,6 +145,33 @@ const mountAdvanced = ({
 
 describe('TreeTable', () => {
     describe('legacy filtering (flat filters, filterMatchMode on Column)', () => {
+        it('keeps a basic filter in the frozen TreeTable column', async () => {
+            const wrapper = mount({
+                components: { TreeTable, Column },
+                data: () => ({ nodes: createNodes() }),
+                template: `
+                    <TreeTable :value="nodes" scrollable>
+                        <Column field="name" header="Name" frozen>
+                            <template #filter><input aria-label="Filter name" /></template>
+                        </Column>
+                        <Column field="type" header="Type" />
+                    </TreeTable>
+                `
+            });
+
+            try {
+                await nextTick();
+                const filterCell = wrapper.get('input[aria-label="Filter name"]').element.closest('th');
+                const headerCell = wrapper.get('.rs-treetable-thead tr:first-child th');
+
+                expect(filterCell?.classList.contains('rs-treetable-frozen-column')).toBe(true);
+                expect(filterCell?.style.insetInlineStart).toBe((headerCell.element as HTMLElement).style.insetInlineStart);
+                expect(filterCell?.style.insetInlineStart).toBe('0px');
+            } finally {
+                wrapper.unmount();
+            }
+        });
+
         it('should keep the whole subtree of a matching node in lenient mode', async () => {
             const wrapper = mountLegacy({ filters: { name: 'vue' } });
 

@@ -223,13 +223,12 @@ export default {
                     this.styleObject.insetInlineStart = pos + 'px';
                 }
 
-                let filterRow = this.$el.parentElement.nextElementSibling;
+                const filterRow = this.$el.parentElement?.nextElementSibling;
+                const filterCell = filterRow?.children[getIndex(this.$el)];
 
-                if (filterRow) {
-                    let index = getIndex(this.$el);
-
-                    filterRow.children[index].style['inset-inline-start'] = this.styleObject['inset-inline-start'];
-                    filterRow.children[index].style['inset-inline-end'] = this.styleObject['inset-inline-end'];
+                if (filterCell?.hasAttribute('data-p-frozen-column')) {
+                    if (this.styleObject.insetInlineStart) filterCell.style.insetInlineStart = this.styleObject.insetInlineStart;
+                    if (this.styleObject.insetInlineEnd) filterCell.style.insetInlineEnd = this.styleObject.insetInlineEnd;
                 }
             }
         },

@@ -30,12 +30,12 @@ const classes = {
         }
     ],
     thead: 'rs-treetable-thead',
-    headerCell: ({ instance, props, filterCell }: StyleContext) =>
+    headerCell: ({ instance, props, filterCell, frozen }: StyleContext) =>
         filterCell
             ? [
                   'rs-treetable-header-cell',
                   {
-                      'rs-treetable-frozen-column': instance.columnProp('frozen')
+                      'rs-treetable-frozen-column': frozen ?? instance.columnProp('frozen')
                   }
               ]
             : [

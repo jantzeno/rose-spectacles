@@ -119,6 +119,7 @@
                                 v-else-if="!columnProp(col, 'hidden')"
                                 :class="getFilterColumnHeaderClass(col)"
                                 :style="[columnProp(col, 'style'), columnProp(col, 'filterHeaderStyle')]"
+                                :data-p-frozen-column="columnProp(col, 'frozen')"
                                 v-bind="ptm('headerCell', ptHeaderCellOptions(col))"
                             >
                                 <component v-if="col.children && col.children.filter" :is="col.children.filter" :column="col" :index="i" />
@@ -473,7 +474,7 @@ export default {
             this.$emit('update:first', this.d_first);
         },
         getFilterColumnHeaderClass(column) {
-            return [this.cx('headerCell', { column }), this.columnProp(column, 'filterHeaderClass')];
+            return [this.cx('headerCell', { filterCell: true, frozen: !!this.columnProp(column, 'frozen') }), this.columnProp(column, 'filterHeaderClass')];
         },
         onColumnHeaderClick(e) {
             let event = e.originalEvent;
