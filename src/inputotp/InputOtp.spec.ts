@@ -1,8 +1,56 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import type { InputOtpChangeEvent } from 'rose-spectacles/inputotp';
 import PrimeVue from '../config/Config';
-import { nextTick } from 'vue';
+import { h, nextTick } from 'vue';
+import Form from '../forms/form/Form.vue';
 import InputOtp from './InputOtp.vue';
+
+it('accepts only one character in the last OTP field inside a form', async () => {
+    const wrapper = mount({
+        render: () => h(Form, null, { default: () => h(InputOtp, { name: 'code', integerOnly: true }) })
+    });
+
+    try {
+        const last = wrapper.findAll('input')[3];
+
+        await last.setValue('5');
+        last.element.setSelectionRange(1, 1);
+
+        const secondDigit = new KeyboardEvent('keydown', { key: '6', cancelable: true, bubbles: true });
+
+        last.element.dispatchEvent(secondDigit);
+        expect(secondDigit.defaultPrevented).toBe(true);
+        expect(last.element.maxLength).toBe(1);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('validates the combined OTP value in a Vue form', async () => {
+    const resolver = vi.fn(({ values }: { values: Record<string, string> }) => ({
+        values,
+        errors: values.code?.length === 4 ? {} : { code: [{ message: 'Enter all four digits' }] }
+    }));
+    const wrapper = mount({
+        render: () => h(Form, { resolver }, { default: () => h(InputOtp, { name: 'code', integerOnly: true }) })
+    });
+
+    try {
+        const inputs = wrapper.findAll('input');
+
+        for (const [index, digit] of ['1', '2', '3', '4'].entries()) {
+            await inputs[index].setValue(digit);
+        }
+
+        await wrapper.get('form').trigger('submit');
+        await nextTick();
+
+        expect(resolver.mock.calls.at(-1)?.[0].values.code).toBe('1234');
+        expect(wrapper.getComponent(Form).emitted('submit')?.at(-1)?.[0]).toMatchObject({ valid: true });
+    } finally {
+        wrapper.unmount();
+    }
+});
 
 describe('InputOtp.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof InputOtp>>;

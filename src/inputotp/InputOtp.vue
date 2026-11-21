@@ -8,6 +8,7 @@
                     :class="cx('pcInputText')"
                     :name="$formName ? $formName + '_' + (i - 1) : undefined"
                     :inputmode="inputMode"
+                    :maxlength="1"
                     :variant="variant"
                     :readonly="readonly"
                     :disabled="disabled"
@@ -166,7 +167,7 @@ export default {
                 default:
                     const target = event.target;
                     const hasSelection = target.selectionStart !== target.selectionEnd;
-                    const isAtMaxLength = this.tokens.join('').length >= this.length;
+                    const isAtMaxLength = target.value.length >= 1 || this.tokens.join('').length >= this.length;
                     const isValidKey = this.integerOnly ? /^[0-9]$/.test(event.key) : true;
 
                     if (!isValidKey || (isAtMaxLength && event.key !== 'Delete' && !hasSelection)) {
