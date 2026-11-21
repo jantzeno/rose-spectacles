@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import InputChipsStyle from './style/InputChipsStyle';
 
@@ -8,7 +8,7 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         modelValue: {
-            type: Array,
+            type: Array as PropType<unknown[]>,
             default: null
         },
         max: {
@@ -16,7 +16,7 @@ export default defineComponent({
             default: null
         },
         separator: {
-            type: [String, Object],
+            type: [String, Object] as PropType<string | RegExp>,
             default: null
         },
         addOnBlur: {

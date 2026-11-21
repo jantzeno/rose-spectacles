@@ -8,7 +8,7 @@
             aria-orientation="horizontal"
             :aria-labelledby="ariaLabelledby"
             :aria-label="ariaLabel"
-            :aria-activedescendant="focused ? focusedOptionId : undefined"
+            :aria-activedescendant="focused ? (focusedOptionId ?? undefined) : undefined"
             @click="onWrapperClick()"
             @focus="onContainerFocus"
             @blur="onContainerBlur"
@@ -21,18 +21,18 @@
                 :id="$id + '_inputchips_item_' + i"
                 role="option"
                 :class="cx('chipItem', { index: i })"
-                :aria-label="val"
+                :aria-label="val as string | undefined"
                 :aria-selected="true"
-                :aria-setsize="modelValue.length"
+                :aria-setsize="modelValue?.length"
                 :aria-posinset="i + 1"
                 v-bind="ptm('chipItem')"
                 :data-p-focused="focusedIndex === i"
             >
-                <slot name="chip" :class="cx('pcChip')" :index="i" :value="val" :removeCallback="(event) => removeItem(event, i)">
+                <slot name="chip" :class="cx('pcChip')" :index="i" :value="val" :removeCallback="(event: Event) => removeItem(event, i)">
                     <!-- TODO: removetokenicon and removeTokenIcon  deprecated since v4.0. Use chipicon slot and chipIcon prop-->
                     <Chip
                         :class="cx('pcChip')"
-                        :label="val"
+                        :label="val as string | undefined"
                         :removeIcon="chipIcon || removeTokenIcon"
                         removable
                         :unstyled="unstyled"
@@ -44,7 +44,7 @@
                                 :name="$slots.chipicon ? 'chipicon' : 'removetokenicon'"
                                 :class="cx('chipIcon')"
                                 :index="i"
-                                :removeCallback="(event) => removeItem(event, i)"
+                                :removeCallback="(event: Event) => removeItem(event, i)"
                             />
                         </template>
                     </Chip>
@@ -72,11 +72,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import Chip from '../chip/Chip.vue';
 import BaseInputChips from './BaseInputChips.vue';
 
-export default {
+export default defineComponent({
     name: 'InputChips',
     extends: BaseInputChips,
     inheritAttrs: false,
@@ -85,7 +86,7 @@ export default {
         return {
             inputValue: '',
             focused: false,
-            focusedIndex: null
+            focusedIndex: null as number | null
         };
     },
     mounted() {
@@ -93,31 +94,31 @@ export default {
     },
     methods: {
         onWrapperClick() {
-            this.$refs.input.focus();
+            (this.$refs.input as HTMLInputElement).focus();
         },
-        onInput(event) {
-            this.inputValue = event.target.value;
+        onInput(event: Event) {
+            this.inputValue = (event.target as HTMLInputElement).value;
             this.focusedIndex = null;
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.focused = true;
             this.focusedIndex = null;
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.focused = false;
             this.focusedIndex = null;
 
             if (this.addOnBlur) {
-                this.addItem(event, event.target.value, false);
+                this.addItem(event, (event.target as HTMLInputElement).value, false);
             }
 
             this.$emit('blur', event);
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (event.isComposing) return;
 
-            const inputValue = event.target.value;
+            const inputValue = (event.target as HTMLInputElement).value;
 
             switch (event.code) {
                 case 'Backspace':
@@ -139,7 +140,7 @@ export default {
 
                 case 'ArrowLeft':
                     if (inputValue.length === 0 && this.modelValue && this.modelValue.length > 0) {
-                        this.$refs.container.focus();
+                        (this.$refs.container as HTMLElement).focus();
                     }
 
                     break;
@@ -158,11 +159,12 @@ export default {
                     break;
             }
         },
-        onPaste(event) {
+        onPaste(event: ClipboardEvent) {
             if (this.separator) {
                 const separator =
                     typeof this.separator === 'string' ? this.separator.replace('\\n', '\n').replace('\\r', '\r').replace('\\t', '\t') : this.separator;
-                let pastedData = (event.clipboardData || window['clipboardData']).getData('Text');
+                const legacyClipboard = (window as Window & { clipboardData?: DataTransfer }).clipboardData;
+                const pastedData = (event.clipboardData ?? legacyClipboard)?.getData('Text');
 
                 if (pastedData) {
                     let value = this.modelValue || [];
@@ -181,16 +183,16 @@ export default {
             this.focusedIndex = -1;
             this.focused = false;
         },
-        onContainerKeyDown(event) {
+        onContainerKeyDown(event: KeyboardEvent) {
             if (event.isComposing) return;
 
             switch (event.code) {
                 case 'ArrowLeft':
-                    this.onArrowLeftKeyOn(event);
+                    this.onArrowLeftKeyOn();
                     break;
 
                 case 'ArrowRight':
-                    this.onArrowRightKeyOn(event);
+                    this.onArrowRightKeyOn();
                     break;
 
                 case 'Backspace':
@@ -211,24 +213,24 @@ export default {
             if (this.inputValue.length === 0 && this.modelValue && this.modelValue.length > 0) {
                 if (this.focusedIndex === this.modelValue.length - 1) {
                     this.focusedIndex = null;
-                    this.$refs.input.focus();
+                    this.onWrapperClick();
                 } else {
-                    this.focusedIndex++;
+                    this.focusedIndex = (this.focusedIndex ?? 0) + 1;
                 }
             }
         },
-        onBackspaceKeyOn(event) {
+        onBackspaceKeyOn(event: KeyboardEvent) {
             if (this.focusedIndex !== null) {
                 this.removeItem(event, this.focusedIndex);
             }
         },
-        updateModel(event, value, preventDefault) {
+        updateModel(event: Event, value: unknown[], preventDefault: boolean) {
             this.$emit('update:modelValue', value);
             this.$emit('add', {
                 originalEvent: event,
                 value: value
             });
-            this.$refs.input.value = '';
+            (this.$refs.input as HTMLInputElement).value = '';
             this.inputValue = '';
 
             setTimeout(() => {
@@ -239,7 +241,7 @@ export default {
                 event.preventDefault();
             }
         },
-        addItem(event, item, preventDefault) {
+        addItem(event: Event, item: string, preventDefault: boolean) {
             if (item && item.trim().length) {
                 let value = this.modelValue ? [...this.modelValue] : [];
 
@@ -255,16 +257,16 @@ export default {
                 event.preventDefault();
             }
         },
-        removeItem(event, index) {
+        removeItem(event: Event, index: number) {
             if (this.disabled) {
                 return;
             }
 
-            let values = [...this.modelValue];
+            const values = [...(this.modelValue ?? [])];
             const removedItem = values.splice(index, 1);
 
             this.focusedIndex = null;
-            this.$refs.input.focus();
+            this.onWrapperClick();
             this.$emit('update:modelValue', values);
             this.$emit('remove', {
                 originalEvent: event,
@@ -274,7 +276,7 @@ export default {
     },
     computed: {
         maxedOut() {
-            return this.max && this.modelValue && this.max === this.modelValue.length;
+            return !!this.max && this.max === this.modelValue?.length;
         },
         focusedOptionId() {
             return this.focusedIndex !== null ? `${this.$id}_inputchips_item_${this.focusedIndex}` : null;
@@ -283,5 +285,5 @@ export default {
     components: {
         Chip
     }
-};
+});
 </script>
