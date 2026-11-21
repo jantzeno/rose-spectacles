@@ -230,6 +230,7 @@
                                                 :aria-disabled="isOptionDisabled(option)"
                                                 :aria-setsize="ariaSetSize"
                                                 :aria-posinset="getAriaPosInset(getOptionIndex(i, getItemOptions))"
+                                                @mousedown="onOptionMouseDown"
                                                 @click="onOptionSelect($event, option)"
                                                 @mousemove="onOptionMouseMove($event, getOptionIndex(i, getItemOptions))"
                                                 :data-p-selected="isSelected(option)"
@@ -658,6 +659,9 @@ export default {
             }
 
             this.$emit('dropdown-click', { originalEvent: event, query });
+        },
+        onOptionMouseDown(event) {
+            if (this.forceSelection && event.button === 0) event.preventDefault();
         },
         onOptionSelect(event, option, isHide = true) {
             const value = this.getOptionValue(option);

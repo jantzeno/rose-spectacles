@@ -78,6 +78,28 @@ it('renders the content slot in place of the default suggestion list', async () 
     }
 });
 
+it.each(['Ber', 'Berlin'])('commits only the clicked suggestion with force selection after typing %s', async (query) => {
+    const wrapper = mountAutoComplete({ multiple: false, forceSelection: true, suggestions: ['Berlin', 'Berlin 2'], optionLabel: undefined });
+
+    try {
+        await openOverlay(wrapper);
+
+        const input = wrapper.get('input');
+        const option = wrapper.get('li[aria-label="Berlin 2"]');
+
+        input.element.value = query;
+        const allowsFocusChange = option.element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+
+        if (allowsFocusChange) await input.trigger('change');
+        await option.trigger('click');
+
+        expect(wrapper.emitted('update:modelValue')).toEqual([['Berlin 2']]);
+        expect(wrapper.emitted('option-select')).toEqual([[expect.objectContaining({ value: 'Berlin 2' })]]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('AutoComplete.vue', () => {
     let wrapper: AutoCompleteWrapper;
 
