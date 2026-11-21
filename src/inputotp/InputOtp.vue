@@ -29,36 +29,38 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import type { InputOtpTemplateEvents } from 'rose-spectacles/inputotp';
 import { isTouchDevice } from '../internal/utils/dom/index';
 import InputText from '../inputtext/InputText.vue';
 import BaseInputOtp from './BaseInputOtp.vue';
 
-export default {
+export default defineComponent({
     name: 'InputOtp',
     extends: BaseInputOtp,
     inheritAttrs: false,
     emits: ['change', 'focus', 'blur'],
     data() {
         return {
-            tokens: []
+            tokens: [] as Array<string | undefined>
         };
     },
     watch: {
         modelValue: {
             immediate: true,
-            handler(newValue) {
-                this.tokens = newValue ? newValue.split('') : new Array(this.length);
+            handler(newValue: unknown) {
+                this.tokens = typeof newValue === 'string' && newValue ? newValue.split('') : new Array<string | undefined>(this.length);
             }
         }
     },
     methods: {
-        getTemplateAttrs(index) {
+        getTemplateAttrs(index: number) {
             return {
                 value: this.tokens[index]
             };
         },
-        getTemplateEvents(index) {
+        getTemplateEvents(index: number): InputOtpTemplateEvents {
             return {
                 input: (event) => this.onInput(event, index),
                 keydown: (event) => this.onKeyDown(event),
@@ -67,19 +69,25 @@ export default {
                 paste: (event) => this.onPaste(event)
             };
         },
-        onInput(event, index) {
-            this.tokens[index] = event.target.value;
+        onInput(event: Event, index: number) {
+            const target = event.target;
+
+            if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+
+            const inputType = (event as InputEvent).inputType;
+
+            this.tokens[index] = target.value;
             this.updateModel(event);
 
-            if (event.inputType === 'deleteContentBackward') {
-                this.moveToPrev(event);
-            } else if (event.inputType === 'deleteContentForward') {
-                this.$nextTick(() => event.target.select());
-            } else if (event.inputType === 'insertText' || (isTouchDevice() && event instanceof CustomEvent)) {
-                this.moveToNext(event);
+            if (inputType === 'deleteContentBackward') {
+                this.moveToPrev(target);
+            } else if (inputType === 'deleteContentForward') {
+                this.$nextTick(() => target.select());
+            } else if (inputType === 'insertText' || (isTouchDevice() && event instanceof CustomEvent)) {
+                this.moveToNext(target);
             }
         },
-        updateModel(event) {
+        updateModel(event: Event) {
             const newValue = this.tokens.join('');
 
             this.writeValue(newValue, event);
@@ -88,54 +96,65 @@ export default {
                 value: newValue
             });
         },
-        moveToPrev(event) {
-            let prevInput = this.findPrevInput(event.target);
+        moveToPrev(target: Element) {
+            const prevInput = this.findPrevInput(target);
 
             if (prevInput) {
                 prevInput.focus();
                 prevInput.select();
             }
         },
-        moveToNext(event) {
-            let nextInput = this.findNextInput(event.target);
+        moveToNext(target: Element) {
+            const nextInput = this.findNextInput(target);
 
             if (nextInput) {
                 nextInput.focus();
                 nextInput.select();
             }
         },
-        findNextInput(element) {
-            let nextElement = element.nextElementSibling;
+        findNextInput(element: Element): HTMLInputElement | undefined {
+            const nextElement = element.nextElementSibling;
 
             if (!nextElement) return;
 
-            return nextElement.nodeName === 'INPUT' ? nextElement : this.findNextInput(nextElement);
+            return nextElement instanceof HTMLInputElement ? nextElement : this.findNextInput(nextElement);
         },
-        findPrevInput(element) {
-            let prevElement = element.previousElementSibling;
+        findPrevInput(element: Element): HTMLInputElement | undefined {
+            const prevElement = element.previousElementSibling;
 
             if (!prevElement) return;
 
-            return prevElement.nodeName === 'INPUT' ? prevElement : this.findPrevInput(prevElement);
+            return prevElement instanceof HTMLInputElement ? prevElement : this.findPrevInput(prevElement);
         },
-        onFocus(event) {
-            event.target.select();
+        onFocus(event: Event) {
+            const target = event.target;
+
+            if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) target.select();
+
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: Event) {
             this.$emit('blur', event);
         },
-        onClick(event) {
-            setTimeout(() => event.target.select(), 1);
+        onClick(event: MouseEvent) {
+            const target = event.target;
+
+            if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) setTimeout(() => target.select(), 1);
         },
-        onKeyDown(event) {
-            if (event.ctrlKey || event.metaKey) {
+        onKeyDown(event: Event) {
+            const target = event.target;
+
+            if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+
+            const { key, ctrlKey, metaKey } = event as KeyboardEvent;
+
+            if (ctrlKey || metaKey) {
                 return;
             }
 
-            switch (event.key) {
+            switch (key) {
                 case 'ArrowLeft':
-                    this.moveToPrev(event);
+                    this.moveToPrev(target);
                     event.preventDefault();
 
                     break;
@@ -147,15 +166,15 @@ export default {
                     break;
 
                 case 'Backspace':
-                    if (event.target.value.length === 0) {
-                        this.moveToPrev(event);
+                    if (target.value.length === 0) {
+                        this.moveToPrev(target);
                         event.preventDefault();
                     }
 
                     break;
 
                 case 'ArrowRight':
-                    this.moveToNext(event);
+                    this.moveToNext(target);
                     event.preventDefault();
 
                     break;
@@ -164,30 +183,30 @@ export default {
                 case 'Tab':
                     break;
 
-                default:
-                    const target = event.target;
+                default: {
                     const hasSelection = target.selectionStart !== target.selectionEnd;
                     const isAtMaxLength = target.value.length >= 1 || this.tokens.join('').length >= this.length;
-                    const isValidKey = this.integerOnly ? /^[0-9]$/.test(event.key) : true;
+                    const isValidKey = this.integerOnly ? /^[0-9]$/.test(key) : true;
 
-                    if (!isValidKey || (isAtMaxLength && event.key !== 'Delete' && !hasSelection)) {
+                    if (!isValidKey || (isAtMaxLength && key !== 'Delete' && !hasSelection)) {
                         event.preventDefault();
                     }
 
                     break;
+                }
             }
         },
-        onPaste(event) {
+        onPaste(event: Event) {
             if (this.readonly || this.disabled) {
                 return;
             }
 
-            let paste = event.clipboardData.getData('text');
+            const paste = (event as ClipboardEvent).clipboardData?.getData('text');
 
-            if (paste.length) {
-                let pastedCode = paste.substring(0, this.length);
+            if (paste) {
+                const pastedCode = paste.substring(0, this.length);
 
-                if (!this.integerOnly || !isNaN(pastedCode)) {
+                if (!this.integerOnly || !isNaN(Number(pastedCode))) {
                     this.tokens = pastedCode.split('');
                     this.updateModel(event);
                 }
@@ -207,5 +226,5 @@ export default {
     components: {
         OtpInputText: InputText
     }
-};
+});
 </script>

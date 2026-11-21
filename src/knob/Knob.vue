@@ -27,13 +27,14 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseKnob from './BaseKnob.vue';
 
 // Set fix value for SSR.
 const Math_PI = 3.14159265358979;
 
-export default {
+export default defineComponent({
     name: 'Knob',
     extends: BaseKnob,
     inheritAttrs: false,
@@ -48,7 +49,7 @@ export default {
         };
     },
     methods: {
-        updateValueByOffset(offsetX, offsetY) {
+        updateValueByOffset(offsetX: number, offsetY: number) {
             let dx = offsetX - this.size / 2;
             let dy = this.size / 2 - offsetY;
             let angle = Math.atan2(dy, dx);
@@ -56,7 +57,7 @@ export default {
 
             this.updateModel(angle, start);
         },
-        updateModel(angle, start) {
+        updateModel(angle: number, start: number) {
             let mappedValue;
 
             if (angle > this.maxRadians) mappedValue = this.mapRange(angle, this.minRadians, this.maxRadians, this.min, this.max);
@@ -68,67 +69,70 @@ export default {
             this.writeValue(newValue);
             this.$emit('change', newValue);
         },
-        updateModelValue(newValue) {
+        updateModelValue(newValue: number) {
             if (newValue > this.max) this.writeValue(this.max);
             else if (newValue < this.min) this.writeValue(this.min);
             else this.writeValue(newValue);
         },
-        mapRange(x, inMin, inMax, outMin, outMax) {
+        mapRange(x: number, inMin: number, inMax: number, outMin: number, outMax: number) {
             return ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
         },
-        onClick(event) {
+        onClick(event: MouseEvent) {
             if (!this.disabled && !this.readonly) {
                 this.updateValueByOffset(event.offsetX, event.offsetY);
             }
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.formField.onBlur?.(event);
         },
-        onMouseDown(event) {
+        onMouseDown(event: MouseEvent) {
             if (!this.disabled && !this.readonly) {
                 window.addEventListener('mousemove', this.onMouseMove);
                 window.addEventListener('mouseup', this.onMouseUp);
                 event.preventDefault();
             }
         },
-        onMouseUp(event) {
+        onMouseUp(event: MouseEvent) {
             if (!this.disabled && !this.readonly) {
                 window.removeEventListener('mousemove', this.onMouseMove);
                 window.removeEventListener('mouseup', this.onMouseUp);
                 event.preventDefault();
             }
         },
-        onTouchStart(event) {
+        onTouchStart(event: TouchEvent) {
             if (!this.disabled && !this.readonly) {
                 window.addEventListener('touchmove', this.onTouchMove);
                 window.addEventListener('touchend', this.onTouchEnd);
                 event.preventDefault();
             }
         },
-        onTouchEnd(event) {
+        onTouchEnd(event: TouchEvent) {
             if (!this.disabled && !this.readonly) {
                 window.removeEventListener('touchmove', this.onTouchMove);
                 window.removeEventListener('touchend', this.onTouchEnd);
                 event.preventDefault();
             }
         },
-        onMouseMove(event) {
+        onMouseMove(event: MouseEvent) {
             if (!this.disabled && !this.readonly) {
                 this.updateValueByOffset(event.offsetX, event.offsetY);
                 event.preventDefault();
             }
         },
-        onTouchMove(event) {
+        onTouchMove(event: TouchEvent) {
             if (!this.disabled && !this.readonly && event.touches.length == 1) {
-                const rect = this.$el.getBoundingClientRect();
                 const touch = event.targetTouches.item(0);
+
+                if (!touch) return;
+
+                const rect = (this.$el as HTMLElement).getBoundingClientRect();
                 const offsetX = touch.clientX - rect.left;
                 const offsetY = touch.clientY - rect.top;
 
                 this.updateValueByOffset(offsetX, offsetY);
             }
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (!this.disabled && !this.readonly) {
                 switch (event.code) {
                     case 'ArrowRight':
@@ -220,12 +224,12 @@ export default {
         },
         valueToDisplay() {
             if (typeof this.valueTemplate === 'string') {
-                return this.valueTemplate.replace(/{value}/g, this.d_value);
+                return this.valueTemplate.replace(/{value}/g, String(this.d_value));
             } else {
                 return this.valueTemplate(this.d_value);
             }
         }
     }
-};
+});
 //Derived and forked from https://github.com/kramer99/vue-knob-control
 </script>

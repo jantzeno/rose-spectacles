@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import { $dt } from '../internal/styled/index';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import KnobStyle from './style/KnobStyle';
@@ -55,7 +55,7 @@ export default defineComponent({
             default: true
         },
         valueTemplate: {
-            type: [String, Function],
+            type: [String, Function] as PropType<string | ((value: number) => string | number)>,
             default: '{value}'
         },
         tabindex: {
