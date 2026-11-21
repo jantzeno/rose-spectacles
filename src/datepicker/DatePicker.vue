@@ -2077,8 +2077,8 @@ export default defineComponent({
         safeParse(value: string): DateSelection {
             try {
                 return this.parseValue(value);
-            } catch (e) {
-                const date = new Date(value);
+            } catch {
+                const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value);
 
                 return !isNaN(date.getTime()) ? (this.isSingleSelection() ? date : [date]) : null;
             }

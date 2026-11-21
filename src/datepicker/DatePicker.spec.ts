@@ -4,6 +4,25 @@ import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
 it.each([
+    ['2026-06-10', new Date(2026, 5, 10)],
+    ['2026-06-10T01:00:00Z', new Date('2026-06-10T01:00:00Z')]
+])('formats the ISO model %s like the equivalent local Date', async (modelValue, date) => {
+    const wrapper = mount(DatePicker, { props: { modelValue: date, dateFormat: 'dd/mm/yy' }, global: { plugins: [PrimeVue] } });
+
+    try {
+        const input = wrapper.get('input');
+        const expected = input.element.value;
+
+        await wrapper.setProps({ modelValue });
+
+        expect(input.element.value).toBe(expected);
+        expect(wrapper.vm.viewDate).toEqual(date);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it.each([
     { view: 'month', current: 5, next: 6, minDate: new Date(2026, 5, 1), maxDate: new Date(2026, 6, 31) },
     { view: 'year', current: 6, next: 7, minDate: new Date(2026, 0, 1), maxDate: new Date(2027, 11, 31) }
 ])('keeps keyboard focus on selectable $view cells at the date bounds', async ({ view, current, next, minDate, maxDate }) => {
