@@ -156,6 +156,10 @@ export interface ToastMessageOptions {
      * Style class of the content.
      */
     contentStyleClass?: any;
+    /**
+     * Application data available to message templates.
+     */
+    [key: string]: unknown;
 }
 
 /**

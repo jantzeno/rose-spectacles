@@ -99,8 +99,9 @@ try {
         `
         import { createApp } from 'vue';
         import RoseSpectacles from 'rose-spectacles/config';
+        import ToastService from 'rose-spectacles/toastservice';
         import App from './App.vue';
-        createApp(App).use(RoseSpectacles).mount('#app');
+        createApp(App).use(RoseSpectacles).use(ToastService).mount('#app');
     `
     );
     await write(
@@ -108,7 +109,7 @@ try {
         `
         <script setup lang="ts">
         import { useTemplateRef } from 'vue';
-        import { Button, Form, CheckIcon } from 'rose-spectacles';
+        import { Button, Form, CheckIcon, Toast, useToast } from 'rose-spectacles';
         import Select from 'rose-spectacles/select';
         import ToastEventBus from 'rose-spectacles/toasteventbus';
         import OverlayEventBus from 'rose-spectacles/overlayeventbus';
@@ -116,8 +117,12 @@ try {
         import DynamicDialogEventBus from 'rose-spectacles/dynamicdialogeventbus';
 
         const form = useTemplateRef<InstanceType<typeof Form>>('form');
+        const toast = useToast();
         async function validateThroughTheFormRef() {
             await form.value?.validate();
+        }
+        function showProgress() {
+            toast.add({ severity: 'waiting', summary: 'Uploading', progress: 25 });
         }
 
         const eventBuses = [ToastEventBus, OverlayEventBus, ConfirmationEventBus, DynamicDialogEventBus];
@@ -133,6 +138,12 @@ try {
                 <CheckIcon label="Included" />
                 <Select :options="['draft', 'ready']" />
                 <Button label="Create" type="button" @click="validateThroughTheFormRef" />
+                <Button label="Show progress" type="button" @click="showProgress" />
+                <Toast>
+                    <template #message="{ message }">
+                        <output v-if="typeof message.progress === 'number'">{{ message.progress }}%</output>
+                    </template>
+                </Toast>
             </Form>
         </template>
     `
