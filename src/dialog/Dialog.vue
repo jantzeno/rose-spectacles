@@ -123,9 +123,17 @@ import Button from '../button/Button.vue';
 import FocusTrap from '../focustrap/FocusTrap';
 import Portal from '../portal/Portal.vue';
 import Ripple from '../ripple/Ripple';
-import { blockBodyScroll, unblockBodyScroll } from '../utils/Utils';
+import { lockBodyScroll } from '../utils/BodyScrollLock';
 import { computed } from 'vue';
 import BaseDialog from './BaseDialog.vue';
+
+const activeDialogs = new Set();
+
+function onDocumentKeyDown(event) {
+    if (event.code === 'Escape' && !event.defaultPrevented && !event.isComposing) {
+        Array.from(activeDialogs).at(-1)?.(event);
+    }
+}
 
 export default {
     name: 'Dialog',
@@ -146,7 +154,7 @@ export default {
             target: null
         };
     },
-    documentKeydownListener: null,
+    releaseBodyScroll: null,
     container: null,
     mask: null,
     content: null,
@@ -272,34 +280,35 @@ export default {
             }
 
             if (!this.modal) {
-                this.maximized ? blockBodyScroll() : unblockBodyScroll();
+                this.enableDocumentSettings();
             }
         },
         enableDocumentSettings() {
-            if (this.modal || (!this.modal && this.blockScroll) || (this.maximizable && this.maximized)) {
-                blockBodyScroll();
+            if (this.modal || this.blockScroll || (this.maximizable && this.maximized)) {
+                this.releaseBodyScroll ??= lockBodyScroll();
+            } else {
+                this.unbindDocumentState();
             }
         },
         unbindDocumentState() {
-            if (this.modal || (!this.modal && this.blockScroll) || (this.maximizable && this.maximized)) {
-                unblockBodyScroll();
-            }
+            this.releaseBodyScroll?.();
+            this.releaseBodyScroll = null;
         },
-        onKeyDown(event) {
-            if (event.code === 'Escape' && this.closeOnEscape && !event.isComposing) {
+        onEscape() {
+            if (this.visible && this.closeOnEscape) {
                 this.close();
             }
         },
         bindDocumentKeyDownListener() {
-            if (!this.documentKeydownListener) {
-                this.documentKeydownListener = this.onKeyDown.bind(this);
-                window.document.addEventListener('keydown', this.documentKeydownListener);
+            if (!activeDialogs.size) {
+                document.addEventListener('keydown', onDocumentKeyDown);
             }
+
+            activeDialogs.add(this.onEscape);
         },
         unbindDocumentKeyDownListener() {
-            if (this.documentKeydownListener) {
-                window.document.removeEventListener('keydown', this.documentKeydownListener);
-                this.documentKeydownListener = null;
+            if (activeDialogs.delete(this.onEscape) && !activeDialogs.size) {
+                document.removeEventListener('keydown', onDocumentKeyDown);
             }
         },
         containerRef(el) {
@@ -374,9 +383,7 @@ export default {
                 this.bindDocumentDragEndListener();
             }
 
-            if (this.closeOnEscape) {
-                this.bindDocumentKeyDownListener();
-            }
+            this.bindDocumentKeyDownListener();
         },
         unbindGlobalListeners() {
             this.unbindDocumentDragListener();

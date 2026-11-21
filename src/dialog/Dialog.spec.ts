@@ -1,5 +1,5 @@
 import PrimeVue from '../config/Config';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import Dialog from './Dialog.vue';
 
 describe('Dialog.vue', () => {
@@ -69,6 +69,65 @@ describe('Dialog.vue', () => {
             document.body.removeAttribute('data-p-unselectable-text');
             document.body.style.userSelect = '';
         }
+    });
+});
+
+describe('nested dialogs', () => {
+    function mountDialogs(afterInnerHide?: () => void) {
+        return mount(
+            {
+                components: { Dialog },
+                props: { innerVisible: Boolean },
+                setup() {
+                    return { afterInnerHide };
+                },
+                template: `
+                    <Dialog appendTo="self" header="Outer dialog" visible modal>
+                        <Dialog appendTo="self" header="Inner dialog" :visible="innerVisible" modal @after-hide="afterInnerHide" />
+                    </Dialog>
+                `
+            },
+            { global: { stubs: { transition: false } } }
+        );
+    }
+
+    it('dismisses only the most recently opened dialog on Escape', async () => {
+        const wrapper = mountDialogs();
+
+        try {
+            await wrapper.setProps({ innerVisible: true });
+            await flushPromises();
+
+            const [outer, inner] = wrapper.findAllComponents(Dialog);
+            document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }));
+
+            expect(inner.emitted('update:visible')).toEqual([[false]]);
+            expect(outer.emitted('update:visible')).toBeUndefined();
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('keeps the body locked when an inner modal closes', async () => {
+        let onInnerHide!: () => void;
+        const innerHidden = new Promise<void>((resolve) => {
+            onInnerHide = resolve;
+        });
+        const wrapper = mountDialogs(onInnerHide);
+
+        try {
+            await wrapper.setProps({ innerVisible: true });
+            expect(document.body.classList.contains('rs-overflow-hidden')).toBe(true);
+
+            await wrapper.setProps({ innerVisible: false });
+            await innerHidden;
+
+            expect(document.body.classList.contains('rs-overflow-hidden')).toBe(true);
+        } finally {
+            wrapper.unmount();
+        }
+
+        expect(document.body.classList.contains('rs-overflow-hidden')).toBe(false);
     });
 });
 
