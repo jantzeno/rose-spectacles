@@ -1358,10 +1358,16 @@
             "title": "Column: incorrect prop type on ColumnPassThroughMethodOptions",
             "labels": ["typescript"],
             "component": "Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The body-cell callback could read the template attribute sort-field but received undefined for props.sortField. The regression now verifies both keys return the column sort field."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-aa7n7rh1?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Column: incorrect prop type on ColumnPassThroughMethodOptions."
+            "resolvingCommit": "063467b61bade1bb16f600372e4351dd6b2a6fdb",
+            "test": {
+                "path": "src/datatable/ColumnPassThrough.spec.ts",
+                "name": "passes the camelCase column props to a DataTable cell callback"
+            }
         },
         {
             "number": 162,
@@ -1943,10 +1949,16 @@
             "title": "Global pass through for button's root label not working when providing function",
             "labels": ["bug"],
             "component": "Button",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The report reproduces only through the removed Nuxt module and explicitly reports that the same configuration works in Vite.",
+                "The retained Vue plugin passed a local test that checks a functional global Button pass-through on initial render and after changing severity."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-6gzyhaxf?file=src%2Fmain.js",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Google Chrome. Verify the reported behavior: Global pass through for button's root label not working when providing function."
+            "test": {
+                "path": "src/button/ButtonPassThrough.spec.ts",
+                "name": "updates the Button root pass-through callback when its severity changes"
+            }
         },
         {
             "number": 217,
@@ -3998,10 +4010,16 @@
             "title": "Tooltip: missing context properties for arrow passthrough",
             "labels": ["bug"],
             "component": "Tooltip",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Both the default right placement and a top tooltip flipped to bottom rendered in the expected positions, but their arrow pass-through did not receive those positions. The regression verifies the four direction flags and the arrow positioning styles."
+            ],
             "reproducer": "https://stackblitz.com/~/github.com/jhillacre/primevue-3-vite-issue-template-tvvr1d",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Tooltip: missing context properties for arrow passthrough."
+            "resolvingCommit": "8cad3273f76bd0c1d2f0b94c84e47cab29f3c84c",
+            "test": {
+                "path": "src/tooltip/Tooltip.spec.ts",
+                "name": "passes the resolved $direction placement to the tooltip arrow"
+            }
         },
         {
             "number": 417,
@@ -5137,10 +5155,16 @@
             "title": "V-styleclass: hideOnOutsideClick not working",
             "labels": ["bug"],
             "component": "StyleClass",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The linked example uses a statically positioned box. The local fixture supplies the show and hide classes on the trigger that sets hideOnOutsideClick. It reproduced the outside-click listener unregistering immediately on visible static targets and now verifies that outside clicks hide the box."
+            ],
             "reproducer": "https://stackblitz.com/edit/1mg1dh?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: V-styleclass: hideOnOutsideClick not working."
+            "resolvingCommit": "3411c537b4ca8c72a51ab7cf452c892fabd16df5",
+            "test": {
+                "path": "src/styleclass/StyleClass.spec.ts",
+                "name": "hides a statically positioned target after an outside click"
+            }
         },
         {
             "number": 527,
