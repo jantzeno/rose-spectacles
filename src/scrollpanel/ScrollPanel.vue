@@ -39,41 +39,44 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { addClass, getHeight, removeClass } from '../internal/utils/dom/index';
 import BaseScrollPanel from './BaseScrollPanel.vue';
 
-export default {
+type ScrollElements = { content: HTMLDivElement; xBar: HTMLDivElement; yBar: HTMLDivElement };
+type ScrollAxis = 'scrollTop' | 'scrollLeft';
+
+export default defineComponent({
     name: 'ScrollPanel',
     extends: BaseScrollPanel,
     inheritAttrs: false,
-    initialized: false,
-    documentResizeListener: null,
-    documentMouseMoveListener: null,
-    documentMouseUpListener: null,
-    frame: null,
-    scrollXRatio: null,
-    scrollYRatio: null,
-    isXBarClicked: false,
-    isYBarClicked: false,
-    lastPageX: null,
-    lastPageY: null,
-    timer: null,
-    outsideClickListener: null,
     data() {
         return {
-            orientation: 'vertical',
+            initialized: false,
+            documentResizeListener: null as (() => void) | null,
+            documentMouseMoveListener: null as ((event: MouseEvent) => void) | null,
+            documentMouseUpListener: null as (() => void) | null,
+            frame: null as number | null,
+            scrollXRatio: 0,
+            scrollYRatio: 0,
+            isXBarClicked: false,
+            isYBarClicked: false,
+            lastPageX: 0,
+            lastPageY: 0,
+            timer: null as ReturnType<typeof setTimeout> | null,
+            orientation: 'vertical' as 'vertical' | 'horizontal',
             lastScrollTop: 0,
             lastScrollLeft: 0
         };
     },
     mounted() {
-        if (this.$el.offsetParent) {
+        if ((this.$el as HTMLElement).offsetParent) {
             this.initialize();
         }
     },
     updated() {
-        if (!this.initialized && this.$el.offsetParent) {
+        if (!this.initialized && (this.$el as HTMLElement).offsetParent) {
             this.initialize();
         }
     },
@@ -85,8 +88,9 @@ export default {
         this.clearTimer();
         this.unbindDocumentResizeListener();
 
-        if (this.frame) {
-            window.cancelAnimationFrame(this.frame);
+        if (this.frame !== null) {
+            if (window.cancelAnimationFrame) window.cancelAnimationFrame(this.frame);
+            else window.clearTimeout(this.frame);
         }
     },
     methods: {
@@ -96,16 +100,19 @@ export default {
             this.calculateContainerHeight();
         },
         calculateContainerHeight() {
-            let containerStyles = getComputedStyle(this.$el),
-                xBarStyles = getComputedStyle(this.$refs.xBar),
-                pureContainerHeight = getHeight(this.$el) - parseInt(xBarStyles['height'], 10);
+            const root = this.$el as HTMLElement;
+            const { content, xBar } = this.$refs as ScrollElements;
 
-            if (containerStyles['max-height'] !== 'none' && pureContainerHeight === 0) {
-                if (this.$refs.content.offsetHeight + parseInt(xBarStyles['height'], 10) > parseInt(containerStyles['max-height'], 10)) {
-                    this.$el.style.height = containerStyles['max-height'];
+            let containerStyles = getComputedStyle(root),
+                xBarStyles = getComputedStyle(xBar),
+                pureContainerHeight = getHeight(root) - parseInt(xBarStyles['height'], 10);
+
+            if (containerStyles.maxHeight !== 'none' && pureContainerHeight === 0) {
+                if (content.offsetHeight + parseInt(xBarStyles.height, 10) > parseInt(containerStyles.maxHeight, 10)) {
+                    root.style.height = containerStyles.maxHeight;
                 } else {
-                    this.$el.style.height =
-                        this.$refs.content.offsetHeight +
+                    root.style.height =
+                        content.offsetHeight +
                         parseFloat(containerStyles.paddingTop) +
                         parseFloat(containerStyles.paddingBottom) +
                         parseFloat(containerStyles.borderTopWidth) +
@@ -115,18 +122,21 @@ export default {
             }
         },
         moveBar() {
-            if (this.$refs.content) {
+            const root = this.$el as HTMLElement;
+            const { content, xBar, yBar } = this.$refs as ScrollElements;
+
+            if (content) {
                 /* horizontal scroll */
-                let totalWidth = this.$refs.content.scrollWidth;
-                let ownWidth = this.$refs.content.clientWidth;
-                let bottom = (this.$el.clientHeight - this.$refs.xBar.clientHeight) * -1;
+                let totalWidth = content.scrollWidth;
+                let ownWidth = content.clientWidth;
+                let bottom = (root.clientHeight - xBar.clientHeight) * -1;
 
                 this.scrollXRatio = ownWidth / totalWidth;
 
                 /* vertical scroll */
-                let totalHeight = this.$refs.content.scrollHeight;
-                let ownHeight = this.$refs.content.clientHeight;
-                let right = (this.$el.clientWidth - this.$refs.yBar.clientWidth) * -1;
+                let totalHeight = content.scrollHeight;
+                let ownHeight = content.clientHeight;
+                let right = (root.clientWidth - yBar.clientWidth) * -1;
 
                 this.scrollYRatio = ownHeight / totalHeight;
 
@@ -134,40 +144,40 @@ export default {
                 const scrollBarHeight = Math.max(this.scrollYRatio * 100, 10);
 
                 this.frame = this.requestAnimationFrame(() => {
-                    if (this.$refs.xBar) {
+                    if (xBar) {
                         if (this.scrollXRatio >= 1) {
-                            this.$refs.xBar.setAttribute('data-p-scrollpanel-hidden', 'true');
-                            !this.isUnstyled && addClass(this.$refs.xBar, 'rs-scrollpanel-hidden');
+                            xBar.setAttribute('data-p-scrollpanel-hidden', 'true');
+                            !this.isUnstyled && addClass(xBar, 'rs-scrollpanel-hidden');
                         } else {
-                            this.$refs.xBar.setAttribute('data-p-scrollpanel-hidden', 'false');
-                            !this.isUnstyled && removeClass(this.$refs.xBar, 'rs-scrollpanel-hidden');
+                            xBar.setAttribute('data-p-scrollpanel-hidden', 'false');
+                            !this.isUnstyled && removeClass(xBar, 'rs-scrollpanel-hidden');
 
-                            this.$refs.xBar.style.cssText =
+                            xBar.style.cssText =
                                 'width:' +
                                 scrollBarWidth +
                                 '%; inset-inline-start:' +
-                                (Math.abs(this.$refs.content.scrollLeft) / (totalWidth - ownWidth)) * (100 - scrollBarWidth) +
+                                (Math.abs(content.scrollLeft) / (totalWidth - ownWidth)) * (100 - scrollBarWidth) +
                                 '%;bottom:' +
                                 bottom +
                                 'px;';
                         }
                     }
 
-                    if (this.$refs.yBar) {
+                    if (yBar) {
                         if (this.scrollYRatio >= 1) {
-                            this.$refs.yBar.setAttribute('data-p-scrollpanel-hidden', 'true');
-                            !this.isUnstyled && addClass(this.$refs.yBar, 'rs-scrollpanel-hidden');
+                            yBar.setAttribute('data-p-scrollpanel-hidden', 'true');
+                            !this.isUnstyled && addClass(yBar, 'rs-scrollpanel-hidden');
                         } else {
-                            this.$refs.yBar.setAttribute('data-p-scrollpanel-hidden', 'false');
-                            !this.isUnstyled && removeClass(this.$refs.yBar, 'rs-scrollpanel-hidden');
+                            yBar.setAttribute('data-p-scrollpanel-hidden', 'false');
+                            !this.isUnstyled && removeClass(yBar, 'rs-scrollpanel-hidden');
 
-                            this.$refs.yBar.style.cssText =
+                            yBar.style.cssText =
                                 'height:' +
                                 scrollBarHeight +
                                 '%; top: calc(' +
-                                (this.$refs.content.scrollTop / (totalHeight - ownHeight)) * (100 - scrollBarHeight) +
+                                (content.scrollTop / (totalHeight - ownHeight)) * (100 - scrollBarHeight) +
                                 '% - ' +
-                                this.$refs.xBar.clientHeight +
+                                xBar.clientHeight +
                                 'px); inset-inline-end:' +
                                 right +
                                 'px;';
@@ -176,42 +186,48 @@ export default {
                 });
             }
         },
-        onYBarMouseDown(e) {
+        onYBarMouseDown(e: MouseEvent) {
+            const { yBar } = this.$refs as ScrollElements;
+
             this.isYBarClicked = true;
-            this.$refs.yBar.focus();
+            yBar.focus();
             this.lastPageY = e.pageY;
-            this.$refs.yBar.setAttribute('data-p-scrollpanel-grabbed', 'true');
-            !this.isUnstyled && addClass(this.$refs.yBar, 'rs-scrollpanel-grabbed');
+            yBar.setAttribute('data-p-scrollpanel-grabbed', 'true');
+            !this.isUnstyled && addClass(yBar, 'rs-scrollpanel-grabbed');
             document.body.setAttribute('data-p-scrollpanel-grabbed', 'true');
             !this.isUnstyled && addClass(document.body, 'rs-scrollpanel-grabbed');
 
             this.bindDocumentMouseListeners();
             e.preventDefault();
         },
-        onXBarMouseDown(e) {
+        onXBarMouseDown(e: MouseEvent) {
+            const { xBar, yBar } = this.$refs as ScrollElements;
+
             this.isXBarClicked = true;
-            this.$refs.xBar.focus();
+            xBar.focus();
             this.lastPageX = e.pageX;
-            this.$refs.yBar.setAttribute('data-p-scrollpanel-grabbed', 'false');
-            !this.isUnstyled && addClass(this.$refs.xBar, 'rs-scrollpanel-grabbed');
+            yBar.setAttribute('data-p-scrollpanel-grabbed', 'false');
+            !this.isUnstyled && addClass(xBar, 'rs-scrollpanel-grabbed');
             document.body.setAttribute('data-p-scrollpanel-grabbed', 'false');
             !this.isUnstyled && addClass(document.body, 'rs-scrollpanel-grabbed');
 
             this.bindDocumentMouseListeners();
             e.preventDefault();
         },
-        onScroll(event) {
-            if (this.lastScrollLeft !== event.target.scrollLeft) {
-                this.lastScrollLeft = event.target.scrollLeft;
+        onScroll(event: Event) {
+            const target = event.target as HTMLElement;
+
+            if (this.lastScrollLeft !== target.scrollLeft) {
+                this.lastScrollLeft = target.scrollLeft;
                 this.orientation = 'horizontal';
-            } else if (this.lastScrollTop !== event.target.scrollTop) {
-                this.lastScrollTop = event.target.scrollTop;
+            } else if (this.lastScrollTop !== target.scrollTop) {
+                this.lastScrollTop = target.scrollTop;
                 this.orientation = 'vertical';
             }
 
             this.moveBar();
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (this.orientation === 'vertical') {
                 switch (event.code) {
                     case 'ArrowDown': {
@@ -267,11 +283,13 @@ export default {
         onKeyUp() {
             this.clearTimer();
         },
-        repeat(bar, step) {
-            this.$refs.content[bar] += step;
+        repeat(bar: ScrollAxis, step: number) {
+            const { content } = this.$refs as ScrollElements;
+
+            content[bar] += step;
             this.moveBar();
         },
-        setTimer(bar, step) {
+        setTimer(bar: ScrollAxis, step: number) {
             this.clearTimer();
             this.timer = setTimeout(() => {
                 this.repeat(bar, step);
@@ -280,9 +298,10 @@ export default {
         clearTimer() {
             if (this.timer) {
                 clearTimeout(this.timer);
+                this.timer = null;
             }
         },
-        onDocumentMouseMove(e) {
+        onDocumentMouseMove(e: MouseEvent) {
             if (this.isXBarClicked) {
                 this.onMouseMoveForXBar(e);
             } else if (this.isYBarClicked) {
@@ -292,28 +311,34 @@ export default {
                 this.onMouseMoveForYBar(e);
             }
         },
-        onMouseMoveForXBar(e) {
+        onMouseMoveForXBar(e: MouseEvent) {
+            const { content } = this.$refs as ScrollElements;
+
             let deltaX = e.pageX - this.lastPageX;
 
             this.lastPageX = e.pageX;
 
             this.frame = this.requestAnimationFrame(() => {
-                this.$refs.content.scrollLeft += deltaX / this.scrollXRatio;
+                content.scrollLeft += deltaX / this.scrollXRatio;
             });
         },
-        onMouseMoveForYBar(e) {
+        onMouseMoveForYBar(e: MouseEvent) {
+            const { content } = this.$refs as ScrollElements;
+
             let deltaY = e.pageY - this.lastPageY;
 
             this.lastPageY = e.pageY;
 
             this.frame = this.requestAnimationFrame(() => {
-                this.$refs.content.scrollTop += deltaY / this.scrollYRatio;
+                content.scrollTop += deltaY / this.scrollYRatio;
             });
         },
-        onFocus(event) {
-            if (this.$refs.xBar.isSameNode(event.target)) {
+        onFocus(event: FocusEvent) {
+            const { xBar, yBar } = this.$refs as ScrollElements;
+
+            if (xBar === event.target) {
                 this.orientation = 'horizontal';
-            } else if (this.$refs.yBar.isSameNode(event.target)) {
+            } else if (yBar === event.target) {
                 this.orientation = 'vertical';
             }
         },
@@ -323,10 +348,12 @@ export default {
             }
         },
         onDocumentMouseUp() {
-            this.$refs.yBar.setAttribute('data-p-scrollpanel-grabbed', 'false');
-            !this.isUnstyled && removeClass(this.$refs.yBar, 'rs-scrollpanel-grabbed');
-            this.$refs.xBar.setAttribute('data-p-scrollpanel-grabbed', 'false');
-            !this.isUnstyled && removeClass(this.$refs.xBar, 'rs-scrollpanel-grabbed');
+            const { xBar, yBar } = this.$refs as ScrollElements;
+
+            yBar.setAttribute('data-p-scrollpanel-grabbed', 'false');
+            !this.isUnstyled && removeClass(yBar, 'rs-scrollpanel-grabbed');
+            xBar.setAttribute('data-p-scrollpanel-grabbed', 'false');
+            !this.isUnstyled && removeClass(xBar, 'rs-scrollpanel-grabbed');
             document.body.setAttribute('data-p-scrollpanel-grabbed', 'false');
             !this.isUnstyled && removeClass(document.body, 'rs-scrollpanel-grabbed');
 
@@ -334,22 +361,19 @@ export default {
             this.isXBarClicked = false;
             this.isYBarClicked = false;
         },
-        requestAnimationFrame(f) {
-            let frame = window.requestAnimationFrame || this.timeoutFrame;
-
-            return frame(f);
+        requestAnimationFrame(callback: FrameRequestCallback) {
+            return window.requestAnimationFrame ? window.requestAnimationFrame(callback) : window.setTimeout(() => callback(performance.now()), 0);
         },
         refresh() {
             this.moveBar();
         },
-        scrollTop(scrollTop) {
-            let scrollableHeight = this.$refs.content.scrollHeight - this.$refs.content.clientHeight;
+        scrollTop(scrollTop: number) {
+            const { content } = this.$refs as ScrollElements;
+
+            let scrollableHeight = content.scrollHeight - content.clientHeight;
 
             scrollTop = scrollTop > scrollableHeight ? scrollableHeight : scrollTop > 0 ? scrollTop : 0;
-            this.$refs.content.scrollTop = scrollTop;
-        },
-        timeoutFrame(fn) {
-            setTimeout(fn, 0);
+            content.scrollTop = scrollTop;
         },
         bindDocumentMouseListeners() {
             if (!this.documentMouseMoveListener) {
@@ -361,9 +385,7 @@ export default {
             }
 
             if (!this.documentMouseUpListener) {
-                this.documentMouseUpListener = (e) => {
-                    this.onDocumentMouseUp(e);
-                };
+                this.documentMouseUpListener = this.onDocumentMouseUp;
 
                 document.addEventListener('mouseup', this.documentMouseUpListener);
             }
@@ -400,5 +422,5 @@ export default {
             return this.$id + '_content';
         }
     }
-};
+});
 </script>
