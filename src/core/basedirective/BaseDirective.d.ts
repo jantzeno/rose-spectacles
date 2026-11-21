@@ -5,7 +5,7 @@
  * @module basedirective
  *
  */
-import { DirectiveBinding, VNode } from 'vue';
+import type { DirectiveBinding, ObjectDirective, VNode } from 'vue';
 
 export interface DirectiveInstance<T = any, V = any> {
     $name: string | undefined;
@@ -43,3 +43,11 @@ export interface DirectiveHooks<T = any, V = any> {
 export interface BaseDirectivePassThroughOptions {
     hooks?: DirectiveHooks;
 }
+
+export interface DirectiveDefinition extends ObjectDirective {
+    extend(options: Record<string, unknown>): DirectiveDefinition;
+    extend(name: string, options?: Record<string, unknown>): DirectiveDefinition;
+}
+
+declare const BaseDirective: Pick<DirectiveDefinition, 'extend'>;
+export default BaseDirective;

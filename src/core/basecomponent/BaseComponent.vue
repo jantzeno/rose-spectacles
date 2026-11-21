@@ -330,9 +330,11 @@ export default {
         ptmo(obj = {}, key = '', params = {}) {
             return this._getPTValue(obj, key, { instance: this, ...params }, false);
         },
+        /** @returns {import('vue').ClassValue} */
         cx(key = '', params = {}) {
             return !this.isUnstyled ? this._getOptionValue(this.$style.classes, key, { ...this.$params, ...params }) : undefined;
         },
+        /** @returns {import('vue').StyleValue} */
         sx(key = '', when = true, params = {}) {
             if (when) {
                 const self = this._getOptionValue(this.$style.inlineStyles, key, { ...this.$params, ...params });

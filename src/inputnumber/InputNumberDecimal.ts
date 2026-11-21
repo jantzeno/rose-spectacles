@@ -12,6 +12,12 @@
  * without passing through a double.
  */
 
+interface DecimalParts {
+    sign: '-' | '';
+    integerPart: string;
+    fractionPart: string;
+}
+
 const DECIMAL_REGEX = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/;
 
 /**
@@ -25,7 +31,7 @@ const MAX_DIGITS = 1000;
  * The source text of a number, bigint or string, or '' for anything that cannot be numeric
  * (including NaN and Infinity).
  */
-function toText(value) {
+function toText(value: unknown) {
     if (typeof value === 'string') return value.trim();
     if (typeof value === 'bigint' || (typeof value === 'number' && Number.isFinite(value))) return value.toString();
 
@@ -36,7 +42,7 @@ function toText(value) {
  * Splits a number, bigint or numeric string into its canonical sign, integer digits and fraction
  * digits, expanding exponential notation. Returns null when the value is not numeric.
  */
-function split(value) {
+function split(value: unknown): DecimalParts | null {
     const text = toText(value);
 
     if (!DECIMAL_REGEX.test(text)) {
@@ -75,14 +81,14 @@ function split(value) {
  * The value as a BigInt multiplied by 10 ** scale. BigInt reads the sign and any leading zeros
  * itself, so no further normalisation is needed here.
  */
-function scaled({ sign, integerPart, fractionPart }, scale) {
+function scaled({ sign, integerPart, fractionPart }: DecimalParts, scale: number) {
     return BigInt(sign + integerPart + fractionPart.padEnd(scale, '0'));
 }
 
 /**
  * Number of fraction digits the two values must share to be compared or added exactly.
  */
-function commonScale(left, right) {
+function commonScale(left: DecimalParts, right: DecimalParts) {
     return Math.max(left.fractionPart.length, right.fractionPart.length);
 }
 
@@ -91,7 +97,7 @@ function commonScale(left, right) {
  * trailing fraction zeros, no exponent, and '0' for every form of zero. Returns null when the
  * value is not numeric.
  */
-export function toDecimalString(value) {
+export function toDecimalString(value: unknown) {
     const decimal = split(value);
 
     if (decimal === null) {
@@ -104,7 +110,7 @@ export function toDecimalString(value) {
 /**
  * The decimal with its sign flipped, canonicalized, or null when the value is not numeric.
  */
-export function negateDecimal(value) {
+export function negateDecimal(value: unknown) {
     const decimal = toDecimalString(value);
 
     if (decimal === null || decimal === '0') {
@@ -117,7 +123,7 @@ export function negateDecimal(value) {
 /**
  * Exact sum of two decimals, or null when either operand is not numeric.
  */
-export function addDecimal(a, b) {
+export function addDecimal(a: unknown, b: unknown) {
     const left = split(a);
     const right = split(b);
 
@@ -137,7 +143,7 @@ export function addDecimal(a, b) {
 /**
  * Exact three-way comparison returning -1, 0 or 1, or null when either operand is not numeric.
  */
-export function compareDecimal(a, b) {
+export function compareDecimal(a: unknown, b: unknown) {
     const left = split(a);
     const right = split(b);
 

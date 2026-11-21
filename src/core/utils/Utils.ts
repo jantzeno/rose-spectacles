@@ -1,10 +1,11 @@
+import type { ComponentOptions, VNode } from 'vue';
 export * from '../../internal/utils/index';
 export { default as ConnectedOverlayScrollHandler } from './ConnectedOverlayScrollHandler';
 export { default as HelperSet } from './HelperSet';
 export { default as SafeTriangle } from './SafeTriangle';
 export { default as UniqueComponentId } from './UniqueComponentId';
 
-export function getVNodeProp(vnode, prop) {
+export function getVNodeProp(vnode: VNode | undefined | null, prop: string) {
     if (vnode) {
         let props = vnode.props;
 
@@ -12,7 +13,7 @@ export function getVNodeProp(vnode, prop) {
             let kebabProp = prop.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
             let propName = Object.prototype.hasOwnProperty.call(props, kebabProp) ? kebabProp : prop;
 
-            return vnode.type.extends.props[prop].type === Boolean && props[propName] === '' ? true : props[propName];
+            return (vnode.type as ComponentOptions).extends?.props?.[prop]?.type === Boolean && props[propName] === '' ? true : props[propName];
         }
     }
 

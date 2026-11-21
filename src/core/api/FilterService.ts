@@ -1,8 +1,11 @@
 import { equals, removeAccents, resolveFieldData } from '../../internal/utils/object/index';
 
+// Filter rules accept heterogeneous application values and preserve JavaScript coercion.
+type FilterRule = (value: any, filter: any, filterLocale?: string) => boolean;
+
 const FilterService = {
-    filter(value, fields, filterValue, filterMatchMode, filterLocale) {
-        let filteredItems = [];
+    filter<T>(value: T[] | null | undefined, fields: string[], filterValue: unknown, filterMatchMode: string, filterLocale?: string) {
+        const filteredItems: T[] = [];
 
         if (!value) {
             return filteredItems;
@@ -258,8 +261,8 @@ const FilterService = {
 
             return value.getTime() > filter.getTime();
         }
-    },
-    register(rule, fn) {
+    } satisfies Record<string, FilterRule> as Record<string, FilterRule>,
+    register(rule: string, fn: FilterRule) {
         this.filters[rule] = fn;
     }
 };

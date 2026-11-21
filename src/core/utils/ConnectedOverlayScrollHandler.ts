@@ -1,12 +1,18 @@
 import { getScrollableParents } from '../../internal/utils/dom/index';
 
 export default class ConnectedOverlayScrollHandler {
-    constructor(element, listener = () => {}) {
+    element: Element | null;
+    listener: EventListener | null;
+    scrollableParents: Element[] | null = null;
+
+    constructor(element: Element, listener: EventListener = () => {}) {
         this.element = element;
         this.listener = listener;
     }
 
     bindScrollListener() {
+        if (!this.element || !this.listener) return;
+
         this.scrollableParents = getScrollableParents(this.element);
 
         for (let i = 0; i < this.scrollableParents.length; i++) {
@@ -15,7 +21,7 @@ export default class ConnectedOverlayScrollHandler {
     }
 
     unbindScrollListener() {
-        if (this.scrollableParents) {
+        if (this.scrollableParents && this.listener) {
             for (let i = 0; i < this.scrollableParents.length; i++) {
                 this.scrollableParents[i].removeEventListener('scroll', this.listener);
             }

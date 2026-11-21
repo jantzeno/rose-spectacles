@@ -75,7 +75,7 @@ describe('decimal', () => {
 
     describe('addDecimal', () => {
         it('should step by 0.1 without drifting', () => {
-            let value = '0';
+            let value: string | null = '0';
 
             for (let i = 0; i < 10; i++) {
                 value = addDecimal(value, '0.1');

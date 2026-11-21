@@ -1172,7 +1172,7 @@
         },
         "./core/utils": {
             "types": "./src/core/utils/Utils.d.ts",
-            "default": "./src/core/utils/Utils.js"
+            "default": "./src/core/utils/Utils.ts"
         },
         "./icons/angledoubledown": {
             "types": "./src/icons/angledoubledown/AngleDoubleDownIcon.d.ts",
@@ -1417,7 +1417,7 @@
         },
         "./passthrough": {
             "types": "./src/passthrough/index.d.ts",
-            "default": "./src/passthrough/index.js"
+            "default": "./src/passthrough/index.ts"
         },
         "./menuitem": {
             "types": "./src/menuitem/MenuItem.d.ts"

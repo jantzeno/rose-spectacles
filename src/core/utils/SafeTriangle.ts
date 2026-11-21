@@ -1,3 +1,13 @@
+type Point = { x: number; y: number };
+type Bounds = Pick<DOMRectReadOnly, 'left' | 'right' | 'top' | 'bottom'>;
+
+interface PendingSubmenu {
+    apex: Point;
+    target: Element;
+    element: Element | null;
+    callback: () => void;
+}
+
 const HISTORY_SIZE = 10;
 
 // how far back the apex has to be, so 1px steps from high polling rate mice don't misreport the direction
@@ -9,12 +19,14 @@ const MIN_APEX_DISTANCE = 8;
  * See https://bjk5.com/post/44698559168/breaking-down-amazons-mega-dropdown
  */
 export default class SafeTriangle {
+    delay: number;
+    points: Point[] = [];
+    pending: PendingSubmenu | null = null;
+    timeout: ReturnType<typeof setTimeout> | undefined;
+    listener: ((event: PointerEvent) => void) | null = null;
+
     constructor(delay = 300) {
         this.delay = delay;
-        this.points = [];
-        this.pending = null;
-        this.timeout = null;
-        this.listener = null;
     }
 
     bind() {
@@ -46,7 +58,7 @@ export default class SafeTriangle {
      * Returns true when the pointer at `event` is heading towards `target`. The `callback` is then
      * postponed until the pointer leaves the safe area or rests, and dropped if it reaches `target`.
      */
-    defer(event, target, callback) {
+    defer(event: MouseEvent | PointerEvent, target: Element | null, callback: () => void) {
         const point = { x: event.clientX, y: event.clientY };
         const apex = this.pending ? this.pending.apex : this.findApex(point);
 
@@ -56,7 +68,7 @@ export default class SafeTriangle {
             return false;
         }
 
-        this.pending = { apex, target, element: event.currentTarget, callback };
+        this.pending = { apex, target, element: event.currentTarget as Element | null, callback };
         this.schedule();
 
         return true;
@@ -68,11 +80,11 @@ export default class SafeTriangle {
 
     cancel() {
         clearTimeout(this.timeout);
-        this.timeout = null;
+        this.timeout = undefined;
         this.pending = null;
     }
 
-    track(point) {
+    track(point: Point) {
         const last = this.points[this.points.length - 1];
 
         if (!last || last.x !== point.x || last.y !== point.y) {
@@ -81,7 +93,7 @@ export default class SafeTriangle {
         }
     }
 
-    findApex(point) {
+    findApex(point: Point) {
         let apex = null;
 
         for (let i = this.points.length - 1; i >= 0; i--) {
@@ -98,6 +110,8 @@ export default class SafeTriangle {
     }
 
     update() {
+        if (!this.pending) return;
+
         const point = this.points[this.points.length - 1];
         const rect = this.pending.target.getBoundingClientRect();
 
@@ -116,6 +130,8 @@ export default class SafeTriangle {
     }
 
     flush() {
+        if (!this.pending) return;
+
         const { element, callback } = this.pending;
         const point = this.points[this.points.length - 1];
 
@@ -128,21 +144,21 @@ export default class SafeTriangle {
     }
 }
 
-function isInsideRect(rect, { x, y }) {
+function isInsideRect(rect: Bounds, { x, y }: Point) {
     return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 }
 
-function cross(a, b, p) {
+function cross(a: Point, b: Point, p: Point) {
     return (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
 }
 
-function isInsideTriangle(a, b, c, p) {
+function isInsideTriangle(a: Point, b: Point, c: Point, p: Point) {
     const d = [cross(a, b, p), cross(b, c, p), cross(c, a, p)];
 
     return !(d.some((v) => v < 0) && d.some((v) => v > 0));
 }
 
-function isInsideSafeArea(apex, rect, point) {
+function isInsideSafeArea(apex: Point, rect: Bounds, point: Point) {
     const corners = [
         { x: rect.left, y: rect.top },
         { x: rect.right, y: rect.top },

@@ -1,3 +1,5 @@
+import type { PassThroughOptions } from 'rose-spectacles/passthrough';
+
 /**
  * @todo: Add dynamic params support;
  *
@@ -5,7 +7,7 @@
  * usePassThrough(pt1, pt2, pt3, pt*, { mergeSections: true });
  * usePassThrough(pt1, { mergeSections: true });
  */
-export const usePassThrough = (pt1 = {}, pt2 = {}, ptOptions) => {
+export const usePassThrough = (pt1: object = {}, pt2: object = {}, ptOptions?: PassThroughOptions) => {
     return {
         _usept: ptOptions,
         originalValue: pt1,
