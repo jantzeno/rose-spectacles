@@ -115,6 +115,7 @@ try {
         `
         <script setup lang="ts">
         import { ${menuComponents.join(', ')}, Form, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
+        import type DataTable from 'rose-spectacles/datatable';
         import type { FormSubmitEvent } from 'rose-spectacles/forms/form';
         import type { MenuItem } from 'rose-spectacles/menuitem';
         import type { OrganizationChartNode } from 'rose-spectacles/organizationchart';
@@ -131,6 +132,7 @@ try {
         const resolveCredentials = ({ values }: { values: Credentials }) => ({ values, errors: {} });
         const submitCredentials = ({ values }: FormSubmitEvent<Credentials>) => values.email.toUpperCase();
         const inferred = <T,>(value: T, ..._requiresKnownType: 0 extends (1 & T) ? [never] : []) => value;
+        const csvText = (table: InstanceType<typeof DataTable>): string => table.generateCSV({ selectionOnly: false }, [{ name: 'Copper' }]);
         </script>
         <template>
             ${menuComponents
@@ -217,6 +219,7 @@ try {
     run(['x', '--no-install', 'vue-tsc', '--noEmit']);
     console.log('Menu and tree slots preserve the declared types of extended models');
     console.log('Form infers the submit event and field slot types from its resolver');
+    console.log('A packed DataTable instance returns CSV text from generateCSV');
 
     await write('SlotTypes.vue', slotTypes.replaceAll('.title', '.missingField'));
     const invalidSlots = spawnSync('bun', ['x', '--no-install', 'vue-tsc', '--noEmit'], { cwd: consumer, encoding: 'utf8' });

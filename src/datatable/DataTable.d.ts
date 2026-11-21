@@ -1719,6 +1719,12 @@ export declare type DataTableEmits = EmitFn<DataTableEmitsOptions>;
 
 export interface DataTableMethods {
     /**
+     * Returns the CSV text for the requested rows.
+     * @param {DataTableExportCSVOptions} [options] - Export options.
+     * @param {Object[]} [data] - Custom exportable data.
+     */
+    generateCSV(options?: DataTableExportCSVOptions, data?: any[]): string;
+    /**
      * Exports the data to CSV format.
      * @param {DataTableExportCSVOptions} [options] - Export options.
      * @param {Object[]} [data] - Custom exportable data. This param can be used on lazy dataTable.
