@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import Popover from './Popover.vue';
 
 describe('Popover.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Popover, {

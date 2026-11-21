@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Message from './Message.vue';
 
 describe('Message.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Message, {

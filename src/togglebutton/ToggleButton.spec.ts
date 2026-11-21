@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import ToggleButton from './ToggleButton.vue';
 
 describe('ToggleButton', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(ToggleButton, {

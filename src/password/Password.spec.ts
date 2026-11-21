@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Password from './Password.vue';
 
 describe('Password.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
     const event = { target: { value: 'P' } };
 
     beforeEach(async () => {

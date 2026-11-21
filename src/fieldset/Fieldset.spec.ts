@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Fieldset from './Fieldset.vue';
 
 describe('Fieldset.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Fieldset, {

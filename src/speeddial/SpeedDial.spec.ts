@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import SpeedDial from './SpeedDial.vue';
 
 describe('SpeedDial.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(SpeedDial, {

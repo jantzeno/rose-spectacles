@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import Paginator from './Paginator.vue';
 
 describe('Paginator.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Paginator, {

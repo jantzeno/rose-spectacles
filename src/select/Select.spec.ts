@@ -1,10 +1,10 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import { h } from 'vue';
 import Select from './Select.vue';
 
 describe('Select.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -29,7 +29,7 @@ describe('Select.vue', () => {
 });
 
 describe('option checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -66,7 +66,7 @@ describe('option checks', () => {
 });
 
 describe('clear checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -99,7 +99,7 @@ describe('clear checks', () => {
 });
 
 describe('editable checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -134,7 +134,7 @@ describe('editable checks', () => {
 });
 
 describe('option groups checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -193,7 +193,7 @@ describe('option groups checks', () => {
 });
 
 describe('templating checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -245,7 +245,7 @@ describe('templating checks', () => {
 });
 
 describe('empty templating checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -275,7 +275,7 @@ describe('empty templating checks', () => {
 });
 
 describe('loader checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {
@@ -314,7 +314,7 @@ describe('loader checks', () => {
 });
 
 describe('filter checks', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(async () => {
         wrapper = mount(Select, {

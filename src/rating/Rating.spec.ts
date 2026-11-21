@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import { expect } from 'vitest';
 import Rating from './Rating.vue';
 
 describe('Rating.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Rating);

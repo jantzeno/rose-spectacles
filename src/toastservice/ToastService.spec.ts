@@ -1,10 +1,10 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import Toast from '../toast/Toast.vue';
 import ToastService from './ToastService';
 
 describe('ToastService', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(Toast, {

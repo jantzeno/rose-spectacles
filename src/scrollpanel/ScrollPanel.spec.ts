@@ -1,8 +1,8 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, type VueWrapper } from '@vue/test-utils';
 import ScrollPanel from './ScrollPanel.vue';
 
 describe('ScrollPanel.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = shallowMount(ScrollPanel, {

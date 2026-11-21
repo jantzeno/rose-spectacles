@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Button from './Button.vue';
 
 describe('Button.vue', () => {
@@ -20,7 +20,7 @@ describe('Button.vue', () => {
         const iconPos = 'right';
         const label = 'Save';
         const props = { icon, iconPos };
-        let wrapper;
+        let wrapper: VueWrapper<any>;
 
         wrapper = mount(Button, {
             props

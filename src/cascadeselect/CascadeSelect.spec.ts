@@ -1,10 +1,10 @@
 import { nextTick } from 'vue';
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import CascadeSelect from './CascadeSelect.vue';
 
 describe('CascadeSelect.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(CascadeSelect, {

@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import SelectButton from './SelectButton.vue';
 
 describe('SelectButton.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(SelectButton, {
@@ -30,7 +30,7 @@ describe('SelectButton.vue', () => {
 });
 
 describe('multiple select', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     beforeEach(() => {
         wrapper = mount(SelectButton, {

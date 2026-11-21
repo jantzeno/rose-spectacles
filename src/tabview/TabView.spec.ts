@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import TabPanel from '../tabpanel/TabPanel.vue';
 import TabView from './TabView.vue';
 
 describe('TabPanel.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<any>;
 
     window.HTMLElement.prototype.scrollIntoView = function () {};
 
