@@ -94,7 +94,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { find, findSingle, scrollInView, setAttribute } from '../internal/utils/dom/index';
 import { findIndexInList, isNotEmpty } from '../internal/utils/object/index';
 import AngleDoubleDownIcon from '../icons/angledoubledown/AngleDoubleDownIcon.vue';
@@ -104,20 +104,20 @@ import AngleUpIcon from '../icons/angleup/AngleUpIcon.vue';
 import Button from '../button/Button.vue';
 import Listbox from '../listbox/Listbox.vue';
 import Ripple from '../ripple/Ripple';
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+import type { ListboxChangeEvent } from '../listbox/Listbox';
 import BaseOrderList from './BaseOrderList.vue';
 
-export default {
+export default defineComponent({
     name: 'OrderList',
     extends: BaseOrderList,
     inheritAttrs: false,
     emits: ['update:modelValue', 'reorder', 'update:selection', 'selection-change', 'focus', 'blur'],
-    itemTouched: false,
-    reorderDirection: null,
-    styleElement: null,
-    list: null,
     data() {
         return {
-            d_selection: this.selection
+            d_selection: this.selection,
+            reorderDirection: null as 'up' | 'top' | 'down' | 'bottom' | null,
+            styleElement: null as HTMLStyleElement | null
         };
     },
     beforeUnmount() {
@@ -135,24 +135,24 @@ export default {
         }
     },
     methods: {
-        updateSelection(event) {
+        updateSelection(event: Event) {
             this.$emit('update:selection', this.d_selection);
             this.$emit('selection-change', {
                 originalEvent: event,
                 value: this.d_selection
             });
         },
-        onChangeSelection(params) {
+        onChangeSelection(params: ListboxChangeEvent) {
             this.d_selection = params.value;
             this.updateSelection(params.originalEvent);
         },
-        onListFocus(event) {
+        onListFocus(event: FocusEvent) {
             this.$emit('focus', event);
         },
-        onListBlur(event) {
+        onListBlur(event: FocusEvent) {
             this.$emit('blur', event);
         },
-        onReorderUpdate(event, value) {
+        onReorderUpdate(event: Event, value: unknown[]) {
             this.$emit('update:modelValue', value);
             this.$emit('reorder', {
                 originalEvent: event,
@@ -160,7 +160,7 @@ export default {
                 direction: this.reorderDirection
             });
         },
-        moveUp(event) {
+        moveUp(event: MouseEvent) {
             if (this.d_selection) {
                 let value = [...this.modelValue];
 
@@ -183,7 +183,7 @@ export default {
                 this.onReorderUpdate(event, value);
             }
         },
-        moveTop(event) {
+        moveTop(event: MouseEvent) {
             if (this.d_selection) {
                 let value = [...this.modelValue];
 
@@ -204,7 +204,7 @@ export default {
                 this.onReorderUpdate(event, value);
             }
         },
-        moveDown(event) {
+        moveDown(event: MouseEvent) {
             if (this.d_selection) {
                 let value = [...this.modelValue];
 
@@ -227,7 +227,7 @@ export default {
                 this.onReorderUpdate(event, value);
             }
         },
-        moveBottom(event) {
+        moveBottom(event: MouseEvent) {
             if (this.d_selection) {
                 let value = [...this.modelValue];
 
@@ -249,26 +249,28 @@ export default {
             }
         },
         updateListScroll() {
-            this.list = findSingle(this.$refs.listbox.$el, '[data-pc-section="list"]');
+            const listbox = this.$refs.listbox as ComponentPublicInstance;
+            const list = findSingle(listbox.$el, '[data-pc-section="list"]');
+            if (!(list instanceof HTMLElement)) return;
 
-            const listItems = find(this.list, '[data-pc-section="item"][data-p-selected="true"]');
+            const listItems = find(list, '[data-pc-section="item"][data-p-selected="true"]') as HTMLElement[];
 
             if (listItems && listItems.length) {
                 switch (this.reorderDirection) {
                     case 'up':
-                        scrollInView(this.list, listItems[0]);
+                        scrollInView(list, listItems[0]);
                         break;
 
                     case 'top':
-                        this.list.scrollTop = 0;
+                        list.scrollTop = 0;
                         break;
 
                     case 'down':
-                        scrollInView(this.list, listItems[listItems.length - 1]);
+                        scrollInView(list, listItems[listItems.length - 1]);
                         break;
 
                     case 'bottom':
-                        this.list.scrollTop = this.list.scrollHeight;
+                        list.scrollTop = list.scrollHeight;
                         break;
 
                     default:
@@ -310,16 +312,16 @@ export default {
     },
     computed: {
         moveUpAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveUp : undefined;
+            return this.$primevue?.config.locale?.aria?.moveUp;
         },
         moveTopAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveTop : undefined;
+            return this.$primevue?.config.locale?.aria?.moveTop;
         },
         moveDownAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveDown : undefined;
+            return this.$primevue?.config.locale?.aria?.moveDown;
         },
         moveBottomAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveBottom : undefined;
+            return this.$primevue?.config.locale?.aria?.moveBottom;
         },
         hasSelectedOption() {
             return isNotEmpty(this.d_selection);
@@ -336,5 +338,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
