@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import Toast from './Toast.vue';
 
 describe('Toast.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof Toast>>;
 
     beforeEach(() => {
         wrapper = mount(Toast, {
@@ -38,7 +38,7 @@ describe('Toast.vue', () => {
     it('should close toast', async () => {
         await wrapper.vm.remove({ message: { severity: 'success', summary: 'Success Message', detail: 'Message Content', life: 3000 }, type: 'close' });
 
-        expect(wrapper.emitted()['close'][0][0].message).not.toBe({});
+        expect(wrapper.emitted('close')?.[0]).toEqual([expect.objectContaining({ message: expect.objectContaining({ summary: 'Success Message' }) })]);
         expect(wrapper.find('.rs-toast-message').exists()).toBe(false);
     });
 

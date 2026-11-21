@@ -25,7 +25,9 @@
     </Portal>
 </template>
 
-<script>
+<script lang="ts">
+import type { ToastMessageOptions } from 'rose-spectacles/toast';
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { setAttribute } from '../internal/utils/dom/index';
 import { isEmpty } from '../internal/utils/object/index';
@@ -37,17 +39,19 @@ import ToastMessage from './ToastMessage.vue';
 
 var messageIdx = 0;
 
-export default {
+type ToastRemoval = { message: ToastMessageOptions; type: 'close' | 'life-end' };
+
+export default defineComponent({
     name: 'Toast',
     extends: BaseToast,
     inheritAttrs: false,
     emits: ['close', 'life-end'],
     data() {
         return {
-            messages: []
+            messages: [] as ToastMessageOptions[],
+            styleElement: null as HTMLStyleElement | null
         };
     },
-    styleElement: null,
     mounted() {
         ToastEventBus.on('add', this.onAdd);
         ToastEventBus.on('remove', this.onRemove);
@@ -62,7 +66,7 @@ export default {
         this.destroyStyle();
 
         if (this.$refs.container && this.autoZIndex) {
-            ZIndex.clear(this.$refs.container);
+            ZIndex.clear(this.$refs.container as HTMLElement);
         }
 
         ToastEventBus.off('add', this.onAdd);
@@ -71,14 +75,14 @@ export default {
         ToastEventBus.off('remove-all-groups', this.onRemoveAllGroups);
     },
     methods: {
-        add(message) {
+        add(message: ToastMessageOptions) {
             if (message.id == null) {
                 message.id = messageIdx++;
             }
 
             this.messages = [...this.messages, message];
         },
-        remove(params) {
+        remove(params: ToastRemoval) {
             const index = this.messages.findIndex((m) => m.id === params.message.id);
 
             if (index !== -1) {
@@ -86,15 +90,16 @@ export default {
                 this.$emit(params.type, { message: params.message });
             }
         },
-        onAdd(message) {
-            if (this.group == message.group) {
-                this.add(message);
+        onAdd(message: unknown) {
+            const toast = message as ToastMessageOptions;
+            if (this.group == toast.group) {
+                this.add(toast);
             }
         },
-        onRemove(message) {
-            this.remove({ message, type: 'close' });
+        onRemove(message: unknown) {
+            this.remove({ message: message as ToastMessageOptions, type: 'close' });
         },
-        onRemoveGroup(group) {
+        onRemoveGroup(group: unknown) {
             if (this.group === group) {
                 this.messages = [];
             }
@@ -105,13 +110,13 @@ export default {
         },
         onEnter() {
             if (this.autoZIndex) {
-                ZIndex.set('modal', this.$refs.container, this.baseZIndex || this.$primevue.config.zIndex.modal);
+                ZIndex.set('modal', this.$refs.container as HTMLElement, this.baseZIndex || this.$primevue.config.zIndex!.modal);
             }
         },
         onLeave() {
             if (this.$refs.container && this.autoZIndex && isEmpty(this.messages)) {
                 setTimeout(() => {
-                    ZIndex.clear(this.$refs.container);
+                    ZIndex.clear(this.$refs.container as HTMLElement);
                 }, 200);
             }
         },
@@ -161,5 +166,5 @@ export default {
         ToastMessage: ToastMessage,
         Portal: Portal
     }
-};
+});
 </script>

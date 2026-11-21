@@ -23,23 +23,29 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import TerminalService from '../terminalservice/TerminalService';
 import BaseTerminal from './BaseTerminal.vue';
 
-export default {
+interface TerminalCommand {
+    text: string;
+    response?: unknown;
+}
+
+export default defineComponent({
     name: 'Terminal',
     extends: BaseTerminal,
     inheritAttrs: false,
     data() {
         return {
-            commandText: null,
-            commands: []
+            commandText: null as string | null,
+            commands: [] as TerminalCommand[]
         };
     },
     mounted() {
         TerminalService.on('response', this.responseListener);
-        this.$refs.input.focus();
+        (this.$refs.input as HTMLInputElement).focus();
     },
     updated() {
         this.$el.scrollTop = this.$el.scrollHeight;
@@ -49,18 +55,18 @@ export default {
     },
     methods: {
         onClick() {
-            this.$refs.input.focus();
+            (this.$refs.input as HTMLInputElement).focus();
         },
-        onKeydown(event) {
+        onKeydown(event: KeyboardEvent) {
             if (event.key === 'Enter' && this.commandText) {
                 this.commands.push({ text: this.commandText });
                 TerminalService.emit('command', this.commandText);
                 this.commandText = '';
             }
         },
-        responseListener(response) {
+        responseListener(response: unknown) {
             this.commands[this.commands.length - 1].response = response;
         }
     }
-};
+});
 </script>
