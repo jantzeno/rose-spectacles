@@ -114,7 +114,8 @@ try {
         'ModelTypes.vue',
         `
         <script setup lang="ts">
-        import { ${menuComponents.join(', ')}, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
+        import { ${menuComponents.join(', ')}, Form, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
+        import type { FormSubmitEvent } from 'rose-spectacles/forms/form';
         import type { MenuItem } from 'rose-spectacles/menuitem';
         import type { OrganizationChartNode } from 'rose-spectacles/organizationchart';
         import type { TreeNode } from 'rose-spectacles/treenode';
@@ -122,10 +123,13 @@ try {
         interface RoutedItem extends MenuItem { route: string }
         interface LabeledTreeNode extends TreeNode { customLabel: string }
         interface Employee extends OrganizationChartNode { department: string }
+        interface Credentials { email: string; password: string }
 
         const menu: RoutedItem[] = [{ label: 'Home', route: '/home' }];
         const nodes: LabeledTreeNode[] = [{ key: 'root', customLabel: 'Reports' }];
         const employee: Employee = { key: 'manager', department: 'Sales' };
+        const resolveCredentials = ({ values }: { values: Credentials }) => ({ values, errors: {} });
+        const submitCredentials = ({ values }: FormSubmitEvent<Credentials>) => values.email.toUpperCase();
         const inferred = <T,>(value: T, ..._requiresKnownType: 0 extends (1 & T) ? [never] : []) => value;
         </script>
         <template>
@@ -145,6 +149,9 @@ try {
             <OrganizationChart :value="employee">
                 <template #default="{ node }">{{ inferred(node.department).toUpperCase() }}</template>
             </OrganizationChart>
+            <Form :resolver="resolveCredentials" @submit="submitCredentials" v-slot="fields">
+                {{ inferred(fields.email?.value)?.toUpperCase() }}
+            </Form>
         </template>
     `
     );
@@ -209,6 +216,7 @@ try {
     }
     run(['x', '--no-install', 'vue-tsc', '--noEmit']);
     console.log('Menu and tree slots preserve the declared types of extended models');
+    console.log('Form infers the submit event and field slot types from its resolver');
 
     await write('SlotTypes.vue', slotTypes.replaceAll('.title', '.missingField'));
     const invalidSlots = spawnSync('bun', ['x', '--no-install', 'vue-tsc', '--noEmit'], { cwd: consumer, encoding: 'utf8' });

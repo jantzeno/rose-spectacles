@@ -71,11 +71,11 @@ export interface FormPassThroughAttributes {
 /**
  * Resolver options for Form component.
  */
-export interface FormResolverOptions {
+export interface FormResolverOptions<T extends Record<string, any> = Record<string, any>> {
     /**
      * The values of the form fields.
      */
-    values: Record<string, any>;
+    values: T;
     /**
      * The names of the form fields.
      */
@@ -125,11 +125,11 @@ export interface FormResetEvent {
 /**
  * The state of a form field.
  */
-export interface FormFieldState {
+export interface FormFieldState<T = any> {
     /**
      * The value of the form field.
      */
-    value: any;
+    value: T;
     /**
      * Whether the form field has been touched.
      * @defaultValue false
@@ -169,16 +169,18 @@ export interface FormFieldState {
 /**
  * Defines valid properties in Form component.
  */
-export interface FormProps {
+type FormResolverResult<T> = Record<string, any> & { values?: T };
+
+export interface FormProps<T extends Record<string, any> = Record<string, any>> {
     /**
      * A function that resolves validation logic.
      * @param {FormResolverOptions} e - Resolver options
      */
-    resolver?: (e: FormResolverOptions) => Promise<Record<string, any>> | Record<string, any> | undefined;
+    resolver?: (e: FormResolverOptions<T>) => Promise<FormResolverResult<T> | undefined> | FormResolverResult<T> | undefined;
     /**
      * The initial values for the form fields.
      */
-    initialValues?: Record<string, any> | undefined;
+    initialValues?: Partial<T> | undefined;
     /**
      * Whether to validate the form fields when the values change.
      * @defaultValue true
@@ -223,7 +225,7 @@ export interface FormProps {
 /**
  * Defines valid slots in Form component.
  */
-export interface FormSlots {
+export interface FormSlots<T extends Record<string, any> = Record<string, any>> {
     /**
      * Default content slot.
      * @param {Object} scope - default slot's params.
@@ -250,6 +252,8 @@ export interface FormSlots {
              * Stores the state of each form field, with the field name as the key and its state as the value.
              */
             [key: string]: FormFieldState;
+        } & {
+            [K in keyof T]?: FormFieldState<T[K]>;
         }
     ) => VNode[];
 }
@@ -257,12 +261,12 @@ export interface FormSlots {
 /**
  * Defines valid emits in Form component.
  */
-export interface FormEmitsOptions {
+export interface FormEmitsOptions<T extends Record<string, any> = Record<string, any>> {
     /**
      * Emitted when the form is submitted.
      * @param {FormSubmitEvent} event - Custom submit event.
      */
-    submit: (event: FormSubmitEvent) => void;
+    submit: (event: FormSubmitEvent<T>) => void;
     /**
      * Emitted when the form is reset.
      * @param {FormResetEvent} event - Custom reset event.
@@ -270,9 +274,9 @@ export interface FormEmitsOptions {
     reset: (event: FormResetEvent) => void;
 }
 
-export declare type FormEmits = EmitFn<FormEmitsOptions>;
+export declare type FormEmits<T extends Record<string, any> = Record<string, any>> = EmitFn<FormEmitsOptions<T>>;
 
-export interface FormFieldState extends useFormFieldState {}
+export interface FormFieldState<T = any> extends useFormFieldState {}
 
 export interface FormInstance {
     /**
@@ -329,11 +333,15 @@ export interface FormInstance {
  * @group Component
  *
  */
-declare const Form: DefineComponent<FormProps, FormSlots, FormEmits, FormInstance>;
+declare const Form: {
+    new <T extends Record<string, any> = Record<string, any>>(
+        props?: FormProps<T>
+    ): InstanceType<DefineComponent<FormProps<T>, FormSlots<T>, FormEmits<T>, FormInstance>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Form: DefineComponent<FormProps, FormSlots, FormEmits, FormInstance>;
+        Form: typeof Form;
     }
 }
 
