@@ -999,7 +999,7 @@ export default {
     },
     computed: {
         columns() {
-            return this.d_columns.get(this);
+            return this.d_columns.get(this) ?? [];
         },
         headerFilterButtonProps() {
             return {

@@ -4,7 +4,7 @@ import type { TreeTableFilterMeta, TreeTableOperatorFilterMetaData } from 'rose-
 import { FilterMatchMode, FilterOperator } from '../core/api/Api';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
-import { nextTick } from 'vue';
+import { h, nextTick } from 'vue';
 import Column from '../column/Column.vue';
 import TreeTable from './TreeTable.vue';
 
@@ -144,6 +144,35 @@ const mountAdvanced = ({
     );
 
 describe('TreeTable', () => {
+    it('renders columns supplied by keyed wrapper components', async () => {
+        const WrappedColumn = {
+            props: { field: String, header: String },
+            setup: (props: { field?: string; header?: string }) => () => h(Column, { field: props.field, header: props.header })
+        };
+        const wrapper = mount({
+            render: () =>
+                h(
+                    TreeTable,
+                    { value: [{ key: 'sample', data: { name: 'Photos', type: 'Folder' } }] },
+                    {
+                        default: () => [
+                            h(WrappedColumn, { key: 'type', field: 'type', header: 'Type' }),
+                            h(WrappedColumn, { key: 'name', field: 'name', header: 'Name' })
+                        ]
+                    }
+                )
+        });
+
+        try {
+            await nextTick();
+
+            expect(wrapper.findAll('thead th').map((header) => header.text())).toEqual(['Type', 'Name']);
+            expect(wrapper.findAll('tbody td').map((cell) => cell.text())).toEqual(['Folder', 'Photos']);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('shows loading icons on root and nested loading nodes', () => {
         const wrapper = mount({
             components: { TreeTable, Column },
