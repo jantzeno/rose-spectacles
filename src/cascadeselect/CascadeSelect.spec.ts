@@ -136,4 +136,14 @@ describe('CascadeSelect.vue', () => {
 
         expect(wrapper.find('.rs-cascadeselect-group-icon').classes()).toContain('pi-bell');
     });
+
+    it('selects a leaf when the controlled value is missing from the current options', async () => {
+        const available = { cname: 'Ottawa' };
+
+        await wrapper.setProps({ modelValue: { cname: 'Removed city' }, options: [available] });
+        await wrapper.trigger('click');
+        await wrapper.get('.rs-cascadeselect-option-content').trigger('click');
+
+        expect(wrapper.emitted('update:modelValue')).toEqual([[available]]);
+    });
 });

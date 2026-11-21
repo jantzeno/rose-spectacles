@@ -211,7 +211,7 @@ export default {
         show(isFocus) {
             this.$emit('before-show');
             this.overlayVisible = true;
-            this.activeOptionPath = this.$filled ? this.findOptionPathByValue(this.d_value) : this.activeOptionPath;
+            this.activeOptionPath = this.$filled ? (this.findOptionPathByValue(this.d_value) ?? []) : this.activeOptionPath;
 
             if (this.$filled && isNotEmpty(this.activeOptionPath)) {
                 const processedOption = this.activeOptionPath[this.activeOptionPath.length - 1];
