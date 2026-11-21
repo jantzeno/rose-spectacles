@@ -47,7 +47,7 @@
                             <span v-if="tab.props && tab.props.header" :class="cx('tab.headerTitle')" v-bind="getTabPT(tab, 'headerTitle', index)">{{
                                 tab.props.header
                             }}</span>
-                            <component v-if="tab.children && tab.children.header" :is="tab.children.header"></component>
+                            <component v-if="getTabHeader(tab)" :is="getTabHeader(tab)"></component>
                         </a>
                     </li>
                     <li ref="inkbar" :class="cx('inkbar')" role="presentation" aria-hidden="true" v-bind="ptm('inkbar')"></li>
@@ -92,15 +92,15 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { findSingle, focus, getAttribute, getOffset, getWidth } from '../internal/utils/dom/index';
 import ChevronLeftIcon from '../icons/chevronleft/ChevronLeftIcon.vue';
 import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
+import { defineComponent, isVNode, mergeProps, type ComponentOptions, type Slots, type VNode } from 'vue';
 import BaseTabView from './BaseTabView.vue';
 
-export default {
+export default defineComponent({
     name: 'TabView',
     extends: BaseTabView,
     inheritAttrs: false,
@@ -130,25 +130,28 @@ export default {
         this.scrollable && this.updateButtonState();
     },
     methods: {
-        isTabPanel(child) {
-            return child.type.name === 'TabPanel';
+        isTabPanel(child: VNode): boolean {
+            return (child.type as ComponentOptions)?.name === 'TabPanel';
         },
-        isTabActive(index) {
+        isTabActive(index: number) {
             return this.d_activeIndex === index;
         },
-        getTabProp(tab, name) {
+        getTabProp(tab: VNode, name: string) {
             return tab.props ? tab.props[name] : undefined;
         },
-        getKey(tab, index) {
+        getTabHeader(tab: VNode) {
+            return (tab.children as Slots | null)?.header;
+        },
+        getKey(tab: VNode, index: number) {
             return this.getTabProp(tab, 'header') || index;
         },
-        getTabHeaderActionId(index) {
+        getTabHeaderActionId(index: number) {
             return `${this.$id}_${index}_header_action`;
         },
-        getTabContentId(index) {
+        getTabContentId(index: number) {
             return `${this.$id}_${index}_content`;
         },
-        getTabPT(tab, key, index) {
+        getTabPT(tab: VNode, key: string, index: number) {
             const count = this.tabs.length;
             const tabMetaData = {
                 props: tab.props,
@@ -172,31 +175,31 @@ export default {
                 this.ptmo(this.getTabProp(tab, 'pt'), key, tabMetaData)
             );
         },
-        onScroll(event) {
+        onScroll(event: Event) {
             this.scrollable && this.updateButtonState();
 
             event.preventDefault();
         },
         onPrevButtonClick() {
-            const content = this.$refs.content;
+            const content = this.$refs.content as HTMLElement;
             const width = getWidth(content);
             const pos = content.scrollLeft - width;
 
             content.scrollLeft = pos <= 0 ? 0 : pos;
         },
         onNextButtonClick() {
-            const content = this.$refs.content;
+            const content = this.$refs.content as HTMLElement;
             const width = getWidth(content) - this.getVisibleButtonWidths();
             const pos = content.scrollLeft + width;
             const lastPos = content.scrollWidth - width;
 
             content.scrollLeft = pos >= lastPos ? lastPos : pos;
         },
-        onTabClick(event, tab, index) {
+        onTabClick(event: MouseEvent, tab: VNode, index: number) {
             this.changeActiveIndex(event, tab, index);
             this.$emit('tab-click', { originalEvent: event, index });
         },
-        onTabKeyDown(event, tab, index) {
+        onTabKeyDown(event: KeyboardEvent, tab: VNode, index: number) {
             switch (event.code) {
                 case 'ArrowLeft':
                     this.onTabArrowLeftKey(event);
@@ -232,45 +235,45 @@ export default {
                     break;
             }
         },
-        onTabArrowRightKey(event) {
-            const nextHeaderAction = this.findNextHeaderAction(event.target.parentElement);
+        onTabArrowRightKey(event: KeyboardEvent) {
+            const nextHeaderAction = this.findNextHeaderAction((event.target as Element | null)?.parentElement ?? null);
 
             nextHeaderAction ? this.changeFocusedTab(event, nextHeaderAction) : this.onTabHomeKey(event);
             event.preventDefault();
         },
-        onTabArrowLeftKey(event) {
-            const prevHeaderAction = this.findPrevHeaderAction(event.target.parentElement);
+        onTabArrowLeftKey(event: KeyboardEvent) {
+            const prevHeaderAction = this.findPrevHeaderAction((event.target as Element | null)?.parentElement ?? null);
 
             prevHeaderAction ? this.changeFocusedTab(event, prevHeaderAction) : this.onTabEndKey(event);
             event.preventDefault();
         },
-        onTabHomeKey(event) {
+        onTabHomeKey(event: KeyboardEvent) {
             const firstHeaderAction = this.findFirstHeaderAction();
 
             this.changeFocusedTab(event, firstHeaderAction);
             event.preventDefault();
         },
-        onTabEndKey(event) {
+        onTabEndKey(event: KeyboardEvent) {
             const lastHeaderAction = this.findLastHeaderAction();
 
             this.changeFocusedTab(event, lastHeaderAction);
             event.preventDefault();
         },
-        onPageDownKey(event) {
-            this.scrollInView({ index: this.$refs.nav.children.length - 2 });
+        onPageDownKey(event: KeyboardEvent) {
+            this.scrollInView({ index: (this.$refs.nav as HTMLElement).children.length - 2 });
             event.preventDefault();
         },
-        onPageUpKey(event) {
+        onPageUpKey(event: KeyboardEvent) {
             this.scrollInView({ index: 0 });
             event.preventDefault();
         },
-        onTabEnterKey(event, tab, index) {
+        onTabEnterKey(event: KeyboardEvent, tab: VNode, index: number) {
             this.changeActiveIndex(event, tab, index);
 
             event.preventDefault();
         },
-        findNextHeaderAction(tabElement, selfCheck = false) {
-            const headerElement = selfCheck ? tabElement : tabElement.nextElementSibling;
+        findNextHeaderAction(tabElement: Element | null, selfCheck = false): Element | null {
+            const headerElement = selfCheck ? tabElement : tabElement?.nextElementSibling;
 
             return headerElement
                 ? getAttribute(headerElement, 'data-p-disabled') || getAttribute(headerElement, 'data-pc-section') === 'inkbar'
@@ -278,8 +281,8 @@ export default {
                     : findSingle(headerElement, '[data-pc-section="headeraction"]')
                 : null;
         },
-        findPrevHeaderAction(tabElement, selfCheck = false) {
-            const headerElement = selfCheck ? tabElement : tabElement.previousElementSibling;
+        findPrevHeaderAction(tabElement: Element | null, selfCheck = false): Element | null {
+            const headerElement = selfCheck ? tabElement : tabElement?.previousElementSibling;
 
             return headerElement
                 ? getAttribute(headerElement, 'data-p-disabled') || getAttribute(headerElement, 'data-pc-section') === 'inkbar'
@@ -288,12 +291,12 @@ export default {
                 : null;
         },
         findFirstHeaderAction() {
-            return this.findNextHeaderAction(this.$refs.nav.firstElementChild, true);
+            return this.findNextHeaderAction((this.$refs.nav as HTMLElement).firstElementChild, true);
         },
         findLastHeaderAction() {
-            return this.findPrevHeaderAction(this.$refs.nav.lastElementChild, true);
+            return this.findPrevHeaderAction((this.$refs.nav as HTMLElement).lastElementChild, true);
         },
-        changeActiveIndex(event, tab, index) {
+        changeActiveIndex(event: Event, tab: VNode, index: number) {
             if (!this.getTabProp(tab, 'disabled') && this.d_activeIndex !== index) {
                 this.d_activeIndex = index;
 
@@ -303,54 +306,58 @@ export default {
                 this.scrollInView({ index });
             }
         },
-        changeFocusedTab(event, element) {
-            if (element) {
+        changeFocusedTab(event: KeyboardEvent, element: Element | null) {
+            if (element instanceof HTMLElement) {
                 focus(element);
                 this.scrollInView({ element });
 
                 if (this.selectOnFocus) {
-                    const index = parseInt(element.parentElement.dataset.pcIndex, 10);
+                    const index = parseInt(element.parentElement?.dataset.pcIndex ?? '', 10);
                     const tab = this.tabs[index];
 
-                    this.changeActiveIndex(event, tab, index);
+                    if (tab) this.changeActiveIndex(event, tab, index);
                 }
             }
         },
-        scrollInView({ element, index = -1 }) {
-            const currentElement = element || this.$refs.nav.children[index];
+        scrollInView({ element, index = -1 }: { element?: Element; index?: number }) {
+            const currentElement = element || (this.$refs.nav as HTMLElement).children[index];
 
             if (currentElement) {
                 currentElement.scrollIntoView && currentElement.scrollIntoView({ block: 'nearest' });
             }
         },
         updateInkBar() {
-            let tabHeader = this.$refs.nav.children[this.d_activeIndex];
+            const nav = this.$refs.nav as HTMLElement;
+            const inkbar = this.$refs.inkbar as HTMLElement;
+            const tabHeader = nav.children[this.d_activeIndex];
 
-            this.$refs.inkbar.style.width = getWidth(tabHeader) + 'px';
-            this.$refs.inkbar.style.left = getOffset(tabHeader).left - getOffset(this.$refs.nav).left + 'px';
+            if (!(tabHeader instanceof HTMLElement)) return;
+
+            inkbar.style.width = getWidth(tabHeader) + 'px';
+            inkbar.style.left = getOffset(tabHeader).left - getOffset(nav).left + 'px';
         },
         updateButtonState() {
-            const content = this.$refs.content;
+            const content = this.$refs.content as HTMLElement;
             const { scrollLeft, scrollWidth } = content;
             const width = getWidth(content);
 
             this.isPrevButtonDisabled = scrollLeft === 0;
-            this.isNextButtonDisabled = parseInt(scrollLeft) === scrollWidth - width;
+            this.isNextButtonDisabled = Math.trunc(scrollLeft) === scrollWidth - width;
         },
         getVisibleButtonWidths() {
-            const { prevBtn, nextBtn } = this.$refs;
+            const { prevBtn, nextBtn } = this.$refs as { prevBtn?: HTMLElement; nextBtn?: HTMLElement };
 
             return [prevBtn, nextBtn].reduce((acc, el) => (el ? acc + getWidth(el) : acc), 0);
         }
     },
     computed: {
-        tabs() {
-            return this.$slots.default().reduce((tabs, child) => {
+        tabs(): VNode[] {
+            return (this.$slots.default?.() ?? []).reduce<VNode[]>((tabs, child) => {
                 if (this.isTabPanel(child)) {
                     tabs.push(child);
                 } else if (child.children && child.children instanceof Array) {
                     child.children.forEach((nestedChild) => {
-                        if (this.isTabPanel(nestedChild)) {
+                        if (isVNode(nestedChild) && this.isTabPanel(nestedChild)) {
                             tabs.push(nestedChild);
                         }
                     });
@@ -360,10 +367,10 @@ export default {
             }, []);
         },
         prevButtonAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.previous : undefined;
+            return this.$primevue?.config.locale?.aria?.previous;
         },
         nextButtonAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.next : undefined;
+            return this.$primevue?.config.locale?.aria?.next;
         }
     },
     directives: {
@@ -373,5 +380,5 @@ export default {
         ChevronLeftIcon,
         ChevronRightIcon
     }
-};
+});
 </script>
