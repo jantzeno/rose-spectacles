@@ -276,9 +276,18 @@
             "title": "Carousel, Galleria, Timeline: value generic type not inferred in slots",
             "labels": ["bug", "typescript"],
             "component": "Carousel, Galleria, Timeline",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case for N/A (type-level issue) that exercises the reported behavior: Carousel, Galleria, Timeline: value generic type not inferred in slots."
+            "disposition": "fixed",
+            "evidence": [
+                "The packed consumer accepted an unknown item property in all three slot templates before the declaration fix.",
+                "The consumer now type checks valid property access and produces exactly one TS2339 per invalid slot template. The declarations use the constructor inference approach discussed in the linked upstream patch."
+            ],
+            "reproducer": "https://stackblitz.com/github/YevheniiKotyrlo/primevue-generic-type-repro?file=src%2FApp.vue",
+            "upstreamPullRequest": "https://github.com/primefaces/primevue/pull/8490",
+            "resolvingCommit": "c82c0f757622c8bb60a57fce497f5ec19e3a8dad",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "Carousel, Galleria, and Timeline slots reject unknown item properties"
+            }
         },
         {
             "number": 56,
