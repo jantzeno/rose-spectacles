@@ -39,6 +39,8 @@ export interface PrimeVueLocaleAriaOptions {
     selectAll?: string;
     unselectAll?: string;
     close?: string;
+    showPassword?: string;
+    hidePassword?: string;
     previous?: string;
     next?: string;
     navigation?: string;

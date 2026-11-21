@@ -129,7 +129,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { cn } from '../internal/utils/index';
 import { absolutePosition, addStyle, getOuterWidth, isTouchDevice, relativePosition } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
@@ -142,7 +143,9 @@ import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import Portal from '../portal/Portal.vue';
 import BasePassword from './BasePassword.vue';
 
-export default {
+type PasswordMeter = { strength: 'weak' | 'medium' | 'strong'; width: string };
+
+export default defineComponent({
     name: 'Password',
     extends: BasePassword,
     inheritAttrs: false,
@@ -153,17 +156,17 @@ export default {
     data() {
         return {
             overlayVisible: false,
-            meter: null,
-            infoText: null,
+            meter: null as PasswordMeter | null,
+            infoText: null as string | null | undefined,
             focused: false,
-            unmasked: false
+            unmasked: false,
+            mediumCheckRegExp: null as RegExp | null,
+            strongCheckRegExp: null as RegExp | null,
+            resizeListener: null as (() => void) | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            overlay: null as HTMLElement | null
         };
     },
-    mediumCheckRegExp: null,
-    strongCheckRegExp: null,
-    resizeListener: null,
-    scrollHandler: null,
-    overlay: null,
     mounted() {
         this.infoText = this.promptText;
         this.mediumCheckRegExp = new RegExp(this.mediumRegex);
@@ -183,8 +186,10 @@ export default {
         }
     },
     methods: {
-        onOverlayEnter(el) {
-            ZIndex.set('overlay', el, this.$primevue.config.zIndex.overlay);
+        onOverlayEnter(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
+            ZIndex.set('overlay', el, this.$primevue?.config.zIndex?.overlay);
 
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
@@ -199,41 +204,45 @@ export default {
             this.unbindResizeListener();
             this.overlay = null;
         },
-        onOverlayAfterLeave(el) {
-            ZIndex.clear(el);
+        onOverlayAfterLeave(el: Element) {
+            if (el instanceof HTMLElement) ZIndex.clear(el);
         },
         alignOverlay() {
+            const input = this.getInputElement();
+
+            if (!this.overlay || !input) return;
+
             if (this.appendTo === 'self') {
-                relativePosition(this.overlay, this.$refs.input.$el);
+                relativePosition(this.overlay, input);
             } else {
-                this.overlay.style.minWidth = getOuterWidth(this.$refs.input.$el) + 'px';
-                absolutePosition(this.overlay, this.$refs.input.$el);
+                this.overlay.style.minWidth = getOuterWidth(input) + 'px';
+                absolutePosition(this.overlay, input);
             }
         },
-        testStrength(str) {
+        testStrength(str: string) {
             let level = 0;
 
-            if (this.strongCheckRegExp.test(str)) level = 3;
-            else if (this.mediumCheckRegExp.test(str)) level = 2;
+            if (this.strongCheckRegExp?.test(str)) level = 3;
+            else if (this.mediumCheckRegExp?.test(str)) level = 2;
             else if (str.length) level = 1;
 
             return level;
         },
-        onInput(event) {
-            this.writeValue(event.target.value, event);
+        onInput(event: Event) {
+            this.writeValue((event.target as HTMLInputElement).value, event);
             this.$emit('change', event);
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.focused = true;
 
             if (this.feedback) {
-                this.setPasswordMeter(this.d_value);
+                this.setPasswordMeter();
                 this.overlayVisible = true;
             }
 
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.focused = false;
 
             if (this.feedback) {
@@ -242,9 +251,9 @@ export default {
 
             this.$emit('blur', event);
         },
-        onKeyUp(event) {
+        onKeyUp(event: KeyboardEvent) {
             if (this.feedback) {
-                const value = event.target.value;
+                const value = (event.target as HTMLInputElement).value;
                 const { meter, label } = this.checkPasswordStrength(value);
 
                 this.meter = meter;
@@ -278,9 +287,9 @@ export default {
                 this.overlayVisible = true;
             }
         },
-        checkPasswordStrength(value) {
-            let label = null;
-            let meter = null;
+        checkPasswordStrength(value: string) {
+            let label: string | undefined;
+            let meter: PasswordMeter | null = null;
 
             switch (this.testStrength(value)) {
                 case 1:
@@ -315,19 +324,24 @@ export default {
 
             return { label, meter };
         },
-        onInvalid(event) {
+        onInvalid(event: Event) {
             this.$emit('invalid', event);
         },
+        getInputElement() {
+            return (this.$refs.input as InstanceType<typeof InputText> | undefined)?.$el as HTMLElement | undefined;
+        },
         bindScrollListener() {
-            if (!this.scrollHandler) {
-                this.scrollHandler = new ConnectedOverlayScrollHandler(this.$refs.input.$el, () => {
+            const input = this.getInputElement();
+
+            if (!this.scrollHandler && input) {
+                this.scrollHandler = new ConnectedOverlayScrollHandler(input, () => {
                     if (this.overlayVisible) {
                         this.overlayVisible = false;
                     }
                 });
             }
 
-            this.scrollHandler.bindScrollListener();
+            this.scrollHandler?.bindScrollListener();
         },
         unbindScrollListener() {
             if (this.scrollHandler) {
@@ -351,8 +365,8 @@ export default {
                 this.resizeListener = null;
             }
         },
-        overlayRef(el) {
-            this.overlay = el;
+        overlayRef(el: Element | ComponentPublicInstance | null) {
+            this.overlay = el instanceof HTMLElement ? el : null;
         },
         onMaskToggle() {
             const activeElement = document.activeElement;
@@ -362,22 +376,24 @@ export default {
 
             if (shouldRefocus) {
                 this.$nextTick(() => {
-                    (this.unmasked ? this.$refs.maskButton : this.$refs.unmaskButton)?.focus();
+                    const button = (this.unmasked ? this.$refs.maskButton : this.$refs.unmaskButton) as HTMLElement | undefined;
+
+                    button?.focus();
                 });
             }
         },
-        onClearClick(event) {
+        onClearClick(event?: MouseEvent) {
             const shouldRefocusInput = document.activeElement === this.$refs.clearButton;
 
-            this.writeValue(null, {});
+            this.writeValue(null, event);
 
             if (shouldRefocusInput) {
                 this.$nextTick(() => {
-                    this.$refs.input?.$el?.focus();
+                    this.getInputElement()?.focus();
                 });
             }
         },
-        onOverlayClick(event) {
+        onOverlayClick(event: MouseEvent) {
             OverlayEventBus.emit('overlay-click', {
                 originalEvent: event,
                 target: this.$el
@@ -389,25 +405,25 @@ export default {
             return this.unmasked ? 'text' : 'password';
         },
         weakText() {
-            return this.weakLabel || this.$primevue.config.locale.weak;
+            return this.weakLabel || this.$primevue?.config.locale?.weak;
         },
         mediumText() {
-            return this.mediumLabel || this.$primevue.config.locale.medium;
+            return this.mediumLabel || this.$primevue?.config.locale?.medium;
         },
         strongText() {
-            return this.strongLabel || this.$primevue.config.locale.strong;
+            return this.strongLabel || this.$primevue?.config.locale?.strong;
         },
         promptText() {
-            return this.promptLabel || this.$primevue.config.locale.passwordPrompt;
+            return this.promptLabel || this.$primevue?.config.locale?.passwordPrompt;
         },
         hidePasswordText() {
-            return this.hidePasswordLabel || this.$primevue.config.locale.aria.hidePassword;
+            return this.hidePasswordLabel || this.$primevue?.config.locale?.aria?.hidePassword;
         },
         showPasswordText() {
-            return this.showPasswordLabel || this.$primevue.config.locale.aria.showPassword;
+            return this.showPasswordLabel || this.$primevue?.config.locale?.aria?.showPassword;
         },
         clearText() {
-            return this.$primevue.config.locale.clear;
+            return this.$primevue?.config.locale?.clear;
         },
         isClearIconVisible() {
             return this.showClear && this.$filled && !this.disabled;
@@ -422,7 +438,7 @@ export default {
         },
         meterDataP() {
             return cn({
-                [this.meter?.strength]: this.meter?.strength
+                [this.meter?.strength ?? '']: this.meter?.strength
             });
         },
         overlayDataP() {
@@ -438,5 +454,5 @@ export default {
         EyeIcon,
         TimesIcon
     }
-};
+});
 </script>
