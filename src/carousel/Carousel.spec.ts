@@ -2,6 +2,28 @@ import { mount } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import Carousel from './Carousel.vue';
 
+it('advances and wraps a circular carousel on its autoplay interval', async () => {
+    vi.useFakeTimers();
+    const wrapper = mount(Carousel, {
+        global: { plugins: [PrimeVue] },
+        props: { value: ['One', 'Two', 'Three'], numVisible: 1, numScroll: 1, circular: true, autoplayInterval: 1000 },
+        slots: { item: '<template #item="{ data }">{{ data }}</template>' }
+    });
+
+    try {
+        await wrapper.vm.$nextTick();
+
+        for (const page of [1, 2, 0]) {
+            vi.advanceTimersByTime(1000);
+            await wrapper.vm.$nextTick();
+            expect(wrapper.emitted('update:page')?.at(-1)).toEqual([page]);
+        }
+    } finally {
+        wrapper.unmount();
+        vi.useRealTimers();
+    }
+});
+
 describe('Carousel.vue', () => {
     it('should exist', async () => {
         const wrapper = mount(Carousel, {

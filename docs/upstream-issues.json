@@ -2248,10 +2248,12 @@
             "title": "Using Carousel with CDN",
             "labels": ["bug"],
             "component": "Carousel",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/web-platform-hrcu2adt?file=index.html",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Using Carousel with CDN."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The upstream reproduction loads Vue and Carousel as standalone CDN scripts. Rose Spectacles ships TypeScript and Vue source entry points for Vite.",
+                "The retained Carousel advances and wraps a circular carousel on its autoplay interval in src/carousel/Carousel.spec.ts."
+            ],
+            "reproducer": "https://stackblitz.com/edit/web-platform-hrcu2adt?file=index.html"
         },
         {
             "number": 245,
@@ -2314,10 +2316,11 @@
             "title": "Tailwind Preflight messes up PrimeVue styling",
             "labels": ["bug", "styling"],
             "component": "IconField, Button, Toast, InputIcon",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/sb1-yznmbvhv?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome 135. Verify the reported behavior: Tailwind Preflight messes up PrimeVue styling."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The reported Button and Toast alignment is specific to Tailwind Preflight combined with the upstream Aura preset and tailwindcss-primeui stylesheet. The source package retains structural CSS and leaves the affected line-height and visual presentation to the consuming app."
+            ],
+            "reproducer": "https://stackblitz.com/edit/sb1-yznmbvhv?file=src%2FApp.vue"
         },
         {
             "number": 251,
@@ -2888,10 +2891,11 @@
             "title": "PrimeVue v4 Styling Issue in Astro.js & Starlight.js Integration",
             "labels": ["bug", "styling"],
             "component": "Shared Vue behavior",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/~/github.com/pallandir/astro-primevue-issue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome Version 133.0.6943. Verify the reported behavior: PrimeVue v4 Styling Issue in Astro.js & Starlight.js Integration."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The report is limited to the removed @primeuix/themes preset loading in Astro and Starlight. The issue says the same styled buttons work in a regular Vue app. The disposable Vue and Vite consumer verifies the supported package entry points."
+            ],
+            "reproducer": "https://stackblitz.com/~/github.com/pallandir/astro-primevue-issue"
         },
         {
             "number": 308,
@@ -3270,10 +3274,17 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/346",
             "title": "Component Name: BaseComponent `theme:change` event is never deregistered",
             "labels": ["bug", "performance"],
-            "component": "Tabs, DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case that exercises the reported behavior: Component Name: BaseComponent `theme:change` event is never deregistered."
+            "component": "BaseComponent",
+            "disposition": "already-fixed",
+            "evidence": [
+                "The Button test emits theme:change before and after unmount with scoped design tokens. The scoped style callback runs while mounted and is detached on unmount.",
+                "The fork checkpoint already tracked the scoped callback and removed it through BaseComponent._removeThemeListeners."
+            ],
+            "resolvingCommit": "a1873d0d9ce6d658bde27218875795b8cd7ad5db",
+            "test": {
+                "path": "src/button/Button.spec.ts",
+                "name": "unregisters the scoped token listener when a styled instance unmounts"
+            }
         },
         {
             "number": 347,
@@ -4576,10 +4587,11 @@
             "title": "Button: unstyled on CDN",
             "labels": ["bug", "regression", "styling"],
             "component": "Button",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://jsbin.com/boveropaga/1/edit?html",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome 125. Verify the reported behavior: Button: unstyled on CDN."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The two reproductions compare the PrimeVue 3.29 and 3.52 standalone CDN scripts and their old severity styling. Rose Spectacles ships Vue source for Vite and does not package the CDN scripts or presets."
+            ],
+            "reproducer": "https://jsbin.com/boveropaga/1/edit?html"
         },
         {
             "number": 470,
@@ -4904,11 +4916,18 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/502",
             "title": "Calendar: When using Tailwind presets, Months outside minDate and maxDate range are clickable, instead of being disabled",
             "labels": ["bug", "styling"],
-            "component": "Calendar",
-            "disposition": "unverified",
-            "evidence": [],
+            "component": "Calendar, DatePicker",
+            "disposition": "fixed",
+            "evidence": [
+                "The retained DatePicker reproduced the Calendar report in unstyled month view. May and September were marked disabled but both click and Enter emitted model updates outside a June-to-August limit.",
+                "Both cases fail before the change and pass with the month availability guard. June still updates the model through both input paths. The legacy Calendar uses the same DatePicker implementation."
+            ],
             "reproducer": "https://stackblitz.com/edit/kmbep6?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Calendar: When using Tailwind presets, Months outside minDate and maxDate range are clickable, instead of being disabled."
+            "resolvingCommit": "fdbbb4fdb7796f30d874aed42e87c16eb43c17ec",
+            "test": {
+                "path": "src/datepicker/DatePicker.spec.ts",
+                "name": "ignores out-of-range months on %s in unstyled month view"
+            }
         },
         {
             "number": 503,
