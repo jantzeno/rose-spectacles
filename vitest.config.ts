@@ -16,6 +16,6 @@ export default defineConfig({
             provider: 'istanbul',
             reporter: ['text', 'json', 'html']
         },
-        setupFiles: [fileURLToPath(new URL('./src/config/Config.spec.js', import.meta.url))]
+        setupFiles: [fileURLToPath(new URL('./src/config/test-setup.ts', import.meta.url))]
     }
 });
