@@ -53,6 +53,23 @@ describe('Dialog.vue', () => {
         expect(wrapper.find('.rs-dialog-content').exists()).toBe(true);
         expect(wrapper.find('.rs-dialog-footer').exists()).toBe(true);
     });
+
+    it('restores document text selection when unmounted during a drag', async () => {
+        const wrapper = mount(Dialog, { props: { appendTo: 'self', header: 'Move me', visible: true } });
+
+        try {
+            await wrapper.get('.rs-dialog-header').trigger('mousedown', { clientX: 20, clientY: 20 });
+            expect(document.body.getAttribute('data-p-unselectable-text')).toBe('true');
+
+            wrapper.unmount();
+
+            expect(document.body.hasAttribute('data-p-unselectable-text')).toBe(false);
+            expect(document.body.style.userSelect).toBe('');
+        } finally {
+            document.body.removeAttribute('data-p-unselectable-text');
+            document.body.style.userSelect = '';
+        }
+    });
 });
 
 describe('closable', () => {

@@ -167,6 +167,7 @@ export default {
         }
     },
     beforeUnmount() {
+        this.endDrag();
         this.unbindDocumentState();
         this.unbindGlobalListeners();
         this.destroyStyle();
@@ -205,9 +206,7 @@ export default {
                 !this.isUnstyled && addClass(this.mask, 'rs-overlay-mask-leave-active');
             }
 
-            if (this.dragging && this.documentDragEndListener) {
-                this.documentDragEndListener();
-            }
+            this.endDrag();
         },
         onLeave() {
             this.$emit('hide');
@@ -429,17 +428,17 @@ export default {
             }
         },
         bindDocumentDragEndListener() {
-            this.documentDragEndListener = (event) => {
-                if (this.dragging) {
-                    this.dragging = false;
-                    document.body.removeAttribute('data-p-unselectable-text');
-                    !this.isUnstyled && (document.body.style['user-select'] = '');
-
-                    this.$emit('dragend', event);
-                }
-            };
-
+            this.documentDragEndListener = this.endDrag;
             window.document.addEventListener('mouseup', this.documentDragEndListener);
+        },
+        endDrag(event) {
+            if (this.dragging) {
+                this.dragging = false;
+                document.body.removeAttribute('data-p-unselectable-text');
+                !this.isUnstyled && (document.body.style['user-select'] = '');
+
+                this.$emit('dragend', event);
+            }
         },
         unbindDocumentDragEndListener() {
             if (this.documentDragEndListener) {
