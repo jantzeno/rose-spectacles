@@ -78,6 +78,19 @@ try {
         );
         console.log('Escape closes the dialog and restores trigger focus');
 
+        await show('#sidebar');
+        await browser.click('[data-example="sidebar"] [data-testid="overlay-open"]');
+        await wait(
+            `(() => {
+                const panel = document.querySelector('.rs-drawer');
+                return panel && panel.scrollHeight > panel.clientHeight && getComputedStyle(panel).overflowY === 'auto';
+            })()`,
+            'Overflowing headless Sidebar content can scroll'
+        );
+        await browser.evaluate(`document.querySelector('.rs-drawer').scrollTop = 300`);
+        assert.ok((await browser.evaluate<number>(`document.querySelector('.rs-drawer').scrollTop`)) > 0);
+        console.log('Overflowing headless Sidebar content can scroll');
+
         await show('#popover');
         await browser.evaluate(`Object.assign(document.querySelector('[data-example="popover"] button').style, {
             position: 'fixed',

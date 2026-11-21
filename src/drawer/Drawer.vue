@@ -28,6 +28,7 @@
                     :role="modal ? 'dialog' : 'complementary'"
                     :aria-modal="modal ? true : undefined"
                     :data-p="dataP"
+                    :data-p-headless="$slots.container ? true : undefined"
                     v-bind="ptmi('root')"
                 >
                     <slot v-if="$slots.container" name="container" :closeCallback="hide"></slot>

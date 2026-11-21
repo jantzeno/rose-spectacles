@@ -3,19 +3,31 @@ import { useConfirm, useDialog, useToast } from 'rose-spectacles';
 import TerminalService from 'rose-spectacles/terminalservice';
 import { component, demo, example, menu, sample, type ComponentName, type Example } from './shared';
 
-function overlay(name: ComponentName): Example {
+function overlay(name: ComponentName, headless = false): Example {
     return example(name, [name], () => {
         const visible = ref(false);
+        const close = () => (visible.value = false);
+        const content = () => [
+            h('p', 'Review these notes before publishing.'),
+            h('button', { type: 'button', autofocus: true, 'data-testid': 'overlay-done', onClick: close }, 'Done')
+        ];
         return () =>
             h('div', [
                 h('button', { type: 'button', 'data-testid': 'overlay-open', onClick: () => (visible.value = true) }, `Open ${name}`),
                 demo(
                     name,
                     { visible: visible.value, 'onUpdate:visible': (next: boolean) => (visible.value = next), header: 'Field notes', modal: true },
-                    () => [
-                        h('p', 'Review these notes before publishing.'),
-                        h('button', { type: 'button', autofocus: true, 'data-testid': 'overlay-done', onClick: () => (visible.value = false) }, 'Done')
-                    ]
+                    headless
+                        ? {
+                              container: () => [
+                                  ...content(),
+                                  h(
+                                      'ol',
+                                      Array.from({ length: 50 }, (_, index) => h('li', `Field note ${index + 1}`))
+                                  )
+                              ]
+                          }
+                        : content
                 )
             ]);
     });
@@ -65,7 +77,7 @@ function directive(name: ComponentName): Directive {
 export const overlays: Example[] = [
     overlay('Dialog'),
     overlay('Drawer'),
-    overlay('Sidebar'),
+    overlay('Sidebar', true),
     anchored('Popover'),
     anchored('OverlayPanel'),
     confirmation('ConfirmDialog'),

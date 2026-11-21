@@ -18,6 +18,10 @@ export const style = /*css*/ `
         padding: dt('drawer.content.padding');
     }
 
+    .rs-drawer[data-p-headless='true'] {
+        overflow-y: auto;
+    }
+
     .rs-drawer-header {
         display: flex;
         align-items: center;
