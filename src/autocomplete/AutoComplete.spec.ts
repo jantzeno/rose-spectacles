@@ -142,12 +142,9 @@ describe('AutoComplete.vue', () => {
     });
 
     it('search complete', async () => {
-        const event = { target: { value: 'b' } };
+        await wrapper.get('input').setValue('b');
 
-        wrapper.vm.onInput(event);
-        await wrapper.vm.$nextTick();
-
-        wrapper.vm.search(event, event.target.value, 'input');
+        wrapper.vm.search(new Event('input'), 'b', 'input');
         await wrapper.vm.$nextTick();
 
         await wrapper.setProps({
@@ -159,9 +156,7 @@ describe('AutoComplete.vue', () => {
     });
 
     it('should show overlay and empty-message if there are no suggestions', async () => {
-        const event = { target: { value: 'b' } };
-
-        wrapper.vm.search(event, event.target.value, 'input');
+        wrapper.vm.search(new Event('input'), 'b', 'input');
         await wrapper.vm.$nextTick();
 
         await wrapper.setProps({
@@ -211,9 +206,7 @@ describe('AutoComplete.vue', () => {
         beforeEach(async () => {
             vi.useFakeTimers();
 
-            const event = { target: { value: 'b' } };
-
-            wrapper.vm.search(event, event.target.value, 'input');
+            wrapper.vm.search(new Event('input'), 'b', 'input');
             await wrapper.setProps({ suggestions: [{ name: 'Bahrain', code: 'BH' }] });
 
             overlay = wrapper.get<HTMLElement>('.rs-autocomplete-overlay').element;
@@ -564,7 +557,7 @@ describe('AutoComplete.vue selection', () => {
         it('should select a range up to the nearest selected suggestion', () => {
             const wrapper = mountAutoComplete({ suggestions: cityNames(), optionLabel: undefined, modelValue: ['Rome'] });
 
-            wrapper.vm.onOptionSelectRange({}, -1, 3);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), -1, 3);
 
             expect(lastEmittedValue(wrapper)).toEqual(['Rome', 'London', 'Istanbul']);
         });
@@ -572,7 +565,7 @@ describe('AutoComplete.vue selection', () => {
         it('should select a range down to the nearest selected suggestion', () => {
             const wrapper = mountAutoComplete({ suggestions: cityNames(), optionLabel: undefined, modelValue: ['Istanbul'] });
 
-            wrapper.vm.onOptionSelectRange({}, 0, -1);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), 0, -1);
 
             expect(lastEmittedValue(wrapper)).toEqual(['Istanbul', 'New York', 'Rome', 'London']);
         });
@@ -584,7 +577,7 @@ describe('AutoComplete.vue selection', () => {
             await openOverlay(wrapper);
             expect(wrapper.vm.focusedOptionIndex).toBe(2);
 
-            wrapper.vm.onOptionSelectRange({}, -1, 0);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), -1, 0);
             expect(lastEmittedValue(wrapper)).toEqual([{ code: 'LDN' }, { code: 'PRS' }, cities()[0], cities()[1]]);
             expect(isEquals).not.toHaveBeenCalled();
         });
@@ -593,7 +586,7 @@ describe('AutoComplete.vue selection', () => {
             const suggestions = cities();
             const wrapper = mountAutoComplete({ suggestions, dataKey: 'code', modelValue: [{ code: 'RM' }, { code: 'LDN' }] });
 
-            wrapper.vm.onOptionSelectRange({}, 0, 3);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), 0, 3);
 
             expect(lastEmittedValue(wrapper)).toEqual([{ code: 'RM' }, { code: 'LDN' }, suggestions[0], suggestions[3]]);
         });
@@ -602,7 +595,7 @@ describe('AutoComplete.vue selection', () => {
             const suggestions = cities();
             const wrapper = mountAutoComplete({ suggestions, modelValue: [{ name: 'Rome', code: 'RM' }] });
 
-            wrapper.vm.onOptionSelectRange({}, -1, 3);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), -1, 3);
 
             expect(lastEmittedValue(wrapper)).toEqual([{ name: 'Rome', code: 'RM' }, suggestions[2], suggestions[3]]);
         });
@@ -614,7 +607,7 @@ describe('AutoComplete.vue selection', () => {
 
             const wrapper = mountAutoComplete({ suggestions, dataKey: 'code', optionDisabled: 'disabled', modelValue: [] });
 
-            wrapper.vm.onOptionSelectRange({}, 1, 3);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), 1, 3);
 
             expect(lastEmittedValue(wrapper)).toEqual([suggestions[1], suggestions[3]]);
         });
@@ -648,7 +641,7 @@ describe('AutoComplete.vue selection', () => {
 
             expect(wrapper.vm.findSelectedOptionIndex()).toBe(2);
 
-            wrapper.vm.onOptionSelectRange({}, -1, 4);
+            wrapper.vm.onOptionSelectRange(new KeyboardEvent('keydown'), -1, 4);
             expect(lastEmittedValue(wrapper)).toEqual(['london', 'Istanbul', 'Paris']);
         });
     });

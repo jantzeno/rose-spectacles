@@ -1,7 +1,9 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import AutoCompleteStyle from './style/AutoCompleteStyle';
+
+type OptionResolver = string | ((option: unknown) => unknown);
 
 export default defineComponent({
     name: 'BaseAutoComplete',
@@ -11,10 +13,10 @@ export default defineComponent({
             type: Array,
             default: null
         },
-        optionLabel: null,
-        optionDisabled: null,
-        optionGroupLabel: null,
-        optionGroupChildren: null,
+        optionLabel: null as unknown as PropType<OptionResolver>,
+        optionDisabled: null as unknown as PropType<OptionResolver>,
+        optionGroupLabel: null as unknown as PropType<OptionResolver>,
+        optionGroupChildren: null as unknown as PropType<OptionResolver>,
         scrollHeight: {
             type: String,
             default: '14rem'
