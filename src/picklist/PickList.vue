@@ -65,7 +65,7 @@
                 ref="sourceList"
                 :id="idSource + '_list'"
                 :modelValue="d_selection[0]"
-                :options="sourceList"
+                :options="sourceList ?? undefined"
                 multiple
                 :metaKeySelection="metaKeySelection"
                 :listStyle="listStyle"
@@ -174,7 +174,7 @@
                 ref="targetList"
                 :id="idTarget + '_list'"
                 :modelValue="d_selection[1]"
-                :options="targetList"
+                :options="targetList ?? undefined"
                 multiple
                 :metaKeySelection="metaKeySelection"
                 :listStyle="listStyle"
@@ -265,8 +265,8 @@
     </div>
 </template>
 
-<script>
-import { find, scrollInView, setAttribute } from '../internal/utils/dom/index';
+<script lang="ts">
+import { scrollInView, setAttribute } from '../internal/utils/dom/index';
 import { findIndexInList, isEmpty } from '../internal/utils/object/index';
 import AngleDoubleDownIcon from '../icons/angledoubledown/AngleDoubleDownIcon.vue';
 import AngleDoubleLeftIcon from '../icons/angledoubleleft/AngleDoubleLeftIcon.vue';
@@ -279,9 +279,14 @@ import AngleUpIcon from '../icons/angleup/AngleUpIcon.vue';
 import Button from '../button/Button.vue';
 import Listbox from '../listbox/Listbox.vue';
 import Ripple from '../ripple/Ripple';
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+import type { ListboxChangeEvent, ListboxOptionDblClickEvent } from '../listbox/Listbox';
 import BasePickList from './BasePickList.vue';
 
-export default {
+type ListIndex = 0 | 1;
+type ListName = 'sourceList' | 'targetList';
+
+export default defineComponent({
     name: 'PickList',
     extends: BasePickList,
     inheritAttrs: false,
@@ -297,15 +302,14 @@ export default {
         'focus',
         'blur'
     ],
-    itemTouched: false,
-    reorderDirection: null,
-    styleElement: null,
-    media: null,
-    mediaChangeListener: null,
     data() {
         return {
             d_selection: this.selection,
-            viewChanged: false
+            viewChanged: false,
+            reorderDirection: null as 'up' | 'down' | 'top' | 'bottom' | null,
+            styleElement: null as HTMLStyleElement | null,
+            media: null as MediaQueryList | null,
+            mediaChangeListener: null as ((event: MediaQueryListEvent) => void) | null
         };
     },
     watch: {
@@ -319,8 +323,11 @@ export default {
     },
     updated() {
         if (this.reorderDirection) {
-            this.updateListScroll(this.$refs.sourceList.$el);
-            this.updateListScroll(this.$refs.targetList.$el);
+            const source = this.$refs.sourceList as ComponentPublicInstance | undefined;
+            const target = this.$refs.targetList as ComponentPublicInstance | undefined;
+
+            this.updateListScroll(source?.$el);
+            this.updateListScroll(target?.$el);
             this.reorderDirection = null;
         }
     },
@@ -335,24 +342,24 @@ export default {
         }
     },
     methods: {
-        updateSelection(event) {
+        updateSelection(event: Event) {
             this.$emit('update:selection', this.d_selection);
             this.$emit('selection-change', {
                 originalEvent: event,
                 value: this.d_selection
             });
         },
-        onChangeSelection(params, listIndex) {
+        onChangeSelection(params: ListboxChangeEvent, listIndex: ListIndex) {
             this.d_selection[listIndex] = params.value;
             this.updateSelection(params.originalEvent);
         },
-        onListFocus(event, listType) {
+        onListFocus(event: FocusEvent, listType: ListName) {
             this.$emit('focus', event, listType);
         },
-        onListBlur(event, listType) {
+        onListBlur(event: FocusEvent, listType: ListName) {
             this.$emit('blur', event, listType);
         },
-        onReorderUpdate(event, value, listIndex) {
+        onReorderUpdate(event: MouseEvent, value: unknown[][], listIndex: ListIndex) {
             this.$emit('update:modelValue', value);
             this.$emit('reorder', {
                 originalEvent: event,
@@ -361,11 +368,11 @@ export default {
                 listIndex
             });
         },
-        onItemDblClick(event, listIndex) {
+        onItemDblClick(event: ListboxOptionDblClickEvent, listIndex: ListIndex) {
             if (listIndex === 0) this.moveToTarget(event.originalEvent);
             else if (listIndex === 1) this.moveToSource(event.originalEvent);
         },
-        moveUp(event, listIndex) {
+        moveUp(event: MouseEvent, listIndex: ListIndex) {
             if (this.d_selection && this.d_selection[listIndex]) {
                 let valueList = [...this.modelValue[listIndex]];
                 let selectionList = this.d_selection[listIndex];
@@ -392,7 +399,7 @@ export default {
                 this.onReorderUpdate(event, value, listIndex);
             }
         },
-        moveTop(event, listIndex) {
+        moveTop(event: MouseEvent, listIndex: ListIndex) {
             if (this.d_selection) {
                 let valueList = [...this.modelValue[listIndex]];
                 let selectionList = this.d_selection[listIndex];
@@ -417,7 +424,7 @@ export default {
                 this.onReorderUpdate(event, value, listIndex);
             }
         },
-        moveDown(event, listIndex) {
+        moveDown(event: MouseEvent, listIndex: ListIndex) {
             if (this.d_selection && this.d_selection[listIndex]) {
                 let valueList = [...this.modelValue[listIndex]];
                 let selectionList = this.d_selection[listIndex];
@@ -445,7 +452,7 @@ export default {
                 this.onReorderUpdate(event, value, listIndex);
             }
         },
-        moveBottom(event, listIndex) {
+        moveBottom(event: MouseEvent, listIndex: ListIndex) {
             if (this.d_selection) {
                 let valueList = [...this.modelValue[listIndex]];
                 let selectionList = this.d_selection[listIndex];
@@ -470,7 +477,7 @@ export default {
                 this.onReorderUpdate(event, value, listIndex);
             }
         },
-        moveToTarget(event) {
+        moveToTarget(event: Event) {
             let selection = this.d_selection && this.d_selection[0] ? this.d_selection[0] : null;
             let sourceList = [...this.modelValue[0]];
             let targetList = [...this.modelValue[1]];
@@ -505,7 +512,7 @@ export default {
                 this.updateSelection(event);
             }
         },
-        moveAllToTarget(event) {
+        moveAllToTarget(event: Event) {
             if (this.modelValue[0]) {
                 let sourceList = [...this.modelValue[0]];
                 let targetList = [...this.modelValue[1]];
@@ -528,7 +535,7 @@ export default {
                 this.updateSelection(event);
             }
         },
-        moveToSource(event) {
+        moveToSource(event: Event) {
             let selection = this.d_selection && this.d_selection[1] ? this.d_selection[1] : null;
             let sourceList = [...this.modelValue[0]];
             let targetList = [...this.modelValue[1]];
@@ -563,7 +570,7 @@ export default {
                 this.updateSelection(event);
             }
         },
-        moveAllToSource(event) {
+        moveAllToSource(event: Event) {
             if (this.modelValue[1]) {
                 let sourceList = [...this.modelValue[0]];
                 let targetList = [...this.modelValue[1]];
@@ -586,46 +593,10 @@ export default {
                 this.updateSelection(event);
             }
         },
-        onItemClick(event, item, index, listIndex) {
-            const listType = listIndex === 0 ? 'sourceList' : 'targetList';
+        updateListScroll(listElement: HTMLElement | undefined) {
+            if (!listElement) return;
 
-            this.itemTouched = false;
-            const selectionList = this.d_selection[listIndex];
-            const selectedIndex = findIndexInList(item, selectionList);
-            const selected = selectedIndex != -1;
-            const metaSelection = this.itemTouched ? false : this.metaKeySelection;
-            const selectedId = find(this.$refs[listType].$el, '[data-pc-section="item"]')[index].getAttribute('id');
-
-            this.focusedOptionIndex = selectedId;
-            let _selection;
-
-            if (metaSelection) {
-                let metaKey = event.metaKey || event.ctrlKey;
-
-                if (selected && metaKey) {
-                    _selection = selectionList.filter((val, index) => index !== selectedIndex);
-                } else {
-                    _selection = metaKey ? (selectionList ? [...selectionList] : []) : [];
-                    _selection.push(item);
-                }
-            } else {
-                if (selected) {
-                    _selection = selectionList.filter((val, index) => index !== selectedIndex);
-                } else {
-                    _selection = selectionList ? [...selectionList] : [];
-                    _selection.push(item);
-                }
-            }
-
-            let newSelection = [...this.d_selection];
-
-            newSelection[listIndex] = _selection;
-            this.d_selection = newSelection;
-
-            this.updateSelection(event);
-        },
-        updateListScroll(listElement) {
-            const listItems = find(listElement, '[data-pc-section="item"][data-p-selected="true"]');
+            const listItems = listElement.querySelectorAll<HTMLElement>('[data-pc-section="item"][data-p-selected="true"]');
 
             if (listItems && listItems.length) {
                 switch (this.reorderDirection) {
@@ -701,10 +672,10 @@ export default {
                 this.styleElement = null;
             }
         },
-        moveDisabled(index) {
+        moveDisabled(index: ListIndex) {
             return this.disabled ? true : this.d_selection && (!this.d_selection[index] || !this.d_selection[index].length) ? true : false;
         },
-        moveAllDisabled(list) {
+        moveAllDisabled(list: ListName) {
             return this.disabled ? true : isEmpty(this[list]);
         }
     },
@@ -722,28 +693,28 @@ export default {
             return this.modelValue && this.modelValue[1] ? this.modelValue[1] : null;
         },
         moveUpAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveUp : undefined;
+            return this.$primevue?.config.locale?.aria?.moveUp;
         },
         moveTopAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveTop : undefined;
+            return this.$primevue?.config.locale?.aria?.moveTop;
         },
         moveDownAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveDown : undefined;
+            return this.$primevue?.config.locale?.aria?.moveDown;
         },
         moveBottomAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveBottom : undefined;
+            return this.$primevue?.config.locale?.aria?.moveBottom;
         },
         moveToTargetAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveToTarget : undefined;
+            return this.$primevue?.config.locale?.aria?.moveToTarget;
         },
         moveAllToTargetAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveAllToTarget : undefined;
+            return this.$primevue?.config.locale?.aria?.moveAllToTarget;
         },
         moveToSourceAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveToSource : undefined;
+            return this.$primevue?.config.locale?.aria?.moveToSource;
         },
         moveAllToSourceAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.moveAllToSource : undefined;
+            return this.$primevue?.config.locale?.aria?.moveAllToSource;
         }
     },
     components: {
@@ -761,5 +732,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>

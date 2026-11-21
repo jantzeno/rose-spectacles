@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import PickListStyle from './style/PickListStyle';
 
@@ -8,11 +8,11 @@ export default defineComponent({
     extends: BaseComponent,
     props: {
         modelValue: {
-            type: Array,
+            type: Array as PropType<unknown[][]>,
             default: () => [[], []]
         },
         selection: {
-            type: Array,
+            type: Array as PropType<unknown[][]>,
             default: () => [[], []]
         },
         dataKey: {
