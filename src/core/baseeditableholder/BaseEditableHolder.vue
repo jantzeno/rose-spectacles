@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent, type PropType } from 'vue';
+import { getValueByPath } from '../../internal/form-values';
 import { isEmpty, isNotEmpty } from '../../internal/utils/index';
 import BaseComponent from '../basecomponent/BaseComponent.vue';
 
@@ -155,7 +156,7 @@ export default defineComponent({
             return this.$formControl?.novalidate;
         },
         $formDefaultValue() {
-            return this.findNonEmpty(this.$formFieldInstance?.initialValue, this.$formInstance?.initialValues?.[String(this.$formName)]);
+            return this.findNonEmpty(this.$formFieldInstance?.initialValue, getValueByPath(this.$formInstance?.initialValues, this.$formName));
         },
         $formValue() {
             return this.findNonEmpty(this.$formFieldInstance?.$field?.value, this.$formInstance?.getFieldState(this.$formName)?.value);

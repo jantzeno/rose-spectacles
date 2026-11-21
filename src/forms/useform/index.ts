@@ -1,4 +1,5 @@
 import type { useFormFieldInstance, useFormFieldOptions, useFormFieldProps, useFormFieldState, useFormOptions } from 'rose-spectacles/forms/useform';
+import { getValueByPath } from '../../internal/form-values';
 import { isArray, isEmpty, isNotEmpty, mergeKeys, resolve } from '../../internal/utils/index';
 import {
     computed,
@@ -57,26 +58,6 @@ function groupKeys(obj: Record<string, unknown>) {
         },
         {} as Record<string, any>
     );
-}
-
-function getValueByPath(obj: Record<string, any> | undefined, path?: string) {
-    if (!obj || !path) {
-        // short circuit if there is nothing to resolve
-        return null;
-    }
-
-    try {
-        const value = obj[path];
-
-        if (isNotEmpty(value)) return value;
-    } catch {
-        // do nothing and continue to other methods to resolve path data
-    }
-
-    /* eslint-disable-next-line no-useless-escape */
-    const keys = path.split(/[\.\[\]]+/).filter(Boolean);
-
-    return keys.reduce((acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined), obj);
 }
 
 type Trigger = 'validateOnBlur' | 'validateOnValueUpdate' | 'validateOnMount' | 'validateOnSubmit';
