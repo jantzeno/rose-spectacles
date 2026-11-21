@@ -2,6 +2,16 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import TieredMenu from './TieredMenu.vue';
 
+it('handles ArrowLeft before an item has focus', () => {
+    const wrapper = mount(TieredMenu, { props: { model: [] } });
+
+    try {
+        expect(() => wrapper.vm.onKeyDown(new KeyboardEvent('keydown', { code: 'ArrowLeft' }))).not.toThrow();
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('TieredMenu.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof TieredMenu>>;
 

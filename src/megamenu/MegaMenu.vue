@@ -181,7 +181,7 @@ export default {
                 const index = this.findFirstFocusedItemIndex();
                 const processedItem = this.findVisibleItem(index);
 
-                this.focusedItemInfo = { index, key: processedItem.key, parentKey: processedItem.parentKey };
+                if (processedItem) this.focusedItemInfo = { index, key: processedItem.key, parentKey: processedItem.parentKey };
             }
 
             this.$emit('focus', event);
@@ -371,6 +371,8 @@ export default {
         },
         onArrowLeftKey(event) {
             const processedItem = this.findVisibleItem(this.focusedItemInfo.index);
+            if (!processedItem) return;
+
             const grouped = this.isProccessedItemGroup(processedItem);
 
             if (grouped) {
@@ -397,6 +399,8 @@ export default {
         },
         onArrowRightKey(event) {
             const processedItem = this.findVisibleItem(this.focusedItemInfo.index);
+            if (!processedItem) return;
+
             const grouped = this.isProccessedItemGroup(processedItem);
 
             if (grouped) {

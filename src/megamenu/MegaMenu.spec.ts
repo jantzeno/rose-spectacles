@@ -1,6 +1,19 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import MegaMenu from './MegaMenu.vue';
 
+it('handles focus and horizontal movement when every action is disabled', () => {
+    const wrapper = mount(MegaMenu, { props: { model: [{ label: 'Disabled', disabled: true }] } });
+
+    try {
+        expect(() => wrapper.vm.onFocus(new FocusEvent('focus'))).not.toThrow();
+        expect(() => wrapper.vm.onKeyDown(new KeyboardEvent('keydown', { code: 'ArrowLeft' }))).not.toThrow();
+        expect(() => wrapper.vm.onKeyDown(new KeyboardEvent('keydown', { code: 'ArrowRight' }))).not.toThrow();
+        expect(wrapper.get('[role="menubar"]').attributes('aria-activedescendant')).toBeUndefined();
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('MegaMenu.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof MegaMenu>>;
 

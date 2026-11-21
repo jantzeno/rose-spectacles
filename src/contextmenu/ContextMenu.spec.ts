@@ -2,6 +2,16 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import ContextMenu from './ContextMenu.vue';
 
+it('handles ArrowLeft in an empty context menu', () => {
+    const wrapper = mount(ContextMenu, { props: { model: [] } });
+
+    try {
+        expect(() => wrapper.vm.onKeyDown(new KeyboardEvent('keydown', { code: 'ArrowLeft' }))).not.toThrow();
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('ContextMenu.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof ContextMenu>>;
 
