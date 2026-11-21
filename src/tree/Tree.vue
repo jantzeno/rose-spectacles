@@ -146,7 +146,7 @@ export default defineComponent({
         expandedKeys(newValue) {
             this.d_expandedKeys = newValue ?? {};
         },
-        droppableNodes(newValue) {
+        dragEnabled(newValue) {
             if (newValue) {
                 this.initDragDropService();
             } else {
@@ -155,7 +155,7 @@ export default defineComponent({
         }
     },
     mounted() {
-        if (this.droppableNodes) {
+        if (this.dragEnabled) {
             this.initDragDropService();
         }
     },
@@ -534,6 +534,9 @@ export default defineComponent({
         }
     },
     computed: {
+        dragEnabled() {
+            return this.draggableNodes || this.droppableNodes;
+        },
         filteredValue(): TreeNodeData[] {
             const filteredNodes: TreeNodeData[] = [];
             const searchFields = typeof this.filterBy === 'function' ? [this.filterBy] : this.filterBy.split(',');

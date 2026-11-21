@@ -2,6 +2,27 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import type { TreeFilterEvent } from 'rose-spectacles/tree';
 import { reactive } from 'vue';
 import Tree from './Tree.vue';
+import { useTreeDragDropService } from './TreeDragDropService';
+
+it('starts a drag from a tree configured as a source only', () => {
+    const node = { key: 'dragged', label: 'Dragged node' };
+    const wrapper = mount(Tree, { props: { value: [node], draggableNodes: true } });
+    const service = useTreeDragDropService();
+    const content = wrapper.get('[data-pc-section="nodecontent"]').element;
+    const start = new Event('dragstart', { cancelable: true });
+    Object.defineProperty(start, 'dataTransfer', { value: { setData: vi.fn(), setDragImage: vi.fn() } });
+
+    try {
+        content.dispatchEvent(start);
+        expect(service.dragState.dragNode).toMatchObject({ key: 'dragged' });
+
+        content.dispatchEvent(new Event('dragend'));
+        expect(service.dragState.dragNode).toBeNull();
+    } finally {
+        service.stopDrag({ node });
+        wrapper.unmount();
+    }
+});
 
 it.each(['loaded', 'lazy'])('preserves focus when expanding a %s tree node', async (mode) => {
     const children = [{ key: 'child', label: 'Child' }];
@@ -10,7 +31,7 @@ it.each(['loaded', 'lazy'])('preserves focus when expanding a %s tree node', asy
     const wrapper = mount(Tree, { attachTo: document.body, props: { value: [parentNode, sibling] } });
 
     try {
-        const parent = wrapper.get('[role="treeitem"][aria-label="Parent"]');
+        const parent = wrapper.get<HTMLElement>('[role="treeitem"][aria-label="Parent"]');
         parent.element.focus();
 
         await parent.trigger('keydown', { code: 'ArrowRight' });
