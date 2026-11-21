@@ -11,7 +11,7 @@
             :aria-valuemin="min"
             :aria-valuemax="max"
             :aria-valuenow="d_value"
-            :inputmode="mode === 'decimal' && !minFractionDigits ? 'numeric' : 'decimal'"
+            :inputmode="mode === 'decimal' && maxFractionDigits === 0 ? 'numeric' : 'decimal'"
             :disabled="disabled"
             :readonly="readonly"
             :placeholder="placeholder"
@@ -164,6 +164,7 @@ export default {
         return {
             // @deprecated
             d_modelValue: this.d_value,
+            lastCommittedValue: this.d_value,
             focused: false
         };
     },
@@ -173,6 +174,7 @@ export default {
             handler(newValue) {
                 // @deprecated since v4.2.0
                 this.d_modelValue = newValue;
+                this.lastCommittedValue = newValue;
 
                 if (this.$refs.clearIcon?.$el?.style) {
                     this.$refs.clearIcon.$el.style.display = isEmpty(newValue) ? 'none' : 'block';
@@ -774,7 +776,7 @@ export default {
                 } else if (decimalCharIndex > selectionStart && decimalCharIndex < selectionEnd) {
                     newValueStr = this.insertText(inputValue, text, selectionStart, selectionEnd);
                     this.updateValue(event, newValueStr, text, 'insert');
-                } else if (decimalCharIndex === -1 && this.maxFractionDigits) {
+                } else if (decimalCharIndex === -1 && this.numberFormat.resolvedOptions().maximumFractionDigits > 0) {
                     newValueStr = this.insertText(inputValue, text, selectionStart, selectionEnd);
                     this.updateValue(event, newValueStr, text, 'insert');
                 }
@@ -1137,7 +1139,10 @@ export default {
             return toDecimalString(numberValue) === valueStr ? numberValue : valueStr;
         },
         updateModel(event, value) {
-            this.writeValue(this.toModelValue(value), event);
+            const modelValue = this.toModelValue(value);
+
+            this.lastCommittedValue = modelValue;
+            this.writeValue(modelValue, event);
         },
         onInputFocus(event) {
             this.focused = true;
@@ -1159,7 +1164,11 @@ export default {
 
             input.value = this.formatValue(newValue);
             input.setAttribute('aria-valuenow', newValue);
-            this.updateModel(event, newValue);
+
+            const modelValue = this.toModelValue(newValue);
+            const unchanged = modelValue === null ? this.lastCommittedValue == null : compareDecimal(modelValue, this.lastCommittedValue) === 0;
+
+            if (!unchanged) this.updateModel(event, newValue);
 
             if (!this.disabled && !this.readonly && this.highlightOnFocus) {
                 clearSelection();

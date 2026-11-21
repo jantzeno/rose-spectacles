@@ -99,6 +99,46 @@ describe('InputNumber.vue', () => {
         expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.value).toBe('$12,345.00');
     });
 
+    it('requests a decimal input mode when the formatter permits fractions', async () => {
+        await wrapper.setProps({ minFractionDigits: 0, maxFractionDigits: 2 });
+
+        const input = wrapper.get('input');
+
+        expect(input.attributes('inputmode')).toBe('decimal');
+        await wrapper.setProps({ maxFractionDigits: 0 });
+        expect(input.attributes('inputmode')).toBe('numeric');
+    });
+
+    it('accepts three fractional digits by default', async () => {
+        await wrapper.setProps({ locale: 'en-US' });
+
+        const input = wrapper.get('input');
+
+        input.element.setSelectionRange(1, 1);
+        for (const key of ['.', '2', '3', '4']) await input.trigger('keypress', { key });
+        await input.trigger('keydown', { key: 'Enter', code: 'Enter' });
+
+        expect(input.element.value).toBe('1.234');
+        expect(wrapper.emitted('update:modelValue')).toEqual([[1.234]]);
+    });
+
+    it('does not emit another model update on blur after a spinner or Enter commit', async () => {
+        await wrapper.setProps({ showButtons: true });
+
+        const input = wrapper.get('input');
+        const increment = wrapper.get('.rs-inputnumber-increment-button');
+
+        await increment.trigger('mousedown');
+        await increment.trigger('mouseup');
+        await input.trigger('blur');
+
+        input.element.value = '12';
+        await input.trigger('keydown', { key: 'Enter', code: 'Enter' });
+        await input.trigger('blur');
+
+        expect(wrapper.emitted('update:modelValue')).toEqual([[2], [12]]);
+    });
+
     it('should have prefix', async () => {
         await wrapper.setProps({ modelValue: 20, prefix: '%' });
 
