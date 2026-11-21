@@ -295,9 +295,18 @@
             "title": "AutoComplete, CascadeSelect, DataView: options/suggestions/value generic type not inferred",
             "labels": ["typescript"],
             "component": "AutoComplete, CascadeSelect, DataView",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case for N/A (type-level issue) that exercises the reported behavior: AutoComplete, CascadeSelect, DataView: options/suggestions/value generic type not inferred."
+            "disposition": "fixed",
+            "evidence": [
+                "The packed Vue consumer originally missed six property errors in AutoComplete and CascadeSelect option slots and callbacks and DataView list and grid slots.",
+                "The consumer now accepts the valid fields and rejects all six invalid fields using the types inferred from suggestions, options, and value arrays."
+            ],
+            "reproducer": "https://stackblitz.com/github/YevheniiKotyrlo/primevue-generic-type-repro?file=src%2FApp.vue",
+            "upstreamPullRequest": "https://github.com/primefaces/primevue/pull/8489",
+            "resolvingCommit": "f8e8b925fcb5c13ed457d124ead5d53801d58aaa",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "AutoComplete, CascadeSelect, and DataView reject unknown option and item properties"
+            }
         },
         {
             "number": 57,
@@ -1945,10 +1954,12 @@
             "title": "Prevent closing drawer by esc keydown",
             "labels": ["bug"],
             "component": "Drawer",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-4ry8juoz?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using -. Verify the reported behavior: Prevent closing drawer by esc keydown."
+            "disposition": "enhancement",
+            "evidence": [
+                "The Drawer test verifies that dismissable controls masking and closeOnEscape controls Escape independently. With dismissable disabled and closeOnEscape enabled, clicking the mask leaves the Drawer open and Escape requests closing it.",
+                "The requested behavior is available by disabling closeOnEscape as well. Coupling those two controls would change the current public behavior."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-4ry8juoz?file=src%2FApp.vue"
         },
         {
             "number": 215,
@@ -2943,10 +2954,17 @@
             "title": "Toast: can't use custom severity",
             "labels": ["enhancement", "typescript"],
             "component": "Toast",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The retained Toast severity already accepts custom strings. The packed consumer failed when a custom waiting message supplied numeric progress metadata to useToast.add.",
+                "The consumer now accepts the message and reads its progress field in the scoped Toast message template after narrowing its type."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-exl2r6ct?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Toast: can't use custom severity."
+            "resolvingCommit": "5cdc9c39e2e9344a254e5bff3617b9306ca63329",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "showProgress"
+            }
         },
         {
             "number": 311,
@@ -4152,11 +4170,18 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/426",
             "title": "Sidebar: In headless mode, the sidebar is not scrollable",
             "labels": ["bug", "styling"],
-            "component": "Sidebar",
-            "disposition": "unverified",
-            "evidence": [],
+            "component": "Drawer, Sidebar",
+            "disposition": "fixed",
+            "evidence": [
+                "The production Firefox gallery reproduced the overflow using the retained Sidebar alias with a long custom container slot. Content exceeded the panel, but the panel was not scrollable.",
+                "The same check passes after setting vertical overflow on the headless Drawer container. Firefox verifies auto scrolling and a changed scroll offset."
+            ],
             "reproducer": "https://stackblitz.com/github/loglinn05/dazzle?file=src%2Fviews%2FProducts.vue&initialpath=products",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Sidebar: In headless mode, the sidebar is not scrollable."
+            "resolvingCommit": "752e0a2bccbd6596dbbc14ae4be645e2f9887fda",
+            "test": {
+                "path": "scripts/browser-smoke.ts",
+                "name": "Overflowing headless Sidebar content can scroll"
+            }
         },
         {
             "number": 427,
