@@ -58,6 +58,7 @@
             :indentation="indentation"
             :ariaPosInset="node.children.indexOf(childNode) + 1"
             :ariaSetSize="node.children.length"
+            :loadingMode="loadingMode"
             :templates="templates"
             @node-toggle="$emit('node-toggle', $event)"
             @node-click="$emit('node-click', $event)"
@@ -244,15 +245,19 @@ export default {
             event.preventDefault();
         },
         onArrowRightKey(event) {
-            const ishiddenIcon = findSingle(event.currentTarget, 'button').style.visibility === 'hidden';
-            const togglerElement = findSingle(this.$refs.node, '[data-pc-section="nodetogglebutton"]');
+            const row = event.currentTarget;
+            const togglerElement = findSingle(row, '[data-pc-section="nodetogglebutton"]');
 
-            if (ishiddenIcon) return;
+            if (!togglerElement || togglerElement.style.visibility === 'hidden') return;
 
             !this.expanded && togglerElement.click();
 
             this.$nextTick(() => {
-                this.onArrowDownKey(event);
+                const child = row.nextElementSibling;
+
+                if (child && Number(child.getAttribute('aria-level')) > this.level + 1) {
+                    this.focusRowChange(row, child);
+                }
             });
 
             event.preventDefault();

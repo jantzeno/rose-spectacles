@@ -144,6 +144,43 @@ const mountAdvanced = ({
     );
 
 describe('TreeTable', () => {
+    it('shows loading icons on root and nested loading nodes', () => {
+        const wrapper = mount({
+            components: { TreeTable, Column },
+            data: () => ({
+                nodes: [{ key: 'root', loading: true, leaf: false, children: [{ key: 'child', loading: true, leaf: false }] }]
+            }),
+            template: `
+                <TreeTable :value="nodes" :expandedKeys="{ root: true }" loadingMode="icon" lazy>
+                    <Column field="name" expander />
+                </TreeTable>
+            `
+        });
+
+        try {
+            expect(wrapper.find('tr[aria-level="1"] .rs-icon-spin').exists()).toBe(true);
+            expect(wrapper.find('tr[aria-level="2"] .rs-icon-spin').exists()).toBe(true);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('moves focus to the first child after expanding a row with ArrowRight', async () => {
+        const wrapper = mountLegacy();
+
+        try {
+            const parent = wrapper.get<HTMLElement>('tr[aria-level="1"]');
+            parent.element.focus();
+
+            await parent.trigger('keydown', { code: 'ArrowRight' });
+            await nextTick();
+
+            expect(document.activeElement).toBe(wrapper.get('tr[aria-level="2"]').element);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     describe('legacy filtering (flat filters, filterMatchMode on Column)', () => {
         it('keeps a basic filter in the frozen TreeTable column', async () => {
             const wrapper = mount({
