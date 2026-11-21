@@ -1746,6 +1746,41 @@ describe('DataTable.vue', () => {
         expect(wrapper.emitted<[{ data: string }]>('rowgroup-expand')?.[0][0].data).toBe('Amy Elsner');
     });
 
+    it('applies the page size to records in expandable row groups', async () => {
+        wrapper = mount(DataTable, {
+            global: { plugins: [PrimeVue], components: { Column } },
+            props: {
+                value: [
+                    { team: 'Blue', name: 'Fay' },
+                    { team: 'Blue', name: 'Jo' },
+                    { team: 'Blue', name: 'Kai' },
+                    { team: 'Green', name: 'Sam' }
+                ],
+                groupRowsBy: 'team',
+                rowGroupMode: 'subheader',
+                expandableRowGroups: true,
+                expandedRowGroups: ['Blue', 'Green'],
+                paginator: true,
+                rows: 2
+            },
+            slots: {
+                default: '<Column field="name" header="Name" />',
+                groupheader: '<template #groupheader="{ data }">{{ data.team }}</template>'
+            }
+        });
+
+        const groups = () => wrapper.findAll('.rs-datatable-row-group-header').map((header) => header.text());
+        const records = () => wrapper.findAll('.rs-datatable-tbody tr:not(.rs-datatable-row-group-header)').map((row) => row.text());
+
+        expect(groups()).toEqual(['Blue']);
+        expect(records()).toEqual(['Fay', 'Jo']);
+
+        await wrapper.get('.rs-paginator-next').trigger('click');
+
+        expect(groups()).toEqual(['Blue', 'Green']);
+        expect(records()).toEqual(['Kai', 'Sam']);
+    });
+
     it('should have rowspan grouping', async () => {
         wrapper = mount(DataTable, {
             global: {

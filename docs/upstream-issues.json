@@ -2234,11 +2234,13 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/243",
             "title": "Paginator is broken with expandableRowGroups",
             "labels": ["bug"],
-            "component": "Paginator",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/htcpt37q?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Chrome Version 136.0.7103.114 (Official Build) (arm64). Verify the reported behavior: Paginator is broken with expandableRowGroups."
+            "component": "DataTable, Paginator",
+            "disposition": "enhancement",
+            "evidence": [
+                "The fork test src/datatable/DataTable.spec.ts exercises two-record pages with expandable groups. The first page shows two Blue records. The second page repeats the Blue header for its remaining record and includes the Green record.",
+                "DataTable.dataToRender applies the page size to records before rendering group headers. The request changes the pagination unit to complete groups."
+            ],
+            "reproducer": "https://stackblitz.com/edit/htcpt37q?file=src%2FApp.vue"
         },
         {
             "number": 244,
