@@ -3,6 +3,36 @@ import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
+it.each(['click', 'keydown'])('ignores out-of-range months on %s in unstyled month view', async (event) => {
+    const wrapper = mount(DatePicker, {
+        global: { plugins: [PrimeVue] },
+        props: {
+            inline: true,
+            unstyled: true,
+            view: 'month',
+            modelValue: new Date(2026, 6, 1),
+            minDate: new Date(2026, 5, 1),
+            maxDate: new Date(2026, 7, 31)
+        }
+    });
+
+    try {
+        const months = wrapper.findAll('[data-pc-section="month"]');
+        const activation = event === 'keydown' ? { code: 'Enter' } : {};
+
+        expect(months[4].attributes('data-p-disabled')).toBe('true');
+        expect(months[8].attributes('data-p-disabled')).toBe('true');
+        await months[4].trigger(event, activation);
+        await months[8].trigger(event, activation);
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+        await months[5].trigger(event, activation);
+        expect(wrapper.emitted('update:modelValue')).toEqual([[new Date(2026, 5, 1)]]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('DatePicker.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof DatePicker>>;
 

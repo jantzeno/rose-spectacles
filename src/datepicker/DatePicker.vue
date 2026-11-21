@@ -2063,6 +2063,8 @@ export default {
             }
         },
         onMonthSelect(event, { month, index }) {
+            if (!month.selectable) return;
+
             if (this.view === 'month') {
                 this.onDateSelect(event, { year: this.currentYear, month: index, day: 1, selectable: true });
             } else {
@@ -2673,7 +2675,7 @@ export default {
                 }
             }
         },
-        onMonthCellKeydown(event, index) {
+        onMonthCellKeydown(event, monthOption) {
             const cell = event.currentTarget;
 
             switch (event.code) {
@@ -2746,7 +2748,7 @@ export default {
                 case 'NumpadEnter':
 
                 case 'Space': {
-                    this.onMonthSelect(event, index);
+                    this.onMonthSelect(event, monthOption);
                     event.preventDefault();
                     break;
                 }
