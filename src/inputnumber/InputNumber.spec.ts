@@ -7,6 +7,14 @@ import InputNumber from './InputNumber.vue';
 describe('InputNumber.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof InputNumber>>;
 
+    const pressKey = (code: string, value?: string | number) => {
+        const input = wrapper.get('input');
+
+        if (value !== undefined) input.element.value = String(value);
+
+        return input.trigger('keydown', { code, key: code });
+    };
+
     beforeEach(() => {
         wrapper = mount(InputNumber, {
             props: {
@@ -21,24 +29,24 @@ describe('InputNumber.vue', () => {
     });
 
     it('is keydown called when down and up keys pressed', async () => {
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: 1 }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([2]);
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowDown', target: { value: 2 }, preventDefault: () => {} });
+        await pressKey('ArrowDown');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual([1]);
     });
 
     it('is keydown called when tab key pressed', async () => {
-        await wrapper.vm.onInputKeyDown({ code: 'Tab', target: { value: '12' }, preventDefault: () => {} });
+        await pressKey('Tab', '12');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([12]);
         expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').attributes()['aria-valuenow']).toBe('12');
     });
 
     it('is keydown called when enter key pressed', async () => {
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '12' }, preventDefault: () => {} });
+        await pressKey('Enter', '12');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([12]);
         expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').attributes()['aria-valuenow']).toBe('12');
@@ -47,7 +55,7 @@ describe('InputNumber.vue', () => {
     it('is keypress called when pressed a number', async () => {
         wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.setSelectionRange(2, 2);
 
-        await wrapper.vm.onInputKeyPress({ key: '1', preventDefault: () => {} });
+        await wrapper.get('input').trigger('keypress', { key: '1' });
 
         expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.[0][0].value).toBe(11);
     });
@@ -56,7 +64,7 @@ describe('InputNumber.vue', () => {
         await wrapper.setProps({ locale: 'fa-IR' });
         wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.setSelectionRange(1, 1);
 
-        await wrapper.vm.onInputKeyPress({ key: '۲', preventDefault: () => {} });
+        await wrapper.get('input').trigger('keypress', { key: '۲' });
 
         expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.[0][0].value).toBe(12);
     });
@@ -64,7 +72,7 @@ describe('InputNumber.vue', () => {
     it('is keypress called when pressed minus', async () => {
         wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.setSelectionRange(0, 0);
 
-        await wrapper.vm.onInputKeyPress({ key: '-', preventDefault: () => {} });
+        await wrapper.get('input').trigger('keypress', { key: '-' });
 
         expect(wrapper.emitted<[InputNumberInputEvent]>('input')?.[0][0].value).toBe(-1);
     });
@@ -72,11 +80,11 @@ describe('InputNumber.vue', () => {
     it('should have min boundary', async () => {
         await wrapper.setProps({ modelValue: 95, min: 95 });
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowDown', target: { value: 96 }, preventDefault: () => {} });
+        await pressKey('ArrowDown');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([95]);
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowDown', target: { value: 95 }, preventDefault: () => {} });
+        await pressKey('ArrowDown');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual([95]);
     });
@@ -84,11 +92,11 @@ describe('InputNumber.vue', () => {
     it('should have max boundary', async () => {
         await wrapper.setProps({ modelValue: 99, max: 100 });
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: 99 }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([100]);
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: 100 }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual([100]);
     });
@@ -148,10 +156,8 @@ describe('InputNumber.vue', () => {
     it('should step 0.1 without floating point drift', async () => {
         await wrapper.setProps({ modelValue: 0, step: 0.1, minFractionDigits: 1 });
 
-        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
-
         for (let i = 0; i < 10; i++) {
-            await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
+            await pressKey('ArrowUp');
         }
 
         const emitted = wrapper.emitted<[string | number | null]>('update:modelValue')?.map(([value]) => value);
@@ -163,10 +169,8 @@ describe('InputNumber.vue', () => {
     it('should step by a step written in exponent notation', async () => {
         await wrapper.setProps({ modelValue: 0, step: 1e-7, maxFractionDigits: 7 });
 
-        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
-
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
+        await pressKey('ArrowUp');
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue']).toEqual([[1e-7], [2e-7]]);
     });
@@ -174,13 +178,13 @@ describe('InputNumber.vue', () => {
     it('should round the value to the fraction digits the field shows', async () => {
         await wrapper.setProps({ locale: 'en-US', maxFractionDigits: 2 });
 
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '1.005' }, preventDefault: () => {} });
+        await pressKey('Enter', '1.005');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([1.01]);
 
         await wrapper.setProps({ roundingMode: 'floor' });
 
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '1.009' }, preventDefault: () => {} });
+        await pressKey('Enter', '1.009');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual([1]);
     });
@@ -188,8 +192,8 @@ describe('InputNumber.vue', () => {
     it('should round a bound finer than the format towards the inside', async () => {
         await wrapper.setProps({ locale: 'en-US', maxFractionDigits: 3, min: '0.0004', max: '1.2345' });
 
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '5' }, preventDefault: () => {} });
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '-5' }, preventDefault: () => {} });
+        await pressKey('Enter', '5');
+        await pressKey('Enter', '-5');
 
         expect(wrapper.emitted()['update:modelValue']).toEqual([[1.234], [0.001]]);
     });
@@ -197,10 +201,8 @@ describe('InputNumber.vue', () => {
     it('should not round when the field is not formatted', async () => {
         await wrapper.setProps({ locale: 'en-US', format: false, modelValue: 0, step: 0.0001 });
 
-        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
-
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
+        await pressKey('ArrowUp');
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue']).toEqual([[0.0001], [0.0002]]);
     });
@@ -208,13 +210,13 @@ describe('InputNumber.vue', () => {
     it('should keep a bound past Number.MAX_VALUE within what the format can show', async () => {
         await wrapper.setProps({ max: '1' + '0'.repeat(400) });
 
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '9'.repeat(401) }, preventDefault: () => {} });
+        await pressKey('Enter', '9'.repeat(401));
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([Number.MAX_VALUE]);
     });
 
     it('should keep the value within what the format can show', async () => {
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '1' + '0'.repeat(309) }, preventDefault: () => {} });
+        await pressKey('Enter', '1' + '0'.repeat(309));
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([Number.MAX_VALUE]);
         expect(wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element.value).not.toContain('∞');
@@ -227,21 +229,21 @@ describe('InputNumber.vue', () => {
     it('should emit a number whenever it holds the value exactly', async () => {
         await wrapper.setProps({ locale: 'en-US', maxFractionDigits: 2 });
 
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '12' }, preventDefault: () => {} });
+        await pressKey('Enter', '12');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([12]);
 
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '0.1' }, preventDefault: () => {} });
+        await pressKey('Enter', '0.1');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual([0.1]);
     });
 
     it('should preserve digits beyond Number.MAX_SAFE_INTEGER', async () => {
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '123456789012345678' }, preventDefault: () => {} });
+        await pressKey('Enter', '123456789012345678');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual(['123456789012345678']);
 
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '999999999999999999' }, preventDefault: () => {} });
+        await pressKey('Enter', '999999999999999999');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual(['999999999999999999']);
     });
@@ -249,7 +251,7 @@ describe('InputNumber.vue', () => {
     it('should step exactly beyond Number.MAX_SAFE_INTEGER', async () => {
         await wrapper.setProps({ modelValue: '123456789012345678' });
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: '123456789012345678' }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual(['123456789012345679']);
     });
@@ -263,11 +265,11 @@ describe('InputNumber.vue', () => {
     it('should clamp against string boundaries exactly', async () => {
         await wrapper.setProps({ modelValue: '999999999999999998', max: '999999999999999999' });
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: '999999999999999998' }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual(['999999999999999999']);
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: '999999999999999999' }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual(['999999999999999999']);
     });
@@ -279,14 +281,14 @@ describe('InputNumber.vue', () => {
 
         input.setSelectionRange(0, 0);
 
-        await wrapper.vm.onInputKeyPress({ key: '-', preventDefault: () => {} });
-        await wrapper.vm.onInputKeyPress({ key: '0', preventDefault: () => {} });
+        await wrapper.get('input').trigger('keypress', { key: '-' });
+        await wrapper.get('input').trigger('keypress', { key: '0' });
 
         expect(input.value).toBe('-0');
     });
 
     it('should emit a canonical zero for a typed negative zero', async () => {
-        await wrapper.vm.onInputKeyDown({ code: 'Enter', target: { value: '-0' }, preventDefault: () => {} });
+        await pressKey('Enter', '-0');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([0]);
     });
@@ -295,9 +297,7 @@ describe('InputNumber.vue', () => {
         // the locale groups with '.', so re-parsing '10.5' would read it as 105
         await wrapper.setProps({ modelValue: 10.5, locale: 'de-DE', max: 10.5, step: 1, minFractionDigits: 1 });
 
-        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
-
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: input, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted().input).toBeUndefined();
     });
@@ -305,10 +305,8 @@ describe('InputNumber.vue', () => {
     it('should step down across zero by 0.1 without floating point drift', async () => {
         await wrapper.setProps({ modelValue: 0.3, step: 0.1, minFractionDigits: 1 });
 
-        const input = wrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
-
         for (let i = 0; i < 5; i++) {
-            await wrapper.vm.onInputKeyDown({ code: 'ArrowDown', target: input, preventDefault: () => {} });
+            await pressKey('ArrowDown');
         }
 
         const emitted = wrapper.emitted<[string | number | null]>('update:modelValue')?.map(([value]) => value);
@@ -320,11 +318,11 @@ describe('InputNumber.vue', () => {
     it('should invert a negative string step when spinning', async () => {
         await wrapper.setProps({ modelValue: 5, step: '-2' });
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowDown', target: { value: 5 }, preventDefault: () => {} });
+        await pressKey('ArrowDown');
 
         expect(wrapper.emitted()['update:modelValue'][0]).toEqual([7]);
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: 7 }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
 
         expect(wrapper.emitted()['update:modelValue'][1]).toEqual([5]);
     });
@@ -332,9 +330,9 @@ describe('InputNumber.vue', () => {
     it('should switch between a number and a string as the value crosses what a number holds', async () => {
         await wrapper.setProps({ modelValue: 9007199254740991 });
 
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: '9007199254740991' }, preventDefault: () => {} });
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowUp', target: { value: '9007199254740992' }, preventDefault: () => {} });
-        await wrapper.vm.onInputKeyDown({ code: 'ArrowDown', target: { value: '9007199254740993' }, preventDefault: () => {} });
+        await pressKey('ArrowUp');
+        await pressKey('ArrowUp');
+        await pressKey('ArrowDown');
 
         expect(wrapper.emitted()['update:modelValue']).toEqual([[9007199254740992], ['9007199254740993'], [9007199254740992]]);
     });
@@ -347,7 +345,7 @@ describe('InputNumber.vue', () => {
 
     describe('typing over initial zero', () => {
         const type = async (input: HTMLInputElement, key: string) => {
-            await wrapper.vm.onInputKeyPress({ key, preventDefault: () => {} });
+            await wrapper.get('input').trigger('keypress', { key });
 
             return { value: input.value, caret: input.selectionStart };
         };
@@ -437,20 +435,20 @@ describe('InputNumber.vue', () => {
         });
 
         it('should stay empty after deleting the last character', async () => {
-            const inputNumber = formWrapper.findComponent(InputNumber);
-            const input = formWrapper.get<HTMLInputElement>('input.rs-inputnumber-input').element;
+            const field = formWrapper.get('input.rs-inputnumber-input');
+            const input = field.element as HTMLInputElement;
 
             expect(input.value).toBe('555');
 
             for (const expected of ['55', '5', '']) {
                 input.setSelectionRange(input.value.length, input.value.length);
-                await inputNumber.vm.onInputKeyDown({ code: 'Backspace', target: input, preventDefault: () => {} });
+                await field.trigger('keydown', { code: 'Backspace' });
                 await nextTick();
 
                 expect(input.value).toBe(expected);
             }
 
-            await inputNumber.vm.onInputBlur({ target: input });
+            await field.trigger('blur');
             await nextTick();
 
             expect(input.value).toBe('');
@@ -462,7 +460,7 @@ describe('InputNumber.vue', () => {
 
             for (let i = 0; i < 3; i++) {
                 input.setSelectionRange(input.value.length, input.value.length);
-                await standalone.vm.onInputKeyDown({ code: 'Backspace', target: input, preventDefault: () => {} });
+                await standalone.get('input').trigger('keydown', { code: 'Backspace' });
                 await nextTick();
             }
 

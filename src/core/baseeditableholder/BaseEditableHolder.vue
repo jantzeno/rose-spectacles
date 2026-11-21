@@ -15,6 +15,7 @@ interface FieldState {
 }
 
 interface FieldRegistration {
+    onInput?: (info: { originalEvent?: Event; value: unknown }) => void;
     onChange?: (info: { originalEvent?: Event; value: unknown }) => void;
     onBlur?: (event?: Event) => void;
 }
