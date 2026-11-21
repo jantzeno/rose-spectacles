@@ -145,6 +145,29 @@ try {
     console.log('Carousel, Galleria, and Timeline slots reject unknown item properties');
 
     run(['x', '--no-install', 'vite', 'build']);
+
+    await write('SlotTypes.vue', slotTypes);
+    run(['add', '--exact', ...Object.entries(optionalDependencies).map(([name, version]) => `${name}@${version}`)]);
+    await write(
+        'App.vue',
+        `
+        <script setup lang="ts">
+        import { ref } from 'vue';
+        import Chart from 'rose-spectacles/chart';
+        import Editor from 'rose-spectacles/editor';
+
+        const chartData = { labels: ['March'], datasets: [{ label: 'Orders', data: [4] }] };
+        const notes = ref('<p>Field notes</p>');
+        </script>
+        <template>
+            <Chart type="bar" :data="chartData" />
+            <Editor v-model="notes" />
+        </template>
+    `
+    );
+    run(['x', '--no-install', 'vue-tsc', '--noEmit']);
+    run(['x', '--no-install', 'vite', 'build']);
+    console.log('Dedicated Chart and Editor imports typecheck and build with their pinned optional peers');
 } finally {
     await rm(consumer, { recursive: true, force: true });
 }
