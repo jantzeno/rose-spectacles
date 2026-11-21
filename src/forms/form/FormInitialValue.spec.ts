@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import { h } from 'vue';
+import { h, type Component } from 'vue';
 import InputText from '../../inputtext/InputText.vue';
 import FormField from '../formfield/FormField.vue';
 import Form from './Form.vue';
@@ -11,15 +11,15 @@ it.each([
     const wrapper = mount({
         render: () =>
             h(
-                Form,
+                Form as Component,
                 { initialValues },
                 {
                     default: () =>
                         h(
-                            FormField,
+                            FormField as Component,
                             { name },
                             {
-                                default: () => h(InputText, { name })
+                                default: () => h(InputText as Component, { name })
                             }
                         )
                 }

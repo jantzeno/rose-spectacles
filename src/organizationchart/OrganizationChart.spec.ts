@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import OrganizationChart from './OrganizationChart.vue';
 
 describe('OrganizationChart.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof OrganizationChart>>;
 
     beforeEach(() => {
         wrapper = mount(OrganizationChart, {
@@ -100,13 +100,12 @@ describe('OrganizationChart.vue', () => {
                 selectionKeys: {}
             },
             slots: {
-                slots: {
-                    default: `
+                default: `
                         <template #default="slotProps">
                             <span>{{slotProps.node.data.label}}</span>
                         </template>
                     `,
-                    person: `
+                person: `
                         <template #person="slotProps">
                             <div class="node-header ui-corner-top">{{slotProps.node.data.label}}</div>
                             <div class="node-content">
@@ -115,7 +114,6 @@ describe('OrganizationChart.vue', () => {
                             </div>
                         </template>
                     `
-                }
             }
         });
     });
@@ -123,6 +121,7 @@ describe('OrganizationChart.vue', () => {
     it('should exist', () => {
         expect(wrapper.find('.rs-organizationchart.rs-component').exists()).toBe(true);
         expect(wrapper.find('table.rs-organizationchart-table').exists()).toBe(true);
+        expect(wrapper.get('.node-header').text()).toBe('CEO');
         expect(wrapper.findAll('.rs-organizationchart-node-toggle-button').length).toBe(5);
     });
 

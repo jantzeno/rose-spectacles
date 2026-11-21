@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import ContextMenu from './ContextMenu.vue';
 
 describe('ContextMenu.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof ContextMenu>>;
 
     beforeEach(() => {
         wrapper = mount(ContextMenu, {
@@ -183,20 +183,21 @@ describe('ContextMenu.vue', () => {
 });
 
 describe('ContextMenu.vue safe triangle', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof ContextMenu>>;
 
-    const rect = (left, top, right, bottom) => () => ({ left, top, right, bottom, width: right - left, height: bottom - top });
+    const rect = (left: number, top: number, right: number, bottom: number) => () =>
+        ({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect;
 
-    const pointerMove = (x, y) => {
+    const pointerMove = (x: number, y: number) => {
         const event = new MouseEvent('pointermove', { clientX: x, clientY: y });
 
         Object.defineProperty(event, 'pointerType', { value: 'mouse' });
         document.dispatchEvent(event);
     };
 
-    const itemContent = (label) => wrapper.find(`li[aria-label="${label}"] > [data-pc-section="itemcontent"]`);
+    const itemContent = (label: string) => wrapper.find(`li[aria-label="${label}"] > [data-pc-section="itemcontent"]`);
 
-    const isActive = (label) => wrapper.find(`li[aria-label="${label}"]`).attributes('data-p-active') === 'true';
+    const isActive = (label: string) => wrapper.find(`li[aria-label="${label}"]`).attributes('data-p-active') === 'true';
 
     // root items are stacked 40px rows, File's submenu opens to their right
     beforeEach(async () => {

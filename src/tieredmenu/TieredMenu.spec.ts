@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import TieredMenu from './TieredMenu.vue';
 
 describe('TieredMenu.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof TieredMenu>>;
 
     beforeEach(() => {
         wrapper = mount(TieredMenu, {
@@ -48,20 +48,21 @@ describe('TieredMenu.vue', () => {
 });
 
 describe('TieredMenu.vue safe triangle', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof TieredMenu>>;
 
-    const rect = (left, top, right, bottom) => () => ({ left, top, right, bottom, width: right - left, height: bottom - top });
+    const rect = (left: number, top: number, right: number, bottom: number) => () =>
+        ({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect;
 
-    const pointerMove = (x, y) => {
+    const pointerMove = (x: number, y: number) => {
         const event = new MouseEvent('pointermove', { clientX: x, clientY: y });
 
         Object.defineProperty(event, 'pointerType', { value: 'mouse' });
         document.dispatchEvent(event);
     };
 
-    const itemContent = (index) => wrapper.findAll('[data-pc-section="itemcontent"]')[index];
+    const itemContent = (index: number) => wrapper.findAll('[data-pc-section="itemcontent"]')[index];
 
-    const isActive = (label) => wrapper.find(`li[aria-label="${label}"]`).attributes('data-p-active') === 'true';
+    const isActive = (label: string) => wrapper.find(`li[aria-label="${label}"]`).attributes('data-p-active') === 'true';
 
     // root items are stacked 40px rows, File's submenu opens to their right
     beforeEach(async () => {
@@ -162,13 +163,14 @@ describe('TieredMenu.vue safe triangle', () => {
         await itemContent(3).trigger('mouseenter', { clientX: 95, clientY: 45 });
         pointerMove(95, 45);
 
-        expect(wrapper.vm.safeTriangle.isPending()).toBe(true);
+        const { safeTriangle } = wrapper.vm as typeof wrapper.vm & { safeTriangle: { isPending: () => boolean } };
+        expect(safeTriangle.isPending()).toBe(true);
 
         // otherwise the timer replays the hover and can reopen a submenu the user just closed
         await itemContent(3).trigger('click');
 
         expect(isActive('Edit')).toBe(true);
-        expect(wrapper.vm.safeTriangle.isPending()).toBe(false);
+        expect(safeTriangle.isPending()).toBe(false);
     });
 
     it('should ignore positions that did not come from a mouse', async () => {

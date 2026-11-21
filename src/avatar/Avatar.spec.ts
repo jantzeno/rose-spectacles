@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import { beforeEach } from 'vitest';
 import Avatar from './Avatar.vue';
 
-let wrapper = null;
+let wrapper: VueWrapper<InstanceType<typeof Avatar>>;
 
 beforeEach(() => {
     wrapper = mount(Avatar, {

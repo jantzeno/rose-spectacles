@@ -1,8 +1,8 @@
-import { mount } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import Menubar from './Menubar.vue';
 
 describe('Menubar.vue', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof Menubar>>;
 
     beforeEach(() => {
         wrapper = mount(Menubar, {
@@ -76,8 +76,8 @@ describe('Menubar.vue', () => {
 
         const exportItem = menuitems.find((item) => item.attributes('aria-label') === 'Export');
 
-        expect(exportItem.attributes('aria-setsize')).toBe('3');
-        expect(exportItem.attributes('aria-posinset')).toBe('3');
+        expect(exportItem?.attributes('aria-setsize')).toBe('3');
+        expect(exportItem?.attributes('aria-posinset')).toBe('3');
     });
 
     it('should slot visible', () => {
@@ -88,20 +88,21 @@ describe('Menubar.vue', () => {
 });
 
 describe('Menubar.vue safe triangle', () => {
-    let wrapper;
+    let wrapper: VueWrapper<InstanceType<typeof Menubar>>;
 
-    const rect = (left, top, right, bottom) => () => ({ left, top, right, bottom, width: right - left, height: bottom - top });
+    const rect = (left: number, top: number, right: number, bottom: number) => () =>
+        ({ left, top, right, bottom, width: right - left, height: bottom - top }) as DOMRect;
 
-    const pointerMove = (x, y) => {
+    const pointerMove = (x: number, y: number) => {
         const event = new MouseEvent('pointermove', { clientX: x, clientY: y });
 
         Object.defineProperty(event, 'pointerType', { value: 'mouse' });
         document.dispatchEvent(event);
     };
 
-    const itemContent = (label) => wrapper.find(`li[aria-label="${label}"] > [data-pc-section="itemcontent"]`);
+    const itemContent = (label: string) => wrapper.find(`li[aria-label="${label}"] > [data-pc-section="itemcontent"]`);
 
-    const isActive = (label) => wrapper.find(`li[aria-label="${label}"]`).attributes('data-p-active') === 'true';
+    const isActive = (label: string) => wrapper.find(`li[aria-label="${label}"]`).attributes('data-p-active') === 'true';
 
     // root items sit side by side, the submenu under File is wider than File itself
     beforeEach(async () => {

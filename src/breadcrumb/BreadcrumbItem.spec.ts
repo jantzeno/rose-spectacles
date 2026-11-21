@@ -1,8 +1,8 @@
-import { RouterLinkStub, shallowMount } from '@vue/test-utils';
+import { RouterLinkStub, shallowMount, type VueWrapper } from '@vue/test-utils';
 import { beforeEach, expect } from 'vitest';
 import BreadcrumbItem from './BreadcrumbItem.vue';
 
-let wrapper = null;
+let wrapper: VueWrapper<InstanceType<typeof BreadcrumbItem>>;
 
 beforeEach(() => {
     wrapper = shallowMount(BreadcrumbItem, {
@@ -51,7 +51,7 @@ describe('BreadcrumbItem', () => {
 
         const spy = vi.spyOn(wrapper.vm.item, 'command');
 
-        wrapper.vm.onClick();
+        wrapper.vm.onClick(new MouseEvent('click'));
         expect(spy).toHaveBeenCalled();
     });
 
