@@ -4,21 +4,26 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ThemeService } from '../internal/styled/index';
-import { toRaw } from 'vue';
+import type { Chart as CanvasChart } from 'chart.js';
+import { defineComponent, ref, shallowRef, toRaw } from 'vue';
 import BaseChart from './BaseChart.vue';
 import { applyPalette, getChartTheme, mergeOptions } from './utils/ChartTheme';
 
-export default {
+export default defineComponent({
     name: 'Chart',
     extends: BaseChart,
     inheritAttrs: false,
     emits: ['select', 'loaded'],
-    chart: null,
-    isDestroyed: false,
-    themeChangeListener: null,
-    themeObserver: null,
+    setup() {
+        return {
+            chart: shallowRef<CanvasChart | null>(null),
+            isDestroyed: ref(false),
+            themeChangeListener: shallowRef<(() => void) | null>(null),
+            themeObserver: shallowRef<MutationObserver | null>(null)
+        };
+    },
     watch: {
         /*
          * Use deep watch to enable triggering watch for changes within structure
@@ -71,9 +76,9 @@ export default {
                     if (module && module.default) {
                         const { data, options } = this.resolveConfig();
 
-                        this.chart = new module.default(this.$refs.canvas, {
-                            type: this.type,
-                            data,
+                        this.chart = new module.default(this.getCanvas(), {
+                            type: this.type!,
+                            data: data!,
                             options,
                             plugins: this.plugins
                         });
@@ -111,8 +116,8 @@ export default {
              * Chart.js keeps a reference to the config passed on construction, so replaced data and
              * options objects have to be reassigned before update() can pick the new values up.
              */
-            this.chart.data = data;
-            this.chart.options = options;
+            this.chart.data = data!;
+            this.chart.options = options!;
             this.chart.update();
         },
         bindThemeListeners() {
@@ -151,13 +156,13 @@ export default {
             }
         },
         getCanvas() {
-            return this.$refs.canvas;
+            return this.$refs.canvas as HTMLCanvasElement;
         },
         getChart() {
             return this.chart;
         },
         getBase64Image() {
-            return this.chart.toBase64Image();
+            return this.chart!.toBase64Image();
         },
         refresh() {
             if (this.chart) {
@@ -167,7 +172,7 @@ export default {
         reinit() {
             this.initChart();
         },
-        onCanvasClick(event) {
+        onCanvasClick(event: MouseEvent) {
             if (this.chart) {
                 const element = this.chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
                 const dataset = this.chart.getElementsAtEventForMode(event, 'dataset', { intersect: true }, false);
@@ -178,5 +183,5 @@ export default {
             }
         }
     }
-};
+});
 </script>

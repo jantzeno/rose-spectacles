@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { ChartData, ChartOptions, ChartType, Plugin } from 'chart.js';
+import { defineComponent, type CanvasHTMLAttributes, type PropType } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import ChartStyle from './style/ChartStyle';
 
@@ -7,10 +8,10 @@ export default defineComponent({
     name: 'BaseChart',
     extends: BaseComponent,
     props: {
-        type: String,
-        data: null,
-        options: null,
-        plugins: null,
+        type: String as PropType<ChartType>,
+        data: Object as PropType<ChartData>,
+        options: Object as PropType<ChartOptions>,
+        plugins: Array as PropType<Plugin[]>,
         width: {
             type: Number,
             default: 300
@@ -20,7 +21,7 @@ export default defineComponent({
             default: 150
         },
         canvasProps: {
-            type: null,
+            type: Object as PropType<CanvasHTMLAttributes>,
             default: null
         },
         themed: {

@@ -47,24 +47,23 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import type Quill from 'quill';
+import type { Delta, EmitterSource, QuillOptions, Range } from 'quill';
+import { defineComponent, shallowRef } from 'vue';
 import { isExist } from '../internal/utils/dom/index';
 import BaseEditor from './BaseEditor.vue';
 
-const QuillJS = (function () {
-    try {
-        return window.Quill;
-    } catch {
-        return null;
-    }
-})();
+const QuillJS = typeof window !== 'undefined' ? (window as Window & { Quill?: typeof Quill }).Quill : undefined;
 
-export default {
+export default defineComponent({
     name: 'Editor',
     extends: BaseEditor,
     inheritAttrs: false,
     emits: ['text-change', 'selection-change', 'load'],
-    quill: null,
+    setup() {
+        return { quill: shallowRef<Quill | null>(null), detachQuillHandlers: shallowRef<(() => void) | null>(null) };
+    },
     watch: {
         modelValue(newValue, oldValue) {
             if (newValue !== oldValue && this.quill && !this.quill.hasFocus()) {
@@ -81,9 +80,9 @@ export default {
         }
     },
     mounted() {
-        const configuration = {
+        const configuration: QuillOptions = {
             modules: {
-                toolbar: this.$refs.toolbarElement,
+                toolbar: this.$refs.toolbarElement as HTMLElement,
                 ...this.modules
             },
             readOnly: this.readonly,
@@ -93,19 +92,19 @@ export default {
         };
         if (QuillJS) {
             // Loaded by script only
-            this.quill = new QuillJS(this.$refs.editorElement, configuration);
+            this.quill = new QuillJS(this.$refs.editorElement as HTMLElement, configuration);
             this.initQuill();
             this.handleLoad();
         } else {
             import('quill')
                 .then((module) => {
-                    if (module && isExist(this.$refs.editorElement)) {
+                    if (module && isExist(this.$refs.editorElement as Node)) {
                         if (module.default) {
                             // webpack
-                            this.quill = new module.default(this.$refs.editorElement, configuration);
+                            this.quill = new module.default(this.$refs.editorElement as HTMLElement, configuration);
                         } else {
                             // parceljs
-                            this.quill = new module(this.$refs.editorElement, configuration);
+                            this.quill = new (module as unknown as typeof Quill)(this.$refs.editorElement as HTMLElement, configuration);
                         }
 
                         this.initQuill();
@@ -117,10 +116,11 @@ export default {
         }
     },
     beforeUnmount() {
+        this.detachQuillHandlers?.();
         this.quill = null;
     },
     methods: {
-        renderValue(value) {
+        renderValue(value: string | null | undefined) {
             if (this.quill) {
                 if (value) {
                     const delta = this.quill.clipboard.convert({ html: value });
@@ -131,18 +131,21 @@ export default {
             }
         },
         initQuill() {
+            const quill = this.quill;
+            if (!quill) return;
+
             this.renderValue(this.d_value);
 
-            this.quill.on('text-change', (delta, oldContents, source) => {
+            const onTextChange = (delta: Delta, _oldContents: Delta, source: EmitterSource) => {
                 if (source === 'user') {
-                    let html = this.quill.getSemanticHTML();
-                    let text = this.quill.getText().trim();
+                    let html = quill.getSemanticHTML();
+                    let text = quill.getText().trim();
 
                     if (html === '<p><br></p>') {
                         html = '';
                     }
 
-                    this.writeValue(html);
+                    this.writeValue(html, undefined);
                     this.$emit('text-change', {
                         htmlValue: html,
                         textValue: text,
@@ -151,11 +154,11 @@ export default {
                         instance: this.quill
                     });
                 }
-            });
+            };
 
-            this.quill.on('selection-change', (range, oldRange, source) => {
-                let html = this.quill.getSemanticHTML();
-                let text = this.quill.getText().trim();
+            const onSelectionChange = (range: Range | null, oldRange: Range | null, source: EmitterSource) => {
+                let html = quill.getSemanticHTML();
+                let text = quill.getText().trim();
 
                 this.$emit('selection-change', {
                     htmlValue: html,
@@ -165,7 +168,14 @@ export default {
                     source: source,
                     instance: this.quill
                 });
-            });
+            };
+
+            quill.on('text-change', onTextChange);
+            quill.on('selection-change', onSelectionChange);
+            this.detachQuillHandlers = () => {
+                quill.off('text-change', onTextChange);
+                quill.off('selection-change', onSelectionChange);
+            };
         },
         handleLoad() {
             if (this.quill && this.quill.getModule('toolbar')) {
@@ -176,5 +186,5 @@ export default {
             if (this.quill) this.quill.enable(!this.readonly);
         }
     }
-};
+});
 </script>

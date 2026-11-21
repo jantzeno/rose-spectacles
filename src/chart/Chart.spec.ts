@@ -2,37 +2,52 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { isReactive, reactive } from 'vue';
 import ChartJS from 'chart.js/auto';
+import type { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
+import type { ChartProps } from 'rose-spectacles/chart';
 import Chart from './Chart.vue';
 import { applyPalette, mergeOptions } from './utils/ChartTheme';
 
-vi.mock('chart.js/auto', () => {
-    const instances = [];
+interface MockChart {
+    canvas: HTMLCanvasElement;
+    data: ChartData;
+    options?: ChartOptions;
+    update: ReturnType<typeof vi.fn>;
+    destroy: ReturnType<typeof vi.fn>;
+    toBase64Image: ReturnType<typeof vi.fn>;
+    getElementsAtEventForMode?: () => { index: number }[];
+}
 
-    class ChartJSMock {
-        constructor(canvas, config) {
+vi.mock('chart.js/auto', () => {
+    const instances: MockChart[] = [];
+
+    class ChartJSMock implements MockChart {
+        static instances = instances;
+        canvas: HTMLCanvasElement;
+        data: ChartData;
+        options?: ChartOptions;
+        update = vi.fn();
+        destroy = vi.fn();
+        toBase64Image = vi.fn(() => 'data:image/png;base64,stub');
+
+        constructor(canvas: HTMLCanvasElement, config: ChartConfiguration) {
             this.canvas = canvas;
             this.data = config.data;
             this.options = config.options;
-            this.update = vi.fn();
-            this.destroy = vi.fn();
-            this.toBase64Image = vi.fn(() => 'data:image/png;base64,stub');
             instances.push(this);
         }
     }
 
-    ChartJSMock.instances = instances;
-
     return { default: ChartJSMock };
 });
 
-const instances = ChartJS.instances;
+const { instances } = ChartJS as unknown as { instances: MockChart[] };
 
 const data = {
     labels: ['Q1', 'Q2'],
     datasets: [{ label: 'Sales', data: [1, 2] }]
 };
 
-const mountChart = async (props = {}) => {
+const mountChart = async (props: ChartProps = {}) => {
     const wrapper = mount(Chart, { props: { type: 'bar', data, ...props } });
 
     await flushPromises();
@@ -67,7 +82,7 @@ describe('Chart.vue', () => {
     it('is loaded event emitted with the chart instance', async () => {
         const wrapper = await mountChart();
 
-        expect(wrapper.emitted().loaded[0][0]).toBe(instances[0]);
+        expect(wrapper.emitted('loaded')?.[0]?.[0]).toBe(instances[0]);
     });
 
     it('is data change updating the chart instead of recreating it', async () => {
@@ -105,7 +120,7 @@ describe('Chart.vue', () => {
     it('is chart given raw data rather than reactive proxies', async () => {
         const source = reactive({ datasets: [{ label: 'Sales', data: [{ x: 1, y: 2 }] }] });
 
-        await mountChart({ data: source, options: reactive({ parsing: false }) });
+        await mountChart({ data: source, options: reactive({ parsing: false as const }) });
 
         expect(isReactive(instances[0].data.datasets[0].data)).toBe(false);
         expect(isReactive(instances[0].options)).toBe(false);
@@ -119,7 +134,7 @@ describe('Chart.vue', () => {
         const chart = instances[0];
 
         // what Chart.js does to each point while stacking with parsing disabled
-        chart.data.datasets[0].data[0]._stacks = { y: {} };
+        Object.assign(chart.data.datasets[0].data[0] as object, { _stacks: { y: {} } });
         await flushPromises();
 
         expect(chart.update).not.toHaveBeenCalled();
@@ -171,11 +186,10 @@ describe('Chart.vue', () => {
 
         wrapper.vm.syncChart();
 
-        const chart = wrapper.vm.getChart();
-
-        expect(chart.options.scales.x.ticks.color).toBe('#6b7280');
-        expect(chart.options.plugins.legend.labels.color).toBe('#111827');
-        expect(chart.data.datasets[0].backgroundColor).toBe('#3b82f6');
+        expect(wrapper.vm.getChart()).toMatchObject({
+            options: { scales: { x: { ticks: { color: '#6b7280' } } }, plugins: { legend: { labels: { color: '#111827' } } } },
+            data: { datasets: [{ backgroundColor: '#3b82f6' }] }
+        });
     });
 
     it('is dark scheme selected from the resolved surface', async () => {
@@ -190,20 +204,20 @@ describe('Chart.vue', () => {
         wrapper.vm.syncChart();
 
         // second slot resolves the dark step (amber.600) rather than the light one
-        expect(wrapper.vm.getChart().options.plugins.legend.labels.color).toBe('#f8fafc');
+        expect(wrapper.vm.getChart()?.options).toMatchObject({ plugins: { legend: { labels: { color: '#f8fafc' } } } });
     });
 
     it('is user options taking precedence over token defaults', async () => {
         const wrapper = await mountChart({ options: { scales: { x: { ticks: { color: 'rebeccapurple' } } } } });
 
-        expect(wrapper.vm.getChart().options.scales.x.ticks.color).toBe('rebeccapurple');
+        expect(wrapper.vm.getChart()?.options).toMatchObject({ scales: { x: { ticks: { color: 'rebeccapurple' } } } });
     });
 
     it('is themed disabled passing options through untouched', async () => {
         const options = { scales: { x: { ticks: { color: 'red' } } } };
         const wrapper = await mountChart({ themed: false, options });
 
-        expect(wrapper.vm.getChart().options).toEqual(options);
+        expect(wrapper.vm.getChart()?.options).toEqual(options);
     });
 
     it('is select event emitted on canvas click', async () => {
@@ -214,7 +228,7 @@ describe('Chart.vue', () => {
 
         await wrapper.find('canvas').trigger('click');
 
-        expect(wrapper.emitted().select[0][0].element).toBe(element);
+        expect(wrapper.emitted<[{ element: typeof element }]>('select')?.[0]?.[0].element).toBe(element);
     });
 });
 
@@ -222,17 +236,17 @@ describe('ChartTheme.mergeOptions', () => {
     it('is user value winning at any depth', () => {
         const merged = mergeOptions({ scales: { x: { ticks: { color: 'token' } } } }, { scales: { x: { ticks: { color: 'user' } } } });
 
-        expect(merged.scales.x.ticks.color).toBe('user');
+        expect(merged).toMatchObject({ scales: { x: { ticks: { color: 'user' } } } });
     });
 
     it('is token defaults kept where the user set nothing', () => {
         const merged = mergeOptions({ scales: { x: { ticks: { color: 'token' }, grid: { color: 'grid' } } } }, { scales: { x: { ticks: { color: 'user' } } } });
 
-        expect(merged.scales.x.grid.color).toBe('grid');
+        expect(merged).toMatchObject({ scales: { x: { grid: { color: 'grid' } } } });
     });
 
     it('is arrays replaced rather than merged', () => {
-        expect(mergeOptions({ list: [1, 2, 3] }, { list: [9] }).list).toEqual([9]);
+        expect(mergeOptions({ list: [1, 2, 3] }, { list: [9] })).toEqual({ list: [9] });
     });
 });
 
@@ -242,40 +256,40 @@ describe('ChartTheme.applyPalette', () => {
     it('is slots assigned by dataset index', () => {
         const result = applyPalette({ datasets: [{ data: [1] }, { data: [2] }] }, 'line', palette);
 
-        expect(result.datasets[0].borderColor).toBe('#111');
-        expect(result.datasets[1].borderColor).toBe('#222');
+        expect(result.datasets[0]).toHaveProperty('borderColor', '#111');
+        expect(result.datasets[1]).toHaveProperty('borderColor', '#222');
     });
 
     it('is user supplied colors left alone', () => {
         const result = applyPalette({ datasets: [{ data: [1], borderColor: 'hotpink' }] }, 'line', palette);
 
-        expect(result.datasets[0].borderColor).toBe('hotpink');
+        expect(result.datasets[0]).toHaveProperty('borderColor', 'hotpink');
     });
 
     it('is radial types colored per data point', () => {
         const result = applyPalette({ datasets: [{ data: [1, 2, 3] }] }, 'pie', palette);
 
-        expect(result.datasets[0].backgroundColor).toEqual(palette);
+        expect(result.datasets[0]).toHaveProperty('backgroundColor', palette);
     });
 
     it('is scatter keeping its points visible', () => {
         const result = applyPalette({ datasets: [{ data: [{ x: 1, y: 2 }] }] }, 'scatter', palette);
 
         // the points are the whole chart, so hiding them the way a line does renders nothing
-        expect(result.datasets[0].pointRadius).toBeGreaterThan(0);
+        expect((result.datasets[0] as { pointRadius?: number }).pointRadius).toBeGreaterThan(0);
     });
 
     it('is line hiding its points until hover', () => {
         const result = applyPalette({ datasets: [{ data: [1, 2] }] }, 'line', palette);
 
-        expect(result.datasets[0].pointRadius).toBe(0);
-        expect(result.datasets[0].pointHoverRadius).toBeGreaterThan(0);
+        expect(result.datasets[0]).toHaveProperty('pointRadius', 0);
+        expect((result.datasets[0] as { pointHoverRadius?: number }).pointHoverRadius).toBeGreaterThan(0);
     });
 
     it('is bubble radius left to the data', () => {
         const result = applyPalette({ datasets: [{ data: [{ x: 1, y: 2, r: 9 }] }] }, 'bubble', palette);
 
-        expect(result.datasets[0].pointRadius).toBeUndefined();
+        expect(result.datasets[0]).not.toHaveProperty('pointRadius');
     });
 
     it('is source data not mutated', () => {
@@ -283,6 +297,6 @@ describe('ChartTheme.applyPalette', () => {
 
         applyPalette(source, 'bar', palette);
 
-        expect(source.datasets[0].borderColor).toBeUndefined();
+        expect(source.datasets[0]).not.toHaveProperty('borderColor');
     });
 });
