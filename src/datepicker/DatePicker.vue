@@ -1967,10 +1967,10 @@ export default {
             event.preventDefault();
         },
         incrementMinute(event) {
-            let newMinute = this.currentMinute + Number(this.stepMinute);
+            const newMinute = (this.currentMinute + Number(this.stepMinute)) % 60;
 
             if (this.validateTime(this.currentHour, newMinute, this.currentSecond, this.pm)) {
-                this.currentMinute = newMinute > 59 ? newMinute - 60 : newMinute;
+                this.currentMinute = newMinute;
             }
 
             event.preventDefault();
@@ -1987,10 +1987,10 @@ export default {
             event.preventDefault();
         },
         incrementSecond(event) {
-            let newSecond = this.currentSecond + Number(this.stepSecond);
+            const newSecond = (this.currentSecond + Number(this.stepSecond)) % 60;
 
             if (this.validateTime(this.currentHour, this.currentMinute, newSecond, this.pm)) {
-                this.currentSecond = newSecond > 59 ? newSecond - 60 : newSecond;
+                this.currentSecond = newSecond;
             }
 
             event.preventDefault();

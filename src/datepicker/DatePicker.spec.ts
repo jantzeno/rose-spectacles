@@ -3,6 +3,24 @@ import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
+it.each([
+    ['minute', new Date(2026, 5, 10, 12, 30), new Date(2026, 5, 10, 12, 59)],
+    ['second', new Date(2026, 5, 10, 12, 30, 15), new Date(2026, 5, 10, 12, 30, 59)]
+])('checks the wrapped %s against minDate before changing the time', async (unit, minDate, modelValue) => {
+    const wrapper = mount(DatePicker, { props: { inline: true, timeOnly: true, showSeconds: true, minDate, modelValue }, global: { plugins: [PrimeVue] } });
+
+    try {
+        const increment = wrapper.get(`.rs-datepicker-${unit}-picker button:first-child`);
+
+        await increment.trigger('mousedown');
+        await increment.trigger('mouseup');
+
+        expect(wrapper.emitted('update:modelValue')).toEqual([[modelValue]]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it.each(['click', 'keydown'])('ignores out-of-range months on %s in unstyled month view', async (event) => {
     const wrapper = mount(DatePicker, {
         global: { plugins: [PrimeVue] },
