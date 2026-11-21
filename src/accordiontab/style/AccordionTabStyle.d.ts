@@ -1,0 +1,15 @@
+/**
+ * @deprecated since v4. Use the new structure of Accordion instead.
+ *
+ * AccordionTab is a helper component for Accordion.
+ *
+ * [Live Demo](https://openvue.dev/accordion/)
+ *
+ * @module accordiontabstyle
+ *
+ */
+import type { BaseStyle } from 'rose-spectacles/core/base/style';
+
+export enum AccordionTabClasses {}
+
+export interface AccordionTabStyle extends BaseStyle {}

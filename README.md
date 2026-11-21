@@ -1,139 +1,48 @@
-<div align="center">
+# Rose Spectacles
 
-# OpenVue
+Rose Spectacles brings Vue 3 components, forms, icons, directives, and services together in one source package. It includes structural styles and exposes `rs-` classes and CSS custom properties for your application styles.
 
-**The Vue UI component library, continued.**
+## Install
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
-[![npm](https://img.shields.io/npm/v/openvue.svg)](https://www.npmjs.com/package/openvue)
-[![npm downloads](https://img.shields.io/npm/dt/openvue.svg)](https://www.npmjs.com/package/openvue)
-
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-
-[**Documentation**](https://openvue.dev) · [**Setup**](https://openvue.dev/setup) · [**Components**](https://openvue.dev/components) · [**Migrate from PrimeVue**](https://openvue.dev/migrate) · [**Changelog**](CHANGELOG.md)
-
-</div>
-
-## About
-
-OpenVue is a community-maintained fork of PrimeVue 4.5.5, one of the most widely adopted Vue.js component libraries, started after its original maintainers ended active open source development and moved new releases to a commercial license. The project is stewarded by [openvi-foundation](https://github.com/openvi-foundation), an independent organization of experienced developers who use this library in production and are committed to keeping it maintained, stable, and open.
-
-OpenVue is not affiliated with PrimeTek or PrimeUI. We started this project because a library with this much adoption, and this many teams depending on it, deserves a maintenance path that isn't tied to any single company's plans.
-
-## Migrating from PrimeVue
-
-**The migration tool is ready, try it out!** One command moves an existing PrimeVue v4 project to OpenVue:
+Pin the Git dependency to a reviewed commit. Replace `COMMIT_SHA` with its full SHA.
 
 ```sh
-npx @openvue/migrate
+bun add 'rose-spectacles@github:jantzeno/rose-spectacles#COMMIT_SHA'
+bun add 'vue@^3.5.0'
 ```
 
-It shows you a plan first (detected package manager, PrimeVue version, and every file it will change) and asks before writing anything. It renames dependencies, rewrites imports, and audits what's left, leaving a single reviewable diff. Use `--dry` for a preview that writes nothing.
+Configure Vite to compile the Vue single-file components and skip prebundling the source package.
 
-Read the full guide at [openvue.dev/migrate](https://openvue.dev/migrate) or the [`@openvue/migrate` README](packages/migrate/README.md).
+```ts
+import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite';
 
-## Installation
-
-```bash
-npm install openvue @openvue/themes
+export default defineConfig({
+    plugins: [vue()],
+    optimizeDeps: { exclude: ['rose-spectacles'] },
+    ssr: { noExternal: ['rose-spectacles'] }
+});
 ```
 
-Register a theme preset when installing the plugin:
+Register the configuration plugin and import components by name or by subpath.
 
-```js
+```ts
 import { createApp } from 'vue';
-import OpenVue from 'openvue/config';
-import Aura from '@openvue/themes/aura';
+import RoseSpectacles from 'rose-spectacles/config';
 import App from './App.vue';
 
-const app = createApp(App);
-
-app.use(OpenVue, {
-    theme: {
-        preset: Aura
-    }
-});
-
-app.mount('#app');
+createApp(App).use(RoseSpectacles).mount('#app');
 ```
 
-Additional packages (`@openvue/forms`, `@openvue/nuxt-module`, `@openvue/mcp`, ...) are opt-in. Install them only if you need form validation, Nuxt integration, or the MCP server.
+```vue
+<script setup lang="ts">
+import { Button } from 'rose-spectacles';
+import Select from 'rose-spectacles/select';
+</script>
+```
 
-## Ecosystem
+Install the optional peer before importing Chart from `rose-spectacles/chart` or Editor from `rose-spectacles/editor`. Import forms and icons by name from the package root or from their dedicated subpaths such as `rose-spectacles/forms/form` and `rose-spectacles/icons/check`. Schema resolvers use `rose-spectacles/forms/resolvers/<library>` with the corresponding validator installed.
 
-The fork spans the full toolchain, each piece maintained under the [openvi-foundation](https://github.com/orgs/openvi-foundation/repositories) organization.
+## Attribution
 
-| Repository                                                                | Description                                         |
-| ------------------------------------------------------------------------- | --------------------------------------------------- |
-| [openvue](https://github.com/openvi-foundation/openvue)                   | The core Vue UI component library (this repository) |
-| [openux](https://github.com/openvi-foundation/openux)                     | Shared theming and design-token package             |
-| [openicons](https://github.com/openvi-foundation/openicons)               | Icon library                                        |
-| [openvue-tailwind](https://github.com/openvi-foundation/openvue-tailwind) | Components styled with Tailwind CSS                 |
-
-## Roadmap
-
-Our priority is stability first, growth second. In order:
-
-1. ~~**Publish to npm.**~~ Done: OpenVue packages are live under the [`@openvue`](https://www.npmjs.com/org/openvue) org on the `latest` tag.
-2. ~~**Launch the OpenVue website.**~~ Done: [openvue.dev](https://openvue.dev) is live with the full documentation and interactive component demos.
-3. ~~**Ship a PrimeVue migration tool.**~~ Done: [`npx @openvue/migrate`](https://openvue.dev/migrate) moves a PrimeVue v4 project to OpenVue in one command.
-4. ~~**Stabilize and release.**~~ Done: **1.0.0** is out. The public API is stable and follows semantic versioning from here.
-5. **Work through the backlog.** Open issues, accessibility and performance come before new surface area.
-6. ~~**Bring Volt back.**~~ Done: [OpenVolt](https://openvolt.openvue.dev) is live, and `npx openvolt-vue` copies the Tailwind-native components into your own codebase.
-7. ~~**Ship a new theme.**~~ Done: [Nide](https://openvue.dev/theming/styled) ships beside Aura, Lara, Material and Nora, and the [Theme Builder](https://openvue.dev/theme) builds a theme from any of them.
-8. **Release 2.0.** Composition API, Vapor mode and TypeScript at the source. Existing applications keep working: OpenVue is getting full Vapor compatibility, but traditional virtual DOM rendering and Options API support are not going anywhere.
-
-## Contributing
-
-OpenVue is maintained by the openvi-foundation team together with a growing community of contributors. Bug reports, fixes, documentation improvements and feature proposals are all welcome.
-
-Start with the [contributing guide](CONTRIBUTING.md) for the development setup and how changes get reviewed. Participation is covered by our [code of conduct](CODE_OF_CONDUCT.md). To report a security issue, follow the [security policy](SECURITY.md) rather than opening an issue.
-
-## Contributors ✨
-
-Everyone who has helped build OpenVue since the fork: code, docs, design, bug reports, and ideas.
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/NJevric"><img src="https://avatars.githubusercontent.com/u/46942531?v=4?s=64" width="64px;" alt="Nikola Jevrić"/><br /><sub><b>Nikola Jevrić</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=NJevric" title="Code">💻</a> <a href="https://github.com/openvi-foundation/openvue/commits?author=NJevric" title="Documentation">📖</a> <a href="#maintenance-NJevric" title="Maintenance">🚧</a> <a href="#infra-NJevric" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/openvi-foundation/openvue/pulls?q=is%3Apr+reviewed-by%3ANJevric" title="Reviewed Pull Requests">👀</a> <a href="#design-NJevric" title="Design">🎨</a> <a href="https://github.com/openvi-foundation/openvue/commits?author=NJevric" title="Tests">⚠️</a> <a href="#security-NJevric" title="Security">🛡️</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/dekitriv"><img src="https://avatars.githubusercontent.com/u/52245546?v=4?s=64" width="64px;" alt="dekitriv"/><br /><sub><b>dekitriv</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=dekitriv" title="Code">💻</a> <a href="#infra-dekitriv" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-dekitriv" title="Maintenance">🚧</a> <a href="#design-dekitriv" title="Design">🎨</a> <a href="#tool-dekitriv" title="Tools">🔧</a> <a href="https://github.com/openvi-foundation/openvue/commits?author=dekitriv" title="Tests">⚠️</a> <a href="https://github.com/openvi-foundation/openvue/commits?author=dekitriv" title="Documentation">📖</a> <a href="https://github.com/openvi-foundation/openvue/pulls?q=is%3Apr+reviewed-by%3Adekitriv" title="Reviewed Pull Requests">👀</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/sane6"><img src="https://avatars.githubusercontent.com/u/57320614?v=4?s=64" width="64px;" alt="Srđan Sanadrović"/><br /><sub><b>Srđan Sanadrović</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=sane6" title="Code">💻</a> <a href="https://github.com/openvi-foundation/openvue/issues?q=author%3Asane6" title="Bug reports">🐛</a> <a href="https://github.com/openvi-foundation/openvue/commits?author=sane6" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/miske11"><img src="https://avatars.githubusercontent.com/u/88431819?v=4?s=64" width="64px;" alt="miske11"/><br /><sub><b>miske11</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=miske11" title="Code">💻</a> <a href="#design-miske11" title="Design">🎨</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/Bharath314"><img src="https://avatars.githubusercontent.com/u/69413757?v=4?s=64" width="64px;" alt="Bharath Valaboju"/><br /><sub><b>Bharath Valaboju</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=Bharath314" title="Code">💻</a> <a href="https://github.com/openvi-foundation/openvue/issues?q=author%3ABharath314" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/wahpiangle"><img src="https://avatars.githubusercontent.com/u/116425066?v=4?s=64" width="64px;" alt="Quan Ming"/><br /><sub><b>Quan Ming</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=wahpiangle" title="Code">💻</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/AntekOlszewski"><img src="https://avatars.githubusercontent.com/u/73691558?v=4?s=64" width="64px;" alt="AntekOlszewski"/><br /><sub><b>AntekOlszewski</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=AntekOlszewski" title="Code">💻</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/Tamas-hi"><img src="https://avatars.githubusercontent.com/u/36476318?v=4?s=64" width="64px;" alt="Tamás H."/><br /><sub><b>Tamás H.</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=Tamas-hi" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="12.5%"><a href="https://jakubpotocky.sk/"><img src="https://avatars.githubusercontent.com/u/16275303?v=4?s=64" width="64px;" alt="Jakub Potocký"/><br /><sub><b>Jakub Potocký</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=Jacobs63" title="Code">💻</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/Pshnychnyi"><img src="https://avatars.githubusercontent.com/u/104310686?v=4?s=64" width="64px;" alt="Artem"/><br /><sub><b>Artem</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=Pshnychnyi" title="Code">💻</a> <a href="https://github.com/openvi-foundation/openvue/issues?q=author%3APshnychnyi" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://www.doxee.com/"><img src="https://avatars.githubusercontent.com/u/2885522?v=4?s=64" width="64px;" alt="Alessandro Riccadonna"/><br /><sub><b>Alessandro Riccadonna</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=ariccadonna-doxee" title="Code">💻</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://sayportfolio.vercel.app/"><img src="https://avatars.githubusercontent.com/u/240962040?v=4?s=64" width="64px;" alt="Sai Asish Y"/><br /><sub><b>Sai Asish Y</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=SAY-5" title="Code">💻</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/tokainz"><img src="https://avatars.githubusercontent.com/u/74963455?v=4?s=64" width="64px;" alt="Tobias Kainz"/><br /><sub><b>Tobias Kainz</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=tokainz" title="Code">💻</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/pupuking723"><img src="https://avatars.githubusercontent.com/u/169750518?v=4?s=64" width="64px;" alt="pupuking723"/><br /><sub><b>pupuking723</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/commits?author=pupuking723" title="Code">💻</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/NikoGJ"><img src="https://avatars.githubusercontent.com/u/18424051?v=4?s=64" width="64px;" alt="Nicolas Granjon"/><br /><sub><b>Nicolas Granjon</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/issues?q=author%3ANikoGJ" title="Bug reports">🐛</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/Mettbrot"><img src="https://avatars.githubusercontent.com/u/1036625?v=4?s=64" width="64px;" alt="Mettbrot"/><br /><sub><b>Mettbrot</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/issues?q=author%3AMettbrot" title="Bug reports">🐛</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/michaelw85"><img src="https://avatars.githubusercontent.com/u/3629094?v=4?s=64" width="64px;" alt="Michael Withagen"/><br /><sub><b>Michael Withagen</b></sub></a><br /><a href="#ideas-michaelw85" title="Ideas, Planning, & Feedback">🤔</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://caddev.info/"><img src="https://avatars.githubusercontent.com/u/93262194?v=4?s=64" width="64px;" alt="Dylan"/><br /><sub><b>Dylan</b></sub></a><br /><a href="#ideas-DJ-caddev" title="Ideas, Planning, & Feedback">🤔</a></td>
-      <td align="center" valign="top" width="12.5%"><a href="https://github.com/posti85"><img src="https://avatars.githubusercontent.com/u/17066163?v=4?s=64" width="64px;" alt="José Antonio Postigo"/><br /><sub><b>José Antonio Postigo</b></sub></a><br /><a href="https://github.com/openvi-foundation/openvue/issues?q=author%3Aposti85" title="Bug reports">🐛</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
-## License
-
-MIT, unchanged. Every release under the MIT license stays exactly as it is. This fork doesn't affect that in any way.
+The source incorporates MIT-licensed work from PrimeTek, OpenVi Foundation, and contributors. See the [license](LICENSE.md).

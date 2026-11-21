@@ -1,128 +1,1499 @@
 {
-    "name": "@openvue/monorepo",
-    "version": "1.1.1",
-    "author": "OpenVue Contributors",
-    "homepage": "https://openvue.dev",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/openvi-foundation/openvue.git"
+  "name": "rose-spectacles",
+  "version": "0.1.0",
+  "description": "Vue 3 components, directives, forms, and icons for Vite applications.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jantzeno/rose-spectacles.git"
+  },
+  "files": [
+    "src",
+    "LICENSE.md",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/*.vue",
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
     },
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/openvi-foundation/openvue/issues"
+    "./icons": {
+      "types": "./src/icons/index.d.ts",
+      "default": "./src/icons/index.js"
     },
-    "scripts": {
-        "setup": "bun run clean && bun run init",
-        "clean": "bunx rimraf --glob \"**/node_modules\" \"**/dist\" \"**/.nuxt\"",
-        "init": "bun install",
-        "link": "bun run --filter './packages/*' dev:link",
-        "release": "bun run build && bun run verify:dist && node scripts/publish-packages.mjs",
-        "release:beta": "bun run build && bun run verify:dist && node scripts/publish-packages.mjs beta",
-        "release:rc": "bun run build && bun run verify:dist && node scripts/publish-packages.mjs rc",
-        "verify:dist": "node scripts/verify-dist.mjs",
-        "build": "NODE_ENV=production bun run build:check && bun run build:packages",
-        "build:check": "bun run format:check && bun run security:check",
-        "build:packages": "bun run build:metadata && bun run build:resolver && bun run build:core && bun run build:lib && bun run build:module && bun run build:themes && bun run build:icons && bun run build:mcp && bun run build:forms && bun run build:migrate && bun run build:volt-cli && bun run build:apps",
-        "build:apps": "bun run build:showcase && bun run build:volt",
-        "build:resolver": "bun run --cwd packages/auto-import-resolver build",
-        "build:core": "bun run --cwd packages/core build",
-        "build:metadata": "bun run --cwd packages/metadata build",
-        "build:module": "bun run --cwd packages/nuxt-module build",
-        "build:lib": "bun run --cwd packages/primevue build",
-        "build:themes": "bun run --cwd packages/themes build",
-        "build:icons": "bun run --cwd packages/icons build",
-        "build:mcp": "bun run --cwd packages/mcp build",
-        "build:migrate": "bun run --cwd packages/migrate build",
-        "build:volt-cli": "bun run --cwd packages/volt-cli build",
-        "build:test-packages": "bun run build:metadata && bun run build:core && bun run build:icons && bun run build:lib && bun run build:themes && bun run build:forms && bun run build:resolver && bun run build:module && bun run build:mcp && bun run build:migrate",
-        "build:forms": "bun run --cwd packages/forms build",
-        "build:showcase": "bun run --cwd apps/showcase build",
-        "build:llm": "bun run --cwd apps/showcase build:llmdocs",
-        "build:volt": "bun run --cwd apps/volt build",
-        "build:apidoc": "bun run --cwd apps/showcase build:apidoc",
-        "dev": "bun run --cwd apps/showcase dev",
-        "preview": "bun run --cwd apps/showcase preview",
-        "hot:dev": "DEV_ENV=hot bun run --cwd apps/showcase dev",
-        "volt:dev": "bun run --cwd apps/volt dev",
-        "module:dev": "bun run --cwd packages/nuxt-module dev",
-        "security:check": "bun audit --prod --audit-level high --ignore GHSA-23hp-3jrh-7fpw --ignore GHSA-2p49-hgcm-8545 --ignore GHSA-34x7-hfp2-rc4v --ignore GHSA-395f-4hp3-45gv --ignore GHSA-3jxr-9vmj-r5cp --ignore GHSA-52cp-r559-cp3m --ignore GHSA-77vg-94rm-hx3p --ignore GHSA-83g3-92jg-28cx --ignore GHSA-8qq5-rm4j-mr97 --ignore GHSA-8x88-c5mf-7j5w --ignore GHSA-96hv-2xvq-fx4p --ignore GHSA-9ppj-qmqm-q256 --ignore GHSA-fx2h-pf6j-xcff --ignore GHSA-hffm-xvc3-vprc --ignore GHSA-jvhm-gjrh-3h93 --ignore GHSA-mm7m-92g8-7m47 --ignore GHSA-p9ff-h696-f583 --ignore GHSA-qffp-2rhf-9h96 --ignore GHSA-r6q2-hw4h-h46w --ignore GHSA-v56q-mh7h-f735 --ignore GHSA-vfj7-8cjw-p6xm --ignore GHSA-w7jw-789q-3m8p --ignore GHSA-xvcm-6775-5m9r",
-        "typecheck": "bun run --cwd packages/primevue typecheck && bun run --cwd packages/migrate typecheck && bun run --cwd packages/volt-cli typecheck",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
-        "format": "prettier --write \"**/*.{js,mjs,jsx,ts,tsx,json,md}\"",
-        "format:check": "prettier --check \"**/*.{js,mjs,jsx,ts,tsx,json,md}\"",
-        "test:unit": "bun run --cwd packages/primevue test:unit && bun run --cwd packages/migrate test:unit && bun run --cwd packages/volt-cli test:unit && bun run --cwd apps/showcase test:unit",
-        "test:contracts": "bun run test:artifacts:pack && bun run verify:dist && node scripts/verify-package-contracts.mjs",
-        "test:artifacts:pack": "node scripts/run-consumer-tests.mjs --pack-only",
-        "test:consumers": "node scripts/run-consumer-tests.mjs",
-        "test:designer-smoke": "node scripts/designer-smoke.mjs",
-        "test:consumers:browser": "node scripts/run-consumer-tests.mjs --browser",
-        "lint:source": "oxlint packages/primevue/src",
-        "format:source": "oxfmt packages/primevue/src"
+    "./core": {
+      "types": "./src/core/index.d.ts",
+      "default": "./src/core/index.js"
     },
-    "devDependencies": {
-        "@babel/preset-env": "^7.21.5",
-        "@rollup/plugin-alias": "^5.1.0",
-        "@rollup/plugin-babel": "^6.0.3",
-        "@rollup/plugin-node-resolve": "^15.2.3",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@playwright/test": "^1.43.1",
-        "eslint": "^9.19.0",
-        "eslint-config-prettier": "^10.0.1",
-        "eslint-plugin-prettier": "^5.2.3",
-        "eslint-plugin-vue": "^9.32.0",
-        "globals": "^15.14.0",
-        "prettier": "^3.5.2",
-        "rollup-plugin-postcss": "^4.0.0",
-        "rollup-plugin-vue": "^6.0.0-beta.9",
-        "typescript": "5.7.3",
-        "oxlint": "1.94.0",
-        "oxfmt": "0.79.0",
-        "jsdom": "19.0.0"
+    "./accordion": {
+      "types": "./src/accordion/Accordion.d.ts",
+      "default": "./src/accordion/Accordion.vue"
     },
-    "publishConfig": {
-        "access": "public"
+    "./accordion/style": {
+      "types": "./src/accordion/style/AccordionStyle.d.ts",
+      "default": "./src/accordion/style/AccordionStyle.js"
     },
-    "packageManager": "bun@1.4.5",
-    "engines": {
-        "node": ">=12.11.0"
+    "./accordioncontent": {
+      "types": "./src/accordioncontent/AccordionContent.d.ts",
+      "default": "./src/accordioncontent/AccordionContent.vue"
     },
-    "overrides": {
-        "fast-uri": ">=4.1.5",
-        "hono": ">=4.13.7",
-        "ip-address": ">=10.7.1",
-        "@vue/devtools-core>nanoid": ">=5.1.16 <6",
-        "postcss>nanoid": ">=3.3.18 <4",
-        "postcss": ">=8.5.18",
-        "@modelcontextprotocol/sdk": ">=1.31.0 <2",
-        "proxy-addr": ">=2.0.8 <3",
-        "source-map-js": ">=1.2.2 <2"
+    "./accordioncontent/style": {
+      "types": "./src/accordioncontent/style/AccordionContentStyle.d.ts",
+      "default": "./src/accordioncontent/style/AccordionContentStyle.js"
     },
-    "workspaces": {
-        "packages": [
-            "packages/*",
-            "apps/*"
-        ],
-        "catalog": {
-            "@openuxkit/styled": "^1.0.0",
-            "@openuxkit/utils": "^1.0.0",
-            "@openuxkit/forms": "^1.0.0",
-            "@openuxkit/styles": "^1.1.0",
-            "@openuxkit/themes": "^1.2.0",
-            "@openuxkit/mcp": "^1.1.0",
-            "tailwindcss-primeui": "^0.6.1",
-            "primeicons": "^7.0.0",
-            "@openvue/openicons": "^1.0.0"
-        },
-        "catalogs": {
-            "app": {
-                "nuxt": "3.15.4",
-                "vite": "6.0.11",
-                "sass": "1.45.0",
-                "sass-loader": "8.0.2",
-                "chart.js": "^4.5.0",
-                "quill": "2.0.0"
-            }
-        }
+    "./accordionheader": {
+      "types": "./src/accordionheader/AccordionHeader.d.ts",
+      "default": "./src/accordionheader/AccordionHeader.vue"
+    },
+    "./accordionheader/style": {
+      "types": "./src/accordionheader/style/AccordionHeaderStyle.d.ts",
+      "default": "./src/accordionheader/style/AccordionHeaderStyle.js"
+    },
+    "./accordionpanel": {
+      "types": "./src/accordionpanel/AccordionPanel.d.ts",
+      "default": "./src/accordionpanel/AccordionPanel.vue"
+    },
+    "./accordionpanel/style": {
+      "types": "./src/accordionpanel/style/AccordionPanelStyle.d.ts",
+      "default": "./src/accordionpanel/style/AccordionPanelStyle.js"
+    },
+    "./accordiontab": {
+      "types": "./src/accordiontab/AccordionTab.d.ts",
+      "default": "./src/accordiontab/AccordionTab.vue"
+    },
+    "./accordiontab/style": {
+      "types": "./src/accordiontab/style/AccordionTabStyle.d.ts",
+      "default": "./src/accordiontab/style/AccordionTabStyle.js"
+    },
+    "./animateonscroll": {
+      "types": "./src/animateonscroll/AnimateOnScroll.d.ts",
+      "default": "./src/animateonscroll/AnimateOnScroll.js"
+    },
+    "./animateonscroll/style": {
+      "types": "./src/animateonscroll/style/AnimateOnScrollStyle.d.ts",
+      "default": "./src/animateonscroll/style/AnimateOnScrollStyle.js"
+    },
+    "./autocomplete": {
+      "types": "./src/autocomplete/AutoComplete.d.ts",
+      "default": "./src/autocomplete/AutoComplete.vue"
+    },
+    "./autocomplete/style": {
+      "types": "./src/autocomplete/style/AutoCompleteStyle.d.ts",
+      "default": "./src/autocomplete/style/AutoCompleteStyle.js"
+    },
+    "./avatar": {
+      "types": "./src/avatar/Avatar.d.ts",
+      "default": "./src/avatar/Avatar.vue"
+    },
+    "./avatar/style": {
+      "types": "./src/avatar/style/AvatarStyle.d.ts",
+      "default": "./src/avatar/style/AvatarStyle.js"
+    },
+    "./avatargroup": {
+      "types": "./src/avatargroup/AvatarGroup.d.ts",
+      "default": "./src/avatargroup/AvatarGroup.vue"
+    },
+    "./avatargroup/style": {
+      "types": "./src/avatargroup/style/AvatarGroupStyle.d.ts",
+      "default": "./src/avatargroup/style/AvatarGroupStyle.js"
+    },
+    "./badge": {
+      "types": "./src/badge/Badge.d.ts",
+      "default": "./src/badge/Badge.vue"
+    },
+    "./badge/style": {
+      "types": "./src/badge/style/BadgeStyle.d.ts",
+      "default": "./src/badge/style/BadgeStyle.js"
+    },
+    "./badgedirective": {
+      "types": "./src/badgedirective/BadgeDirective.d.ts",
+      "default": "./src/badgedirective/BadgeDirective.js"
+    },
+    "./badgedirective/style": {
+      "types": "./src/badgedirective/style/BadgeDirectiveStyle.d.ts",
+      "default": "./src/badgedirective/style/BadgeDirectiveStyle.js"
+    },
+    "./blockui": {
+      "types": "./src/blockui/BlockUI.d.ts",
+      "default": "./src/blockui/BlockUI.vue"
+    },
+    "./blockui/style": {
+      "types": "./src/blockui/style/BlockUIStyle.d.ts",
+      "default": "./src/blockui/style/BlockUIStyle.js"
+    },
+    "./breadcrumb": {
+      "types": "./src/breadcrumb/Breadcrumb.d.ts",
+      "default": "./src/breadcrumb/Breadcrumb.vue"
+    },
+    "./breadcrumb/style": {
+      "types": "./src/breadcrumb/style/BreadcrumbStyle.d.ts",
+      "default": "./src/breadcrumb/style/BreadcrumbStyle.js"
+    },
+    "./button": {
+      "types": "./src/button/Button.d.ts",
+      "default": "./src/button/Button.vue"
+    },
+    "./button/style": {
+      "types": "./src/button/style/ButtonStyle.d.ts",
+      "default": "./src/button/style/ButtonStyle.js"
+    },
+    "./buttongroup": {
+      "types": "./src/buttongroup/ButtonGroup.d.ts",
+      "default": "./src/buttongroup/ButtonGroup.vue"
+    },
+    "./buttongroup/style": {
+      "types": "./src/buttongroup/style/ButtonGroupStyle.d.ts",
+      "default": "./src/buttongroup/style/ButtonGroupStyle.js"
+    },
+    "./calendar": {
+      "types": "./src/calendar/Calendar.d.ts",
+      "default": "./src/calendar/Calendar.vue"
+    },
+    "./calendar/style": {
+      "types": "./src/calendar/style/CalendarStyle.d.ts",
+      "default": "./src/calendar/style/CalendarStyle.js"
+    },
+    "./card": {
+      "types": "./src/card/Card.d.ts",
+      "default": "./src/card/Card.vue"
+    },
+    "./card/style": {
+      "types": "./src/card/style/CardStyle.d.ts",
+      "default": "./src/card/style/CardStyle.js"
+    },
+    "./carousel": {
+      "types": "./src/carousel/Carousel.d.ts",
+      "default": "./src/carousel/Carousel.vue"
+    },
+    "./carousel/style": {
+      "types": "./src/carousel/style/CarouselStyle.d.ts",
+      "default": "./src/carousel/style/CarouselStyle.js"
+    },
+    "./cascadeselect": {
+      "types": "./src/cascadeselect/CascadeSelect.d.ts",
+      "default": "./src/cascadeselect/CascadeSelect.vue"
+    },
+    "./cascadeselect/style": {
+      "types": "./src/cascadeselect/style/CascadeSelectStyle.d.ts",
+      "default": "./src/cascadeselect/style/CascadeSelectStyle.js"
+    },
+    "./chart": {
+      "types": "./src/chart/Chart.d.ts",
+      "default": "./src/chart/Chart.vue"
+    },
+    "./chart/style": {
+      "types": "./src/chart/style/ChartStyle.d.ts",
+      "default": "./src/chart/style/ChartStyle.js"
+    },
+    "./checkbox": {
+      "types": "./src/checkbox/Checkbox.d.ts",
+      "default": "./src/checkbox/Checkbox.vue"
+    },
+    "./checkbox/style": {
+      "types": "./src/checkbox/style/CheckboxStyle.d.ts",
+      "default": "./src/checkbox/style/CheckboxStyle.js"
+    },
+    "./checkboxgroup": {
+      "types": "./src/checkboxgroup/CheckboxGroup.d.ts",
+      "default": "./src/checkboxgroup/CheckboxGroup.vue"
+    },
+    "./checkboxgroup/style": {
+      "types": "./src/checkboxgroup/style/CheckboxGroupStyle.d.ts",
+      "default": "./src/checkboxgroup/style/CheckboxGroupStyle.js"
+    },
+    "./chip": {
+      "types": "./src/chip/Chip.d.ts",
+      "default": "./src/chip/Chip.vue"
+    },
+    "./chip/style": {
+      "types": "./src/chip/style/ChipStyle.d.ts",
+      "default": "./src/chip/style/ChipStyle.js"
+    },
+    "./chips": {
+      "types": "./src/chips/Chips.d.ts",
+      "default": "./src/chips/Chips.vue"
+    },
+    "./chips/style": {
+      "types": "./src/chips/style/ChipsStyle.d.ts",
+      "default": "./src/chips/style/ChipsStyle.js"
+    },
+    "./colorpicker": {
+      "types": "./src/colorpicker/ColorPicker.d.ts",
+      "default": "./src/colorpicker/ColorPicker.vue"
+    },
+    "./colorpicker/style": {
+      "types": "./src/colorpicker/style/ColorPickerStyle.d.ts",
+      "default": "./src/colorpicker/style/ColorPickerStyle.js"
+    },
+    "./column": {
+      "types": "./src/column/Column.d.ts",
+      "default": "./src/column/Column.vue"
+    },
+    "./column/style": {
+      "types": "./src/column/style/ColumnStyle.d.ts",
+      "default": "./src/column/style/ColumnStyle.js"
+    },
+    "./columngroup": {
+      "types": "./src/columngroup/ColumnGroup.d.ts",
+      "default": "./src/columngroup/ColumnGroup.vue"
+    },
+    "./columngroup/style": {
+      "types": "./src/columngroup/style/ColumnGroupStyle.d.ts",
+      "default": "./src/columngroup/style/ColumnGroupStyle.js"
+    },
+    "./config": {
+      "types": "./src/config/Config.d.ts",
+      "default": "./src/config/Config.js"
+    },
+    "./confirmationeventbus": {
+      "types": "./src/confirmationeventbus/ConfirmationEventBus.d.ts",
+      "default": "./src/confirmationeventbus/ConfirmationEventBus.js"
+    },
+    "./confirmationservice": {
+      "types": "./src/confirmationservice/ConfirmationService.d.ts",
+      "default": "./src/confirmationservice/ConfirmationService.js"
+    },
+    "./confirmdialog": {
+      "types": "./src/confirmdialog/ConfirmDialog.d.ts",
+      "default": "./src/confirmdialog/ConfirmDialog.vue"
+    },
+    "./confirmdialog/style": {
+      "types": "./src/confirmdialog/style/ConfirmDialogStyle.d.ts",
+      "default": "./src/confirmdialog/style/ConfirmDialogStyle.js"
+    },
+    "./confirmpopup": {
+      "types": "./src/confirmpopup/ConfirmPopup.d.ts",
+      "default": "./src/confirmpopup/ConfirmPopup.vue"
+    },
+    "./confirmpopup/style": {
+      "types": "./src/confirmpopup/style/ConfirmPopupStyle.d.ts",
+      "default": "./src/confirmpopup/style/ConfirmPopupStyle.js"
+    },
+    "./contextmenu": {
+      "types": "./src/contextmenu/ContextMenu.d.ts",
+      "default": "./src/contextmenu/ContextMenu.vue"
+    },
+    "./contextmenu/style": {
+      "types": "./src/contextmenu/style/ContextMenuStyle.d.ts",
+      "default": "./src/contextmenu/style/ContextMenuStyle.js"
+    },
+    "./datatable": {
+      "types": "./src/datatable/DataTable.d.ts",
+      "default": "./src/datatable/DataTable.vue"
+    },
+    "./datatable/style": {
+      "types": "./src/datatable/style/DataTableStyle.d.ts",
+      "default": "./src/datatable/style/DataTableStyle.js"
+    },
+    "./dataview": {
+      "types": "./src/dataview/DataView.d.ts",
+      "default": "./src/dataview/DataView.vue"
+    },
+    "./dataview/style": {
+      "types": "./src/dataview/style/DataViewStyle.d.ts",
+      "default": "./src/dataview/style/DataViewStyle.js"
+    },
+    "./datepicker": {
+      "types": "./src/datepicker/DatePicker.d.ts",
+      "default": "./src/datepicker/DatePicker.vue"
+    },
+    "./datepicker/style": {
+      "types": "./src/datepicker/style/DatePickerStyle.d.ts",
+      "default": "./src/datepicker/style/DatePickerStyle.js"
+    },
+    "./deferredcontent": {
+      "types": "./src/deferredcontent/DeferredContent.d.ts",
+      "default": "./src/deferredcontent/DeferredContent.vue"
+    },
+    "./deferredcontent/style": {
+      "types": "./src/deferredcontent/style/DeferredContentStyle.d.ts",
+      "default": "./src/deferredcontent/style/DeferredContentStyle.js"
+    },
+    "./dialog": {
+      "types": "./src/dialog/Dialog.d.ts",
+      "default": "./src/dialog/Dialog.vue"
+    },
+    "./dialog/style": {
+      "types": "./src/dialog/style/DialogStyle.d.ts",
+      "default": "./src/dialog/style/DialogStyle.js"
+    },
+    "./dialogservice": {
+      "types": "./src/dialogservice/DialogService.d.ts",
+      "default": "./src/dialogservice/DialogService.js"
+    },
+    "./divider": {
+      "types": "./src/divider/Divider.d.ts",
+      "default": "./src/divider/Divider.vue"
+    },
+    "./divider/style": {
+      "types": "./src/divider/style/DividerStyle.d.ts",
+      "default": "./src/divider/style/DividerStyle.js"
+    },
+    "./dock": {
+      "types": "./src/dock/Dock.d.ts",
+      "default": "./src/dock/Dock.vue"
+    },
+    "./dock/style": {
+      "types": "./src/dock/style/DockStyle.d.ts",
+      "default": "./src/dock/style/DockStyle.js"
+    },
+    "./drawer": {
+      "types": "./src/drawer/Drawer.d.ts",
+      "default": "./src/drawer/Drawer.vue"
+    },
+    "./drawer/style": {
+      "types": "./src/drawer/style/DrawerStyle.d.ts",
+      "default": "./src/drawer/style/DrawerStyle.js"
+    },
+    "./dropdown": {
+      "types": "./src/dropdown/Dropdown.d.ts",
+      "default": "./src/dropdown/Dropdown.vue"
+    },
+    "./dropdown/style": {
+      "types": "./src/dropdown/style/DropdownStyle.d.ts",
+      "default": "./src/dropdown/style/DropdownStyle.js"
+    },
+    "./dynamicdialog": {
+      "types": "./src/dynamicdialog/DynamicDialog.d.ts",
+      "default": "./src/dynamicdialog/DynamicDialog.vue"
+    },
+    "./dynamicdialog/style": {
+      "types": "./src/dynamicdialog/style/DynamicDialogStyle.d.ts",
+      "default": "./src/dynamicdialog/style/DynamicDialogStyle.js"
+    },
+    "./dynamicdialogeventbus": {
+      "types": "./src/dynamicdialogeventbus/DynamicDialogEventBus.d.ts",
+      "default": "./src/dynamicdialogeventbus/DynamicDialogEventBus.js"
+    },
+    "./editor": {
+      "types": "./src/editor/Editor.d.ts",
+      "default": "./src/editor/Editor.vue"
+    },
+    "./editor/style": {
+      "types": "./src/editor/style/EditorStyle.d.ts",
+      "default": "./src/editor/style/EditorStyle.js"
+    },
+    "./fieldset": {
+      "types": "./src/fieldset/Fieldset.d.ts",
+      "default": "./src/fieldset/Fieldset.vue"
+    },
+    "./fieldset/style": {
+      "types": "./src/fieldset/style/FieldsetStyle.d.ts",
+      "default": "./src/fieldset/style/FieldsetStyle.js"
+    },
+    "./fileupload": {
+      "types": "./src/fileupload/FileUpload.d.ts",
+      "default": "./src/fileupload/FileUpload.vue"
+    },
+    "./fileupload/style": {
+      "types": "./src/fileupload/style/FileUploadStyle.d.ts",
+      "default": "./src/fileupload/style/FileUploadStyle.js"
+    },
+    "./floatlabel": {
+      "types": "./src/floatlabel/FloatLabel.d.ts",
+      "default": "./src/floatlabel/FloatLabel.vue"
+    },
+    "./floatlabel/style": {
+      "types": "./src/floatlabel/style/FloatLabelStyle.d.ts",
+      "default": "./src/floatlabel/style/FloatLabelStyle.js"
+    },
+    "./fluid": {
+      "types": "./src/fluid/Fluid.d.ts",
+      "default": "./src/fluid/Fluid.vue"
+    },
+    "./fluid/style": {
+      "types": "./src/fluid/style/FluidStyle.d.ts",
+      "default": "./src/fluid/style/FluidStyle.js"
+    },
+    "./focustrap": {
+      "types": "./src/focustrap/FocusTrap.d.ts",
+      "default": "./src/focustrap/FocusTrap.js"
+    },
+    "./focustrap/style": {
+      "types": "./src/focustrap/style/FocusTrapStyle.d.ts",
+      "default": "./src/focustrap/style/FocusTrapStyle.js"
+    },
+    "./galleria": {
+      "types": "./src/galleria/Galleria.d.ts",
+      "default": "./src/galleria/Galleria.vue"
+    },
+    "./galleria/style": {
+      "types": "./src/galleria/style/GalleriaStyle.d.ts",
+      "default": "./src/galleria/style/GalleriaStyle.js"
+    },
+    "./iconfield": {
+      "types": "./src/iconfield/IconField.d.ts",
+      "default": "./src/iconfield/IconField.vue"
+    },
+    "./iconfield/style": {
+      "types": "./src/iconfield/style/IconFieldStyle.d.ts",
+      "default": "./src/iconfield/style/IconFieldStyle.js"
+    },
+    "./iftalabel": {
+      "types": "./src/iftalabel/IftaLabel.d.ts",
+      "default": "./src/iftalabel/IftaLabel.vue"
+    },
+    "./iftalabel/style": {
+      "types": "./src/iftalabel/style/IftaLabelStyle.d.ts",
+      "default": "./src/iftalabel/style/IftaLabelStyle.js"
+    },
+    "./image": {
+      "types": "./src/image/Image.d.ts",
+      "default": "./src/image/Image.vue"
+    },
+    "./image/style": {
+      "types": "./src/image/style/ImageStyle.d.ts",
+      "default": "./src/image/style/ImageStyle.js"
+    },
+    "./imagecompare": {
+      "types": "./src/imagecompare/ImageCompare.d.ts",
+      "default": "./src/imagecompare/ImageCompare.vue"
+    },
+    "./imagecompare/style": {
+      "types": "./src/imagecompare/style/ImageCompareStyle.d.ts",
+      "default": "./src/imagecompare/style/ImageCompareStyle.js"
+    },
+    "./inlinemessage": {
+      "types": "./src/inlinemessage/InlineMessage.d.ts",
+      "default": "./src/inlinemessage/InlineMessage.vue"
+    },
+    "./inlinemessage/style": {
+      "types": "./src/inlinemessage/style/InlineMessageStyle.d.ts",
+      "default": "./src/inlinemessage/style/InlineMessageStyle.js"
+    },
+    "./inplace": {
+      "types": "./src/inplace/Inplace.d.ts",
+      "default": "./src/inplace/Inplace.vue"
+    },
+    "./inplace/style": {
+      "types": "./src/inplace/style/InplaceStyle.d.ts",
+      "default": "./src/inplace/style/InplaceStyle.js"
+    },
+    "./inputchips": {
+      "types": "./src/inputchips/InputChips.d.ts",
+      "default": "./src/inputchips/InputChips.vue"
+    },
+    "./inputchips/style": {
+      "types": "./src/inputchips/style/InputChipsStyle.d.ts",
+      "default": "./src/inputchips/style/InputChipsStyle.js"
+    },
+    "./inputgroup": {
+      "types": "./src/inputgroup/InputGroup.d.ts",
+      "default": "./src/inputgroup/InputGroup.vue"
+    },
+    "./inputgroup/style": {
+      "types": "./src/inputgroup/style/InputGroupStyle.d.ts",
+      "default": "./src/inputgroup/style/InputGroupStyle.js"
+    },
+    "./inputgroupaddon": {
+      "types": "./src/inputgroupaddon/InputGroupAddon.d.ts",
+      "default": "./src/inputgroupaddon/InputGroupAddon.vue"
+    },
+    "./inputgroupaddon/style": {
+      "types": "./src/inputgroupaddon/style/InputGroupAddonStyle.d.ts",
+      "default": "./src/inputgroupaddon/style/InputGroupAddonStyle.js"
+    },
+    "./inputicon": {
+      "types": "./src/inputicon/InputIcon.d.ts",
+      "default": "./src/inputicon/InputIcon.vue"
+    },
+    "./inputicon/style": {
+      "types": "./src/inputicon/style/InputIconStyle.d.ts",
+      "default": "./src/inputicon/style/InputIconStyle.js"
+    },
+    "./inputmask": {
+      "types": "./src/inputmask/InputMask.d.ts",
+      "default": "./src/inputmask/InputMask.vue"
+    },
+    "./inputmask/style": {
+      "types": "./src/inputmask/style/InputMaskStyle.d.ts",
+      "default": "./src/inputmask/style/InputMaskStyle.js"
+    },
+    "./inputnumber": {
+      "types": "./src/inputnumber/InputNumber.d.ts",
+      "default": "./src/inputnumber/InputNumber.vue"
+    },
+    "./inputnumber/style": {
+      "types": "./src/inputnumber/style/InputNumberStyle.d.ts",
+      "default": "./src/inputnumber/style/InputNumberStyle.js"
+    },
+    "./inputotp": {
+      "types": "./src/inputotp/InputOtp.d.ts",
+      "default": "./src/inputotp/InputOtp.vue"
+    },
+    "./inputotp/style": {
+      "types": "./src/inputotp/style/InputOtpStyle.d.ts",
+      "default": "./src/inputotp/style/InputOtpStyle.js"
+    },
+    "./inputswitch": {
+      "types": "./src/inputswitch/InputSwitch.d.ts",
+      "default": "./src/inputswitch/InputSwitch.vue"
+    },
+    "./inputswitch/style": {
+      "types": "./src/inputswitch/style/InputSwitchStyle.d.ts",
+      "default": "./src/inputswitch/style/InputSwitchStyle.js"
+    },
+    "./inputtext": {
+      "types": "./src/inputtext/InputText.d.ts",
+      "default": "./src/inputtext/InputText.vue"
+    },
+    "./inputtext/style": {
+      "types": "./src/inputtext/style/InputTextStyle.d.ts",
+      "default": "./src/inputtext/style/InputTextStyle.js"
+    },
+    "./keyfilter": {
+      "types": "./src/keyfilter/KeyFilter.d.ts",
+      "default": "./src/keyfilter/KeyFilter.js"
+    },
+    "./keyfilter/style": {
+      "types": "./src/keyfilter/style/KeyFilterStyle.d.ts",
+      "default": "./src/keyfilter/style/KeyFilterStyle.js"
+    },
+    "./knob": {
+      "types": "./src/knob/Knob.d.ts",
+      "default": "./src/knob/Knob.vue"
+    },
+    "./knob/style": {
+      "types": "./src/knob/style/KnobStyle.d.ts",
+      "default": "./src/knob/style/KnobStyle.js"
+    },
+    "./listbox": {
+      "types": "./src/listbox/Listbox.d.ts",
+      "default": "./src/listbox/Listbox.vue"
+    },
+    "./listbox/style": {
+      "types": "./src/listbox/style/ListboxStyle.d.ts",
+      "default": "./src/listbox/style/ListboxStyle.js"
+    },
+    "./megamenu": {
+      "types": "./src/megamenu/MegaMenu.d.ts",
+      "default": "./src/megamenu/MegaMenu.vue"
+    },
+    "./megamenu/style": {
+      "types": "./src/megamenu/style/MegaMenuStyle.d.ts",
+      "default": "./src/megamenu/style/MegaMenuStyle.js"
+    },
+    "./menu": {
+      "types": "./src/menu/Menu.d.ts",
+      "default": "./src/menu/Menu.vue"
+    },
+    "./menu/style": {
+      "types": "./src/menu/style/MenuStyle.d.ts",
+      "default": "./src/menu/style/MenuStyle.js"
+    },
+    "./menubar": {
+      "types": "./src/menubar/Menubar.d.ts",
+      "default": "./src/menubar/Menubar.vue"
+    },
+    "./menubar/style": {
+      "types": "./src/menubar/style/MenubarStyle.d.ts",
+      "default": "./src/menubar/style/MenubarStyle.js"
+    },
+    "./message": {
+      "types": "./src/message/Message.d.ts",
+      "default": "./src/message/Message.vue"
+    },
+    "./message/style": {
+      "types": "./src/message/style/MessageStyle.d.ts",
+      "default": "./src/message/style/MessageStyle.js"
+    },
+    "./metergroup": {
+      "types": "./src/metergroup/MeterGroup.d.ts",
+      "default": "./src/metergroup/MeterGroup.vue"
+    },
+    "./metergroup/style": {
+      "types": "./src/metergroup/style/MeterGroupStyle.d.ts",
+      "default": "./src/metergroup/style/MeterGroupStyle.js"
+    },
+    "./multiselect": {
+      "types": "./src/multiselect/MultiSelect.d.ts",
+      "default": "./src/multiselect/MultiSelect.vue"
+    },
+    "./multiselect/style": {
+      "types": "./src/multiselect/style/MultiSelectStyle.d.ts",
+      "default": "./src/multiselect/style/MultiSelectStyle.js"
+    },
+    "./orderlist": {
+      "types": "./src/orderlist/OrderList.d.ts",
+      "default": "./src/orderlist/OrderList.vue"
+    },
+    "./orderlist/style": {
+      "types": "./src/orderlist/style/OrderListStyle.d.ts",
+      "default": "./src/orderlist/style/OrderListStyle.js"
+    },
+    "./organizationchart": {
+      "types": "./src/organizationchart/OrganizationChart.d.ts",
+      "default": "./src/organizationchart/OrganizationChart.vue"
+    },
+    "./organizationchart/style": {
+      "types": "./src/organizationchart/style/OrganizationChartStyle.d.ts",
+      "default": "./src/organizationchart/style/OrganizationChartStyle.js"
+    },
+    "./overlaybadge": {
+      "types": "./src/overlaybadge/OverlayBadge.d.ts",
+      "default": "./src/overlaybadge/OverlayBadge.vue"
+    },
+    "./overlaybadge/style": {
+      "types": "./src/overlaybadge/style/OverlayBadgeStyle.d.ts",
+      "default": "./src/overlaybadge/style/OverlayBadgeStyle.js"
+    },
+    "./overlayeventbus": {
+      "types": "./src/overlayeventbus/OverlayEventBus.d.ts",
+      "default": "./src/overlayeventbus/OverlayEventBus.js"
+    },
+    "./overlaypanel": {
+      "types": "./src/overlaypanel/OverlayPanel.d.ts",
+      "default": "./src/overlaypanel/OverlayPanel.vue"
+    },
+    "./overlaypanel/style": {
+      "types": "./src/overlaypanel/style/OverlayPanelStyle.d.ts",
+      "default": "./src/overlaypanel/style/OverlayPanelStyle.js"
+    },
+    "./paginator": {
+      "types": "./src/paginator/Paginator.d.ts",
+      "default": "./src/paginator/Paginator.vue"
+    },
+    "./paginator/style": {
+      "types": "./src/paginator/style/PaginatorStyle.d.ts",
+      "default": "./src/paginator/style/PaginatorStyle.js"
+    },
+    "./panel": {
+      "types": "./src/panel/Panel.d.ts",
+      "default": "./src/panel/Panel.vue"
+    },
+    "./panel/style": {
+      "types": "./src/panel/style/PanelStyle.d.ts",
+      "default": "./src/panel/style/PanelStyle.js"
+    },
+    "./panelmenu": {
+      "types": "./src/panelmenu/PanelMenu.d.ts",
+      "default": "./src/panelmenu/PanelMenu.vue"
+    },
+    "./panelmenu/style": {
+      "types": "./src/panelmenu/style/PanelMenuStyle.d.ts",
+      "default": "./src/panelmenu/style/PanelMenuStyle.js"
+    },
+    "./password": {
+      "types": "./src/password/Password.d.ts",
+      "default": "./src/password/Password.vue"
+    },
+    "./password/style": {
+      "types": "./src/password/style/PasswordStyle.d.ts",
+      "default": "./src/password/style/PasswordStyle.js"
+    },
+    "./picklist": {
+      "types": "./src/picklist/PickList.d.ts",
+      "default": "./src/picklist/PickList.vue"
+    },
+    "./picklist/style": {
+      "types": "./src/picklist/style/PickListStyle.d.ts",
+      "default": "./src/picklist/style/PickListStyle.js"
+    },
+    "./popover": {
+      "types": "./src/popover/Popover.d.ts",
+      "default": "./src/popover/Popover.vue"
+    },
+    "./popover/style": {
+      "types": "./src/popover/style/PopoverStyle.d.ts",
+      "default": "./src/popover/style/PopoverStyle.js"
+    },
+    "./portal": {
+      "types": "./src/portal/Portal.d.ts",
+      "default": "./src/portal/Portal.vue"
+    },
+    "./portal/style": {
+      "types": "./src/portal/style/PortalStyle.d.ts",
+      "default": "./src/portal/style/PortalStyle.js"
+    },
+    "./progressbar": {
+      "types": "./src/progressbar/ProgressBar.d.ts",
+      "default": "./src/progressbar/ProgressBar.vue"
+    },
+    "./progressbar/style": {
+      "types": "./src/progressbar/style/ProgressBarStyle.d.ts",
+      "default": "./src/progressbar/style/ProgressBarStyle.js"
+    },
+    "./progressspinner": {
+      "types": "./src/progressspinner/ProgressSpinner.d.ts",
+      "default": "./src/progressspinner/ProgressSpinner.vue"
+    },
+    "./progressspinner/style": {
+      "types": "./src/progressspinner/style/ProgressSpinnerStyle.d.ts",
+      "default": "./src/progressspinner/style/ProgressSpinnerStyle.js"
+    },
+    "./radiobutton": {
+      "types": "./src/radiobutton/RadioButton.d.ts",
+      "default": "./src/radiobutton/RadioButton.vue"
+    },
+    "./radiobutton/style": {
+      "types": "./src/radiobutton/style/RadioButtonStyle.d.ts",
+      "default": "./src/radiobutton/style/RadioButtonStyle.js"
+    },
+    "./radiobuttongroup": {
+      "types": "./src/radiobuttongroup/RadioButtonGroup.d.ts",
+      "default": "./src/radiobuttongroup/RadioButtonGroup.vue"
+    },
+    "./radiobuttongroup/style": {
+      "types": "./src/radiobuttongroup/style/RadioButtonGroupStyle.d.ts",
+      "default": "./src/radiobuttongroup/style/RadioButtonGroupStyle.js"
+    },
+    "./rating": {
+      "types": "./src/rating/Rating.d.ts",
+      "default": "./src/rating/Rating.vue"
+    },
+    "./rating/style": {
+      "types": "./src/rating/style/RatingStyle.d.ts",
+      "default": "./src/rating/style/RatingStyle.js"
+    },
+    "./ripple": {
+      "types": "./src/ripple/Ripple.d.ts",
+      "default": "./src/ripple/Ripple.js"
+    },
+    "./ripple/style": {
+      "types": "./src/ripple/style/RippleStyle.d.ts",
+      "default": "./src/ripple/style/RippleStyle.js"
+    },
+    "./row": {
+      "types": "./src/row/Row.d.ts",
+      "default": "./src/row/Row.vue"
+    },
+    "./row/style": {
+      "types": "./src/row/style/RowStyle.d.ts",
+      "default": "./src/row/style/RowStyle.js"
+    },
+    "./scrollpanel": {
+      "types": "./src/scrollpanel/ScrollPanel.d.ts",
+      "default": "./src/scrollpanel/ScrollPanel.vue"
+    },
+    "./scrollpanel/style": {
+      "types": "./src/scrollpanel/style/ScrollPanelStyle.d.ts",
+      "default": "./src/scrollpanel/style/ScrollPanelStyle.js"
+    },
+    "./scrolltop": {
+      "types": "./src/scrolltop/ScrollTop.d.ts",
+      "default": "./src/scrolltop/ScrollTop.vue"
+    },
+    "./scrolltop/style": {
+      "types": "./src/scrolltop/style/ScrollTopStyle.d.ts",
+      "default": "./src/scrolltop/style/ScrollTopStyle.js"
+    },
+    "./select": {
+      "types": "./src/select/Select.d.ts",
+      "default": "./src/select/Select.vue"
+    },
+    "./select/style": {
+      "types": "./src/select/style/SelectStyle.d.ts",
+      "default": "./src/select/style/SelectStyle.js"
+    },
+    "./selectbutton": {
+      "types": "./src/selectbutton/SelectButton.d.ts",
+      "default": "./src/selectbutton/SelectButton.vue"
+    },
+    "./selectbutton/style": {
+      "types": "./src/selectbutton/style/SelectButtonStyle.d.ts",
+      "default": "./src/selectbutton/style/SelectButtonStyle.js"
+    },
+    "./sidebar": {
+      "types": "./src/sidebar/Sidebar.d.ts",
+      "default": "./src/sidebar/Sidebar.vue"
+    },
+    "./sidebar/style": {
+      "types": "./src/sidebar/style/SidebarStyle.d.ts",
+      "default": "./src/sidebar/style/SidebarStyle.js"
+    },
+    "./skeleton": {
+      "types": "./src/skeleton/Skeleton.d.ts",
+      "default": "./src/skeleton/Skeleton.vue"
+    },
+    "./skeleton/style": {
+      "types": "./src/skeleton/style/SkeletonStyle.d.ts",
+      "default": "./src/skeleton/style/SkeletonStyle.js"
+    },
+    "./slider": {
+      "types": "./src/slider/Slider.d.ts",
+      "default": "./src/slider/Slider.vue"
+    },
+    "./slider/style": {
+      "types": "./src/slider/style/SliderStyle.d.ts",
+      "default": "./src/slider/style/SliderStyle.js"
+    },
+    "./speeddial": {
+      "types": "./src/speeddial/SpeedDial.d.ts",
+      "default": "./src/speeddial/SpeedDial.vue"
+    },
+    "./speeddial/style": {
+      "types": "./src/speeddial/style/SpeedDialStyle.d.ts",
+      "default": "./src/speeddial/style/SpeedDialStyle.js"
+    },
+    "./splitbutton": {
+      "types": "./src/splitbutton/SplitButton.d.ts",
+      "default": "./src/splitbutton/SplitButton.vue"
+    },
+    "./splitbutton/style": {
+      "types": "./src/splitbutton/style/SplitButtonStyle.d.ts",
+      "default": "./src/splitbutton/style/SplitButtonStyle.js"
+    },
+    "./splitter": {
+      "types": "./src/splitter/Splitter.d.ts",
+      "default": "./src/splitter/Splitter.vue"
+    },
+    "./splitter/style": {
+      "types": "./src/splitter/style/SplitterStyle.d.ts",
+      "default": "./src/splitter/style/SplitterStyle.js"
+    },
+    "./splitterpanel": {
+      "types": "./src/splitterpanel/SplitterPanel.d.ts",
+      "default": "./src/splitterpanel/SplitterPanel.vue"
+    },
+    "./splitterpanel/style": {
+      "types": "./src/splitterpanel/style/SplitterPanelStyle.d.ts",
+      "default": "./src/splitterpanel/style/SplitterPanelStyle.js"
+    },
+    "./step": {
+      "types": "./src/step/Step.d.ts",
+      "default": "./src/step/Step.vue"
+    },
+    "./step/style": {
+      "types": "./src/step/style/StepStyle.d.ts",
+      "default": "./src/step/style/StepStyle.js"
+    },
+    "./stepitem": {
+      "types": "./src/stepitem/StepItem.d.ts",
+      "default": "./src/stepitem/StepItem.vue"
+    },
+    "./stepitem/style": {
+      "types": "./src/stepitem/style/StepItemStyle.d.ts",
+      "default": "./src/stepitem/style/StepItemStyle.js"
+    },
+    "./steplist": {
+      "types": "./src/steplist/StepList.d.ts",
+      "default": "./src/steplist/StepList.vue"
+    },
+    "./steplist/style": {
+      "types": "./src/steplist/style/StepListStyle.d.ts",
+      "default": "./src/steplist/style/StepListStyle.js"
+    },
+    "./steppanel": {
+      "types": "./src/steppanel/StepPanel.d.ts",
+      "default": "./src/steppanel/StepPanel.vue"
+    },
+    "./steppanel/style": {
+      "types": "./src/steppanel/style/StepPanelStyle.d.ts",
+      "default": "./src/steppanel/style/StepPanelStyle.js"
+    },
+    "./steppanels": {
+      "types": "./src/steppanels/StepPanels.d.ts",
+      "default": "./src/steppanels/StepPanels.vue"
+    },
+    "./steppanels/style": {
+      "types": "./src/steppanels/style/StepPanelsStyle.d.ts",
+      "default": "./src/steppanels/style/StepPanelsStyle.js"
+    },
+    "./stepper": {
+      "types": "./src/stepper/Stepper.d.ts",
+      "default": "./src/stepper/Stepper.vue"
+    },
+    "./stepper/style": {
+      "types": "./src/stepper/style/StepperStyle.d.ts",
+      "default": "./src/stepper/style/StepperStyle.js"
+    },
+    "./steps": {
+      "types": "./src/steps/Steps.d.ts",
+      "default": "./src/steps/Steps.vue"
+    },
+    "./steps/style": {
+      "types": "./src/steps/style/StepsStyle.d.ts",
+      "default": "./src/steps/style/StepsStyle.js"
+    },
+    "./styleclass": {
+      "types": "./src/styleclass/StyleClass.d.ts",
+      "default": "./src/styleclass/StyleClass.js"
+    },
+    "./styleclass/style": {
+      "types": "./src/styleclass/style/StyleClassStyle.d.ts",
+      "default": "./src/styleclass/style/StyleClassStyle.js"
+    },
+    "./tab": {
+      "types": "./src/tab/Tab.d.ts",
+      "default": "./src/tab/Tab.vue"
+    },
+    "./tab/style": {
+      "types": "./src/tab/style/TabStyle.d.ts",
+      "default": "./src/tab/style/TabStyle.js"
+    },
+    "./tablist": {
+      "types": "./src/tablist/TabList.d.ts",
+      "default": "./src/tablist/TabList.vue"
+    },
+    "./tablist/style": {
+      "types": "./src/tablist/style/TabListStyle.d.ts",
+      "default": "./src/tablist/style/TabListStyle.js"
+    },
+    "./tabmenu": {
+      "types": "./src/tabmenu/TabMenu.d.ts",
+      "default": "./src/tabmenu/TabMenu.vue"
+    },
+    "./tabmenu/style": {
+      "types": "./src/tabmenu/style/TabMenuStyle.d.ts",
+      "default": "./src/tabmenu/style/TabMenuStyle.js"
+    },
+    "./tabpanel": {
+      "types": "./src/tabpanel/TabPanel.d.ts",
+      "default": "./src/tabpanel/TabPanel.vue"
+    },
+    "./tabpanel/style": {
+      "types": "./src/tabpanel/style/TabPanelStyle.d.ts",
+      "default": "./src/tabpanel/style/TabPanelStyle.js"
+    },
+    "./tabpanels": {
+      "types": "./src/tabpanels/TabPanels.d.ts",
+      "default": "./src/tabpanels/TabPanels.vue"
+    },
+    "./tabpanels/style": {
+      "types": "./src/tabpanels/style/TabPanelsStyle.d.ts",
+      "default": "./src/tabpanels/style/TabPanelsStyle.js"
+    },
+    "./tabs": {
+      "types": "./src/tabs/Tabs.d.ts",
+      "default": "./src/tabs/Tabs.vue"
+    },
+    "./tabs/style": {
+      "types": "./src/tabs/style/TabsStyle.d.ts",
+      "default": "./src/tabs/style/TabsStyle.js"
+    },
+    "./tabview": {
+      "types": "./src/tabview/TabView.d.ts",
+      "default": "./src/tabview/TabView.vue"
+    },
+    "./tabview/style": {
+      "types": "./src/tabview/style/TabViewStyle.d.ts",
+      "default": "./src/tabview/style/TabViewStyle.js"
+    },
+    "./tag": {
+      "types": "./src/tag/Tag.d.ts",
+      "default": "./src/tag/Tag.vue"
+    },
+    "./tag/style": {
+      "types": "./src/tag/style/TagStyle.d.ts",
+      "default": "./src/tag/style/TagStyle.js"
+    },
+    "./terminal": {
+      "types": "./src/terminal/Terminal.d.ts",
+      "default": "./src/terminal/Terminal.vue"
+    },
+    "./terminal/style": {
+      "types": "./src/terminal/style/TerminalStyle.d.ts",
+      "default": "./src/terminal/style/TerminalStyle.js"
+    },
+    "./terminalservice": {
+      "types": "./src/terminalservice/TerminalService.d.ts",
+      "default": "./src/terminalservice/TerminalService.js"
+    },
+    "./textarea": {
+      "types": "./src/textarea/Textarea.d.ts",
+      "default": "./src/textarea/Textarea.vue"
+    },
+    "./textarea/style": {
+      "types": "./src/textarea/style/TextareaStyle.d.ts",
+      "default": "./src/textarea/style/TextareaStyle.js"
+    },
+    "./tieredmenu": {
+      "types": "./src/tieredmenu/TieredMenu.d.ts",
+      "default": "./src/tieredmenu/TieredMenu.vue"
+    },
+    "./tieredmenu/style": {
+      "types": "./src/tieredmenu/style/TieredMenuStyle.d.ts",
+      "default": "./src/tieredmenu/style/TieredMenuStyle.js"
+    },
+    "./timeline": {
+      "types": "./src/timeline/Timeline.d.ts",
+      "default": "./src/timeline/Timeline.vue"
+    },
+    "./timeline/style": {
+      "types": "./src/timeline/style/TimelineStyle.d.ts",
+      "default": "./src/timeline/style/TimelineStyle.js"
+    },
+    "./toast": {
+      "types": "./src/toast/Toast.d.ts",
+      "default": "./src/toast/Toast.vue"
+    },
+    "./toast/style": {
+      "types": "./src/toast/style/ToastStyle.d.ts",
+      "default": "./src/toast/style/ToastStyle.js"
+    },
+    "./toasteventbus": {
+      "types": "./src/toasteventbus/ToastEventBus.d.ts",
+      "default": "./src/toasteventbus/ToastEventBus.js"
+    },
+    "./toastservice": {
+      "types": "./src/toastservice/ToastService.d.ts",
+      "default": "./src/toastservice/ToastService.js"
+    },
+    "./togglebutton": {
+      "types": "./src/togglebutton/ToggleButton.d.ts",
+      "default": "./src/togglebutton/ToggleButton.vue"
+    },
+    "./togglebutton/style": {
+      "types": "./src/togglebutton/style/ToggleButtonStyle.d.ts",
+      "default": "./src/togglebutton/style/ToggleButtonStyle.js"
+    },
+    "./toggleswitch": {
+      "types": "./src/toggleswitch/ToggleSwitch.d.ts",
+      "default": "./src/toggleswitch/ToggleSwitch.vue"
+    },
+    "./toggleswitch/style": {
+      "types": "./src/toggleswitch/style/ToggleSwitchStyle.d.ts",
+      "default": "./src/toggleswitch/style/ToggleSwitchStyle.js"
+    },
+    "./toolbar": {
+      "types": "./src/toolbar/Toolbar.d.ts",
+      "default": "./src/toolbar/Toolbar.vue"
+    },
+    "./toolbar/style": {
+      "types": "./src/toolbar/style/ToolbarStyle.d.ts",
+      "default": "./src/toolbar/style/ToolbarStyle.js"
+    },
+    "./tooltip": {
+      "types": "./src/tooltip/Tooltip.d.ts",
+      "default": "./src/tooltip/Tooltip.js"
+    },
+    "./tooltip/style": {
+      "types": "./src/tooltip/style/TooltipStyle.d.ts",
+      "default": "./src/tooltip/style/TooltipStyle.js"
+    },
+    "./tree": {
+      "types": "./src/tree/Tree.d.ts",
+      "default": "./src/tree/Tree.vue"
+    },
+    "./tree/style": {
+      "types": "./src/tree/style/TreeStyle.d.ts",
+      "default": "./src/tree/style/TreeStyle.js"
+    },
+    "./treeselect": {
+      "types": "./src/treeselect/TreeSelect.d.ts",
+      "default": "./src/treeselect/TreeSelect.vue"
+    },
+    "./treeselect/style": {
+      "types": "./src/treeselect/style/TreeSelectStyle.d.ts",
+      "default": "./src/treeselect/style/TreeSelectStyle.js"
+    },
+    "./treetable": {
+      "types": "./src/treetable/TreeTable.d.ts",
+      "default": "./src/treetable/TreeTable.vue"
+    },
+    "./treetable/style": {
+      "types": "./src/treetable/style/TreeTableStyle.d.ts",
+      "default": "./src/treetable/style/TreeTableStyle.js"
+    },
+    "./useconfirm": {
+      "types": "./src/useconfirm/UseConfirm.d.ts",
+      "default": "./src/useconfirm/UseConfirm.js"
+    },
+    "./usedialog": {
+      "types": "./src/usedialog/UseDialog.d.ts",
+      "default": "./src/usedialog/UseDialog.js"
+    },
+    "./usestyle": {
+      "types": "./src/usestyle/UseStyle.d.ts",
+      "default": "./src/usestyle/UseStyle.js"
+    },
+    "./usetoast": {
+      "types": "./src/usetoast/UseToast.d.ts",
+      "default": "./src/usetoast/UseToast.js"
+    },
+    "./utils": {
+      "types": "./src/utils/Utils.d.ts",
+      "default": "./src/utils/Utils.js"
+    },
+    "./virtualscroller": {
+      "types": "./src/virtualscroller/VirtualScroller.d.ts",
+      "default": "./src/virtualscroller/VirtualScroller.vue"
+    },
+    "./virtualscroller/style": {
+      "types": "./src/virtualscroller/style/VirtualScrollerStyle.d.ts",
+      "default": "./src/virtualscroller/style/VirtualScrollerStyle.js"
+    },
+    "./core/api": {
+      "types": "./src/core/api/Api.d.ts",
+      "default": "./src/core/api/Api.js"
+    },
+    "./core/useid": {
+      "types": "./src/core/useid/UseId.d.ts",
+      "default": "./src/core/useid/UseId.js"
+    },
+    "./core/base/style": {
+      "types": "./src/core/base/style/BaseStyle.d.ts",
+      "default": "./src/core/base/style/BaseStyle.js"
+    },
+    "./core/base": {
+      "types": "./src/core/base/Base.d.ts",
+      "default": "./src/core/base/Base.js"
+    },
+    "./core/basecomponent/style": {
+      "types": "./src/core/basecomponent/style/BaseComponentStyle.d.ts",
+      "default": "./src/core/basecomponent/style/BaseComponentStyle.js"
+    },
+    "./core/basecomponent": {
+      "types": "./src/core/basecomponent/BaseComponent.d.ts",
+      "default": "./src/core/basecomponent/BaseComponent.vue"
+    },
+    "./core/basedirective": {
+      "types": "./src/core/basedirective/BaseDirective.d.ts",
+      "default": "./src/core/basedirective/BaseDirective.js"
+    },
+    "./core/baseeditableholder": {
+      "types": "./src/core/baseeditableholder/BaseEditableHolder.d.ts",
+      "default": "./src/core/baseeditableholder/BaseEditableHolder.vue"
+    },
+    "./core/baseinput": {
+      "types": "./src/core/baseinput/BaseInput.d.ts",
+      "default": "./src/core/baseinput/BaseInput.vue"
+    },
+    "./core/config": {
+      "types": "./src/core/config/PrimeVue.d.ts",
+      "default": "./src/core/config/PrimeVue.js"
+    },
+    "./core/service": {
+      "types": "./src/core/service/PrimeVueService.d.ts",
+      "default": "./src/core/service/PrimeVueService.js"
+    },
+    "./core/useattrselector": {
+      "types": "./src/core/useattrselector/UseAttrSelector.d.ts",
+      "default": "./src/core/useattrselector/UseAttrSelector.js"
+    },
+    "./core/usestyle": {
+      "types": "./src/core/usestyle/UseStyle.d.ts",
+      "default": "./src/core/usestyle/UseStyle.js"
+    },
+    "./core/utils": {
+      "types": "./src/core/utils/Utils.d.ts",
+      "default": "./src/core/utils/Utils.js"
+    },
+    "./icons/angledoubledown": {
+      "types": "./src/icons/angledoubledown/AngleDoubleDownIcon.d.ts",
+      "default": "./src/icons/angledoubledown/AngleDoubleDownIcon.vue"
+    },
+    "./icons/angledoubleleft": {
+      "types": "./src/icons/angledoubleleft/AngleDoubleLeftIcon.d.ts",
+      "default": "./src/icons/angledoubleleft/AngleDoubleLeftIcon.vue"
+    },
+    "./icons/angledoubleright": {
+      "types": "./src/icons/angledoubleright/AngleDoubleRightIcon.d.ts",
+      "default": "./src/icons/angledoubleright/AngleDoubleRightIcon.vue"
+    },
+    "./icons/angledoubleup": {
+      "types": "./src/icons/angledoubleup/AngleDoubleUpIcon.d.ts",
+      "default": "./src/icons/angledoubleup/AngleDoubleUpIcon.vue"
+    },
+    "./icons/angledown": {
+      "types": "./src/icons/angledown/AngleDownIcon.d.ts",
+      "default": "./src/icons/angledown/AngleDownIcon.vue"
+    },
+    "./icons/angleleft": {
+      "types": "./src/icons/angleleft/AngleLeftIcon.d.ts",
+      "default": "./src/icons/angleleft/AngleLeftIcon.vue"
+    },
+    "./icons/angleright": {
+      "types": "./src/icons/angleright/AngleRightIcon.d.ts",
+      "default": "./src/icons/angleright/AngleRightIcon.vue"
+    },
+    "./icons/angleup": {
+      "types": "./src/icons/angleup/AngleUpIcon.d.ts",
+      "default": "./src/icons/angleup/AngleUpIcon.vue"
+    },
+    "./icons/arrowdown": {
+      "types": "./src/icons/arrowdown/ArrowDownIcon.d.ts",
+      "default": "./src/icons/arrowdown/ArrowDownIcon.vue"
+    },
+    "./icons/arrowup": {
+      "types": "./src/icons/arrowup/ArrowUpIcon.d.ts",
+      "default": "./src/icons/arrowup/ArrowUpIcon.vue"
+    },
+    "./icons/ban": {
+      "types": "./src/icons/ban/BanIcon.d.ts",
+      "default": "./src/icons/ban/BanIcon.vue"
+    },
+    "./icons/bars": {
+      "types": "./src/icons/bars/BarsIcon.d.ts",
+      "default": "./src/icons/bars/BarsIcon.vue"
+    },
+    "./icons/baseicon": {
+      "types": "./src/icons/baseicon/BaseIcon.d.ts",
+      "default": "./src/icons/baseicon/BaseIcon.vue"
+    },
+    "./icons/baseicon/style": {
+      "types": "./src/icons/baseicon/style/BaseIconStyle.d.ts",
+      "default": "./src/icons/baseicon/style/BaseIconStyle.js"
+    },
+    "./icons/blank": {
+      "types": "./src/icons/blank/BlankIcon.d.ts",
+      "default": "./src/icons/blank/BlankIcon.vue"
+    },
+    "./icons/calendar": {
+      "types": "./src/icons/calendar/CalendarIcon.d.ts",
+      "default": "./src/icons/calendar/CalendarIcon.vue"
+    },
+    "./icons/check": {
+      "types": "./src/icons/check/CheckIcon.d.ts",
+      "default": "./src/icons/check/CheckIcon.vue"
+    },
+    "./icons/chevrondown": {
+      "types": "./src/icons/chevrondown/ChevronDownIcon.d.ts",
+      "default": "./src/icons/chevrondown/ChevronDownIcon.vue"
+    },
+    "./icons/chevronleft": {
+      "types": "./src/icons/chevronleft/ChevronLeftIcon.d.ts",
+      "default": "./src/icons/chevronleft/ChevronLeftIcon.vue"
+    },
+    "./icons/chevronright": {
+      "types": "./src/icons/chevronright/ChevronRightIcon.d.ts",
+      "default": "./src/icons/chevronright/ChevronRightIcon.vue"
+    },
+    "./icons/chevronup": {
+      "types": "./src/icons/chevronup/ChevronUpIcon.d.ts",
+      "default": "./src/icons/chevronup/ChevronUpIcon.vue"
+    },
+    "./icons/exclamationtriangle": {
+      "types": "./src/icons/exclamationtriangle/ExclamationTriangleIcon.d.ts",
+      "default": "./src/icons/exclamationtriangle/ExclamationTriangleIcon.vue"
+    },
+    "./icons/eye": {
+      "types": "./src/icons/eye/EyeIcon.d.ts",
+      "default": "./src/icons/eye/EyeIcon.vue"
+    },
+    "./icons/eyeslash": {
+      "types": "./src/icons/eyeslash/EyeSlashIcon.d.ts",
+      "default": "./src/icons/eyeslash/EyeSlashIcon.vue"
+    },
+    "./icons/filter": {
+      "types": "./src/icons/filter/FilterIcon.d.ts",
+      "default": "./src/icons/filter/FilterIcon.vue"
+    },
+    "./icons/filterfill": {
+      "types": "./src/icons/filterfill/FilterFillIcon.d.ts",
+      "default": "./src/icons/filterfill/FilterFillIcon.vue"
+    },
+    "./icons/filterslash": {
+      "types": "./src/icons/filterslash/FilterSlashIcon.d.ts",
+      "default": "./src/icons/filterslash/FilterSlashIcon.vue"
+    },
+    "./icons/infocircle": {
+      "types": "./src/icons/infocircle/InfoCircleIcon.d.ts",
+      "default": "./src/icons/infocircle/InfoCircleIcon.vue"
+    },
+    "./icons/minus": {
+      "types": "./src/icons/minus/MinusIcon.d.ts",
+      "default": "./src/icons/minus/MinusIcon.vue"
+    },
+    "./icons/pencil": {
+      "types": "./src/icons/pencil/PencilIcon.d.ts",
+      "default": "./src/icons/pencil/PencilIcon.vue"
+    },
+    "./icons/plus": {
+      "types": "./src/icons/plus/PlusIcon.d.ts",
+      "default": "./src/icons/plus/PlusIcon.vue"
+    },
+    "./icons/refresh": {
+      "types": "./src/icons/refresh/RefreshIcon.d.ts",
+      "default": "./src/icons/refresh/RefreshIcon.vue"
+    },
+    "./icons/search": {
+      "types": "./src/icons/search/SearchIcon.d.ts",
+      "default": "./src/icons/search/SearchIcon.vue"
+    },
+    "./icons/searchminus": {
+      "types": "./src/icons/searchminus/SearchMinusIcon.d.ts",
+      "default": "./src/icons/searchminus/SearchMinusIcon.vue"
+    },
+    "./icons/searchplus": {
+      "types": "./src/icons/searchplus/SearchPlusIcon.d.ts",
+      "default": "./src/icons/searchplus/SearchPlusIcon.vue"
+    },
+    "./icons/sortalt": {
+      "types": "./src/icons/sortalt/SortAltIcon.d.ts",
+      "default": "./src/icons/sortalt/SortAltIcon.vue"
+    },
+    "./icons/sortamountdown": {
+      "types": "./src/icons/sortamountdown/SortAmountDownIcon.d.ts",
+      "default": "./src/icons/sortamountdown/SortAmountDownIcon.vue"
+    },
+    "./icons/sortamountupalt": {
+      "types": "./src/icons/sortamountupalt/SortAmountUpAltIcon.d.ts",
+      "default": "./src/icons/sortamountupalt/SortAmountUpAltIcon.vue"
+    },
+    "./icons/spinner": {
+      "types": "./src/icons/spinner/SpinnerIcon.d.ts",
+      "default": "./src/icons/spinner/SpinnerIcon.vue"
+    },
+    "./icons/star": {
+      "types": "./src/icons/star/StarIcon.d.ts",
+      "default": "./src/icons/star/StarIcon.vue"
+    },
+    "./icons/starfill": {
+      "types": "./src/icons/starfill/StarFillIcon.d.ts",
+      "default": "./src/icons/starfill/StarFillIcon.vue"
+    },
+    "./icons/thlarge": {
+      "types": "./src/icons/thlarge/ThLargeIcon.d.ts",
+      "default": "./src/icons/thlarge/ThLargeIcon.vue"
+    },
+    "./icons/times": {
+      "types": "./src/icons/times/TimesIcon.d.ts",
+      "default": "./src/icons/times/TimesIcon.vue"
+    },
+    "./icons/timescircle": {
+      "types": "./src/icons/timescircle/TimesCircleIcon.d.ts",
+      "default": "./src/icons/timescircle/TimesCircleIcon.vue"
+    },
+    "./icons/trash": {
+      "types": "./src/icons/trash/TrashIcon.d.ts",
+      "default": "./src/icons/trash/TrashIcon.vue"
+    },
+    "./icons/undo": {
+      "types": "./src/icons/undo/UndoIcon.d.ts",
+      "default": "./src/icons/undo/UndoIcon.vue"
+    },
+    "./icons/upload": {
+      "types": "./src/icons/upload/UploadIcon.d.ts",
+      "default": "./src/icons/upload/UploadIcon.vue"
+    },
+    "./icons/windowmaximize": {
+      "types": "./src/icons/windowmaximize/WindowMaximizeIcon.d.ts",
+      "default": "./src/icons/windowmaximize/WindowMaximizeIcon.vue"
+    },
+    "./icons/windowminimize": {
+      "types": "./src/icons/windowminimize/WindowMinimizeIcon.d.ts",
+      "default": "./src/icons/windowminimize/WindowMinimizeIcon.vue"
+    },
+    "./forms": {
+      "types": "./src/forms/index.d.ts",
+      "default": "./src/forms/index.js"
+    },
+    "./forms/form": {
+      "types": "./src/forms/form/Form.d.ts",
+      "default": "./src/forms/form/Form.vue"
+    },
+    "./forms/form/style": {
+      "types": "./src/forms/form/style/FormStyle.d.ts",
+      "default": "./src/forms/form/style/FormStyle.js"
+    },
+    "./forms/formfield": {
+      "types": "./src/forms/formfield/FormField.d.ts",
+      "default": "./src/forms/formfield/FormField.vue"
+    },
+    "./forms/formfield/style": {
+      "types": "./src/forms/formfield/style/FormFieldStyle.d.ts",
+      "default": "./src/forms/formfield/style/FormFieldStyle.js"
+    },
+    "./forms/useform": {
+      "types": "./src/forms/useform/index.d.ts",
+      "default": "./src/forms/useform/index.js"
+    },
+    "./package.json": "./package.json",
+    "./forms/resolvers/joi": {
+      "types": "./src/forms/resolvers/joi/index.d.ts",
+      "default": "./src/forms/resolvers/joi/index.js"
+    },
+    "./forms/resolvers/superstruct": {
+      "types": "./src/forms/resolvers/superstruct/index.d.ts",
+      "default": "./src/forms/resolvers/superstruct/index.js"
+    },
+    "./forms/resolvers/valibot": {
+      "types": "./src/forms/resolvers/valibot/index.d.ts",
+      "default": "./src/forms/resolvers/valibot/index.js"
+    },
+    "./forms/resolvers/yup": {
+      "types": "./src/forms/resolvers/yup/index.d.ts",
+      "default": "./src/forms/resolvers/yup/index.js"
+    },
+    "./forms/resolvers/zod": {
+      "types": "./src/forms/resolvers/zod/index.d.ts",
+      "default": "./src/forms/resolvers/zod/index.js"
+    },
+    "./passthrough": {
+      "types": "./src/passthrough/index.d.ts",
+      "default": "./src/passthrough/index.js"
+    },
+    "./menuitem": {
+      "types": "./src/menuitem/MenuItem.d.ts"
+    },
+    "./treenode": {
+      "types": "./src/treenode/TreeNode.d.ts"
+    },
+    "./confirmationoptions": {
+      "types": "./src/confirmationoptions/ConfirmationOptions.d.ts"
+    },
+    "./dynamicdialogoptions": {
+      "types": "./src/dynamicdialogoptions/DynamicDialogOptions.d.ts"
     }
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "chart.js": "^4.0.0",
+    "quill": "^2.0.0",
+    "joi": "^17.13.3",
+    "superstruct": "^2.0.2",
+    "valibot": "^0.42.1",
+    "yup": "^1.4.0",
+    "zod": "^3.23.8"
+  },
+  "peerDependenciesMeta": {
+    "chart.js": {
+      "optional": true
+    },
+    "quill": {
+      "optional": true
+    },
+    "joi": {
+      "optional": true
+    },
+    "superstruct": {
+      "optional": true
+    },
+    "valibot": {
+      "optional": true
+    },
+    "yup": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "@vitejs/plugin-vue": "5.2.4",
+    "@vue/test-utils": "2.5.0",
+    "chart.js": "4.5.1",
+    "quill": "2.0.3",
+    "jsdom": "19.0.0",
+    "oxfmt": "0.79.0",
+    "oxlint": "1.94.0",
+    "typescript": "5.7.3",
+    "vite": "6.0.11",
+    "vitest": "0.29.8",
+    "vue": "3.5.42",
+    "vue-tsc": "2.1.10",
+    "joi": "^17.13.3",
+    "superstruct": "^2.0.2",
+    "valibot": "^0.42.1",
+    "yup": "^1.4.0",
+    "zod": "^3.23.8"
+  },
+  "scripts": {
+    "test:unit": "NODE_OPTIONS=--no-webstorage vitest run",
+    "lint": "oxlint src",
+    "format": "oxfmt src",
+    "format:check": "oxfmt --check src",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "packageManager": "bun@1.4.5",
+  "engines": {
+    "node": "^22.12.0 || >=24.0.0"
+  }
 }

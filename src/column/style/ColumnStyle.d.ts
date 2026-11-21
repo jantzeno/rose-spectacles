@@ -1,0 +1,15 @@
+/**
+ *
+ * Column component defines various options to specify corresponding features.
+ * It is a helper component for DataTable and TreeTable.
+ *
+ * [Live Demo](https://openvue.dev/datatable/)
+ *
+ * @module columnstyle
+ *
+ */
+import type { BaseStyle } from 'rose-spectacles/core/base/style';
+
+export enum ColumnClasses {}
+
+export interface ColumnStyle extends BaseStyle {}

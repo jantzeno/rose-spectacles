@@ -1,0 +1,19 @@
+/**
+ *
+ * Fluid is a layout component to make descendant components span full width of their container.
+ *
+ * [Live Demo](https://openvue.dev/fluid/)
+ *
+ * @module fluidstyle
+ *
+ */
+import type { BaseStyle } from 'rose-spectacles/core/base/style';
+
+export enum FluidClasses {
+    /**
+     * Class name of the root element
+     */
+    root = 'rs-fluid'
+}
+
+export interface FluidStyle extends BaseStyle {}

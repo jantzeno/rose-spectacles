@@ -1,0 +1,19 @@
+/**
+ *
+ * CheckboxGroup is a component that groups multiple checkboxes, allowing users to select one or more options.
+ *
+ * [Live Demo](https://openvue.dev/checkbox/)
+ *
+ * @module checkboxgroupstyle
+ *
+ */
+import type { BaseStyle } from 'rose-spectacles/core/base/style';
+
+export enum CheckboxGroupClasses {
+    /**
+     * Class name of the root element
+     */
+    root = 'rs-checkbox-group'
+}
+
+export interface CheckboxGroupStyle extends BaseStyle {}

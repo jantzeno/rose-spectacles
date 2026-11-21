@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
 Copyright (c) 2018-2025 PrimeTek
+Copyright (c) 2025 PrimeTek (OpenUX helpers and styles)
 Copyright (c) 2026 Openvi Foundation and contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

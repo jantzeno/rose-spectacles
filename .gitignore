@@ -1,45 +1,17 @@
-# Nuxt dev/build outputs
-.output
-.data
-.nuxt
-.nitro
-.cache
-dist
-
-# Node dependencies
-node_modules
-
-# Logs
-logs
-*.log*
-
-# Misc
-.DS_Store
-.fleet
-.idea
-.eslintcache
-coverage
-test-artifacts
-**/.DS_Store
-
-# Local env files
+node_modules/
+dist/
+coverage/
+.vite/
+test-artifacts/
+*.tsbuildinfo
+*.log
 .env
 .env.*
 !.env.example
+.DS_Store
+.agents/
+docs/plans/
+docs/superpowers/
 
-# Custom
-api-generator/typedoc.json
-apps/showcase/components.d.ts
+.nuxt/
 apps/showcase/assets/data/search-index.json
-
-.claude
-.report
-.agents
-docs/plans
-docs/superpowers
-CLAUDE.md
-*.tsbuildinfo
-
-# Impeccable design-tool context (local only)
-apps/showcase/PRODUCT.md
-apps/showcase/.impeccable/
