@@ -61,6 +61,11 @@ import type { MenuItemEvent, MenuNavigationItem } from '../internal/processed-me
 import BaseTieredMenu from './BaseTieredMenu.vue';
 import TieredMenuSub from './TieredMenuSub.vue';
 
+interface MenuTrigger {
+    currentTarget: EventTarget | null;
+    relatedTarget?: EventTarget | null;
+}
+
 export default defineComponent({
     name: 'TieredMenu',
     extends: BaseTieredMenu,
@@ -155,20 +160,20 @@ export default defineComponent({
         isProccessedItemGroup(processedItem: MenuNavigationItem) {
             return processedItem && isNotEmpty(processedItem.items);
         },
-        toggle(event: Event) {
+        toggle(event: MenuTrigger) {
             this.visible ? this.hide(event, true) : this.show(event);
         },
-        show(event: Event, isFocus = false) {
+        show(event: MenuTrigger, isFocus = false) {
             if (this.popup) {
                 this.$emit('before-show');
                 this.visible = true;
                 this.target = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
-                this.relatedTarget = 'relatedTarget' in event && event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
+                this.relatedTarget = event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
             }
 
             isFocus && focus(this.menubar);
         },
-        hide(_event?: Event, isFocus = false) {
+        hide(_event?: Event | MenuTrigger, isFocus = false) {
             if (this.popup) {
                 this.$emit('before-hide');
                 this.visible = false;
