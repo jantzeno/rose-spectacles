@@ -344,10 +344,11 @@
             "title": "Fix calendar view jumping when selecting range start from second month (UX)",
             "labels": ["enhancement"],
             "component": "Calendar",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/6dwdb7p7?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Fix calendar view jumping when selecting range start from second month (UX)."
+            "disposition": "enhancement",
+            "evidence": [
+                "The request proposes an optional preserveViewOnRangeStart prop that holds the displayed months while choosing the first date of a range. The retained DatePicker derives its displayed month from the selected value. An opt-in mode would add a new interaction without changing the default."
+            ],
+            "reproducer": "https://stackblitz.com/edit/6dwdb7p7?file=src%2FApp.vue"
         },
         {
             "number": 58,
@@ -1266,10 +1267,11 @@
             "title": "Add generic support for `Select` component",
             "labels": ["enhancement", "typescript"],
             "component": "Select",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-2u5rgp64?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Add generic support for `Select` component."
+            "disposition": "enhancement",
+            "evidence": [
+                "The retained Select accepts runtime property paths and resolver functions for option labels and values. Requiring strings to be valid compile-time keys adds constraints to that public API and needs to account for dotted fields and grouped option shapes."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-2u5rgp64?file=src%2FApp.vue"
         },
         {
             "number": 149,
@@ -1583,10 +1585,12 @@
             "title": "[BUG] ScrollPanel close menu (Select Menu) on scroll",
             "labels": ["bug"],
             "component": "ScrollPanel, Select, Menu",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-create-vue-typescript-issue-template-pbhbdch5?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using Firefox 141.0. Verify the reported behavior: [BUG] ScrollPanel close menu (Select Menu) on scroll."
+            "disposition": "enhancement",
+            "evidence": [
+                "The Select test opens a list inside a retained ScrollPanel with appendTo set to self, then observes the overlay close after the connected region scrolls.",
+                "Select registers the component scroll handler on ancestors for every append destination. Keeping an overlay open and tracking its anchor requires an additional scrolling behavior."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-create-vue-typescript-issue-template-pbhbdch5?file=src%2FApp.vue"
         },
         {
             "number": 177,
@@ -2067,10 +2071,17 @@
             "title": "Form: Generic type is not inferred from `resolver` prop, causing type errors",
             "labels": ["bug", "typescript"],
             "component": "Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The packed Vue consumer rejected a Credentials resolver and a FormSubmitEvent<Credentials> callback, and left the field slot value unchecked.",
+                "The consumer now infers the resolver values through the submit callback and the default slot field state. Both consumer builds pass with the updated Form declaration."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-e1bu1x7g?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Form: Generic type is not inferred from `resolver` prop, causing type errors."
+            "resolvingCommit": "0511f2aa7a599b2e5e6ccd6b219b7f372044b852",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "Form infers the submit event and field slot types from its resolver"
+            }
         },
         {
             "number": 222,

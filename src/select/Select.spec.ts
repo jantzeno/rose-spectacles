@@ -1,7 +1,41 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import { h } from 'vue';
+import ScrollPanel from '../scrollpanel/ScrollPanel.vue';
 import Select from './Select.vue';
+
+it('dismisses a Select overlay when its containing ScrollPanel scrolls', async () => {
+    const wrapper = mount(
+        {
+            render: () =>
+                h(
+                    ScrollPanel,
+                    { pt: { content: { style: { overflow: 'auto' } } } },
+                    { default: () => h(Select, { appendTo: 'self', options: ['Berlin', 'Oslo'] }) }
+                )
+        },
+        { attachTo: document.body, global: { plugins: [PrimeVue] } }
+    );
+
+    try {
+        const select = wrapper.getComponent(Select);
+        const region = wrapper.get<HTMLDivElement>('.rs-scrollpanel-content');
+
+        region.element.style.overflow = 'auto';
+
+        await select.trigger('click');
+        expect(select.find('.rs-select-overlay').exists()).toBe(true);
+
+        select.vm.onOverlayAfterEnter();
+        expect(select.vm.scrollHandler.scrollableParents).toContain(region.element);
+        await region.trigger('scroll');
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+        expect(select.find('.rs-select-overlay').exists()).toBe(false);
+    } finally {
+        wrapper.unmount();
+    }
+});
 
 describe('Select.vue', () => {
     let wrapper: VueWrapper<any>;
