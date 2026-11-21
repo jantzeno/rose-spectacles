@@ -52,8 +52,10 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
                 el.$_pstyleclass_clicklistener = null;
             }
 
-            this.unbindResizeListener(el);
-            this.unbindDocumentListener(el);
+            if (this.$el) {
+                this.unbindResizeListener(this.$el);
+                this.unbindDocumentListener(this.$el);
+            }
         },
         enter(target: StyleClassElement, el: StyleClassElement, binding: Binding) {
             if (binding.value.enterActiveClass) {
@@ -168,7 +170,7 @@ const StyleClass = BaseStyleClass.extend('styleclass', {
         bindDocumentListener(target: StyleClassElement, el: StyleClassElement, binding: Binding) {
             if (!target.$p_styleclass_documentlistener) {
                 target.$p_styleclass_documentlistener = (event) => {
-                    if (!this.isVisible(target) || getComputedStyle(target).getPropertyValue('position') === 'static') {
+                    if (!this.isVisible(target)) {
                         this.unbindDocumentListener(target);
                     } else if (this.isOutsideClick(event, target, el)) {
                         this.leave(target, binding);

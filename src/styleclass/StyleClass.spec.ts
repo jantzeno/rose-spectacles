@@ -8,6 +8,41 @@ config.global.directives = {
 };
 
 describe('StyleClass', () => {
+    it('hides a statically positioned target after an outside click', async () => {
+        const wrapper = mount(
+            {
+                template: `
+                    <div>
+                        <button v-styleclass="{
+                            selector: '@next',
+                            enterFromClass: 'surface-hidden',
+                            leaveToClass: 'surface-hidden',
+                            hideOnOutsideClick: true
+                        }">Show</button>
+                        <div class="surface-hidden" data-testid="surface" style="position: static">Content</div>
+                        <button data-testid="outside">Outside</button>
+                    </div>
+                `
+            },
+            { attachTo: document.body }
+        );
+        const surface = wrapper.get<HTMLElement>('[data-testid="surface"]');
+        Object.defineProperty(surface.element, 'offsetParent', {
+            get: () => (surface.classes().includes('surface-hidden') ? null : document.body)
+        });
+
+        try {
+            await wrapper.get('button').trigger('click');
+            expect(surface.classes()).not.toContain('surface-hidden');
+            await surface.trigger('click');
+            expect(surface.classes()).not.toContain('surface-hidden');
+            await wrapper.get('[data-testid="outside"]').trigger('click');
+            expect(surface.classes()).toContain('surface-hidden');
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('should work with next selector', async () => {
         const wrapper = mount({
             template: `
