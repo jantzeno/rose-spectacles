@@ -146,7 +146,7 @@ describe('ContextMenu.vue', () => {
     });
 
     it('should exist', async () => {
-        const event = { pageX: 100, pageY: 120, preventDefault: () => {}, stopPropagation: () => {} };
+        const event = new MouseEvent('contextmenu', { clientX: 100, clientY: 120, button: 2 });
         const show = vi.spyOn(wrapper.vm, 'show');
 
         wrapper.vm.show(event);

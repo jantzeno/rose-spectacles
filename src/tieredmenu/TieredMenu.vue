@@ -48,41 +48,45 @@
     </Portal>
 </template>
 
-<script>
+<script lang="ts">
 import { absolutePosition, addStyle, findSingle, focus, getOuterWidth, isTouchDevice } from '../internal/utils/dom/index';
 import { findLastIndex, isEmpty, isNotEmpty, isPrintableCharacter, resolve } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler, SafeTriangle } from '../core/utils/Utils';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import Portal from '../portal/Portal.vue';
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+import type { MenuItem } from '../menuitem/MenuItem';
+import type { MenuItemEvent, MenuNavigationItem } from '../internal/processed-menu-item';
 import BaseTieredMenu from './BaseTieredMenu.vue';
 import TieredMenuSub from './TieredMenuSub.vue';
 
-export default {
+export default defineComponent({
     name: 'TieredMenu',
     extends: BaseTieredMenu,
     inheritAttrs: false,
     emits: ['focus', 'blur', 'before-show', 'before-hide', 'hide', 'show'],
-    outsideClickListener: null,
-    matchMediaListener: null,
-    scrollHandler: null,
-    resizeListener: null,
-    safeTriangle: null,
-    target: null,
-    container: null,
-    menubar: null,
-    searchTimeout: null,
-    searchValue: null,
     data() {
         return {
             focused: false,
             focusedItemInfo: { index: -1, level: 0, parentKey: '' },
-            activeItemPath: [],
+            activeItemPath: [] as MenuNavigationItem[],
             visible: !this.popup,
             submenuVisible: false,
             dirty: false,
-            query: null,
-            queryMatches: false
+            query: null as MediaQueryList | null,
+            queryMatches: false,
+            matchMediaListener: null as (() => void) | null,
+            safeTriangle: null as SafeTriangle | null,
+            outsideClickListener: null as ((event: MouseEvent) => void) | null,
+            resizeListener: null as ((event: Event) => void) | null,
+            searchValue: '',
+            searchTimeout: null as ReturnType<typeof setTimeout> | null,
+            container: null as HTMLElement | null,
+            menubar: null as HTMLElement | null,
+            target: null as HTMLElement | null,
+            relatedTarget: null as HTMLElement | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null
         };
     },
     watch: {
@@ -108,6 +112,7 @@ export default {
         this.bindMatchMediaListener();
     },
     beforeUnmount() {
+        if (this.searchTimeout) clearTimeout(this.searchTimeout);
         this.unbindOutsideClickListener();
         this.unbindResizeListener();
         this.unbindMatchMediaListener();
@@ -126,44 +131,44 @@ export default {
         this.container = null;
     },
     methods: {
-        getItemProp(item, name) {
+        getItemProp(item: MenuItem | undefined, name: string) {
             return item ? resolve(item[name]) : undefined;
         },
-        getItemLabel(item) {
+        getItemLabel(item: MenuItem) {
             return this.getItemProp(item, 'label');
         },
-        isItemDisabled(item) {
+        isItemDisabled(item: MenuItem) {
             return this.getItemProp(item, 'disabled');
         },
-        isItemVisible(item) {
+        isItemVisible(item: MenuItem) {
             return this.getItemProp(item, 'visible') !== false;
         },
-        isItemGroup(item) {
+        isItemGroup(item: MenuItem) {
             return isNotEmpty(this.getItemProp(item, 'items'));
         },
-        isItemSeparator(item) {
+        isItemSeparator(item: MenuItem) {
             return this.getItemProp(item, 'separator');
         },
-        getProccessedItemLabel(processedItem) {
+        getProccessedItemLabel(processedItem: MenuNavigationItem) {
             return processedItem ? this.getItemLabel(processedItem.item) : undefined;
         },
-        isProccessedItemGroup(processedItem) {
+        isProccessedItemGroup(processedItem: MenuNavigationItem) {
             return processedItem && isNotEmpty(processedItem.items);
         },
-        toggle(event) {
+        toggle(event: Event) {
             this.visible ? this.hide(event, true) : this.show(event);
         },
-        show(event, isFocus) {
+        show(event: Event, isFocus = false) {
             if (this.popup) {
                 this.$emit('before-show');
                 this.visible = true;
-                this.target = event.currentTarget;
-                this.relatedTarget = event.relatedTarget || null;
+                this.target = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+                this.relatedTarget = 'relatedTarget' in event && event.relatedTarget instanceof HTMLElement ? event.relatedTarget : null;
             }
 
             isFocus && focus(this.menubar);
         },
-        hide(event, isFocus) {
+        hide(_event?: Event, isFocus = false) {
             if (this.popup) {
                 this.$emit('before-hide');
                 this.visible = false;
@@ -176,7 +181,7 @@ export default {
             this.dirty = false;
             this.target = null;
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.focused = true;
 
             if (!this.popup) {
@@ -186,14 +191,14 @@ export default {
 
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.focused = false;
             this.focusedItemInfo = { index: -1, level: 0, parentKey: '' };
             this.searchValue = '';
             this.dirty = false;
             this.$emit('blur', event);
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (this.disabled) {
                 event.preventDefault();
 
@@ -262,7 +267,7 @@ export default {
                     break;
             }
         },
-        onItemChange(event, type) {
+        onItemChange(event: MenuItemEvent, type?: 'hover') {
             const { processedItem, isFocus } = event;
 
             if (isEmpty(processedItem)) return;
@@ -288,13 +293,13 @@ export default {
 
             this.activeItemPath = activeItemPath;
         },
-        onOverlayClick(event) {
+        onOverlayClick(event: MouseEvent) {
             OverlayEventBus.emit('overlay-click', {
                 originalEvent: event,
                 target: this.target
             });
         },
-        onItemClick(event) {
+        onItemClick(event: MenuItemEvent<MouseEvent>) {
             this.safeTriangle && this.safeTriangle.cancel();
 
             const { originalEvent, processedItem } = event;
@@ -323,30 +328,30 @@ export default {
                 }
             }
         },
-        onItemMouseEnter(event) {
+        onItemMouseEnter(event: MenuItemEvent<MouseEvent>) {
             if (this.dirty && !this.deferItemChange(event)) {
                 this.onItemChange(event, 'hover');
             }
         },
-        onItemMouseMove(event) {
+        onItemMouseMove(event: MenuItemEvent<MouseEvent>) {
             if (this.focused && !(this.safeTriangle && this.safeTriangle.isPending())) {
                 this.changeFocusedItemIndex(event, event.processedItem.index);
             }
         },
-        deferItemChange(event) {
+        deferItemChange(event: MenuItemEvent<MouseEvent>) {
             const { originalEvent, processedItem } = event;
             const activeItem = this.activeItemPath.find((p) => p.parentKey === processedItem.parentKey);
             const submenu = activeItem && activeItem.key !== processedItem.key ? findSingle(this.menubar, `[id="${this.$id}_${activeItem.key}_list"]`) : null;
 
             return !!this.safeTriangle && this.safeTriangle.defer(originalEvent, submenu, () => this.onItemChange(event, 'hover'));
         },
-        onArrowDownKey(event) {
+        onArrowDownKey(event: KeyboardEvent) {
             const itemIndex = this.focusedItemInfo.index !== -1 ? this.findNextItemIndex(this.focusedItemInfo.index) : this.findFirstFocusedItemIndex();
 
             this.changeFocusedItemIndex(event, itemIndex);
             event.preventDefault();
         },
-        onArrowUpKey(event) {
+        onArrowUpKey(event: KeyboardEvent) {
             if (event.altKey) {
                 if (this.focusedItemInfo.index !== -1) {
                     const processedItem = this.visibleItems[this.focusedItemInfo.index];
@@ -364,13 +369,13 @@ export default {
                 event.preventDefault();
             }
         },
-        onArrowLeftKey(event) {
+        onArrowLeftKey(event: KeyboardEvent) {
             const processedItem = this.visibleItems[this.focusedItemInfo.index];
             const parentItem = this.activeItemPath.find((p) => p.key === processedItem.parentKey);
             const root = isEmpty(processedItem.parent);
 
             if (!root) {
-                this.focusedItemInfo = { index: -1, parentKey: parentItem ? parentItem.parentKey : '' };
+                this.focusedItemInfo = { index: -1, level: parentItem?.level ?? 0, parentKey: parentItem?.parentKey ?? '' };
                 this.searchValue = '';
                 this.onArrowDownKey(event);
             }
@@ -379,31 +384,31 @@ export default {
 
             event.preventDefault();
         },
-        onArrowRightKey(event) {
+        onArrowRightKey(event: KeyboardEvent) {
             const processedItem = this.visibleItems[this.focusedItemInfo.index];
             const grouped = this.isProccessedItemGroup(processedItem);
 
             if (grouped) {
                 this.onItemChange({ originalEvent: event, processedItem });
-                this.focusedItemInfo = { index: -1, parentKey: processedItem.key };
+                this.focusedItemInfo = { index: -1, level: processedItem.level + 1, parentKey: processedItem.key };
                 this.searchValue = '';
                 this.onArrowDownKey(event);
             }
 
             event.preventDefault();
         },
-        onHomeKey(event) {
+        onHomeKey(event: KeyboardEvent) {
             this.changeFocusedItemIndex(event, this.findFirstItemIndex());
             event.preventDefault();
         },
-        onEndKey(event) {
+        onEndKey(event: KeyboardEvent) {
             this.changeFocusedItemIndex(event, this.findLastItemIndex());
             event.preventDefault();
         },
-        onEnterKey(event) {
+        onEnterKey(event: KeyboardEvent) {
             if (this.focusedItemInfo.index !== -1) {
-                const element = findSingle(this.menubar, `li[id="${`${this.focusedItemId}`}"]`);
-                const anchorElement = element && findSingle(element, '[data-pc-section="itemlink"]');
+                const element = this.menubar?.querySelector<HTMLElement>(`li[id="${`${this.focusedItemId}`}"]`);
+                const anchorElement = element && element.querySelector<HTMLElement>('[data-pc-section="itemlink"]');
 
                 anchorElement ? anchorElement.click() : element && element.click();
 
@@ -417,10 +422,10 @@ export default {
 
             event.preventDefault();
         },
-        onSpaceKey(event) {
+        onSpaceKey(event: KeyboardEvent) {
             this.onEnterKey(event);
         },
-        onEscapeKey(event) {
+        onEscapeKey(event: KeyboardEvent) {
             if (this.popup || this.focusedItemInfo.level !== 0) {
                 const _focusedItemInfo = this.focusedItemInfo;
 
@@ -431,7 +436,7 @@ export default {
 
             event.preventDefault();
         },
-        onTabKey(event) {
+        onTabKey(event: KeyboardEvent) {
             if (this.focusedItemInfo.index !== -1) {
                 const processedItem = this.visibleItems[this.focusedItemInfo.index];
                 const grouped = this.isProccessedItemGroup(processedItem);
@@ -441,9 +446,11 @@ export default {
 
             this.hide();
         },
-        onEnter(el) {
+        onEnter(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
             if (this.autoZIndex) {
-                ZIndex.set('menu', el, this.baseZIndex || this.$primevue.config.zIndex.menu);
+                ZIndex.set('menu', el, this.baseZIndex || this.$primevue?.config.zIndex?.menu);
             }
 
             addStyle(el, { position: 'absolute', top: '0' });
@@ -467,12 +474,14 @@ export default {
             this.container = null;
             this.dirty = false;
         },
-        onAfterLeave(el) {
-            if (this.autoZIndex) {
+        onAfterLeave(el: Element) {
+            if (this.autoZIndex && el instanceof HTMLElement) {
                 ZIndex.clear(el);
             }
         },
         alignOverlay() {
+            if (!this.container || !this.target) return;
+
             absolutePosition(this.container, this.target);
             const targetWidth = getOuterWidth(this.target);
 
@@ -483,8 +492,11 @@ export default {
         bindOutsideClickListener() {
             if (!this.outsideClickListener) {
                 this.outsideClickListener = (event) => {
-                    const isOutsideContainer = this.container && !this.container.contains(event.target);
-                    const isOutsideTarget = this.popup ? !(this.target && (this.target === event.target || this.target.contains(event.target))) : true;
+                    const target = event.target;
+                    if (!(target instanceof Node)) return;
+
+                    const isOutsideContainer = this.container && !this.container.contains(target);
+                    const isOutsideTarget = !this.popup || !this.target?.contains(target);
 
                     if (isOutsideContainer && isOutsideTarget) {
                         this.hide();
@@ -501,13 +513,13 @@ export default {
             }
         },
         bindScrollListener() {
-            if (!this.scrollHandler) {
+            if (!this.scrollHandler && this.target) {
                 this.scrollHandler = new ConnectedOverlayScrollHandler(this.target, (event) => {
                     this.hide(event, true);
                 });
             }
 
-            this.scrollHandler.bindScrollListener();
+            this.scrollHandler?.bindScrollListener();
         },
         unbindScrollListener() {
             if (this.scrollHandler) {
@@ -559,17 +571,17 @@ export default {
         },
         unbindMatchMediaListener() {
             if (this.matchMediaListener) {
-                this.query.removeEventListener('change', this.matchMediaListener);
+                this.query?.removeEventListener('change', this.matchMediaListener);
                 this.matchMediaListener = null;
             }
         },
-        isItemMatched(processedItem) {
+        isItemMatched(processedItem: MenuNavigationItem) {
             return (
                 this.isValidItem(processedItem) &&
                 this.getProccessedItemLabel(processedItem)?.toLocaleLowerCase().startsWith(this.searchValue.toLocaleLowerCase())
             );
         },
-        isValidItem(processedItem) {
+        isValidItem(processedItem: MenuNavigationItem) {
             return (
                 !!processedItem &&
                 !this.isItemDisabled(processedItem.item) &&
@@ -577,10 +589,10 @@ export default {
                 this.isItemVisible(processedItem.item)
             );
         },
-        isValidSelectedItem(processedItem) {
+        isValidSelectedItem(processedItem: MenuNavigationItem) {
             return this.isValidItem(processedItem) && this.isSelected(processedItem);
         },
-        isSelected(processedItem) {
+        isSelected(processedItem: MenuNavigationItem) {
             return this.activeItemPath.some((p) => p.key === processedItem.key);
         },
         findFirstItemIndex() {
@@ -589,13 +601,13 @@ export default {
         findLastItemIndex() {
             return findLastIndex(this.visibleItems, (processedItem) => this.isValidItem(processedItem));
         },
-        findNextItemIndex(index) {
+        findNextItemIndex(index: number) {
             const matchedItemIndex =
                 index < this.visibleItems.length - 1 ? this.visibleItems.slice(index + 1).findIndex((processedItem) => this.isValidItem(processedItem)) : -1;
 
             return matchedItemIndex > -1 ? matchedItemIndex + index + 1 : index;
         },
-        findPrevItemIndex(index) {
+        findPrevItemIndex(index: number) {
             const matchedItemIndex = index > 0 ? findLastIndex(this.visibleItems.slice(0, index), (processedItem) => this.isValidItem(processedItem)) : -1;
 
             return matchedItemIndex > -1 ? matchedItemIndex : index;
@@ -613,7 +625,7 @@ export default {
 
             return selectedIndex < 0 ? this.findLastItemIndex() : selectedIndex;
         },
-        searchItems(event, char) {
+        searchItems(event: KeyboardEvent, char: string) {
             this.searchValue = (this.searchValue || '') + char;
 
             let itemIndex = -1;
@@ -652,7 +664,7 @@ export default {
 
             return matched;
         },
-        changeFocusedItemIndex(event, index) {
+        changeFocusedItemIndex(_event: Event | MenuItemEvent, index: number) {
             if (this.focusedItemInfo.index !== index) {
                 this.focusedItemInfo.index = index;
                 this.scrollInView();
@@ -660,38 +672,40 @@ export default {
         },
         scrollInView(index = -1) {
             const id = index !== -1 ? `${this.$id}_${index}` : this.focusedItemId;
-            const element = findSingle(this.menubar, `li[id="${id}"]`);
+            const element = this.menubar?.querySelector<HTMLElement>(`li[id="${id}"]`);
 
             if (element) {
                 element.scrollIntoView && element.scrollIntoView({ block: 'nearest', inline: 'start' });
             }
         },
-        createProcessedItems(items, level = 0, parent = {}, parentKey = '') {
-            const processedItems = [];
+        createProcessedItems(items: MenuItem[] | undefined | null, level = 0, parent?: MenuNavigationItem, parentKey = ''): MenuNavigationItem[] {
+            const processedItems: MenuNavigationItem[] = [];
 
             items &&
                 items.forEach((item, index) => {
                     const key = (parentKey !== '' ? parentKey + '_' : '') + index;
-                    const newItem = {
+                    const newItem: MenuNavigationItem = {
                         item,
                         index,
                         level,
                         key,
                         parent,
-                        parentKey
+                        parentKey,
+                        items: []
                     };
 
-                    newItem['items'] = this.createProcessedItems(item.items, level + 1, newItem, key);
+                    newItem.items = this.createProcessedItems(item.items, level + 1, newItem, key);
                     processedItems.push(newItem);
                 });
 
             return processedItems;
         },
-        containerRef(el) {
-            this.container = el;
+        containerRef(el: Element | ComponentPublicInstance | null) {
+            this.container = el instanceof HTMLElement ? el : null;
         },
-        menubarRef(el) {
-            this.menubar = el ? el.$el : undefined;
+        menubarRef(el: Element | ComponentPublicInstance | null) {
+            const root = el && !(el instanceof Element) ? el.$el : el;
+            this.menubar = root instanceof HTMLElement ? root : null;
         }
     },
     computed: {
@@ -706,12 +720,12 @@ export default {
         focusedItemId() {
             return this.focusedItemInfo.index !== -1
                 ? `${this.$id}${isNotEmpty(this.focusedItemInfo.parentKey) ? '_' + this.focusedItemInfo.parentKey : ''}_${this.focusedItemInfo.index}`
-                : null;
+                : undefined;
         }
     },
     components: {
         TieredMenuSub: TieredMenuSub,
         Portal: Portal
     }
-};
+});
 </script>
