@@ -55,14 +55,14 @@
         "access": "public"
     },
     "scripts": {
-        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ pnpm run build:package",
-        "build:package": "pnpm run build:prebuild && pnpm run prepack",
+        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ bun run build:package",
+        "build:package": "bun run build:prebuild && bun run prepack",
         "build:prebuild": "node ./scripts/prebuild.mjs",
         "prepack": "nuxt-module-build build",
         "dev": "nuxi dev playground",
         "dev:build": "nuxi build playground",
         "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-        "dev:link": "pnpm link --global && npm link",
+        "dev:link": "bun link",
         "test": "vitest run",
         "test:watch": "vitest watch",
         "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"

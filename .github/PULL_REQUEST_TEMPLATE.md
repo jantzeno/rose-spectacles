@@ -9,7 +9,7 @@
 ### Checklist
 
 - [ ] Tests added or updated for the change
-- [ ] `pnpm run lint` and `pnpm run format` pass
+- [ ] `bun run lint` and `bun run format` pass
 - [ ] Changelog entry added under `## [Unreleased]` in `CHANGELOG.md` (skip for internal refactors, tests, CI, and docs typos)
 
 <!-- Feature PRs are welcome. See CONTRIBUTING.md for the development setup and review process. -->

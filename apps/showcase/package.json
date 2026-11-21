@@ -32,8 +32,8 @@
         "passthrough"
     ],
     "scripts": {
-        "build": "pnpm run build:prebuild && pnpm run build:llmdocs && pnpm run build:searchindex && nuxt build",
-        "dev": "pnpm run build:searchindex && nuxt dev",
+        "build": "bun run build:prebuild && bun run build:llmdocs && bun run build:searchindex && nuxt build",
+        "dev": "bun run build:searchindex && nuxt dev",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare && node ./scripts/build-search-index.mjs",

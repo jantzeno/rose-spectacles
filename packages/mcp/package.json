@@ -50,10 +50,10 @@
         "LICENSE"
     ],
     "scripts": {
-        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ pnpm run build:package",
-        "build:package": "pnpm run build:prebuild && tsup",
+        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ bun run build:package",
+        "build:package": "bun run build:prebuild && tsup",
         "build:prebuild": "node ./scripts/prebuild.mjs",
-        "dev:link": "pnpm link --global && npm link"
+        "dev:link": "bun link"
     },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.31.0",

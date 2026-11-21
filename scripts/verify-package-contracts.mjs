@@ -13,7 +13,7 @@ const artifactDir = process.env.OPENVUE_TEST_ARTIFACTS ? resolve(root, process.e
 const artifactManifest = join(artifactDir, 'manifest.json');
 
 if (!existsSync(artifactManifest)) {
-    console.error(`Missing ${relative(root, artifactManifest)}. Run pnpm test:artifacts:pack first.`);
+    console.error(`Missing ${relative(root, artifactManifest)}. Run bun run test:artifacts:pack first.`);
     process.exit(1);
 }
 

@@ -340,13 +340,13 @@
         "access": "public"
     },
     "scripts": {
-        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ pnpm run build:package",
-        "build:package": "pnpm run build:prebuild && pnpm run build:api && rollup -c && pnpm run build:postbuild",
+        "build": "NODE_ENV=production INPUT_DIR=src/ OUTPUT_DIR=dist/ bun run build:package",
+        "build:package": "bun run build:prebuild && bun run build:api && rollup -c && bun run build:postbuild",
         "build:api": "node ./scripts/build-api.js",
         "build:prebuild": "node ./scripts/prebuild.mjs",
         "build:postbuild": "node ./scripts/postbuild.mjs",
         "typecheck": "tsc --noEmit",
-        "dev:link": "pnpm link --global && npm link",
+        "dev:link": "bun link",
         "test:unit": "vitest run",
         "test:unit:watch": "vitest watch",
         "test:coverage": "vitest run --coverage"

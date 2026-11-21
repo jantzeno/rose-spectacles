@@ -4,21 +4,11 @@ import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { packPackage, publishable } from './package-artifacts.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const fixtureRoot = join(root, 'packages', 'migrate', 'test', 'consumers');
-const publishable = {
-    openvue: 'primevue',
-    '@openvue/core': 'core',
-    '@openvue/forms': 'forms',
-    '@openvue/icons': 'icons',
-    '@openvue/themes': 'themes',
-    '@openvue/nuxt-module': 'nuxt-module',
-    '@openvue/auto-import-resolver': 'auto-import-resolver',
-    '@openvue/metadata': 'metadata',
-    '@openvue/mcp': 'mcp',
-    '@openvue/migrate': 'migrate'
-};
+const consumerPackages = Object.keys(publishable).filter((name) => name !== 'openvolt-vue');
 const args = new Set(process.argv.slice(2));
 const requested = process.argv.slice(2).find((arg) => !arg.startsWith('-'));
 const keep = args.has('--keep');
@@ -33,9 +23,8 @@ function run(command, commandArgs, options = {}) {
     const timeout = options.timeout ?? Number(process.env.OPENVUE_TEST_COMMAND_TIMEOUT ?? 20 * 60_000);
     const result = spawnSync(command, commandArgs, {
         cwd: options.cwd ?? root,
-        encoding: 'utf8',
         shell: process.platform === 'win32',
-        stdio: options.capture ? 'pipe' : 'inherit',
+        stdio: 'inherit',
         env: { ...process.env, ...options.env },
         timeout
     });
@@ -49,15 +38,8 @@ function run(command, commandArgs, options = {}) {
     }
 
     if (result.status !== 0) {
-        if (options.capture) {
-            process.stderr.write(result.stdout ?? '');
-            process.stderr.write(result.stderr ?? '');
-        }
-
         throw new Error(`${command} ${commandArgs.join(' ')} failed with exit code ${result.status}`);
     }
-
-    return result.stdout?.trim() ?? '';
 }
 
 function walk(dir) {
@@ -99,7 +81,11 @@ function assertSnapshotUnchanged(dir, before, label) {
 }
 
 function packageCommand(manager, action) {
-    if (manager === 'pnpm') return ['pnpm', action === 'install' ? ['install', '--no-frozen-lockfile'] : ['run', action]];
+    if (manager === 'pnpm') {
+        const args = action === 'install' ? ['install', '--no-frozen-lockfile'] : ['run', action];
+
+        return ['bun', ['x', 'pnpm@9.15.9', ...args]];
+    }
 
     return ['npm', action === 'install' ? ['install', '--no-audit', '--no-fund'] : ['run', action]];
 }
@@ -196,7 +182,7 @@ function assertLocalResolution(dir) {
 
     if (registryEntry) throw new Error(`${basename(dir)}: an OpenVue package resolved from a remote registry: ${registryEntry[0].trim()}`);
 
-    for (const name of Object.keys(publishable)) {
+    for (const name of consumerPackages) {
         const packageFile = join(dir, 'node_modules', ...name.split('/'), 'package.json');
 
         if (!existsSync(packageFile)) throw new Error(`${basename(dir)}: locally packed ${name} is not installed`);
@@ -472,7 +458,7 @@ async function packPackages() {
         return Object.fromEntries(Object.entries(readPackageSync(manifest)).map(([name, file]) => [name, resolve(suppliedDir, file)]));
     }
 
-    if (!skipBuild) run('pnpm', ['run', 'build:test-packages']);
+    if (!skipBuild) run('bun', ['run', 'build:test-packages']);
 
     const artifactDir = suppliedDir ?? mkdtempSync(join(tmpdir(), 'openvue-artifacts-'));
 
@@ -480,14 +466,10 @@ async function packPackages() {
     if (!suppliedDir) workDirs.push(artifactDir);
     const tarballs = {};
 
-    for (const [name, directory] of Object.entries(publishable)) {
-        const output = run('pnpm', ['pack', '--pack-destination', artifactDir], { cwd: join(root, 'packages', directory), capture: true });
-        const path = output
-            .split(/\r?\n/)
-            .find((line) => line.trim().endsWith('.tgz'))
-            ?.trim();
+    for (const name of consumerPackages) {
+        const path = packPackage(name, artifactDir);
 
-        if (!path || !existsSync(path)) throw new Error(`Could not locate packed artifact for ${name} in output:\n${output}`);
+        if (!existsSync(path)) throw new Error(`Could not locate packed artifact for ${name}: ${path}`);
         tarballs[name] = path;
     }
 
@@ -499,7 +481,7 @@ async function packPackages() {
 function ensureMigrateCli() {
     const entry = join(root, 'packages', 'migrate', 'dist', 'index.js');
 
-    if (!existsSync(entry)) run('pnpm', ['run', 'build:migrate']);
+    if (!existsSync(entry)) run('bun', ['run', 'build:migrate']);
 
     return entry;
 }

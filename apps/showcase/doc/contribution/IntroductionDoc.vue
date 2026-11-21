@@ -14,7 +14,7 @@
         <p>To begin with, clone the OpenVue repository from GitHub:</p>
         <DocSectionCode :code="code1" hideToggleCode hideStackBlitz />
         <p>
-            The repository is a pnpm workspace, so install <a href="https://pnpm.io/installation" target="_blank" rel="noopener noreferrer">pnpm</a> first, then install the dependencies and run the showcase in your local environment at
+            The repository is a Bun workspace, so install <a href="https://bun.com/docs/installation" target="_blank" rel="noopener noreferrer">Bun</a> first, then install the dependencies and run the showcase in your local environment at
             <i>http://localhost:3000/</i>.
         </p>
         <DocSectionCode :code="code2" hideToggleCode hideStackBlitz />
@@ -39,8 +39,8 @@ cd openvue
             },
             code2: {
                 basic: `
-pnpm install
-pnpm run dev
+bun install
+bun run dev
 `
             },
             code3: {

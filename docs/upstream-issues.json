@@ -1,0 +1,6403 @@
+{
+  "snapshot": {
+    "repository": "openvi-foundation/openvue",
+    "startedAt": "2026-11-21T18:38:37Z",
+    "finishedAt": "2026-11-21T18:38:46Z",
+    "forkRevision": "e3a1df2f67135ec65ada522ece07b7fa8eb2b50a",
+    "planningTotal": 558,
+    "total": 561,
+    "repositoryIssuePages": 6,
+    "searchIssuePages": 6,
+    "issueNumbersSha256": "bd4db5226c70528048bc9daca56f57cd1707779845ba6471fe469558f7d80f53",
+    "listSource": "https://api.github.com/repos/openvi-foundation/openvue/issues?state=open",
+    "reconciliationSource": "https://github.com/openvi-foundation/openvue/issues?q=is%3Aissue+is%3Aopen"
+  },
+  "issues": [
+    {
+      "number": 15,
+      "url": "https://github.com/openvi-foundation/openvue/issues/15",
+      "title": "Select, MultiSelect, Listbox: options and slots are untyped (any)",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 17,
+      "url": "https://github.com/openvi-foundation/openvue/issues/17",
+      "title": "Password Component: Strength Meter Not Announced to Screen Readers (WCAG 1.3.1 / 4.1.3)",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 20,
+      "url": "https://github.com/openvi-foundation/openvue/issues/20",
+      "title": "PrimeVue Component (Button) CSS not injected when component is removed during initial render",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 21,
+      "url": "https://github.com/openvi-foundation/openvue/issues/21",
+      "title": "InputNumber runtime style tag created but empty when component first mounts inside a re-rendering subtree (styled mode, Aura)",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 22,
+      "url": "https://github.com/openvi-foundation/openvue/issues/22",
+      "title": "Column: #body/#editor/#node slot data is any, even with typed DataTable",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 23,
+      "url": "https://github.com/openvi-foundation/openvue/issues/23",
+      "title": "Tree-family components: generic T not inferred from value/options prop",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 38,
+      "url": "https://github.com/openvi-foundation/openvue/issues/38",
+      "title": "undefined provided as `context` on `PassThroughMethodOption` of `Select` component",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 39,
+      "url": "https://github.com/openvi-foundation/openvue/issues/39",
+      "title": "Form: TypeScript doesn't know about the `Form` function `validate`",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 40,
+      "url": "https://github.com/openvi-foundation/openvue/issues/40",
+      "title": "InputGroupAddon doesn't resize properly when the addon is text and InputGroup size is set to small.",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 41,
+      "url": "https://github.com/openvi-foundation/openvue/issues/41",
+      "title": "DataTable documentation: error in example for row expand",
+      "labels": [
+        "documentation"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 42,
+      "url": "https://github.com/openvi-foundation/openvue/issues/42",
+      "title": "Scoped Design Tokens don't apply correctly in dark mode",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 44,
+      "url": "https://github.com/openvi-foundation/openvue/issues/44",
+      "title": "DataTable: different default match mode for global/local filters",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 45,
+      "url": "https://github.com/openvi-foundation/openvue/issues/45",
+      "title": "Design Tokens affect child components",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 46,
+      "url": "https://github.com/openvi-foundation/openvue/issues/46",
+      "title": "Listbox: Missing programmatic grouping for option groups (WCAG 1.3.1 violation)",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 47,
+      "url": "https://github.com/openvi-foundation/openvue/issues/47",
+      "title": "@primevue/mcp fails on opencode with 'Tool get_composable expected a Zod schema or ToolAnnotations'",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 48,
+      "url": "https://github.com/openvi-foundation/openvue/issues/48",
+      "title": "PanelMenu with one panel doesn't have a top border",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 49,
+      "url": "https://github.com/openvi-foundation/openvue/issues/49",
+      "title": "🚀 Feature Request: Bring PrimeVue Tree to react-arborist-level performance and architecture",
+      "labels": [
+        "enhancement",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 50,
+      "url": "https://github.com/openvi-foundation/openvue/issues/50",
+      "title": "DatePicker accessibility and keyboard focus inconsistencies (triggers, grid semantics, SR announcements)",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 51,
+      "url": "https://github.com/openvi-foundation/openvue/issues/51",
+      "title": "@primevue/mcp fails to start in Cursor with get_composable ToolAnnotations/Zod schema error",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 52,
+      "url": "https://github.com/openvi-foundation/openvue/issues/52",
+      "title": "Menu-family components: generic T not inferred from model prop",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 53,
+      "url": "https://github.com/openvi-foundation/openvue/issues/53",
+      "title": "VirtualScroller, SelectButton, InputChips: generic type not inferred from items/options/modelValue",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 54,
+      "url": "https://github.com/openvi-foundation/openvue/issues/54",
+      "title": "OrderList, PickList: modelValue generic type not inferred in slots",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 55,
+      "url": "https://github.com/openvi-foundation/openvue/issues/55",
+      "title": "Carousel, Galleria, Timeline: value generic type not inferred in slots",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 56,
+      "url": "https://github.com/openvi-foundation/openvue/issues/56",
+      "title": "AutoComplete, CascadeSelect, DataView: options/suggestions/value generic type not inferred",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 57,
+      "url": "https://github.com/openvi-foundation/openvue/issues/57",
+      "title": "Fix calendar view jumping when selecting range start from second month (UX)",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 58,
+      "url": "https://github.com/openvi-foundation/openvue/issues/58",
+      "title": "MultiSelect dropdown misaligned when opened programmatically inside Popover (v4.5.4)",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 59,
+      "url": "https://github.com/openvi-foundation/openvue/issues/59",
+      "title": "Bug: Manual input in DatePicker (range mode) resets/clears value on blur",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 61,
+      "url": "https://github.com/openvi-foundation/openvue/issues/61",
+      "title": "Form data TypeScript typing",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 62,
+      "url": "https://github.com/openvi-foundation/openvue/issues/62",
+      "title": "DataTable v-model:filters and DatePicker v-model lose type specificity (DefineComponent no-arg constructor)",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 63,
+      "url": "https://github.com/openvi-foundation/openvue/issues/63",
+      "title": "InputText and DatePicker emit types include unreachable undefined, breaking strictTemplates",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 65,
+      "url": "https://github.com/openvi-foundation/openvue/issues/65",
+      "title": "InputNumber: Cut or Paste via keyboard shortcuts in Safari doesn't work",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 66,
+      "url": "https://github.com/openvi-foundation/openvue/issues/66",
+      "title": "PanelMenu highlight is confusing.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 67,
+      "url": "https://github.com/openvi-foundation/openvue/issues/67",
+      "title": "Popover placement goes outside of body",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 68,
+      "url": "https://github.com/openvi-foundation/openvue/issues/68",
+      "title": "FormField not initializing properly nested data with Form's initialValues",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 69,
+      "url": "https://github.com/openvi-foundation/openvue/issues/69",
+      "title": "FileUpload allows queueing up `fileLimit`+1 files",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 70,
+      "url": "https://github.com/openvi-foundation/openvue/issues/70",
+      "title": "Missing .d.ts type declarations for EventBus subpath exports",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 71,
+      "url": "https://github.com/openvi-foundation/openvue/issues/71",
+      "title": "Possibility to trim filter in Select/Multiselect compnent",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 72,
+      "url": "https://github.com/openvi-foundation/openvue/issues/72",
+      "title": "NaN in InputNumber (in a Form with FormValue) when pressing meta+backspace",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 73,
+      "url": "https://github.com/openvi-foundation/openvue/issues/73",
+      "title": "Select-component might cause unintentional text selection outside element",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 74,
+      "url": "https://github.com/openvi-foundation/openvue/issues/74",
+      "title": "Forms: Unable to Remove Objects from Array",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 75,
+      "url": "https://github.com/openvi-foundation/openvue/issues/75",
+      "title": "Unstyled button becomes styled when passing \"button\" to \"as\" prop",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 76,
+      "url": "https://github.com/openvi-foundation/openvue/issues/76",
+      "title": "Buttons in InputGroupAddon missing focus-visible indicator (WCAG 2.1 AA)",
+      "labels": [
+        "bug",
+        "accessibility",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 77,
+      "url": "https://github.com/openvi-foundation/openvue/issues/77",
+      "title": "[Bug] Editor: Unordered (UL)  List button inserts Ordered list (OL) instead of unordered list (UL)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 78,
+      "url": "https://github.com/openvi-foundation/openvue/issues/78",
+      "title": "PopOver doesn't work when await is present in the handler",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 79,
+      "url": "https://github.com/openvi-foundation/openvue/issues/79",
+      "title": "Row selection triggers unnecessary re-rendering of `#expansion` slot content",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 80,
+      "url": "https://github.com/openvi-foundation/openvue/issues/80",
+      "title": "feat(paginator): Add appendTo prop for dropdown components",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 81,
+      "url": "https://github.com/openvi-foundation/openvue/issues/81",
+      "title": "Question about Quill CVE-2025-15056 in PrimeVue Editor",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 82,
+      "url": "https://github.com/openvi-foundation/openvue/issues/82",
+      "title": "Feat: [DX] - add define slots on volt components",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 83,
+      "url": "https://github.com/openvi-foundation/openvue/issues/83",
+      "title": "Select: [Bug] Issue when both Filter and Editable attributes are enabled",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 84,
+      "url": "https://github.com/openvi-foundation/openvue/issues/84",
+      "title": "InputMask: Input cursor moves before the dash when the value is cleared up to the dash",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 86,
+      "url": "https://github.com/openvi-foundation/openvue/issues/86",
+      "title": "TreeTable: Doesn't render when using wrapped Column components",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 87,
+      "url": "https://github.com/openvi-foundation/openvue/issues/87",
+      "title": "DatePicker overlay hides on scroll (mobile UX issue)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 88,
+      "url": "https://github.com/openvi-foundation/openvue/issues/88",
+      "title": "Toast reset z-index race condition",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 89,
+      "url": "https://github.com/openvi-foundation/openvue/issues/89",
+      "title": "[Forms]: zodResolver fails to validate nested array fields while yupResolver works correctly",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 90,
+      "url": "https://github.com/openvi-foundation/openvue/issues/90",
+      "title": "Tree's .p-tree-node-label DOM will be replaced on value update when inside Panel and use TreeNode template",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 91,
+      "url": "https://github.com/openvi-foundation/openvue/issues/91",
+      "title": "InputNumber updates the model on blur even if not necessary",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 92,
+      "url": "https://github.com/openvi-foundation/openvue/issues/92",
+      "title": "Datatable with rowspan,frozen columns is not working expected",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 93,
+      "url": "https://github.com/openvi-foundation/openvue/issues/93",
+      "title": "NumberInput undo (ctrl+z) does not work",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 94,
+      "url": "https://github.com/openvi-foundation/openvue/issues/94",
+      "title": "p-anchored-overlay transition styles are loaded & applied in unstyled mode",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 95,
+      "url": "https://github.com/openvi-foundation/openvue/issues/95",
+      "title": "Select and other popups/modals are misplaced when using Splitter",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 96,
+      "url": "https://github.com/openvi-foundation/openvue/issues/96",
+      "title": "Dropdown/Select/Autocomplete: Component keeps focus when an option is selected with tab",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 97,
+      "url": "https://github.com/openvi-foundation/openvue/issues/97",
+      "title": "Bug on scrollable tabs after 4.5.0",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 98,
+      "url": "https://github.com/openvi-foundation/openvue/issues/98",
+      "title": "Broken type check in many components due to recent vue-tsc update",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 99,
+      "url": "https://github.com/openvi-foundation/openvue/issues/99",
+      "title": "DataTable: Incorrect typing for groupRowsBy (and/or incomplete doc)",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 100,
+      "url": "https://github.com/openvi-foundation/openvue/issues/100",
+      "title": "Select: make @filter event cancelable",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 101,
+      "url": "https://github.com/openvi-foundation/openvue/issues/101",
+      "title": "API Docs show that DataTable groupRowsBy prop can take array of field keys but in practice it does not work",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 102,
+      "url": "https://github.com/openvi-foundation/openvue/issues/102",
+      "title": "PrimeVue extension in Firefox cannot use Autocomplete",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 103,
+      "url": "https://github.com/openvi-foundation/openvue/issues/103",
+      "title": "Tooltip is not fully accessible, ESC does not dismiss hover tooltips and tooltip collapses when pointer enters it",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 104,
+      "url": "https://github.com/openvi-foundation/openvue/issues/104",
+      "title": "TreeTable - If some children are not selectable, the parent can't still be checked and not partialChecked",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 105,
+      "url": "https://github.com/openvi-foundation/openvue/issues/105",
+      "title": "Icons misaligned in Microsoft Edge v142 (PrimeVue v2–v4, Icon Library demo pages)",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 106,
+      "url": "https://github.com/openvi-foundation/openvue/issues/106",
+      "title": "Popover takes two clicks to close when inline Datepicker is focused",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 108,
+      "url": "https://github.com/openvi-foundation/openvue/issues/108",
+      "title": "Autocomplete: forceSelection throws an error when the value of the optionLabel key is a number.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 109,
+      "url": "https://github.com/openvi-foundation/openvue/issues/109",
+      "title": "Invalid columns widths when reorder columns in DataTable",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 110,
+      "url": "https://github.com/openvi-foundation/openvue/issues/110",
+      "title": "After migration from primevue3 to primevue4 elements become bigger",
+      "labels": [
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 112,
+      "url": "https://github.com/openvi-foundation/openvue/issues/112",
+      "title": "FloatLabel and InputText overlap when using static value prop instead of a ref",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 113,
+      "url": "https://github.com/openvi-foundation/openvue/issues/113",
+      "title": "Input fields inside loop and v-model update value of all fields",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 114,
+      "url": "https://github.com/openvi-foundation/openvue/issues/114",
+      "title": "Styles are injected in the document head instead of in the ShadowRoot when building a custom element",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 115,
+      "url": "https://github.com/openvi-foundation/openvue/issues/115",
+      "title": "Datatable edit row mode and sort field overwrite data",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 116,
+      "url": "https://github.com/openvi-foundation/openvue/issues/116",
+      "title": "TieredMenu bug with sub menu icon disappear",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 117,
+      "url": "https://github.com/openvi-foundation/openvue/issues/117",
+      "title": "Datatable with frozen row and edit row overwrite data",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 118,
+      "url": "https://github.com/openvi-foundation/openvue/issues/118",
+      "title": "MultiSelect dropdown crash after selecting all items in virtualScroller",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 119,
+      "url": "https://github.com/openvi-foundation/openvue/issues/119",
+      "title": "Calendar: calendar closes on scroll when calendar is in Sidebar component",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 121,
+      "url": "https://github.com/openvi-foundation/openvue/issues/121",
+      "title": "DatePicker: Minutes increment allows to set time before minDate",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 122,
+      "url": "https://github.com/openvi-foundation/openvue/issues/122",
+      "title": "There are some problems with the ‘Button Component’",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 124,
+      "url": "https://github.com/openvi-foundation/openvue/issues/124",
+      "title": "Volt: DataTable: virtualscroller destroying layout on Firefox",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 125,
+      "url": "https://github.com/openvi-foundation/openvue/issues/125",
+      "title": "Cut-off popover",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 126,
+      "url": "https://github.com/openvi-foundation/openvue/issues/126",
+      "title": "Select: .p-select class does not exist at first launch",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 127,
+      "url": "https://github.com/openvi-foundation/openvue/issues/127",
+      "title": "DatePicker: Styling its width displays incorrectly",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 128,
+      "url": "https://github.com/openvi-foundation/openvue/issues/128",
+      "title": "InputMask does not work on Samsung Android Chrome  on Update 4.4.1",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 129,
+      "url": "https://github.com/openvi-foundation/openvue/issues/129",
+      "title": "Datepicker throws exception since v4.4.0 when change from range to single selectionMode",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 130,
+      "url": "https://github.com/openvi-foundation/openvue/issues/130",
+      "title": "<TreeSelect> As a filter component in <DataTable> select bug",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 131,
+      "url": "https://github.com/openvi-foundation/openvue/issues/131",
+      "title": "Set menu item to active based on current route",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 132,
+      "url": "https://github.com/openvi-foundation/openvue/issues/132",
+      "title": "Password uses invalid aria attribute",
+      "labels": [
+        "bug",
+        "accessibility",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 133,
+      "url": "https://github.com/openvi-foundation/openvue/issues/133",
+      "title": "The 'InputOtp' component encountered an error in form validation",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 134,
+      "url": "https://github.com/openvi-foundation/openvue/issues/134",
+      "title": "Use <optgroup> and <option> element for optionGroups in Select and MultiSelect",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 136,
+      "url": "https://github.com/openvi-foundation/openvue/issues/136",
+      "title": "AutoComplete: Shift+Home always selects entire text, not from current caret position",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 137,
+      "url": "https://github.com/openvi-foundation/openvue/issues/137",
+      "title": "DataTable: Select input hides on focus filter input",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 138,
+      "url": "https://github.com/openvi-foundation/openvue/issues/138",
+      "title": "Issue with PrimeVue Carousel in Web component",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 139,
+      "url": "https://github.com/openvi-foundation/openvue/issues/139",
+      "title": "Drawer doesn't open if close button icon is set in presets",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 140,
+      "url": "https://github.com/openvi-foundation/openvue/issues/140",
+      "title": "Tooltip and fit-content issue",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 141,
+      "url": "https://github.com/openvi-foundation/openvue/issues/141",
+      "title": "`emptyMessage` prop for DataTable needs to be better documented",
+      "labels": [
+        "documentation"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 142,
+      "url": "https://github.com/openvi-foundation/openvue/issues/142",
+      "title": "DOM XSS in PanelMenu via URL using JavaScript Pseudo Protocol",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 143,
+      "url": "https://github.com/openvi-foundation/openvue/issues/143",
+      "title": "Chip: Removable chip lost the tabindex making it unfocusable with tab",
+      "labels": [
+        "bug",
+        "accessibility",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 145,
+      "url": "https://github.com/openvi-foundation/openvue/issues/145",
+      "title": "InputMask: How to Escape Character *,a,9",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 146,
+      "url": "https://github.com/openvi-foundation/openvue/issues/146",
+      "title": "DatePicker uses incorrect aria attributes causing accessibility violations",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 147,
+      "url": "https://github.com/openvi-foundation/openvue/issues/147",
+      "title": "Select & related compoents not accessible on ios with voiceover ",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 148,
+      "url": "https://github.com/openvi-foundation/openvue/issues/148",
+      "title": "Add generic support for `Select` component",
+      "labels": [
+        "enhancement",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 149,
+      "url": "https://github.com/openvi-foundation/openvue/issues/149",
+      "title": "Select is not clearable with keyboard",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 150,
+      "url": "https://github.com/openvi-foundation/openvue/issues/150",
+      "title": "VirtualScroller fails to initialize when parent element starts with `display:none`",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 151,
+      "url": "https://github.com/openvi-foundation/openvue/issues/151",
+      "title": "Rendering bug `IftaLabel + Select` Component With `size=\"small\"`",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 152,
+      "url": "https://github.com/openvi-foundation/openvue/issues/152",
+      "title": "Popover: Clicking outside does not close popover if element stops propagation",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 153,
+      "url": "https://github.com/openvi-foundation/openvue/issues/153",
+      "title": "Rolldown ( and Vite classic ) choking on PrimeVue exports.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 154,
+      "url": "https://github.com/openvi-foundation/openvue/issues/154",
+      "title": "ColorPicker in Forms ignores initial color value and is always initially red",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 155,
+      "url": "https://github.com/openvi-foundation/openvue/issues/155",
+      "title": "DataTable with Virtual Scroll (preloaded data) crashes unsing delay and dynamic columns (no #body)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 156,
+      "url": "https://github.com/openvi-foundation/openvue/issues/156",
+      "title": "DataTable unselect events not firing",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 157,
+      "url": "https://github.com/openvi-foundation/openvue/issues/157",
+      "title": "Dynamic Dialog breaks after exception in inner component's setup function",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 158,
+      "url": "https://github.com/openvi-foundation/openvue/issues/158",
+      "title": "Scoped tokens can't be applied to nested PrimeVue components",
+      "labels": [
+        "enhancement",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 159,
+      "url": "https://github.com/openvi-foundation/openvue/issues/159",
+      "title": "Datatable: Frozen columns width not updated correctly",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 160,
+      "url": "https://github.com/openvi-foundation/openvue/issues/160",
+      "title": "AutoComplete: Can Not Highlight Existing Chips",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 161,
+      "url": "https://github.com/openvi-foundation/openvue/issues/161",
+      "title": "Column: incorrect prop type on ColumnPassThroughMethodOptions",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 162,
+      "url": "https://github.com/openvi-foundation/openvue/issues/162",
+      "title": "PickList not accessibility conform - WCAG 2.1 AA",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 163,
+      "url": "https://github.com/openvi-foundation/openvue/issues/163",
+      "title": "TreeSelect overlay not aligned",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 164,
+      "url": "https://github.com/openvi-foundation/openvue/issues/164",
+      "title": "DataTable, TreeTable: styling of the loading state is quite limited",
+      "labels": [
+        "enhancement",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 165,
+      "url": "https://github.com/openvi-foundation/openvue/issues/165",
+      "title": "InputOtp allows multiple characters in the last field when typing manually in forms",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 166,
+      "url": "https://github.com/openvi-foundation/openvue/issues/166",
+      "title": "SplitButton example in docs breaks with appendTo=\"self\"",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 167,
+      "url": "https://github.com/openvi-foundation/openvue/issues/167",
+      "title": "DataTable: stateful tables using local storage fail to display filters when adding a new column",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 168,
+      "url": "https://github.com/openvi-foundation/openvue/issues/168",
+      "title": "AutoComplete: content slot is not implemented",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 169,
+      "url": "https://github.com/openvi-foundation/openvue/issues/169",
+      "title": "InputNumber should provide a customizable prop to allow both comma and dot as decimal separators when typing, regardless of locale",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 170,
+      "url": "https://github.com/openvi-foundation/openvue/issues/170",
+      "title": "MultiSelect - Accessibility Improvements",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 171,
+      "url": "https://github.com/openvi-foundation/openvue/issues/171",
+      "title": "Sorting on column group with rowspan",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 172,
+      "url": "https://github.com/openvi-foundation/openvue/issues/172",
+      "title": "PrimeVue continues loading styles even in unstyled mode",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 173,
+      "url": "https://github.com/openvi-foundation/openvue/issues/173",
+      "title": "The thousands separator on the numpad should adapt to the locale.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 174,
+      "url": "https://github.com/openvi-foundation/openvue/issues/174",
+      "title": "DataTable: Memory leak. VNodes and reactive effects retained after DOM removal",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 175,
+      "url": "https://github.com/openvi-foundation/openvue/issues/175",
+      "title": "[@primevue/forms] Form state doesn't unregister fields when items are dynamically removed from an array",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 176,
+      "url": "https://github.com/openvi-foundation/openvue/issues/176",
+      "title": "[BUG] ScrollPanel close menu (Select Menu) on scroll",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 177,
+      "url": "https://github.com/openvi-foundation/openvue/issues/177",
+      "title": "Bug: Missing dependency in @primevue/core",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 178,
+      "url": "https://github.com/openvi-foundation/openvue/issues/178",
+      "title": "Vue Language Tool assumes every component is imported globally",
+      "labels": [
+        "bug",
+        "typescript",
+        "breaking change"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 179,
+      "url": "https://github.com/openvi-foundation/openvue/issues/179",
+      "title": "Wrong value returned with AutoComplete in a Form",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 180,
+      "url": "https://github.com/openvi-foundation/openvue/issues/180",
+      "title": "DataTable: Column reorder causes columns to overlap / break layout when dragging quickly",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 181,
+      "url": "https://github.com/openvi-foundation/openvue/issues/181",
+      "title": "Image component preview on touch device",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 182,
+      "url": "https://github.com/openvi-foundation/openvue/issues/182",
+      "title": "Password Input includes value in dom",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 183,
+      "url": "https://github.com/openvi-foundation/openvue/issues/183",
+      "title": "DataTable edit cell with datepicker not working well",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 184,
+      "url": "https://github.com/openvi-foundation/openvue/issues/184",
+      "title": "Select Component - label is orphaned from element in WAVE tool",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 185,
+      "url": "https://github.com/openvi-foundation/openvue/issues/185",
+      "title": "PrimeUX Nuxt module imports all component styles into <head> #7959",
+      "labels": [
+        "performance",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 186,
+      "url": "https://github.com/openvi-foundation/openvue/issues/186",
+      "title": "PrimeVue Nuxt module imports all component styles into <head>",
+      "labels": [
+        "enhancement",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 187,
+      "url": "https://github.com/openvi-foundation/openvue/issues/187",
+      "title": "No way to stop closing autocomplete suggestions on clicking suggestion",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 188,
+      "url": "https://github.com/openvi-foundation/openvue/issues/188",
+      "title": "Select overlay in DataTable body column overflows frozen columns even with appendTo=\"self\"",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 189,
+      "url": "https://github.com/openvi-foundation/openvue/issues/189",
+      "title": "Dialog Focus Guards Violate WCAG Accessibility Guidelines",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 190,
+      "url": "https://github.com/openvi-foundation/openvue/issues/190",
+      "title": "General w3c validator issue for all components",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 191,
+      "url": "https://github.com/openvi-foundation/openvue/issues/191",
+      "title": "Stepper/StepPanel components: problem with aria values - Accessibility score drop",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 192,
+      "url": "https://github.com/openvi-foundation/openvue/issues/192",
+      "title": "Triggering datatable filter event with a custom filters list not possible ?",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 193,
+      "url": "https://github.com/openvi-foundation/openvue/issues/193",
+      "title": "FileImport: Accept '.ext' should not accept files named 'ext'",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 194,
+      "url": "https://github.com/openvi-foundation/openvue/issues/194",
+      "title": "TreeTable lazy loading - loading-mode \"icon\" only works for root items",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 195,
+      "url": "https://github.com/openvi-foundation/openvue/issues/195",
+      "title": "Issue with Month Shift & Missing Hover in DatePicker Range Selector",
+      "labels": [
+        "bug",
+        "enhancement",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 196,
+      "url": "https://github.com/openvi-foundation/openvue/issues/196",
+      "title": "DataTable: Table layout shifts when groupRowsBy is rowspan and row expansion is enabled",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 198,
+      "url": "https://github.com/openvi-foundation/openvue/issues/198",
+      "title": "Multiple Overlays results in unexpected closes when clicking",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 199,
+      "url": "https://github.com/openvi-foundation/openvue/issues/199",
+      "title": "Missing prop to DataView, inconsistency with DataTable",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 200,
+      "url": "https://github.com/openvi-foundation/openvue/issues/200",
+      "title": "Forms & FormFields: When validating a field, under some circumstances, the first field will also be validated",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 201,
+      "url": "https://github.com/openvi-foundation/openvue/issues/201",
+      "title": "Menu component in popup mode closes unexpectedly on Tab after activation",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 202,
+      "url": "https://github.com/openvi-foundation/openvue/issues/202",
+      "title": "DatePicker: can't type months like 10, 11, or 12  (view=\"month\", yy/mm format)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 203,
+      "url": "https://github.com/openvi-foundation/openvue/issues/203",
+      "title": "Editor: components style not working",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 204,
+      "url": "https://github.com/openvi-foundation/openvue/issues/204",
+      "title": "DataTable showClearButton doesn't appear anymore",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 205,
+      "url": "https://github.com/openvi-foundation/openvue/issues/205",
+      "title": "MultiSelect can't change input size",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 206,
+      "url": "https://github.com/openvi-foundation/openvue/issues/206",
+      "title": "DataTable: rowData doesn't have to be object",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 207,
+      "url": "https://github.com/openvi-foundation/openvue/issues/207",
+      "title": "Select dates from previous months",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 208,
+      "url": "https://github.com/openvi-foundation/openvue/issues/208",
+      "title": "DataTable is not working as expected when a new row is inserted while editing any existing item.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 209,
+      "url": "https://github.com/openvi-foundation/openvue/issues/209",
+      "title": "DatePicker: Unable to pick end time when using range selection with showTime",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 210,
+      "url": "https://github.com/openvi-foundation/openvue/issues/210",
+      "title": "AutoComplete: Enter should submit form if TextInput is empty (PrimeVue 4.3.6)",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 211,
+      "url": "https://github.com/openvi-foundation/openvue/issues/211",
+      "title": "Editor: quill-delta",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 212,
+      "url": "https://github.com/openvi-foundation/openvue/issues/212",
+      "title": "AutoComplete: Various bugs",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 213,
+      "url": "https://github.com/openvi-foundation/openvue/issues/213",
+      "title": "ToggleSwitch and ToggleButton not respecting modelValue state while in controlled mode",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 214,
+      "url": "https://github.com/openvi-foundation/openvue/issues/214",
+      "title": "Prevent closing drawer by esc keydown",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 215,
+      "url": "https://github.com/openvi-foundation/openvue/issues/215",
+      "title": "Datatable @value-change inconsistency",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 216,
+      "url": "https://github.com/openvi-foundation/openvue/issues/216",
+      "title": "Global pass through for button's root label not working when providing function",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 217,
+      "url": "https://github.com/openvi-foundation/openvue/issues/217",
+      "title": "autocomplete issue as a column filter in ag-grid in chrome",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 218,
+      "url": "https://github.com/openvi-foundation/openvue/issues/218",
+      "title": "volt ui and primevue types problems in checkbox, menu, overlaybadge, popover and rating components",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 219,
+      "url": "https://github.com/openvi-foundation/openvue/issues/219",
+      "title": "AutoComplete on Form: typing exactly the same value as an option value shows [object Object]",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 220,
+      "url": "https://github.com/openvi-foundation/openvue/issues/220",
+      "title": "MutliSelect OptionDisabled value bypassed by chips remove icon",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 221,
+      "url": "https://github.com/openvi-foundation/openvue/issues/221",
+      "title": "Form: Generic type is not inferred from `resolver` prop, causing type errors",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 222,
+      "url": "https://github.com/openvi-foundation/openvue/issues/222",
+      "title": "Multiselect in DataTable with cell edit closes after clicking 1 item since update to PrimeVue 4.3",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 223,
+      "url": "https://github.com/openvi-foundation/openvue/issues/223",
+      "title": "Tooltip: Visual bug with rounded corners when tooltips are shifted/repositioned",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 225,
+      "url": "https://github.com/openvi-foundation/openvue/issues/225",
+      "title": "Nested data is not supported in the initialValues and setValues props of the Form component. ",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 226,
+      "url": "https://github.com/openvi-foundation/openvue/issues/226",
+      "title": "validateOnBlur does not work for Password component (maybe other components as well?)",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 227,
+      "url": "https://github.com/openvi-foundation/openvue/issues/227",
+      "title": "Form not always configure validation of fields",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 228,
+      "url": "https://github.com/openvi-foundation/openvue/issues/228",
+      "title": "DatePicker not populated correctly when wrapped in Form",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 229,
+      "url": "https://github.com/openvi-foundation/openvue/issues/229",
+      "title": "Initial values visually incorrect with Form values",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 230,
+      "url": "https://github.com/openvi-foundation/openvue/issues/230",
+      "title": "The \"touched\" form state of Password fields is never updated to \"true\"",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 231,
+      "url": "https://github.com/openvi-foundation/openvue/issues/231",
+      "title": "Form validation failed while setting field value programmatically (data received from database from backen)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 232,
+      "url": "https://github.com/openvi-foundation/openvue/issues/232",
+      "title": "Forms not initializing well, causing issues with Popover inputs & need for v-model",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 233,
+      "url": "https://github.com/openvi-foundation/openvue/issues/233",
+      "title": "IconField show Icon outside Input",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 234,
+      "url": "https://github.com/openvi-foundation/openvue/issues/234",
+      "title": "InputNumber inside a Form breaks on android",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 235,
+      "url": "https://github.com/openvi-foundation/openvue/issues/235",
+      "title": "primevue/nuxt-module: tree shaking not working with autoimport true",
+      "labels": [
+        "bug",
+        "performance",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 236,
+      "url": "https://github.com/openvi-foundation/openvue/issues/236",
+      "title": "DataTable: empty table header error",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 237,
+      "url": "https://github.com/openvi-foundation/openvue/issues/237",
+      "title": "Tree Checkbox State Incorrect with Filtered Nodes",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 238,
+      "url": "https://github.com/openvi-foundation/openvue/issues/238",
+      "title": "The priority of default-value is higher than v-model.",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 239,
+      "url": "https://github.com/openvi-foundation/openvue/issues/239",
+      "title": "Misaligned Popover Arrow",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 240,
+      "url": "https://github.com/openvi-foundation/openvue/issues/240",
+      "title": "AutoComplete select value arrow inside Forms",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 241,
+      "url": "https://github.com/openvi-foundation/openvue/issues/241",
+      "title": "Dialog: Dragging Off-Screen Puts Dialog Against Invisible Wall",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 242,
+      "url": "https://github.com/openvi-foundation/openvue/issues/242",
+      "title": "Color picker preview color is wrong after changing hue",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 243,
+      "url": "https://github.com/openvi-foundation/openvue/issues/243",
+      "title": "Paginator is broken with expandableRowGroups",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 244,
+      "url": "https://github.com/openvi-foundation/openvue/issues/244",
+      "title": "Using Carousel with CDN",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 245,
+      "url": "https://github.com/openvi-foundation/openvue/issues/245",
+      "title": "InputNumber: internal ModelValue not being tracked correctly when value changed by user (again)",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 246,
+      "url": "https://github.com/openvi-foundation/openvue/issues/246",
+      "title": "InputNumber inconsistent caret placement on focus",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 247,
+      "url": "https://github.com/openvi-foundation/openvue/issues/247",
+      "title": "fix(FormField): DatePicker - When used inside the forms(Form and FormField) component, the DatePicker automatically substitutes the date 02.01.2001.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 248,
+      "url": "https://github.com/openvi-foundation/openvue/issues/248",
+      "title": "yupResolver() param type error in typescript!",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 249,
+      "url": "https://github.com/openvi-foundation/openvue/issues/249",
+      "title": "Button: Conflicting disabled state during loading",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 250,
+      "url": "https://github.com/openvi-foundation/openvue/issues/250",
+      "title": "Tailwind Preflight messes up PrimeVue styling",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 251,
+      "url": "https://github.com/openvi-foundation/openvue/issues/251",
+      "title": "Iconfield doesnt appear when using with input group",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 252,
+      "url": "https://github.com/openvi-foundation/openvue/issues/252",
+      "title": "Escape key on ColorPicker overview inside a drawer closes the drawer + Enter key won't work",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 253,
+      "url": "https://github.com/openvi-foundation/openvue/issues/253",
+      "title": "Field remains in form model even after v-if removes the component",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 254,
+      "url": "https://github.com/openvi-foundation/openvue/issues/254",
+      "title": "TreeTable: Frozen Column with Basic Filtering",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 255,
+      "url": "https://github.com/openvi-foundation/openvue/issues/255",
+      "title": "SpeedDial mask prop option blocks page content when hidden (Reproducible with PrimeVue website docs and inspector tool)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 256,
+      "url": "https://github.com/openvi-foundation/openvue/issues/256",
+      "title": "Can not use Select with fiilter or auto complete to do datatable cell edit.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 257,
+      "url": "https://github.com/openvi-foundation/openvue/issues/257",
+      "title": "InputNumber in PrimeVue 4.3.2 behaves incorrectly with different currencies and locales",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 258,
+      "url": "https://github.com/openvi-foundation/openvue/issues/258",
+      "title": "TreeSelect empty slot when filter shows 0 results",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 259,
+      "url": "https://github.com/openvi-foundation/openvue/issues/259",
+      "title": "AutoComplete in PrimeVue Form component with initial values cannot be cleared",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 260,
+      "url": "https://github.com/openvi-foundation/openvue/issues/260",
+      "title": "initialValues reactive",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 261,
+      "url": "https://github.com/openvi-foundation/openvue/issues/261",
+      "title": "`bodyClass` in <Column> Fails to Render Dynamic Classes in DataTable",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 262,
+      "url": "https://github.com/openvi-foundation/openvue/issues/262",
+      "title": "feat(datatable): add generateCSV() to separate CSV generation from export logic",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 263,
+      "url": "https://github.com/openvi-foundation/openvue/issues/263",
+      "title": "DataTable fires @page on mount even with :first and lazy set",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 264,
+      "url": "https://github.com/openvi-foundation/openvue/issues/264",
+      "title": "[VirtualScroller] Bad performance of inner components rendering",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 265,
+      "url": "https://github.com/openvi-foundation/openvue/issues/265",
+      "title": "Feature - Tooltip component for Volt",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 266,
+      "url": "https://github.com/openvi-foundation/openvue/issues/266",
+      "title": "Slider behaves erratically",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 267,
+      "url": "https://github.com/openvi-foundation/openvue/issues/267",
+      "title": "InputNumber currency DKK fails when more than 3 digits",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 268,
+      "url": "https://github.com/openvi-foundation/openvue/issues/268",
+      "title": "TreeSelect: error when v-model does not exist in options",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 269,
+      "url": "https://github.com/openvi-foundation/openvue/issues/269",
+      "title": "Primevue Editor bullet list option in toolbar adds ordered list",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 270,
+      "url": "https://github.com/openvi-foundation/openvue/issues/270",
+      "title": "InputNumber cannot be customized to set the name attribute.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 271,
+      "url": "https://github.com/openvi-foundation/openvue/issues/271",
+      "title": "The DatePicker icon disappears when inside an InputGroup",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 272,
+      "url": "https://github.com/openvi-foundation/openvue/issues/272",
+      "title": "Strict CSP (style-src 'self') violation in DataTable with VirtualScroller",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 273,
+      "url": "https://github.com/openvi-foundation/openvue/issues/273",
+      "title": "Tooltip focus support for Select, AutoComplete, InputNumber",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 274,
+      "url": "https://github.com/openvi-foundation/openvue/issues/274",
+      "title": "Custom Severity support for Tag",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 275,
+      "url": "https://github.com/openvi-foundation/openvue/issues/275",
+      "title": "ConfirmPopup, no position if event is stopped",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 277,
+      "url": "https://github.com/openvi-foundation/openvue/issues/277",
+      "title": "onMenuMatchModeChange with menu filters without constraints and operator does not work",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 278,
+      "url": "https://github.com/openvi-foundation/openvue/issues/278",
+      "title": "Enhancement - Datatable filter menu does not close on enter",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 279,
+      "url": "https://github.com/openvi-foundation/openvue/issues/279",
+      "title": "InputNumber inconsistent currency cursor calculation",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 280,
+      "url": "https://github.com/openvi-foundation/openvue/issues/280",
+      "title": "DatePicker - Inconsistent Behaviour with Manual Input",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 281,
+      "url": "https://github.com/openvi-foundation/openvue/issues/281",
+      "title": "Pass through class is replacing class of components having 'pc' instead of merging in Volt",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 282,
+      "url": "https://github.com/openvi-foundation/openvue/issues/282",
+      "title": "DatePicker Allows Navigation to Disabled Months/Years via Keyboard",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 283,
+      "url": "https://github.com/openvi-foundation/openvue/issues/283",
+      "title": "PanelMenu: Click event not triggered by keyboard interaction for header items with custom templates",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 284,
+      "url": "https://github.com/openvi-foundation/openvue/issues/284",
+      "title": "Improve Shadow DOM Support",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 286,
+      "url": "https://github.com/openvi-foundation/openvue/issues/286",
+      "title": "FloatLabel: Label is not visible while using CDN",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 287,
+      "url": "https://github.com/openvi-foundation/openvue/issues/287",
+      "title": "PrimeVue Forms + Datepicker: \"Clear\" button sets date to initial value date-string - breaks input-format",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 288,
+      "url": "https://github.com/openvi-foundation/openvue/issues/288",
+      "title": "3 digits hex support for ColorPicker",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 289,
+      "url": "https://github.com/openvi-foundation/openvue/issues/289",
+      "title": "InputNumber behaviour .fill in playwright",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 290,
+      "url": "https://github.com/openvi-foundation/openvue/issues/290",
+      "title": "SelectButton breaks when multiple and nested in FormField",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 291,
+      "url": "https://github.com/openvi-foundation/openvue/issues/291",
+      "title": "Data table body slot: the cell in each column is rendered twice at first",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 292,
+      "url": "https://github.com/openvi-foundation/openvue/issues/292",
+      "title": "Autoimport: true in nuxt results in huge bundle size",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 293,
+      "url": "https://github.com/openvi-foundation/openvue/issues/293",
+      "title": "InputMask puts a mask only after field is updated",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 294,
+      "url": "https://github.com/openvi-foundation/openvue/issues/294",
+      "title": "DataTable Using Column Group can not adjust column width and drag column",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 295,
+      "url": "https://github.com/openvi-foundation/openvue/issues/295",
+      "title": "TreeSelect: Performance issue with large initial value in selectionMode=\"checkbox\"",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 297,
+      "url": "https://github.com/openvi-foundation/openvue/issues/297",
+      "title": "Performance of select dropdowns decreased in v4",
+      "labels": [
+        "performance",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 298,
+      "url": "https://github.com/openvi-foundation/openvue/issues/298",
+      "title": "Nuxt module styles are broken",
+      "labels": [
+        "bug",
+        "styling",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 299,
+      "url": "https://github.com/openvi-foundation/openvue/issues/299",
+      "title": "useForm validating multiple fields",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 300,
+      "url": "https://github.com/openvi-foundation/openvue/issues/300",
+      "title": "BaseEditableHolder should not update its internal value when controlled by the parent",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 301,
+      "url": "https://github.com/openvi-foundation/openvue/issues/301",
+      "title": "DatePicker now breaks formatting when given an ISO string",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 302,
+      "url": "https://github.com/openvi-foundation/openvue/issues/302",
+      "title": "DOM nodes are not cleared when first created or destroyed",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 303,
+      "url": "https://github.com/openvi-foundation/openvue/issues/303",
+      "title": "TreeSelect Component Breaks in Checkbox Selection Mode Inside FormField",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 304,
+      "url": "https://github.com/openvi-foundation/openvue/issues/304",
+      "title": "DataTable: frozen column doesn't work correctly with Column Group",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 305,
+      "url": "https://github.com/openvi-foundation/openvue/issues/305",
+      "title": "InputMask: Unmask inside form without v-model",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 307,
+      "url": "https://github.com/openvi-foundation/openvue/issues/307",
+      "title": "PrimeVue v4 Styling Issue in Astro.js & Starlight.js Integration",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 308,
+      "url": "https://github.com/openvi-foundation/openvue/issues/308",
+      "title": "Form: add \"form-level\" dirty check",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 309,
+      "url": "https://github.com/openvi-foundation/openvue/issues/309",
+      "title": "DataTable: \"Row Group\" doesn't work correctly with virtual scrolling",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 310,
+      "url": "https://github.com/openvi-foundation/openvue/issues/310",
+      "title": "Toast: can't use custom severity",
+      "labels": [
+        "enhancement",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 311,
+      "url": "https://github.com/openvi-foundation/openvue/issues/311",
+      "title": "Card: Add a `border` design token",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 312,
+      "url": "https://github.com/openvi-foundation/openvue/issues/312",
+      "title": "SSR with Vite – Styles Are Not Included in Server-Rendered HTML",
+      "labels": [
+        "bug",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 313,
+      "url": "https://github.com/openvi-foundation/openvue/issues/313",
+      "title": "Feature Request: Transform CSS Logical Properties to Physical Properties for Legacy Browser Support",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 314,
+      "url": "https://github.com/openvi-foundation/openvue/issues/314",
+      "title": "Primevue DatePicker DisabledDates doesn't work when in monthly view mode",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 315,
+      "url": "https://github.com/openvi-foundation/openvue/issues/315",
+      "title": "When using Nuxt3 with SSR, styles load with a delay.",
+      "labels": [
+        "bug",
+        "styling",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 316,
+      "url": "https://github.com/openvi-foundation/openvue/issues/316",
+      "title": "@primevue/forms - No values property on FormSubmitEvent",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 317,
+      "url": "https://github.com/openvi-foundation/openvue/issues/317",
+      "title": "Menubar component doesn't work with shadow dom",
+      "labels": [
+        "bug",
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 318,
+      "url": "https://github.com/openvi-foundation/openvue/issues/318",
+      "title": "TreeSelect modelValue / defaultValue doesn't displayed",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 319,
+      "url": "https://github.com/openvi-foundation/openvue/issues/319",
+      "title": "'name' does not exist in type 'FormFieldProps & VNodeProps & AllowedComponentProps & ComponentCustomProps'.",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 321,
+      "url": "https://github.com/openvi-foundation/openvue/issues/321",
+      "title": "Tree: filter input is named `pcFilterInput` while other components have it named `pcFilter`",
+      "labels": [
+        "bug",
+        "documentation",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 322,
+      "url": "https://github.com/openvi-foundation/openvue/issues/322",
+      "title": "Autocomplete: NVDA screenreader says 'no results found' after selecting a result",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 323,
+      "url": "https://github.com/openvi-foundation/openvue/issues/323",
+      "title": "Datepicker loses focus when selecting a specific date",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 324,
+      "url": "https://github.com/openvi-foundation/openvue/issues/324",
+      "title": "Add appendTo property to Toast",
+      "labels": [
+        "enhancement",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 325,
+      "url": "https://github.com/openvi-foundation/openvue/issues/325",
+      "title": "DataTable: Rowspan not working correctly when returning it from passThrough bodyCell (of Column)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 327,
+      "url": "https://github.com/openvi-foundation/openvue/issues/327",
+      "title": "DataTable onRowClick should support \"Open Link in New Tab\" and right-click context menu functionality.",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 328,
+      "url": "https://github.com/openvi-foundation/openvue/issues/328",
+      "title": "<Select> How to use custom filtering functions",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 329,
+      "url": "https://github.com/openvi-foundation/openvue/issues/329",
+      "title": "Custom filter model causes error when inside a column group",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 330,
+      "url": "https://github.com/openvi-foundation/openvue/issues/330",
+      "title": "Slot #Value, dropdown editable doesn't work",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 331,
+      "url": "https://github.com/openvi-foundation/openvue/issues/331",
+      "title": "Editor: Lack of Documentation or Missing Functionality for Configuring and Extending Quill in PrimeVue Editor",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 332,
+      "url": "https://github.com/openvi-foundation/openvue/issues/332",
+      "title": "[Select] Virtual Scroll List Items Jumping Issue",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 333,
+      "url": "https://github.com/openvi-foundation/openvue/issues/333",
+      "title": "Carousel Component Responsive Bug",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 334,
+      "url": "https://github.com/openvi-foundation/openvue/issues/334",
+      "title": "Listbox not possible to mix group and non-group options",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 335,
+      "url": "https://github.com/openvi-foundation/openvue/issues/335",
+      "title": "InputNumber: mobile device keyboard decimal point",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 336,
+      "url": "https://github.com/openvi-foundation/openvue/issues/336",
+      "title": "Web Types & other extracts of meta data - missing some components",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 337,
+      "url": "https://github.com/openvi-foundation/openvue/issues/337",
+      "title": "Forms state out of sync because d_value",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 339,
+      "url": "https://github.com/openvi-foundation/openvue/issues/339",
+      "title": "Tooltip Directive: Programatically control tooltips individually and as a group to show/hide",
+      "labels": [
+        "bug",
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 340,
+      "url": "https://github.com/openvi-foundation/openvue/issues/340",
+      "title": "Optimizing CSS for Icon-Only Buttons: Ensuring Perfect 1:1 Aspect Ratio",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 341,
+      "url": "https://github.com/openvi-foundation/openvue/issues/341",
+      "title": "Editor: Focus is applied to the editor when it uses v-model even if it is not the first focus-able component",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 342,
+      "url": "https://github.com/openvi-foundation/openvue/issues/342",
+      "title": "RadioButton: When scale is applied, radio is not properly drawn",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 343,
+      "url": "https://github.com/openvi-foundation/openvue/issues/343",
+      "title": "Dialog: The body class p-overflow-hidden is removed when a nested dialog is closed",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 344,
+      "url": "https://github.com/openvi-foundation/openvue/issues/344",
+      "title": "Form: breaking `autoImport: true`",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 345,
+      "url": "https://github.com/openvi-foundation/openvue/issues/345",
+      "title": "InputNumber: Input Clears on Decimal Entry in Android Native Keyboard",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 346,
+      "url": "https://github.com/openvi-foundation/openvue/issues/346",
+      "title": "Component Name: BaseComponent `theme:change` event is never deregistered",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 347,
+      "url": "https://github.com/openvi-foundation/openvue/issues/347",
+      "title": "DataTable: Issue with VirtualScroller and Scrollable Property",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 348,
+      "url": "https://github.com/openvi-foundation/openvue/issues/348",
+      "title": "Form field: Unable to build complex form field",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 349,
+      "url": "https://github.com/openvi-foundation/openvue/issues/349",
+      "title": "In DataTable, frozen columns prevent the full row from being highlighted when a row is selected",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 350,
+      "url": "https://github.com/openvi-foundation/openvue/issues/350",
+      "title": "After updating PrimeVue 4.1.1, typescript errors began to occur",
+      "labels": [
+        "bug",
+        "typescript",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 351,
+      "url": "https://github.com/openvi-foundation/openvue/issues/351",
+      "title": "MultiSelect: width overflow with VirtualScroller",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 352,
+      "url": "https://github.com/openvi-foundation/openvue/issues/352",
+      "title": "Tailwind Primevue not working with Nuxt Security module",
+      "labels": [
+        "bug",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 353,
+      "url": "https://github.com/openvi-foundation/openvue/issues/353",
+      "title": "Datatable: reorderableColumns ",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 354,
+      "url": "https://github.com/openvi-foundation/openvue/issues/354",
+      "title": "DataTable: `multiSortMeta` prop and `d_multiSortMeta` ref are out of sync - Grouping + sorting issue",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 355,
+      "url": "https://github.com/openvi-foundation/openvue/issues/355",
+      "title": "Forms: Form does not revalidate when child FormField visibility changes",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 356,
+      "url": "https://github.com/openvi-foundation/openvue/issues/356",
+      "title": "InputMask: Value is not unmasked when pasting inside Form",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 357,
+      "url": "https://github.com/openvi-foundation/openvue/issues/357",
+      "title": "AnimateOnScroll: Opacity remains zero if the element is positioned higher on load position",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 358,
+      "url": "https://github.com/openvi-foundation/openvue/issues/358",
+      "title": "datatable  fix multiple columns displaying in tabs error",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 359,
+      "url": "https://github.com/openvi-foundation/openvue/issues/359",
+      "title": "Using PrimeVue within a vue component library",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 361,
+      "url": "https://github.com/openvi-foundation/openvue/issues/361",
+      "title": "AutoComplete Keyboard Navigation Issue during IME Input",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 362,
+      "url": "https://github.com/openvi-foundation/openvue/issues/362",
+      "title": "InputNumber: No input of negative numbers possible on iPhones/IOS",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 363,
+      "url": "https://github.com/openvi-foundation/openvue/issues/363",
+      "title": "InputNumber: InputMode wrong calculated",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 364,
+      "url": "https://github.com/openvi-foundation/openvue/issues/364",
+      "title": "Popover: Popover position is not relatively calculated when using append-to=self. This causes aligment problems in a fixed element.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 365,
+      "url": "https://github.com/openvi-foundation/openvue/issues/365",
+      "title": "AutoComplete: V4 Chips Component was Deprecated, AutoComplete with the multiple param does not allow the very convenient addOnBlur or separator params",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 366,
+      "url": "https://github.com/openvi-foundation/openvue/issues/366",
+      "title": "Histoire is interfering with PrimeVue's Tree Component",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 367,
+      "url": "https://github.com/openvi-foundation/openvue/issues/367",
+      "title": "MultiSelect: 'aria-describedby' required for accessibility",
+      "labels": [
+        "enhancement",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 368,
+      "url": "https://github.com/openvi-foundation/openvue/issues/368",
+      "title": "DatePicker: cursor-pointer at calendar icon when input is disabled",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 369,
+      "url": "https://github.com/openvi-foundation/openvue/issues/369",
+      "title": "Component preset css not being applied",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 370,
+      "url": "https://github.com/openvi-foundation/openvue/issues/370",
+      "title": "Calendar: aria-label does not speak date values in widget",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 371,
+      "url": "https://github.com/openvi-foundation/openvue/issues/371",
+      "title": "When using Nuxt with PrimeVue, during static site generation (SSG),causing each HTML file to be quite large, exceeding 100KB",
+      "labels": [
+        "bug",
+        "performance",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 372,
+      "url": "https://github.com/openvi-foundation/openvue/issues/372",
+      "title": "SSR Nuxt Styled Mode w/ Tailwind - cssLayer theme option property causing delayed component styling",
+      "labels": [
+        "bug",
+        "styling",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 373,
+      "url": "https://github.com/openvi-foundation/openvue/issues/373",
+      "title": "primevue/nuxt-module: TypeScript support missing for auto-imported components when using components.prefix in PrimeVue Nuxt module",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 374,
+      "url": "https://github.com/openvi-foundation/openvue/issues/374",
+      "title": "DataTable - Deep reactivity does not work with virtual scroller.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 375,
+      "url": "https://github.com/openvi-foundation/openvue/issues/375",
+      "title": "PickList: double-click behavior is broken in v3",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 376,
+      "url": "https://github.com/openvi-foundation/openvue/issues/376",
+      "title": "Vue test utils doesn't work with primevue components",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 377,
+      "url": "https://github.com/openvi-foundation/openvue/issues/377",
+      "title": "[DataTable] Expand composant re-render",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 378,
+      "url": "https://github.com/openvi-foundation/openvue/issues/378",
+      "title": "Virtualscroll not adjusting displayed items to available space",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 379,
+      "url": "https://github.com/openvi-foundation/openvue/issues/379",
+      "title": "All: In tsx mode, all attributes of the component will be prompted that they do not exist.",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 380,
+      "url": "https://github.com/openvi-foundation/openvue/issues/380",
+      "title": "Toast, ToastService - unable to use useToast() composable outside of SFC",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 381,
+      "url": "https://github.com/openvi-foundation/openvue/issues/381",
+      "title": "Carousel component items disappear on mobile after swiping (翻頁後輪播圖內的項目消失)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 382,
+      "url": "https://github.com/openvi-foundation/openvue/issues/382",
+      "title": "Component Name: DataTable",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 383,
+      "url": "https://github.com/openvi-foundation/openvue/issues/383",
+      "title": "DataTable: Column Filter Menu Closes Unexpectedly When DataTable Width Changes After Filter Application",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 384,
+      "url": "https://github.com/openvi-foundation/openvue/issues/384",
+      "title": "DatePicker: does not handle correctly some dates on manual input",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 385,
+      "url": "https://github.com/openvi-foundation/openvue/issues/385",
+      "title": "[styled tailwind nuxt] InputText and other component style are not been included in top style. Cause layout shift.",
+      "labels": [
+        "bug",
+        "styling",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 386,
+      "url": "https://github.com/openvi-foundation/openvue/issues/386",
+      "title": "VirtualScroller: autoSize property does not work",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 387,
+      "url": "https://github.com/openvi-foundation/openvue/issues/387",
+      "title": "Select, Menu, TieredMenu: Displayed in wrong position when transform: scale is used",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 388,
+      "url": "https://github.com/openvi-foundation/openvue/issues/388",
+      "title": "PickList with OrderList children - auto scrolls hovered-over PickList item out of view",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 389,
+      "url": "https://github.com/openvi-foundation/openvue/issues/389",
+      "title": "PickList: Double-Click - With Item A selected, Double-Click Item B moves A",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 390,
+      "url": "https://github.com/openvi-foundation/openvue/issues/390",
+      "title": "AutoComplete: `#footer` is inaccessible (WCAG 2.0 accessibility issue)",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 391,
+      "url": "https://github.com/openvi-foundation/openvue/issues/391",
+      "title": "Menubar: Passthroug not working for the child elements",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 392,
+      "url": "https://github.com/openvi-foundation/openvue/issues/392",
+      "title": "Dialog: Nested dialogs are closed together when they are closed with the ESC key",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 393,
+      "url": "https://github.com/openvi-foundation/openvue/issues/393",
+      "title": "PrimeDropdown: ClearIcon on focus and when wrapped by InputGroup doesn't clickable",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 394,
+      "url": "https://github.com/openvi-foundation/openvue/issues/394",
+      "title": "Calendar: every calendar week is wrong",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 395,
+      "url": "https://github.com/openvi-foundation/openvue/issues/395",
+      "title": "VirtualScroller: `scrollInView` cannot scroll upwards",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 396,
+      "url": "https://github.com/openvi-foundation/openvue/issues/396",
+      "title": "Component Name: Tieredmenu's popup box doesn't follow Button when window resize.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 397,
+      "url": "https://github.com/openvi-foundation/openvue/issues/397",
+      "title": "Tree: Inconsistent keyboard navigation when using lazy load",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 398,
+      "url": "https://github.com/openvi-foundation/openvue/issues/398",
+      "title": "Datatable: Tailwind virtualscroll row height increases based on number of rows",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 399,
+      "url": "https://github.com/openvi-foundation/openvue/issues/399",
+      "title": "Tree: Performance is bad when you have a large number of children",
+      "labels": [
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 400,
+      "url": "https://github.com/openvi-foundation/openvue/issues/400",
+      "title": "Nuxt module: `autoImport` logic inverted",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 401,
+      "url": "https://github.com/openvi-foundation/openvue/issues/401",
+      "title": "DataTable: ColumnGroup with v-if Results in Duplicated Columns when within an AccordionContent",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 402,
+      "url": "https://github.com/openvi-foundation/openvue/issues/402",
+      "title": "Data Typing for a PrimeVue Component Wrapper",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 403,
+      "url": "https://github.com/openvi-foundation/openvue/issues/403",
+      "title": "DatePicker: The value in the input field is not fully displayed in date range picker",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 404,
+      "url": "https://github.com/openvi-foundation/openvue/issues/404",
+      "title": "DataTable: rowGroupToggler styling from pt in Column not applied",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 405,
+      "url": "https://github.com/openvi-foundation/openvue/issues/405",
+      "title": "DataTable: wrong cell value when both FrozenRow and cell edit mode are used",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 406,
+      "url": "https://github.com/openvi-foundation/openvue/issues/406",
+      "title": "DataTable: desync between the items property in VirtualScroller and a value property in TableBody",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 407,
+      "url": "https://github.com/openvi-foundation/openvue/issues/407",
+      "title": "Popover: Component type is missing",
+      "labels": [
+        "typescript",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 408,
+      "url": "https://github.com/openvi-foundation/openvue/issues/408",
+      "title": "Multiple components, e.g. Avatar: Wrong emits typing",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 409,
+      "url": "https://github.com/openvi-foundation/openvue/issues/409",
+      "title": "Virtual Scrolling Issue with Expandable Rows in DataTable Component",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 410,
+      "url": "https://github.com/openvi-foundation/openvue/issues/410",
+      "title": "Wrong default value for Column reorderableColumn property",
+      "labels": [
+        "documentation",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 411,
+      "url": "https://github.com/openvi-foundation/openvue/issues/411",
+      "title": "Tabs: Scrollable Tabs inside Form - Clicking on scroll button causing Form to submit",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 412,
+      "url": "https://github.com/openvi-foundation/openvue/issues/412",
+      "title": "AutoComplete/MultiSelect: Custom template chip not working correctly",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 413,
+      "url": "https://github.com/openvi-foundation/openvue/issues/413",
+      "title": "DataTable scroll-height=\"flex\" does not work initially on v4",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 414,
+      "url": "https://github.com/openvi-foundation/openvue/issues/414",
+      "title": "DataTable with Checkbox selection: ARIA attribute is not allowed: aria-selected=\"true\"",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 415,
+      "url": "https://github.com/openvi-foundation/openvue/issues/415",
+      "title": "Select: ARIA hidden element must not be focusable or contain focusable elements",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 416,
+      "url": "https://github.com/openvi-foundation/openvue/issues/416",
+      "title": "Tooltip: missing context properties for arrow passthrough",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 417,
+      "url": "https://github.com/openvi-foundation/openvue/issues/417",
+      "title": "Tab v4: incorrect behavior of the PageUp, PageDown, End, Left Arrow buttons",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 418,
+      "url": "https://github.com/openvi-foundation/openvue/issues/418",
+      "title": "DataTable with virtual scroll missing horizontal row borders",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 419,
+      "url": "https://github.com/openvi-foundation/openvue/issues/419",
+      "title": "PrimeVue v4 ignores Nuxt configuration settings when building the project",
+      "labels": [
+        "bug",
+        "styling",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 420,
+      "url": "https://github.com/openvi-foundation/openvue/issues/420",
+      "title": "Menubar v4: initial rendering without styles",
+      "labels": [
+        "bug",
+        "styling",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 421,
+      "url": "https://github.com/openvi-foundation/openvue/issues/421",
+      "title": "DatePicker (Calendar): hidden date parts should always be set to 0",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 422,
+      "url": "https://github.com/openvi-foundation/openvue/issues/422",
+      "title": "DataView & DataTable: pass type of value prop into slotProps etc.",
+      "labels": [
+        "enhancement",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 423,
+      "url": "https://github.com/openvi-foundation/openvue/issues/423",
+      "title": "DataView: dataKey prop should be same type as DataTable's dataKey prop",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 424,
+      "url": "https://github.com/openvi-foundation/openvue/issues/424",
+      "title": "Tiered Menu: First sub level doesn't open on hover but all other levels do",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 425,
+      "url": "https://github.com/openvi-foundation/openvue/issues/425",
+      "title": "DataTable: Frozen Column Breaks Frozen RowSpan Column",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 426,
+      "url": "https://github.com/openvi-foundation/openvue/issues/426",
+      "title": "Sidebar: In headless mode, the sidebar is not scrollable",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 427,
+      "url": "https://github.com/openvi-foundation/openvue/issues/427",
+      "title": "The typescript type definition have some problems.",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 428,
+      "url": "https://github.com/openvi-foundation/openvue/issues/428",
+      "title": "Component variables (i.e. --p-card-background) not defined on load.",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 429,
+      "url": "https://github.com/openvi-foundation/openvue/issues/429",
+      "title": "Popover: Opacity is 0",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 430,
+      "url": "https://github.com/openvi-foundation/openvue/issues/430",
+      "title": "NumberInput: prefix/suffix breaks",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 431,
+      "url": "https://github.com/openvi-foundation/openvue/issues/431",
+      "title": "Select is not emitting the Escape keydown",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 432,
+      "url": "https://github.com/openvi-foundation/openvue/issues/432",
+      "title": "Primevue not working with strictTemplates enabled",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 433,
+      "url": "https://github.com/openvi-foundation/openvue/issues/433",
+      "title": "Responsive on Tabs not working",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 434,
+      "url": "https://github.com/openvi-foundation/openvue/issues/434",
+      "title": "Checkbox: Indeterminate checkbox is not nullable",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 435,
+      "url": "https://github.com/openvi-foundation/openvue/issues/435",
+      "title": "Several components / Message: Page reload causes style tags in head (`data-primevue-style-id`) for several components to be missing",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 436,
+      "url": "https://github.com/openvi-foundation/openvue/issues/436",
+      "title": "InputChips: error thrown by null inputValue on left keydown if user does not add their own chip to input beforehand",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 437,
+      "url": "https://github.com/openvi-foundation/openvue/issues/437",
+      "title": "IconField: Doesn't work with InputNumber",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 438,
+      "url": "https://github.com/openvi-foundation/openvue/issues/438",
+      "title": "Dialog: Will not stick on the border if moving too fast",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 439,
+      "url": "https://github.com/openvi-foundation/openvue/issues/439",
+      "title": "InputNumber: An InputNumber's width exceeds the width of its parent",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 440,
+      "url": "https://github.com/openvi-foundation/openvue/issues/440",
+      "title": "InputNumber : Tabs in DataTable not preselect content",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 441,
+      "url": "https://github.com/openvi-foundation/openvue/issues/441",
+      "title": "Menubar: Nested Menubar share breakpoint",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 442,
+      "url": "https://github.com/openvi-foundation/openvue/issues/442",
+      "title": "Tooltip: aria-describedby is not applied or linked to the target, so the tooltip is not read aloud by screen reader",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 443,
+      "url": "https://github.com/openvi-foundation/openvue/issues/443",
+      "title": "Editor/Select: components do not work with the google translate extension activated (Chrome and possibly others)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 444,
+      "url": "https://github.com/openvi-foundation/openvue/issues/444",
+      "title": "Tabs: Background is missing when using \"scrollable\" prop",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 445,
+      "url": "https://github.com/openvi-foundation/openvue/issues/445",
+      "title": "[bug] Editor: remove quill styles",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 446,
+      "url": "https://github.com/openvi-foundation/openvue/issues/446",
+      "title": "DataTable / TreeTable: Unable to drag rows, columns or resize columns in Mobile device",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 447,
+      "url": "https://github.com/openvi-foundation/openvue/issues/447",
+      "title": "InputNumber : tooltip directive not working when set to focus",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 448,
+      "url": "https://github.com/openvi-foundation/openvue/issues/448",
+      "title": "InputMask: optional ? mask operator breaks slot-char functionality",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 449,
+      "url": "https://github.com/openvi-foundation/openvue/issues/449",
+      "title": "Component Name: DateTable-forzen columns",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 450,
+      "url": "https://github.com/openvi-foundation/openvue/issues/450",
+      "title": "The CascadeSelect Component looks strange when on a mobile screen",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 451,
+      "url": "https://github.com/openvi-foundation/openvue/issues/451",
+      "title": "InputNumber not working with android Backspace",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 452,
+      "url": "https://github.com/openvi-foundation/openvue/issues/452",
+      "title": "DEP0155 and DEP0156 warning during nuxt build in 4.0.0-rc.1",
+      "labels": [
+        "bug",
+        "ssr"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 453,
+      "url": "https://github.com/openvi-foundation/openvue/issues/453",
+      "title": "DataTable: Nested table inherits parent tables settings",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 454,
+      "url": "https://github.com/openvi-foundation/openvue/issues/454",
+      "title": "primeicons.woff2 is outside of Vite serving allow list",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 455,
+      "url": "https://github.com/openvi-foundation/openvue/issues/455",
+      "title": "Autocomplete: forceSelection true causes the change event to be emitted twice when an option from the list is selected",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 456,
+      "url": "https://github.com/openvi-foundation/openvue/issues/456",
+      "title": "InputMask: Props declaration not accepting null model value",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 457,
+      "url": "https://github.com/openvi-foundation/openvue/issues/457",
+      "title": "InputNumber: @input binding function not working as expected on mobile devices",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 458,
+      "url": "https://github.com/openvi-foundation/openvue/issues/458",
+      "title": "Tabs: Controlled value prop gets out of sync when navigating with Tab in TabList",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 460,
+      "url": "https://github.com/openvi-foundation/openvue/issues/460",
+      "title": "Tooltip not showing on mobile issue",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 461,
+      "url": "https://github.com/openvi-foundation/openvue/issues/461",
+      "title": "Passing props to header/footer of DynamicDialog via options.emits seems semantically incorrect",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 462,
+      "url": "https://github.com/openvi-foundation/openvue/issues/462",
+      "title": "DataTable: Reorder (Drag and Drop) not working on touch device.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 463,
+      "url": "https://github.com/openvi-foundation/openvue/issues/463",
+      "title": "InputOtp: Unable to delete value on Android Chrome",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 464,
+      "url": "https://github.com/openvi-foundation/openvue/issues/464",
+      "title": "Datatable: Date sorting is working only on it own with multiple sorting",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 465,
+      "url": "https://github.com/openvi-foundation/openvue/issues/465",
+      "title": "DataTable: Selected row disables some keyboard actions",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 466,
+      "url": "https://github.com/openvi-foundation/openvue/issues/466",
+      "title": "VirtualScroller: Scrolling is not smooth.",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 467,
+      "url": "https://github.com/openvi-foundation/openvue/issues/467",
+      "title": "DataTable: Reorder blink effect",
+      "labels": [
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 468,
+      "url": "https://github.com/openvi-foundation/openvue/issues/468",
+      "title": "TypeScript error composable confirm",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 469,
+      "url": "https://github.com/openvi-foundation/openvue/issues/469",
+      "title": "Button: unstyled on CDN",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 470,
+      "url": "https://github.com/openvi-foundation/openvue/issues/470",
+      "title": "InputNumber: maxFractionDigits default is 0 and the documentation says it's 3",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 471,
+      "url": "https://github.com/openvi-foundation/openvue/issues/471",
+      "title": "Calendar: Range-Picker in view=\"month\" and view=\"year\" not highlighting selected months/years correctly",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 472,
+      "url": "https://github.com/openvi-foundation/openvue/issues/472",
+      "title": "Menubar: Viewport panning on zoom when focusing menu items",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 473,
+      "url": "https://github.com/openvi-foundation/openvue/issues/473",
+      "title": "Menubar: context.focused is true on hover",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 474,
+      "url": "https://github.com/openvi-foundation/openvue/issues/474",
+      "title": "FileUpload v4: PassThrough for button in basic mode differs from documentation",
+      "labels": [
+        "documentation"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 475,
+      "url": "https://github.com/openvi-foundation/openvue/issues/475",
+      "title": "InputNumber: InputNumber Component Not Functioning Properly on Mobile Devices",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 477,
+      "url": "https://github.com/openvi-foundation/openvue/issues/477",
+      "title": "DataTable: auto enable loading when sorting/filtering/swapping page",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 478,
+      "url": "https://github.com/openvi-foundation/openvue/issues/478",
+      "title": "DatePicker: not use month parameter on onMonthSelect",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 479,
+      "url": "https://github.com/openvi-foundation/openvue/issues/479",
+      "title": "Calendar: Manual input doesn't work consistently",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 480,
+      "url": "https://github.com/openvi-foundation/openvue/issues/480",
+      "title": "InputMask: Error when testing with jsdom and testing-library",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 481,
+      "url": "https://github.com/openvi-foundation/openvue/issues/481",
+      "title": "TreeSelect: Selection panel detached from input when open on top  ",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 482,
+      "url": "https://github.com/openvi-foundation/openvue/issues/482",
+      "title": "TreeSelect: Panel closes, or selectedValue becomes null when watching a prop change and scrolling down",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 483,
+      "url": "https://github.com/openvi-foundation/openvue/issues/483",
+      "title": "Dropdown: delete/home/end keys not working as expected in editable mode",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 484,
+      "url": "https://github.com/openvi-foundation/openvue/issues/484",
+      "title": "Calendar: No longer allows modelValue: string",
+      "labels": [
+        "typescript",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 485,
+      "url": "https://github.com/openvi-foundation/openvue/issues/485",
+      "title": "DataTable: RowGroupMode rowspan does not work with virtual scroller",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 486,
+      "url": "https://github.com/openvi-foundation/openvue/issues/486",
+      "title": "Editor: \"Normal\" header style creates an <undefined> tag instead of a <p> tag",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 487,
+      "url": "https://github.com/openvi-foundation/openvue/issues/487",
+      "title": "Dropdown / MultiSelect: no hover styling when `focusOnHover: false`",
+      "labels": [
+        "bug",
+        "regression",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 488,
+      "url": "https://github.com/openvi-foundation/openvue/issues/488",
+      "title": "DataTable: Cannot set properties of null (setting 'tabIndex')",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 489,
+      "url": "https://github.com/openvi-foundation/openvue/issues/489",
+      "title": "Calendar: Hour are ignored on date select",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 491,
+      "url": "https://github.com/openvi-foundation/openvue/issues/491",
+      "title": "TabView: Show active tab with autoscroll ",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 493,
+      "url": "https://github.com/openvi-foundation/openvue/issues/493",
+      "title": "DataTable: not possible to set up the height for the row when datatable component has fixed height",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 494,
+      "url": "https://github.com/openvi-foundation/openvue/issues/494",
+      "title": "TreeTable: cell layout - force single line",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 495,
+      "url": "https://github.com/openvi-foundation/openvue/issues/495",
+      "title": "Accordion: Incorrect typing of AccordionTab headericon active parameter",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 496,
+      "url": "https://github.com/openvi-foundation/openvue/issues/496",
+      "title": "InputOtp: Aria Label like PrimeReact/PrimeFaces",
+      "labels": [
+        "enhancement",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 497,
+      "url": "https://github.com/openvi-foundation/openvue/issues/497",
+      "title": "AutoComplete : permit to show overlay on focus",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 498,
+      "url": "https://github.com/openvi-foundation/openvue/issues/498",
+      "title": "Menubar + MegaMenu: With nested menu items, swiping on mobile closes menus",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 499,
+      "url": "https://github.com/openvi-foundation/openvue/issues/499",
+      "title": "Dialog: Header slot remains visible even if empty",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 500,
+      "url": "https://github.com/openvi-foundation/openvue/issues/500",
+      "title": "Dropdown: Typing in the filter box clears the selection",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 501,
+      "url": "https://github.com/openvi-foundation/openvue/issues/501",
+      "title": "DataTable: scrolbar in virtualscroll goes back to top when you are close to the end of the table",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 502,
+      "url": "https://github.com/openvi-foundation/openvue/issues/502",
+      "title": "Calendar: When using Tailwind presets, Months outside minDate and maxDate range are clickable, instead of being disabled",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 503,
+      "url": "https://github.com/openvi-foundation/openvue/issues/503",
+      "title": "Chips: Chips extend past their container, and thus can't be closed",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 504,
+      "url": "https://github.com/openvi-foundation/openvue/issues/504",
+      "title": "When Using Stateful & Lazy, Filter state not saved to Session",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 505,
+      "url": "https://github.com/openvi-foundation/openvue/issues/505",
+      "title": "Dialog: $attrs work incorrectly",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 506,
+      "url": "https://github.com/openvi-foundation/openvue/issues/506",
+      "title": "Dropdown: Dropdown item can't be selected if the item value is falsey",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 507,
+      "url": "https://github.com/openvi-foundation/openvue/issues/507",
+      "title": "Calendar: Month/Year pickers don't work when multiplemonths > 1",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 508,
+      "url": "https://github.com/openvi-foundation/openvue/issues/508",
+      "title": "MultiSelect: No value available when submitted in a form",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 509,
+      "url": "https://github.com/openvi-foundation/openvue/issues/509",
+      "title": "DataTable: expansion view gets unmounted whenever the Component that renders the table receives new props",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 510,
+      "url": "https://github.com/openvi-foundation/openvue/issues/510",
+      "title": "DataTable: selectionMode disables copy of row",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 511,
+      "url": "https://github.com/openvi-foundation/openvue/issues/511",
+      "title": "TabView issue when try to delete the tabpanel",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 512,
+      "url": "https://github.com/openvi-foundation/openvue/issues/512",
+      "title": "Dynamic Dialog - data and typescript",
+      "labels": [
+        "enhancement",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 513,
+      "url": "https://github.com/openvi-foundation/openvue/issues/513",
+      "title": "CSP usage doesn't work in all cases",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 514,
+      "url": "https://github.com/openvi-foundation/openvue/issues/514",
+      "title": "Chips component seperator option bug with typing Korean Language",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 515,
+      "url": "https://github.com/openvi-foundation/openvue/issues/515",
+      "title": "InputMask: model is not reactive when using `slot-char`",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 516,
+      "url": "https://github.com/openvi-foundation/openvue/issues/516",
+      "title": "Calendar: Combining options results in some being ignored",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 517,
+      "url": "https://github.com/openvi-foundation/openvue/issues/517",
+      "title": "DataTable: Does not display columns with blank names",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 518,
+      "url": "https://github.com/openvi-foundation/openvue/issues/518",
+      "title": "Dropdown: Dropdown does not open when loading making it unusable with server side options",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 519,
+      "url": "https://github.com/openvi-foundation/openvue/issues/519",
+      "title": "VirtualScroller: autoSize property does not work ",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 520,
+      "url": "https://github.com/openvi-foundation/openvue/issues/520",
+      "title": "Editor: v-model makes editor color and background color selectors disappear",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 522,
+      "url": "https://github.com/openvi-foundation/openvue/issues/522",
+      "title": "Editor: Errors after inserting any type of content into the editor using the quill instance",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 523,
+      "url": "https://github.com/openvi-foundation/openvue/issues/523",
+      "title": "TieredMenu: pass-through only works for `root`, does not work for menu items",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 524,
+      "url": "https://github.com/openvi-foundation/openvue/issues/524",
+      "title": "DataTable: Columns with reorderableColumn prop set to false can be reordered if a column with reorderableColumn prop set to true is also selected",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 525,
+      "url": "https://github.com/openvi-foundation/openvue/issues/525",
+      "title": "Password: Passthrough and IconField not working properly",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 526,
+      "url": "https://github.com/openvi-foundation/openvue/issues/526",
+      "title": "V-styleclass: hideOnOutsideClick not working",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 527,
+      "url": "https://github.com/openvi-foundation/openvue/issues/527",
+      "title": "DataTable: Colapsing a Row causes all other expanded Row to rerender",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 530,
+      "url": "https://github.com/openvi-foundation/openvue/issues/530",
+      "title": "DataTable: Frozen Column Rendering Issue When Columns Automatically Resized",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 531,
+      "url": "https://github.com/openvi-foundation/openvue/issues/531",
+      "title": "DataTable: Deleting rows from model does not update selection",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 532,
+      "url": "https://github.com/openvi-foundation/openvue/issues/532",
+      "title": "Component Name: Issue Title",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 533,
+      "url": "https://github.com/openvi-foundation/openvue/issues/533",
+      "title": "Datatable: wrong cell position when cell editing and filter applied",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 534,
+      "url": "https://github.com/openvi-foundation/openvue/issues/534",
+      "title": "Calendar: incorrect pt types",
+      "labels": [
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 535,
+      "url": "https://github.com/openvi-foundation/openvue/issues/535",
+      "title": "OverlayPanel / Menu: Prop `append-to` does not properly respect `fixed` elements",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 536,
+      "url": "https://github.com/openvi-foundation/openvue/issues/536",
+      "title": "DataTable: Resizeable columns don't resize in unstyled mode",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 537,
+      "url": "https://github.com/openvi-foundation/openvue/issues/537",
+      "title": "Datatable: cell edit-mode issues when rows move while editing",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 538,
+      "url": "https://github.com/openvi-foundation/openvue/issues/538",
+      "title": "DataTable: doesn't work with Local pt prop",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 539,
+      "url": "https://github.com/openvi-foundation/openvue/issues/539",
+      "title": "Multiselect: Virtualscroll AutoSize error",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 540,
+      "url": "https://github.com/openvi-foundation/openvue/issues/540",
+      "title": "Dropdown: panel closes while typing Japanese",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 541,
+      "url": "https://github.com/openvi-foundation/openvue/issues/541",
+      "title": "Autocomplete doesn't work properly",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 542,
+      "url": "https://github.com/openvi-foundation/openvue/issues/542",
+      "title": "DataTable: rows disappear when data changes",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 543,
+      "url": "https://github.com/openvi-foundation/openvue/issues/543",
+      "title": "Core: Animations respect `prefers-reduced-motion` OS setting",
+      "labels": [
+        "enhancement",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 544,
+      "url": "https://github.com/openvi-foundation/openvue/issues/544",
+      "title": "`zIndex` not taken into account e.g. between Menubar and Sidebar",
+      "labels": [
+        "bug",
+        "regression"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 545,
+      "url": "https://github.com/openvi-foundation/openvue/issues/545",
+      "title": "Datatable: poor performance with large number of columns",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 546,
+      "url": "https://github.com/openvi-foundation/openvue/issues/546",
+      "title": "Dropdown filter: empty filter message not being read properly by VoiceOver",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 547,
+      "url": "https://github.com/openvi-foundation/openvue/issues/547",
+      "title": "Timeline: Last element of horizontal timeline is different",
+      "labels": [
+        "bug",
+        "enhancement",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 548,
+      "url": "https://github.com/openvi-foundation/openvue/issues/548",
+      "title": "All Components: Base PrimeVue CSS included in compiled JS with unstyled set to true",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 549,
+      "url": "https://github.com/openvi-foundation/openvue/issues/549",
+      "title": "TabView: Scrollable tabview - next icon does not hide when scroll to end point (only more than 1 line tab header)",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 550,
+      "url": "https://github.com/openvi-foundation/openvue/issues/550",
+      "title": "Dropdown: Unusable because of missing HTML input element when it is not `editable`",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 551,
+      "url": "https://github.com/openvi-foundation/openvue/issues/551",
+      "title": "Composables: the autoimport when rename in nuxt.config",
+      "labels": [
+        "bug",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 552,
+      "url": "https://github.com/openvi-foundation/openvue/issues/552",
+      "title": "PrimeVue should use only one nonce for the inline styles",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 554,
+      "url": "https://github.com/openvi-foundation/openvue/issues/554",
+      "title": "Update Inter font to 4.0",
+      "labels": [
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 556,
+      "url": "https://github.com/openvi-foundation/openvue/issues/556",
+      "title": "SelectButton: the multiple and allowempty combo should make it possible to deselect values as long as at least 1 remains.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 558,
+      "url": "https://github.com/openvi-foundation/openvue/issues/558",
+      "title": "General: Passthrough default props and icons",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 559,
+      "url": "https://github.com/openvi-foundation/openvue/issues/559",
+      "title": "Calendar: Calendar navigates to wrong month on UnSelect",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 561,
+      "url": "https://github.com/openvi-foundation/openvue/issues/561",
+      "title": "MenuBar: Allow setting custom active menu item",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 562,
+      "url": "https://github.com/openvi-foundation/openvue/issues/562",
+      "title": "Menu: Allow template for separator items",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 563,
+      "url": "https://github.com/openvi-foundation/openvue/issues/563",
+      "title": "Multiselect: panel-class doesn't work with scoped css",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 564,
+      "url": "https://github.com/openvi-foundation/openvue/issues/564",
+      "title": "Tooltip directive: Custom triggers (Click etc.)",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 565,
+      "url": "https://github.com/openvi-foundation/openvue/issues/565",
+      "title": "Calendar: `monthtitle` and `yeartitle` slots",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 566,
+      "url": "https://github.com/openvi-foundation/openvue/issues/566",
+      "title": "InputNumber: Number 1 in Arabic Not being Typed",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 567,
+      "url": "https://github.com/openvi-foundation/openvue/issues/567",
+      "title": "Dynamic Dialog: expose maximizeToggle",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 568,
+      "url": "https://github.com/openvi-foundation/openvue/issues/568",
+      "title": "AutoComplete: Different 'update' event behaviour for multiple=true/false",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 569,
+      "url": "https://github.com/openvi-foundation/openvue/issues/569",
+      "title": "Dropdown/Calendar: Panels z-index issue with manually assigned container index.",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 570,
+      "url": "https://github.com/openvi-foundation/openvue/issues/570",
+      "title": "Data Table (Column Filter): Filtering on empty values",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 572,
+      "url": "https://github.com/openvi-foundation/openvue/issues/572",
+      "title": "Password: Strength check doesn't applied immediatly when using Firefox's \"Use a Securely Generated Password\" autofill",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 574,
+      "url": "https://github.com/openvi-foundation/openvue/issues/574",
+      "title": "Css styles",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 575,
+      "url": "https://github.com/openvi-foundation/openvue/issues/575",
+      "title": "Menu: More flexible MenuItem types",
+      "labels": [
+        "enhancement",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 576,
+      "url": "https://github.com/openvi-foundation/openvue/issues/576",
+      "title": "DataTable: ColumnFilter doesn't support column fields which are functions",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 578,
+      "url": "https://github.com/openvi-foundation/openvue/issues/578",
+      "title": "Multiselect with shift key and click in TreeTable",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 579,
+      "url": "https://github.com/openvi-foundation/openvue/issues/579",
+      "title": "AccordionTab: Focus lost when editing a field that the AccordionTab header is bound to.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 580,
+      "url": "https://github.com/openvi-foundation/openvue/issues/580",
+      "title": "ToolTips not reactive",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 581,
+      "url": "https://github.com/openvi-foundation/openvue/issues/581",
+      "title": "InputMask: Dynamic mask change cause caret to jump",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 582,
+      "url": "https://github.com/openvi-foundation/openvue/issues/582",
+      "title": "TabView: Next arrow disappears before the last tab is scrolled to",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 583,
+      "url": "https://github.com/openvi-foundation/openvue/issues/583",
+      "title": "Calendar: Inline violation of No Keyboard Trap -  WCAG SC 2.1.2",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 584,
+      "url": "https://github.com/openvi-foundation/openvue/issues/584",
+      "title": "Dropdown: selected value display disappears when the filter is enabled and a search term is entered that doesn't include the selected value",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 586,
+      "url": "https://github.com/openvi-foundation/openvue/issues/586",
+      "title": "Calendar: When using min/max dates and keyboard navigation the component loses focus",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 587,
+      "url": "https://github.com/openvi-foundation/openvue/issues/587",
+      "title": "TreeTable: Node Click Event",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 588,
+      "url": "https://github.com/openvi-foundation/openvue/issues/588",
+      "title": "All: Using Primevue inside a custom element",
+      "labels": [
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 589,
+      "url": "https://github.com/openvi-foundation/openvue/issues/589",
+      "title": "All components: Improve type support",
+      "labels": [
+        "enhancement",
+        "typescript"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 590,
+      "url": "https://github.com/openvi-foundation/openvue/issues/590",
+      "title": " ContextMenu Not Working on iOS Devices",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 591,
+      "url": "https://github.com/openvi-foundation/openvue/issues/591",
+      "title": "Dialog: Interaction with UI in disappearing Dialog should be disabled",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 593,
+      "url": "https://github.com/openvi-foundation/openvue/issues/593",
+      "title": "Calendar: Accessibility issue using calendar through NVDA screen readerComponent Name: Issue Title",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 594,
+      "url": "https://github.com/openvi-foundation/openvue/issues/594",
+      "title": "InputNumber: Any characters are entered in the Android mobile devices",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 595,
+      "url": "https://github.com/openvi-foundation/openvue/issues/595",
+      "title": "InputNumber: doesn't open numeric keyboard on mobile devices",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 596,
+      "url": "https://github.com/openvi-foundation/openvue/issues/596",
+      "title": "DataTable: Draggable Row",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 597,
+      "url": "https://github.com/openvi-foundation/openvue/issues/597",
+      "title": "Dropdown: About behavior during full-width input to filter",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 598,
+      "url": "https://github.com/openvi-foundation/openvue/issues/598",
+      "title": "Image: preview: being able to specify a different url for the full-screen image",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 600,
+      "url": "https://github.com/openvi-foundation/openvue/issues/600",
+      "title": "AutoComplete: ForceSelection triggers \"update:modelValue\" twice when two or more options contain the same name",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 601,
+      "url": "https://github.com/openvi-foundation/openvue/issues/601",
+      "title": "DataTable: Async handling for preventing cell to close",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 603,
+      "url": "https://github.com/openvi-foundation/openvue/issues/603",
+      "title": "Dropdown: Even if the options are empty, the set model does not appear in the drop-down list when the model is set from outside.",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 604,
+      "url": "https://github.com/openvi-foundation/openvue/issues/604",
+      "title": "DataTable: Setting sortField or v-model:filters Attributes Causes Data to Revert/Save Incorrectly When Editing Multiple Rows",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 605,
+      "url": "https://github.com/openvi-foundation/openvue/issues/605",
+      "title": "When using NVDA screen reader 'InputNumber' field announces \"blank\" instead of number value.",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 606,
+      "url": "https://github.com/openvi-foundation/openvue/issues/606",
+      "title": "TabView: Active tab doesn't render correctly when placed inside an AccordionTab",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 607,
+      "url": "https://github.com/openvi-foundation/openvue/issues/607",
+      "title": "Tooltip: Clicking on target on touch supported device should toggle tooltip, not only close it.",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 608,
+      "url": "https://github.com/openvi-foundation/openvue/issues/608",
+      "title": "Tooltip: unable to dismiss after changing modifiers",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 609,
+      "url": "https://github.com/openvi-foundation/openvue/issues/609",
+      "title": "Phone input",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 610,
+      "url": "https://github.com/openvi-foundation/openvue/issues/610",
+      "title": "CascadeSelect: In a modal, overlay sub-items run off the bottom of the screen if the list is too long",
+      "labels": [
+        "bug",
+        "styling"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 611,
+      "url": "https://github.com/openvi-foundation/openvue/issues/611",
+      "title": "ListBox : Shift Selection",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 612,
+      "url": "https://github.com/openvi-foundation/openvue/issues/612",
+      "title": "VirtualScroller: support for variable items sizes",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 613,
+      "url": "https://github.com/openvi-foundation/openvue/issues/613",
+      "title": "InputMask cannot input content when setting unmask=\"true\" in Android browser",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 614,
+      "url": "https://github.com/openvi-foundation/openvue/issues/614",
+      "title": "Dropdown | `required` property",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 615,
+      "url": "https://github.com/openvi-foundation/openvue/issues/615",
+      "title": "Dropdown: Not associated with label",
+      "labels": [
+        "bug",
+        "accessibility"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 616,
+      "url": "https://github.com/openvi-foundation/openvue/issues/616",
+      "title": "Consistent teleport targets for all components",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 617,
+      "url": "https://github.com/openvi-foundation/openvue/issues/617",
+      "title": "Tree and TreeTable: Scroll performance (big amount data) (virtual scrolling)",
+      "labels": [
+        "enhancement",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 619,
+      "url": "https://github.com/openvi-foundation/openvue/issues/619",
+      "title": "Add totalSize props to VirtualScroller to support lazy loading",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 634,
+      "url": "https://github.com/openvi-foundation/openvue/issues/634",
+      "title": "Feature (Slider): add option for discrete mode with visual tick at every step",
+      "labels": [
+        "enhancement"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 658,
+      "url": "https://github.com/openvi-foundation/openvue/issues/658",
+      "title": "Feature: Strongly typed TS with <script setup> style conversion",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 694,
+      "url": "https://github.com/openvi-foundation/openvue/issues/694",
+      "title": "Feature: allow resizing frozen columns (`frozen` + `resizableColumns`)",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 698,
+      "url": "https://github.com/openvi-foundation/openvue/issues/698",
+      "title": "Bug: Splitter: TypeError: Cannot read properties of undefined (reading 'style') when the number of panels changes",
+      "labels": [
+        "bug"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 706,
+      "url": "https://github.com/openvi-foundation/openvue/issues/706",
+      "title": "Feature: DataTable: support wrapped Column / ColumnGroup / Row without a key (they are silently dropped)",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 726,
+      "url": "https://github.com/openvi-foundation/openvue/issues/726",
+      "title": "Feature: Slider `inverted` prop and RTL arrow keys",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 729,
+      "url": "https://github.com/openvi-foundation/openvue/issues/729",
+      "title": "DataTable: slow with a large selection (select-all checkbox, and row selection without dataKey)",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 730,
+      "url": "https://github.com/openvi-foundation/openvue/issues/730",
+      "title": "OrderList / PickList: slow with a large selection unless dataKey is set",
+      "labels": [
+        "bug",
+        "performance"
+      ],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 731,
+      "url": "https://github.com/openvi-foundation/openvue/issues/731",
+      "title": "Bug: Select closes when you pick an option in a Select placed in its header or footer",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 733,
+      "url": "https://github.com/openvi-foundation/openvue/issues/733",
+      "title": "Bug: CascadeSelect closes when you pick an option in a Select placed in its header or footer",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 735,
+      "url": "https://github.com/openvi-foundation/openvue/issues/735",
+      "title": "Bug: TreeSelect needs two outside clicks to close after a click inside its panel",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    },
+    {
+      "number": 736,
+      "url": "https://github.com/openvi-foundation/openvue/issues/736",
+      "title": "Bug: TreeSelect closes when you pick an option in a Select placed in its header or footer",
+      "labels": [],
+      "component": null,
+      "disposition": "pending",
+      "evidence": []
+    }
+  ]
+}

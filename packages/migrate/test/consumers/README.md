@@ -6,12 +6,12 @@ The six fixtures cover manual Vite imports, Vite auto-imports, Nuxt SSR, Laravel
 
 The Volt fixture copies the OpenVolt components from `apps/volt/volt` instead of keeping its own. The `asPrimeVue` copy option points their imports back at `primevue` and `@primevue/*`, so the baseline matches a project that still uses PrimeVue's Volt.
 
-Run the complete contract suite from the repository root:
+Run the complete contract suite from the repository root. Bun runs the suite and downloads the pinned pnpm version for fixtures that use it.
 
 ```sh
-pnpm test:contracts
-pnpm test:consumers
-pnpm test:consumers:browser
+bun run test:contracts
+bun run test:consumers
+bun run test:consumers:browser
 ```
 
 Use `OPENVUE_TEST_ARTIFACTS` to reuse a previously packed artifact directory. The runner rejects workspace links and remote OpenVue resolutions so local monorepo state cannot hide publishing defects.

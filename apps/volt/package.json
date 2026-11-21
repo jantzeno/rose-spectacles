@@ -27,7 +27,7 @@
     ],
     "type": "module",
     "scripts": {
-        "build": "pnpm run build:prebuild && nuxt build",
+        "build": "bun run build:prebuild && nuxt build",
         "dev": "nuxt dev",
         "generate": "nuxt generate",
         "preview": "nuxt preview",

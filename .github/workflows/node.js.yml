@@ -19,35 +19,32 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-            - name: Install pnpm
-              uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-              with:
-                  version: 9.15.9
+            - name: Install Bun
+              uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: 'pnpm'
 
             - name: Install dependencies
-              run: pnpm install --frozen-lockfile
+              run: bun install --frozen-lockfile
 
             - name: Lint Check
               if: ${{ success() }}
               run: |
-                  pnpm run lint
+                  bun run lint
 
             # - name: Code Format Check
             #   id: codeFormatCheck
             #   if: ${{ success() }}
             #   run: |
-            #       pnpm run format:check
+            #       bun run format:check
 
             # - name: Code Format
             #   if: always() && steps.codeFormatCheck.outcome == 'failure'
             #   run: |
-            #       npm run format
+            #       bun run format
             #       git config user.name "GitHub Actions Bot"
             #       git config user.email "<>"
             #       git commit -a -m "Code Format"
@@ -56,9 +53,9 @@ jobs:
             - name: Security Check
               if: ${{ success() }}
               run: |
-                  pnpm run security:check
+                  bun run security:check
 
             # - name: Unit Tests Check
             #   if: ${{ success() }}
             #   run: |
-            #       npm run test:unit
+            #       bun run test:unit

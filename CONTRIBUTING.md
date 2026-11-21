@@ -18,22 +18,22 @@ Use the **Feature request** issue template. Describe the problem you're running 
 
 ## Development setup
 
-This is a pnpm monorepo.
+Install [Bun](https://bun.com/docs/installation) using the version in `package.json`.
 
 ```bash
 git clone https://github.com/openvi-foundation/openvue.git
 cd openvue
-pnpm run init
-pnpm run dev
+bun install
+bun run dev
 ```
 
 Useful commands while working on a component:
 
 ```bash
-pnpm run lint
-pnpm run format
-pnpm --filter openvue exec vitest run src/button
-pnpm --filter openvue exec vitest run src/button/Button.spec.js
+bun run lint
+bun run format
+bun run --cwd packages/primevue vitest run src/button
+bun run --cwd packages/primevue vitest run src/button/Button.spec.js
 ```
 
 ## Submitting a pull request
@@ -41,7 +41,7 @@ pnpm --filter openvue exec vitest run src/button/Button.spec.js
 1. Fork the repository.
 2. Create a branch off `master` (`git checkout -b feature/your-feature-name`).
 3. Make your change, and add or update tests for it.
-4. Run `pnpm run lint` and `pnpm run format` before committing.
+4. Run `bun run lint` and `bun run format` before committing.
 5. Add a changelog entry if the change is user-facing (see below).
 6. Reference the related issue in your PR description.
 7. Open the PR against `master`.
@@ -66,4 +66,4 @@ Skip it for internal refactors, test-only changes, CI, and documentation typos. 
 
 ## Code style
 
-Formatting is enforced by Prettier and ESLint (`pnpm run format:check`, `pnpm run lint`). Match the existing patterns in a component directory rather than introducing a new style, most components follow the same `Component.vue` / `BaseComponent.vue` / `style/ComponentStyle.js` structure.
+Formatting is enforced by Prettier and ESLint (`bun run format:check`, `bun run lint`). Match the existing patterns in a component directory rather than introducing a new style, most components follow the same `Component.vue` / `BaseComponent.vue` / `style/ComponentStyle.js` structure.

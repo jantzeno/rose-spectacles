@@ -9,7 +9,7 @@
  * @playwright/test purely as a browser automation library, the same way run-consumer-tests.mjs
  * already does in CI.
  *
- * Usage: node scripts/designer-smoke.mjs   (requires `pnpm --filter showcase build` first)
+ * Usage: node scripts/designer-smoke.mjs   (requires `bun run build:showcase` first)
  */
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -68,7 +68,7 @@ function stopPreview(child) {
 }
 
 if (!existsSync(join(showcase, '.output', 'server', 'index.mjs'))) {
-    fail('showcase is not built — run `pnpm --filter showcase build` first');
+    fail('showcase is not built — run `bun run build:showcase` first');
 }
 
 // Run the built Nitro server directly rather than through `nuxt preview`: no shell, no .cmd
