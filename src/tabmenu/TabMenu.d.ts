@@ -161,11 +161,11 @@ export interface TabMenuRouterBindProps {
 /**
  * Defines valid properties in TabMenu component.
  */
-export interface TabMenuProps {
+export interface TabMenuProps<T extends MenuItem = MenuItem> {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * Active index of menuitem.
      * @defaultValue 0
@@ -203,7 +203,7 @@ export interface TabMenuProps {
 /**
  * Defines valid slots in TabMenu component.
  */
-export interface TabMenuSlots {
+export interface TabMenuSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom content for each item.
      * @param {Object} scope - item slot's params.
@@ -212,7 +212,7 @@ export interface TabMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Index of the menuitem
          */
@@ -238,7 +238,7 @@ export interface TabMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -268,11 +268,13 @@ export declare type TabMenuEmits = EmitFn<TabMenuEmitsOptions>;
  * @group Component
  *
  */
-declare const TabMenu: DefineComponent<TabMenuProps, TabMenuSlots, TabMenuEmits>;
+declare const TabMenu: {
+    new <T extends MenuItem = MenuItem>(props?: TabMenuProps<T>): InstanceType<DefineComponent<TabMenuProps<T>, TabMenuSlots<T>, TabMenuEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        TabMenu: DefineComponent<TabMenuProps, TabMenuSlots, TabMenuEmits>;
+        TabMenu: typeof TabMenu;
     }
 }
 

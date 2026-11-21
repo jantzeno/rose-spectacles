@@ -137,7 +137,7 @@ export interface StepsRouterBindProps {
 /**
  * Defines valid properties in Steps component.
  */
-export interface StepsProps {
+export interface StepsProps<T extends MenuItem = MenuItem> {
     /**
      * Unique identifier of the element.
      */
@@ -145,7 +145,7 @@ export interface StepsProps {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * Whether the items are clickable or not.
      * @defaultValue true
@@ -180,7 +180,7 @@ export interface StepsProps {
 /**
  * Defines valid slots in Steps component.
  */
-export interface StepsSlots {
+export interface StepsSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom item template.
      * @param {Object} scope - item slot's params.
@@ -189,7 +189,7 @@ export interface StepsSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Current active state of the menuitem
          */
@@ -225,11 +225,13 @@ export declare type StepsEmits = EmitFn<StepsEmitsOptions>;
  * @group Component
  *
  */
-declare const Steps: DefineComponent<StepsProps, StepsSlots, StepsEmits>;
+declare const Steps: {
+    new <T extends MenuItem = MenuItem>(props?: StepsProps<T>): InstanceType<DefineComponent<StepsProps<T>, StepsSlots<T>, StepsEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Steps: DefineComponent<StepsProps, StepsSlots, StepsEmits>;
+        Steps: typeof Steps;
     }
 }
 

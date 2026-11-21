@@ -241,11 +241,11 @@ export interface MegaMenuRouterBindProps {
 /**
  * Defines valid properties in MegaMenu component.
  */
-export interface MegaMenuProps {
+export interface MegaMenuProps<T extends MenuItem = MenuItem> {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * Defines the orientation.
      * @defaultValue horizontal
@@ -302,7 +302,7 @@ export interface MegaMenuProps {
 /**
  * Defines valid slots in MegaMenu component.
  */
-export interface MegaMenuSlots {
+export interface MegaMenuSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom start template.
      */
@@ -319,7 +319,7 @@ export interface MegaMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Label property of the menuitem
          */
@@ -373,7 +373,7 @@ export interface MegaMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -408,11 +408,13 @@ export declare type MegaMenuEmits = EmitFn<MegaMenuEmitsOptions>;
  * @group Component
  *
  */
-declare const MegaMenu: DefineComponent<MegaMenuProps, MegaMenuSlots, MegaMenuEmits>;
+declare const MegaMenu: {
+    new <T extends MenuItem = MenuItem>(props?: MegaMenuProps<T>): InstanceType<DefineComponent<MegaMenuProps<T>, MegaMenuSlots<T>, MegaMenuEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        MegaMenu: DefineComponent<MegaMenuProps, MegaMenuSlots, MegaMenuEmits>;
+        MegaMenu: typeof MegaMenu;
     }
 }
 

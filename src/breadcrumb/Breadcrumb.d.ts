@@ -135,15 +135,15 @@ export interface BreadcrumbRouterBindProps {
 /**
  * Defines valid properties in Breadcrumb component.
  */
-export interface BreadcrumbProps {
+export interface BreadcrumbProps<T extends MenuItem = MenuItem, H extends MenuItem = T> {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * Configuration for the home icon.
      */
-    home?: MenuItem | undefined;
+    home?: H | undefined;
     /**
      * Defines a string value that labels an interactive element.
      */
@@ -176,7 +176,7 @@ export interface BreadcrumbProps {
 /**
  * Defines valid slots in Breadcrumb component.
  */
-export interface BreadcrumbSlots {
+export interface BreadcrumbSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom item template.
      * @param {Object} scope - item slot's params.
@@ -185,7 +185,7 @@ export interface BreadcrumbSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Label property of the menuitem
          */
@@ -207,7 +207,7 @@ export interface BreadcrumbSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -231,11 +231,15 @@ export declare type BreadcrumbEmits = EmitFn<BreadcrumbEmitsOptions>;
  * @group Component
  *
  */
-declare const Breadcrumb: DefineComponent<BreadcrumbProps, BreadcrumbSlots, BreadcrumbEmits>;
+declare const Breadcrumb: {
+    new <T extends MenuItem = MenuItem, H extends MenuItem = T>(
+        props?: BreadcrumbProps<T, H>
+    ): InstanceType<DefineComponent<BreadcrumbProps<T, H>, BreadcrumbSlots<T | H>, BreadcrumbEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Breadcrumb: DefineComponent<BreadcrumbProps, BreadcrumbSlots, BreadcrumbEmits>;
+        Breadcrumb: typeof Breadcrumb;
     }
 }
 

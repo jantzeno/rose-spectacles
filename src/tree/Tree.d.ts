@@ -339,11 +339,11 @@ export interface TreeContext {
 /**
  * Defines valid properties in Tree component.
  */
-export interface TreeProps {
+export interface TreeProps<T extends TreeNode = TreeNode> {
     /**
      * An array of treenodes.
      */
-    value?: TreeNode[] | undefined;
+    value?: T[] | undefined;
     /**
      * A map of keys to represent the expansion state in controlled mode.
      */
@@ -385,7 +385,7 @@ export interface TreeProps {
      * When filtering is enabled, filterBy decides which field or fields (comma separated) to search against. A callable taking a TreeNode can be provided instead of a list of field names.
      * @defaultValue label
      */
-    filterBy?: string | ((node: TreeNode) => string) | undefined;
+    filterBy?: string | ((node: T) => string) | undefined;
     /**
      * Mode for filtering.
      * @defaultValue lenient
@@ -465,7 +465,7 @@ export interface TreeProps {
 /**
  * Defines valid slots in Tree component.
  */
-export interface TreeSlots {
+export interface TreeSlots<T extends TreeNode = TreeNode> {
     /**
      * Default content slot.
      */
@@ -473,7 +473,7 @@ export interface TreeSlots {
         /**
          * Tree node instance
          */
-        node: TreeNode;
+        node: T;
         /**
          * Selection state
          */
@@ -523,7 +523,7 @@ export interface TreeSlots {
         /**
          * Tree node instance
          */
-        node: TreeNode;
+        node: T;
         /**
          * Expanded state of the node
          */
@@ -538,7 +538,7 @@ export interface TreeSlots {
         /**
          * Tree node instance
          */
-        node: TreeNode;
+        node: T;
         /**
          * Expanded state of the node
          */
@@ -552,7 +552,7 @@ export interface TreeSlots {
         /**
          * Tree node instance
          */
-        node: TreeNode;
+        node: T;
         /**
          * Expanded state of the node
          */
@@ -566,7 +566,7 @@ export interface TreeSlots {
         /**
          * Tree node instance
          */
-        node: TreeNode;
+        node: T;
         /**
          * Style class of the icon.
          */
@@ -594,7 +594,7 @@ export interface TreeSlots {
         /**
          * Current value
          */
-        value: TreeNode[];
+        value: T[];
         /**
          * Current expanded key
          */
@@ -612,7 +612,7 @@ export interface TreeSlots {
         /**
          * Current value
          */
-        value: TreeNode[];
+        value: T[];
         /**
          * Current expanded key
          */
@@ -715,11 +715,13 @@ export declare type TreeEmits = EmitFn<TreeEmitsOptions>;
  * @group Component
  *
  */
-declare const Tree: DefineComponent<TreeProps, TreeSlots, TreeEmits>;
+declare const Tree: {
+    new <T extends TreeNode = TreeNode>(props?: TreeProps<T>): InstanceType<DefineComponent<TreeProps<T>, TreeSlots<T>, TreeEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Tree: DefineComponent<TreeProps, TreeSlots, TreeEmits>;
+        Tree: typeof Tree;
     }
 }
 

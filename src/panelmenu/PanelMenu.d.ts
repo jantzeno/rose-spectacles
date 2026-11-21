@@ -258,11 +258,11 @@ export interface PanelMenuRouterBindProps {
 /**
  * Defines valid properties in PanelMenu component.
  */
-export interface PanelMenuProps {
+export interface PanelMenuProps<T extends MenuItem = MenuItem> {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * A map of keys to represent the expansion state in controlled mode.
      * @type {PanelMenuExpandedKeys}
@@ -301,7 +301,7 @@ export interface PanelMenuProps {
 /**
  * Defines valid slots in PanelMenu component.
  */
-export interface PanelMenuSlots {
+export interface PanelMenuSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom content for each item.
      * @param {Object} scope - item slot's params.
@@ -310,7 +310,7 @@ export interface PanelMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Whether there is a root menuitem
          */
@@ -350,7 +350,7 @@ export interface PanelMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -364,7 +364,7 @@ export interface PanelMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -404,11 +404,13 @@ export declare type PanelMenuEmits = EmitFn<PanelMenuEmitsOptions>;
  * @group Component
  *
  */
-declare const PanelMenu: DefineComponent<PanelMenuProps, PanelMenuSlots, PanelMenuEmits>;
+declare const PanelMenu: {
+    new <T extends MenuItem = MenuItem>(props?: PanelMenuProps<T>): InstanceType<DefineComponent<PanelMenuProps<T>, PanelMenuSlots<T>, PanelMenuEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        PanelMenu: DefineComponent<PanelMenuProps, PanelMenuSlots, PanelMenuEmits>;
+        PanelMenu: typeof PanelMenu;
     }
 }
 

@@ -117,7 +117,7 @@ export interface SplitButtonState {
 /**
  * Defines valid properties in SplitButton component.
  */
-export interface SplitButtonProps {
+export interface SplitButtonProps<T extends MenuItem = MenuItem> {
     /**
      * Text of the button.
      */
@@ -129,7 +129,7 @@ export interface SplitButtonProps {
     /**
      * MenuModel instance to define the overlay items.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * Whether to automatically manage layering.
      * @defaultValue true
@@ -237,7 +237,7 @@ export interface SplitButtonProps {
 /**
  * Defines valid slots in SplitButton component.
  */
-export interface SplitButtonSlots {
+export interface SplitButtonSlots<T extends MenuItem = MenuItem> {
     /**
      * Button part of the content can easily be customized with the default slot instead of using the built-in modes.
      */
@@ -285,7 +285,7 @@ export interface SplitButtonSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -299,7 +299,7 @@ export interface SplitButtonSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Label property of the menuitem
          */
@@ -337,11 +337,13 @@ export declare type SplitButtonEmits = EmitFn<SplitButtonEmitsOptions>;
  * @group Component
  *
  */
-declare const SplitButton: DefineComponent<SplitButtonProps, SplitButtonSlots, SplitButtonEmits>;
+declare const SplitButton: {
+    new <T extends MenuItem = MenuItem>(props?: SplitButtonProps<T>): InstanceType<DefineComponent<SplitButtonProps<T>, SplitButtonSlots<T>, SplitButtonEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        SplitButton: DefineComponent<SplitButtonProps, SplitButtonSlots, SplitButtonEmits>;
+        SplitButton: typeof SplitButton;
     }
 }
 

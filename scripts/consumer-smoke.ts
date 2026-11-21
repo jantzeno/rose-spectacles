@@ -56,7 +56,7 @@ try {
         'tsconfig.json',
         JSON.stringify({
             compilerOptions: { target: 'ES2022', module: 'ESNext', moduleResolution: 'Bundler', strict: true, noEmit: true },
-            include: ['main.ts', 'App.vue', 'SlotTypes.vue']
+            include: ['main.ts', 'App.vue', 'SlotTypes.vue', 'ModelTypes.vue']
         })
     );
     const slotTypes = `
@@ -109,6 +109,45 @@ try {
         </template>
     `;
     await write('SlotTypes.vue', slotTypes);
+    const menuComponents = ['Breadcrumb', 'ContextMenu', 'MegaMenu', 'Menu', 'Menubar', 'PanelMenu', 'SplitButton', 'Steps', 'TabMenu', 'TieredMenu'];
+    await write(
+        'ModelTypes.vue',
+        `
+        <script setup lang="ts">
+        import { ${menuComponents.join(', ')}, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
+        import type { MenuItem } from 'rose-spectacles/menuitem';
+        import type { OrganizationChartNode } from 'rose-spectacles/organizationchart';
+        import type { TreeNode } from 'rose-spectacles/treenode';
+
+        interface RoutedItem extends MenuItem { route: string }
+        interface LabeledTreeNode extends TreeNode { customLabel: string }
+        interface Employee extends OrganizationChartNode { department: string }
+
+        const menu: RoutedItem[] = [{ label: 'Home', route: '/home' }];
+        const nodes: LabeledTreeNode[] = [{ key: 'root', customLabel: 'Reports' }];
+        const employee: Employee = { key: 'manager', department: 'Sales' };
+        const inferred = <T,>(value: T, ..._requiresKnownType: 0 extends (1 & T) ? [never] : []) => value;
+        </script>
+        <template>
+            ${menuComponents
+                .map(
+                    (name) => `<${name} :model="menu">
+                <template #item="{ item }">{{ inferred(item.route).toUpperCase() }}</template>
+            </${name}>`
+                )
+                .join('\n')}
+            <Tree :value="nodes">
+                <template #default="{ node }">{{ inferred(node.customLabel).toUpperCase() }}</template>
+            </Tree>
+            <TreeSelect :options="nodes">
+                <template #option="{ node }">{{ inferred(node.customLabel).toUpperCase() }}</template>
+            </TreeSelect>
+            <OrganizationChart :value="employee">
+                <template #default="{ node }">{{ inferred(node.department).toUpperCase() }}</template>
+            </OrganizationChart>
+        </template>
+    `
+    );
     await write(
         'main.ts',
         `
@@ -169,6 +208,7 @@ try {
         assert.equal(existsSync(join(consumer, 'node_modules', name)), false, `${name} is absent in the base consumer`);
     }
     run(['x', '--no-install', 'vue-tsc', '--noEmit']);
+    console.log('Menu and tree slots preserve the declared types of extended models');
 
     await write('SlotTypes.vue', slotTypes.replaceAll('.title', '.missingField'));
     const invalidSlots = spawnSync('bun', ['x', '--no-install', 'vue-tsc', '--noEmit'], { cwd: consumer, encoding: 'utf8' });

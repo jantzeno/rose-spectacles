@@ -176,7 +176,7 @@ export interface TreeSelectState {
 /**
  * Defines valid properties in TreeSelect component.
  */
-export interface TreeSelectProps {
+export interface TreeSelectProps<T extends TreeNode = TreeNode> {
     /**
      * Value of the component.
      */
@@ -192,7 +192,7 @@ export interface TreeSelectProps {
     /**
      * An array of treenodes.
      */
-    options?: TreeNode[] | undefined;
+    options?: T[] | undefined;
     /**
      * A map of keys to represent the expansion state in controlled mode.
      */
@@ -268,7 +268,7 @@ export interface TreeSelectProps {
      * When filtering is enabled, filterBy decides which field or fields (comma separated) to search against. A callable taking a TreeNode can be provided instead of a list of field names.
      * @defaultValue label
      */
-    filterBy?: string | ((node: TreeNode) => string) | undefined;
+    filterBy?: string | ((node: T) => string) | undefined;
     /**
      * Mode for filtering.
      * @defaultValue lenient
@@ -370,7 +370,7 @@ export interface TreeSelectProps {
 /**
  * Defines valid slots in TreeSelect component.
  */
-export interface TreeSelectSlots {
+export interface TreeSelectSlots<T extends TreeNode = TreeNode> {
     /**
      * Custom value template.
      * @param {Object} scope - value slot's params.
@@ -379,7 +379,7 @@ export interface TreeSelectSlots {
         /**
          * Selected value
          */
-        value: TreeNode | any;
+        value: T[];
         /**
          * Placeholder
          */
@@ -393,7 +393,7 @@ export interface TreeSelectSlots {
         /**
          * Current node
          */
-        node: TreeNode | any;
+        node: T;
         /**
          * Selection state
          */
@@ -415,7 +415,7 @@ export interface TreeSelectSlots {
         /**
          * An array of treenodes.
          */
-        options: TreeNode[];
+        options: T[];
     }): VNode[];
     /**
      * Custom footer template.
@@ -429,7 +429,7 @@ export interface TreeSelectSlots {
         /**
          * An array of treenodes.
          */
-        options: TreeNode[];
+        options: T[];
     }): VNode[];
     /**
      * Custom empty template.
@@ -465,7 +465,7 @@ export interface TreeSelectSlots {
         /**
          * Node instance
          */
-        node: TreeNode | any;
+        node: T;
         /**
          * Expanded state of the node
          */
@@ -479,7 +479,7 @@ export interface TreeSelectSlots {
         /**
          * Node instance
          */
-        node: TreeNode | any;
+        node: T;
         /**
          * Expanded state of the node
          */
@@ -605,11 +605,15 @@ export interface TreeSelectMethods {
  * @group Component
  *
  */
-declare const TreeSelect: DefineComponent<TreeSelectProps, TreeSelectSlots, TreeSelectEmits, TreeSelectMethods>;
+declare const TreeSelect: {
+    new <T extends TreeNode = TreeNode>(
+        props?: TreeSelectProps<T>
+    ): InstanceType<DefineComponent<TreeSelectProps<T>, TreeSelectSlots<T>, TreeSelectEmits, TreeSelectMethods>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        TreeSelect: DefineComponent<TreeSelectProps, TreeSelectSlots, TreeSelectEmits, TreeSelectMethods>;
+        TreeSelect: typeof TreeSelect;
     }
 }
 

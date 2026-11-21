@@ -234,11 +234,11 @@ export interface MenubarRouterBindProps {
 /**
  * Defines valid properties in Menubar component.
  */
-export interface MenubarProps {
+export interface MenubarProps<T extends MenuItem = MenuItem> {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * The breakpoint to define the maximum width boundary.
      * @defaultValue 960px
@@ -280,7 +280,7 @@ export interface MenubarProps {
 /**
  * Defines valid slots in Menubar component.
  */
-export interface MenubarSlots {
+export interface MenubarSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom start template.
      */
@@ -297,7 +297,7 @@ export interface MenubarSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Label property of the menuitem
          */
@@ -387,7 +387,7 @@ export interface MenubarSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -411,11 +411,13 @@ export declare type MenubarEmits = EmitFn<MenubarEmitsOptions>;
  * @group Component
  *
  */
-declare const Menubar: DefineComponent<MenubarProps, MenubarSlots, MenubarEmits>;
+declare const Menubar: {
+    new <T extends MenuItem = MenuItem>(props?: MenubarProps<T>): InstanceType<DefineComponent<MenubarProps<T>, MenubarSlots<T>, MenubarEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Menubar: DefineComponent<MenubarProps, MenubarSlots, MenubarEmits>;
+        Menubar: typeof Menubar;
     }
 }
 

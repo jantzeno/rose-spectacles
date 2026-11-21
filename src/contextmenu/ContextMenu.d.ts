@@ -226,11 +226,11 @@ export interface ContextMenuRouterBindProps {
 /**
  * Defines valid properties in ContextMenu component.
  */
-export interface ContextMenuProps {
+export interface ContextMenuProps<T extends MenuItem = MenuItem> {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * The breakpoint to define the maximum width boundary.
      * @defaultValue 960px
@@ -292,7 +292,7 @@ export interface ContextMenuProps {
 /**
  * Defines valid slots in ContextMenu component.
  */
-export interface ContextMenuSlots {
+export interface ContextMenuSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom item template.
      * @param {Object} scope - item slot's params.
@@ -301,7 +301,7 @@ export interface ContextMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Label property of the menuitem
          */
@@ -323,7 +323,7 @@ export interface ContextMenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -408,11 +408,15 @@ export interface ContextMenuMethods {
  * @group Component
  *
  */
-declare const ContextMenu: DefineComponent<ContextMenuProps, ContextMenuSlots, ContextMenuEmits, ContextMenuMethods>;
+declare const ContextMenu: {
+    new <T extends MenuItem = MenuItem>(
+        props?: ContextMenuProps<T>
+    ): InstanceType<DefineComponent<ContextMenuProps<T>, ContextMenuSlots<T>, ContextMenuEmits, ContextMenuMethods>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        ContextMenu: DefineComponent<ContextMenuProps, ContextMenuSlots, ContextMenuEmits, ContextMenuMethods>;
+        ContextMenu: typeof ContextMenu;
     }
 }
 

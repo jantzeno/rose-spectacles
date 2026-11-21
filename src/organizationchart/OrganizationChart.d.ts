@@ -235,11 +235,11 @@ export interface OrganizationChartContext {
 /**
  * Defines valid properties in OrganizationChart component.
  */
-export interface OrganizationChartProps {
+export interface OrganizationChartProps<T extends OrganizationChartNode = OrganizationChartNode> {
     /**
      * Value of the component.
      */
-    value?: OrganizationChartNode;
+    value?: T;
     /**
      * A map instance of key-value pairs to represented the selected nodes.
      */
@@ -281,7 +281,7 @@ export interface OrganizationChartProps {
 /**
  * Defines valid slots in OrganizationChart component.
  */
-export interface OrganizationChartSlots {
+export interface OrganizationChartSlots<T extends OrganizationChartNode = OrganizationChartNode> {
     /**
      * Custom content template.
      */
@@ -289,7 +289,7 @@ export interface OrganizationChartSlots {
         /**
          * Current node
          */
-        node: any;
+        node: T;
     }): VNode[];
     /**
      * Dynamic content template.
@@ -366,11 +366,15 @@ export declare type OrganizationChartEmits = EmitFn<OrganizationChartEmitsOption
  * @group Component
  *
  */
-declare const OrganizationChart: DefineComponent<OrganizationChartProps, OrganizationChartSlots, OrganizationChartEmits>;
+declare const OrganizationChart: {
+    new <T extends OrganizationChartNode = OrganizationChartNode>(
+        props?: OrganizationChartProps<T>
+    ): InstanceType<DefineComponent<OrganizationChartProps<T>, OrganizationChartSlots<T>, OrganizationChartEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        OrganizationChart: DefineComponent<OrganizationChartProps, OrganizationChartSlots, OrganizationChartEmits>;
+        OrganizationChart: typeof OrganizationChart;
     }
 }
 

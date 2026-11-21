@@ -195,11 +195,11 @@ export interface MenuRouterBindProps {
 /**
  * Defines valid properties in Menu component.
  */
-export interface MenuProps {
+export interface MenuProps<T extends MenuItem = MenuItem> {
     /**
      * An array of menuitems.
      */
-    model?: MenuItem[] | undefined;
+    model?: T[] | undefined;
     /**
      * Defines if menu would displayed as a popup.
      * @defaultValue false
@@ -256,7 +256,7 @@ export interface MenuProps {
 /**
  * Defines valid slots in Menu component.
  */
-export interface MenuSlots {
+export interface MenuSlots<T extends MenuItem = MenuItem> {
     /**
      * Custom start template.
      */
@@ -273,7 +273,7 @@ export interface MenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Label property of the menuitem
          */
@@ -291,7 +291,7 @@ export interface MenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
         /**
          * Style class of the item icon element.
          */
@@ -306,7 +306,7 @@ export interface MenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
     }): VNode[];
     /**
      * Custom submenu label template.
@@ -316,7 +316,7 @@ export interface MenuSlots {
         /**
          * Menuitem instance
          */
-        item: MenuItem;
+        item: T;
     }): VNode[];
 }
 
@@ -382,11 +382,13 @@ export interface MenuMethods {
  * @group Component
  *
  */
-declare const Menu: DefineComponent<MenuProps, MenuSlots, MenuEmits, MenuMethods>;
+declare const Menu: {
+    new <T extends MenuItem = MenuItem>(props?: MenuProps<T>): InstanceType<DefineComponent<MenuProps<T>, MenuSlots<T>, MenuEmits, MenuMethods>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Menu: DefineComponent<MenuProps, MenuSlots, MenuEmits, MenuMethods>;
+        Menu: typeof Menu;
     }
 }
 
