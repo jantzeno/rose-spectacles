@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TieredMenuStyle from './style/TieredMenuStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseTieredMenu',
     extends: BaseComponent,
     props: {
@@ -54,5 +55,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

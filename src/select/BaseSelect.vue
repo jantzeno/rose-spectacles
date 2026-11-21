@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import SelectStyle from './style/SelectStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseSelect',
     extends: BaseInput,
     props: {
@@ -177,5 +178,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

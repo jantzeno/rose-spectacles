@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import TextareaStyle from './style/TextareaStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseTextarea',
     extends: BaseInput,
     props: {
@@ -15,5 +16,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import InputTextStyle from './style/InputTextStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseInputText',
     extends: BaseInput,
     style: InputTextStyle,
@@ -12,5 +13,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

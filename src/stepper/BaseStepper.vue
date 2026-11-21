@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import StepperStyle from './style/StepperStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseStepper',
     extends: BaseComponent,
     props: {
@@ -23,5 +24,5 @@ export default {
             $pcStepItem: null
         };
     }
-};
+});
 </script>

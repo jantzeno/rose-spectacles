@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import FluidStyle from './style/FluidStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseFluid',
     extends: BaseComponent,
     style: FluidStyle,
@@ -12,5 +13,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

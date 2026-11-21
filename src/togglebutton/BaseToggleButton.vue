@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import ToggleButtonStyle from './style/ToggleButtonStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseToggleButton',
     extends: BaseEditableHolder,
     props: {
@@ -48,5 +49,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

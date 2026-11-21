@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DialogStyle from './style/DialogStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseDialog',
     extends: BaseComponent,
     props: {
@@ -135,5 +136,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

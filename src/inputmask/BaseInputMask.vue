@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import InputMaskStyle from './style/InputMaskStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseInputMask',
     extends: BaseInput,
     props: {
@@ -46,5 +47,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

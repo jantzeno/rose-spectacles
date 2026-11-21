@@ -3,11 +3,12 @@
         <rect width="1" height="1" fill="currentColor" fill-opacity="0" />
     </svg>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseIcon from '../baseicon/BaseIcon.vue';
 
-export default {
+export default defineComponent({
     name: 'BlankIcon',
     extends: BaseIcon
-};
+});
 </script>

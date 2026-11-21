@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import EditorStyle from './style/EditorStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseEditor',
     extends: BaseEditableHolder,
     props: {
@@ -19,5 +20,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

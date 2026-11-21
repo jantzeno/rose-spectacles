@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import ScrollPanelStyle from './style/ScrollPanelStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseScrollPanel',
     extends: BaseComponent,
     props: {
@@ -18,5 +19,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

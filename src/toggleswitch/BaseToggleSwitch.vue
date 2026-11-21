@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import ToggleSwitchStyle from './style/ToggleSwitchStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseToggleSwitch',
     extends: BaseEditableHolder,
     props: {
@@ -50,5 +51,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

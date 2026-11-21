@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TerminalStyle from './style/TerminalStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseTerminal',
     extends: BaseComponent,
     props: {
@@ -22,5 +23,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

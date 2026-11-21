@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import PanelStyle from './style/PanelStyle';
 
-export default {
+export default defineComponent({
     name: 'BasePanel',
     extends: BaseComponent,
     props: {
@@ -27,5 +28,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

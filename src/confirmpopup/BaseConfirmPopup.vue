@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import ConfirmPopupStyle from './style/ConfirmPopupStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseConfirmPopup',
     extends: BaseComponent,
     props: {
@@ -15,5 +16,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TreeTableStyle from './style/TreeTableStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseTreeTable',
     extends: BaseComponent,
     props: {
@@ -215,5 +216,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

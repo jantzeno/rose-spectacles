@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import PanelMenuStyle from './style/PanelMenuStyle';
 
-export default {
+export default defineComponent({
     name: 'BasePanelMenu',
     extends: BaseComponent,
     props: {
@@ -30,5 +31,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

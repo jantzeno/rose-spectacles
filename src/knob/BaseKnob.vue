@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { $dt } from '../internal/styled/index';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import KnobStyle from './style/KnobStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseKnob',
     extends: BaseEditableHolder,
     props: {
@@ -77,5 +78,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

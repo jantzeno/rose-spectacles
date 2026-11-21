@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import InputOtpStyle from './style/InputOtpStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseInputOtp',
     extends: BaseInput,
     props: {
@@ -34,5 +35,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -7,11 +7,12 @@
     </svg>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseIcon from '../baseicon/BaseIcon.vue';
 
-export default {
+export default defineComponent({
     name: 'PlusIcon',
     extends: BaseIcon
-};
+});
 </script>

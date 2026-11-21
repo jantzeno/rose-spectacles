@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import RatingStyle from './style/RatingStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseRating',
     extends: BaseEditableHolder,
     props: {
@@ -30,5 +31,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

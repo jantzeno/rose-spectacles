@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import ListboxStyle from './style/ListboxStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseListbox',
     extends: BaseEditableHolder,
     props: {
@@ -113,5 +114,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

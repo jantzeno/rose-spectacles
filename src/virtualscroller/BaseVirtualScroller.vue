@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import VirtualScrollerStyle from './style/VirtualScrollerStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseVirtualScroller',
     extends: BaseComponent,
     props: {
@@ -101,5 +102,5 @@ export default {
     beforeMount() {
         VirtualScrollerStyle.loadCSS({ nonce: this.$primevueConfig?.csp?.nonce });
     }
-};
+});
 </script>

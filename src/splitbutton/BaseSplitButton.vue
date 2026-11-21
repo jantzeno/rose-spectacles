@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import SplitButtonStyle from './style/SplitButtonStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseSplitButton',
     extends: BaseComponent,
     props: {
@@ -98,5 +99,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

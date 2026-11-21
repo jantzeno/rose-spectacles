@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import ImageCompareStyle from './style/ImageCompareStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseImageCompare',
     extends: BaseComponent,
     props: {
@@ -26,5 +27,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../../core/basecomponent/BaseComponent.vue';
 import FormFieldStyle from './style/FormFieldStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseFormField',
     extends: BaseComponent,
     style: FormFieldStyle,
@@ -50,5 +51,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

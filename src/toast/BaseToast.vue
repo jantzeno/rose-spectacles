@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import ToastStyle from './style/ToastStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseToast',
     extends: BaseComponent,
     props: {
@@ -70,5 +71,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import SelectButtonStyle from './style/SelectButtonStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseSelectButton',
     extends: BaseEditableHolder,
     props: {
@@ -36,5 +37,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

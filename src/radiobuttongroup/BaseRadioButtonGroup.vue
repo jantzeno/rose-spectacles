@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import RadioButtonGroupStyle from './style/RadioButtonGroupStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseRadioButtonGroup',
     extends: BaseEditableHolder,
     style: RadioButtonGroupStyle,
@@ -12,5 +13,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

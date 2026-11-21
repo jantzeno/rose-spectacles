@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import PasswordStyle from './style/PasswordStyle';
 
-export default {
+export default defineComponent({
     name: 'BasePassword',
     extends: BaseInput,
     props: {
@@ -150,5 +151,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import MenuStyle from './style/MenuStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseMenu',
     extends: BaseComponent,
     props: {
@@ -46,5 +47,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

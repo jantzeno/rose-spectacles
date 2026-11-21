@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DataTableStyle from './style/DataTableStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseDataTable',
     extends: BaseComponent,
     props: {
@@ -309,5 +310,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

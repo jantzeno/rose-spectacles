@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import InputGroupAddonStyle from './style/InputGroupAddonStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseInputGroupAddon',
     extends: BaseComponent,
     style: InputGroupAddonStyle,
@@ -12,5 +13,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

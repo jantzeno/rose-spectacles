@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import MultiSelectStyle from './style/MultiSelectStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseMultiSelect',
     extends: BaseInput,
     props: {
@@ -181,5 +182,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

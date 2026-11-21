@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import SplitterPanelStyle from './style/SplitterPanelStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseSplitterPanel',
     extends: BaseComponent,
     props: {
@@ -22,5 +23,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import PickListStyle from './style/PickListStyle';
 
-export default {
+export default defineComponent({
     name: 'BasePickList',
     extends: BaseComponent,
     props: {
@@ -112,5 +113,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

@@ -1,7 +1,8 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../baseeditableholder/BaseEditableHolder.vue';
 
-export default {
+export default defineComponent({
     name: 'BaseInput',
     extends: BaseEditableHolder,
     props: {
@@ -38,5 +39,5 @@ export default {
             return this.$fluid;
         }
     }
-};
+});
 </script>

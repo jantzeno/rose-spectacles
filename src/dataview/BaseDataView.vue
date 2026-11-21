@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DataViewStyle from './style/DataViewStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseDataView',
     extends: BaseComponent,
     props: {
@@ -78,5 +79,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

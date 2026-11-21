@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import RadioButtonStyle from './style/RadioButtonStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseRadioButton',
     extends: BaseInput,
     props: {
@@ -44,5 +45,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

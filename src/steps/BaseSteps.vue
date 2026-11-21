@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import StepsStyle from './style/StepsStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseSteps',
     extends: BaseComponent,
     props: {
@@ -29,5 +30,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

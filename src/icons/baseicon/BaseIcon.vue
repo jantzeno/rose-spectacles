@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { isEmpty } from '../../internal/utils/object/index';
 import BaseComponent from '../../core/basecomponent/BaseComponent.vue';
 import BaseIconStyle from './style/BaseIconStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseIcon',
     extends: BaseComponent,
     props: {
@@ -42,5 +43,5 @@ export default {
             };
         }
     }
-};
+});
 </script>

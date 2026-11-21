@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import AccordionTabStyle from './style/AccordionTabStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseAccordionTab',
     extends: BaseComponent,
     props: {
@@ -23,5 +24,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

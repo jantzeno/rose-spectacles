@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DrawerStyle from './style/DrawerStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseDrawer',
     extends: BaseComponent,
     props: {
@@ -64,5 +65,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

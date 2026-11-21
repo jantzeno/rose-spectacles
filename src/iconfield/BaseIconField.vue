@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import IconFieldStyle from './style/IconFieldStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseIconField',
     extends: BaseComponent,
     style: IconFieldStyle,
@@ -12,5 +13,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

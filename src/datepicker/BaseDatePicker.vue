@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import DatePickerStyle from './style/DatePickerStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseDatePicker',
     extends: BaseInput,
     props: {
@@ -239,5 +240,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

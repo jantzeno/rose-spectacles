@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import SliderStyle from './style/SliderStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseSlider',
     extends: BaseEditableHolder,
     props: {
@@ -46,5 +47,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

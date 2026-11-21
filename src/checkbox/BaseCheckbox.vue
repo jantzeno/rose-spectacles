@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseInput from '../core/baseinput/BaseInput.vue';
 import CheckboxStyle from './style/CheckboxStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseCheckbox',
     extends: BaseInput,
     props: {
@@ -60,5 +61,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

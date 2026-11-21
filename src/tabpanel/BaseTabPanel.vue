@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import TabPanelStyle from './style/TabPanelStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseTabPanel',
     extends: BaseComponent,
     props: {
@@ -37,5 +38,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

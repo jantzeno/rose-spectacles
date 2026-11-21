@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import OrderListStyle from './style/OrderListStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseOrderList',
     extends: BaseComponent,
     props: {
@@ -96,5 +97,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>

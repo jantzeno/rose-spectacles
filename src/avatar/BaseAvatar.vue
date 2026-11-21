@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import AvatarStyle from './style/AvatarStyle';
 
-export default {
+export default defineComponent({
     name: 'BaseAvatar',
     extends: BaseComponent,
     props: {
@@ -42,5 +43,5 @@ export default {
             $parentInstance: this
         };
     }
-};
+});
 </script>
