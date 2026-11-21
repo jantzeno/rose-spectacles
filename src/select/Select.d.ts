@@ -13,6 +13,7 @@ import type { InputIconPassThroughOptions } from 'rose-spectacles/inputicon';
 import type { InputTextPassThroughOptions } from 'rose-spectacles/inputtext';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { VirtualScrollerItemOptions, VirtualScrollerPassThroughOptionType, VirtualScrollerProps } from 'rose-spectacles/virtualscroller';
+import type { ChoiceItem, DisplayedChoice } from '../internal/choice-options';
 import { TransitionProps, VNode } from 'vue';
 
 export declare type SelectPassThroughOptionType<T = any> =
@@ -294,7 +295,7 @@ export interface SelectContext {
 /**
  * Defines valid properties in Select component.
  */
-export interface SelectProps {
+export interface SelectProps<T = any, GroupField extends string = string, Child = any> {
     /**
      * Value of the component.
      */
@@ -310,27 +311,27 @@ export interface SelectProps {
     /**
      * An array of select items to display as the available options.
      */
-    options?: any[];
+    options?: T[];
     /**
      * Property name or getter function to use as the label of an option.
      */
-    optionLabel?: string | ((data: any) => string) | undefined;
+    optionLabel?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => string) | undefined;
     /**
      * Property name or getter function to use as the value of an option, defaults to the option itself when not defined.
      */
-    optionValue?: string | ((data: any) => any) | undefined;
+    optionValue?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => any) | undefined;
     /**
      * Property name or getter function to use as the disabled flag of an option, defaults to false when not defined.
      */
-    optionDisabled?: string | ((data: any) => boolean) | undefined;
+    optionDisabled?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => boolean) | undefined;
     /**
      * Property name or getter function to use as the label of an option group.
      */
-    optionGroupLabel?: string | ((data: any) => string) | undefined;
+    optionGroupLabel?: string | ((data: NoInfer<T>) => string) | undefined;
     /**
      * Property name or getter function that refers to the children options of option group.
      */
-    optionGroupChildren?: string | ((data: any) => any[]) | undefined;
+    optionGroupChildren?: GroupField | ((data: NoInfer<T>) => Child[]) | undefined;
     /**
      * Height of the viewport, a scrollbar is defined if height of list exceeds this value.
      * @defaultValue 14rem
@@ -580,7 +581,7 @@ export interface SelectProps {
 /**
  * Defines valid slots in Select component.
  */
-export interface SelectSlots {
+export interface SelectSlots<T = any, GroupField extends string = string, Child = never> {
     /**
      * Custom value template.
      * @param {Object} scope - value slot's params.
@@ -607,7 +608,7 @@ export interface SelectSlots {
         /**
          * Displayed options
          */
-        options: any[];
+        options: DisplayedChoice<T, GroupField, Child>[];
     }): VNode[];
     /**
      * Custom footer template of panel.
@@ -621,7 +622,7 @@ export interface SelectSlots {
         /**
          * Displayed options
          */
-        options: any[];
+        options: DisplayedChoice<T, GroupField, Child>[];
     }): VNode[];
     /**
      * Custom option template.
@@ -631,7 +632,7 @@ export interface SelectSlots {
         /**
          * Option instance
          */
-        option: any;
+        option: ChoiceItem<T, GroupField, Child>;
         /**
          * Selection state
          */
@@ -649,7 +650,7 @@ export interface SelectSlots {
         /**
          * Option instance
          */
-        option: any;
+        option: T;
         /**
          * Index of the option
          */
@@ -671,7 +672,7 @@ export interface SelectSlots {
         /**
          * An array of objects to display for virtualscroller
          */
-        items: any;
+        items: DisplayedChoice<T, GroupField, Child>[];
         /**
          * Style class of the component
          */
@@ -823,11 +824,15 @@ export interface SelectMethods {
  * @group Component
  *
  */
-declare const Select: DefineComponent<SelectProps, SelectSlots, SelectEmits, SelectMethods>;
+declare const Select: {
+    new <T = any, GroupField extends string = string, Child = never>(
+        props?: SelectProps<T, GroupField, Child>
+    ): InstanceType<DefineComponent<SelectProps<T, GroupField, Child>, SelectSlots<T, GroupField, Child>, SelectEmits, SelectMethods>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Select: DefineComponent<SelectProps, SelectSlots, SelectEmits, SelectMethods>;
+        Select: typeof Select;
     }
 }
 

@@ -56,14 +56,16 @@ try {
         'tsconfig.json',
         JSON.stringify({
             compilerOptions: { target: 'ES2022', module: 'ESNext', moduleResolution: 'Bundler', strict: true, noEmit: true },
+            vueCompilerOptions: { strictTemplates: true },
             include: ['main.ts', 'App.vue', 'SlotTypes.vue', 'ModelTypes.vue']
         })
     );
     const slotTypes = `
         <script setup lang="ts">
-        import { AutoComplete, Carousel, CascadeSelect, DataView, Galleria, InputChips, OrderList, PickList, SelectButton, Timeline, VirtualScroller } from 'rose-spectacles';
+        import { AutoComplete, Carousel, CascadeSelect, DataView, Galleria, InputChips, Listbox, MultiSelect, OrderList, PickList, Select, SelectButton, Timeline, VirtualScroller } from 'rose-spectacles';
 
         const entries: { title: string }[] = [{ title: 'First entry' }];
+        const groups = [{ title: 'Group', children: entries }];
         </script>
         <template>
             <Carousel :value="entries">
@@ -106,6 +108,24 @@ try {
             <VirtualScroller :items="entries" :item-size="24">
                 <template #item="{ item }">{{ item.title }}</template>
             </VirtualScroller>
+            ${['Listbox', 'MultiSelect', 'Select']
+                .map(
+                    (name) => `
+                    <${name} :options="entries" option-value="title" :model-value="${name === 'MultiSelect' ? "['First entry']" : "'First entry'"}">
+                        <template #option="{ option }">{{ option.title }}</template>
+                        <template #header="{ options }">{{ options[0].title }}</template>
+                        <template #footer="{ options }">{{ options[0].title }}</template>
+                    </${name}>
+                    <${name} :options="groups" option-group-label="title" option-group-children="children">
+                        <template #option="{ option }">{{ option.title }}</template>
+                        <template #optiongroup="{ option }">{{ option.title }}</template>
+                        <template #header="{ options }">
+                            {{ 'group' in options[0] ? options[0].optionGroup.title : '' }}
+                        </template>
+                    </${name}>
+                `
+                )
+                .join('')}
         </template>
     `;
     await write('SlotTypes.vue', slotTypes);
@@ -227,12 +247,13 @@ try {
     const diagnostics = invalidSlots.stdout + invalidSlots.stderr;
     assert.equal(invalidSlots.status, 2, diagnostics);
     const slotErrors = diagnostics.match(/SlotTypes\.vue\(\d+,\d+\): error TS2339: Property 'missingField' does not exist on type/g);
-    assert.equal(slotErrors?.length, 14, diagnostics);
-    assert.equal(diagnostics.match(/error TS\d+:/g)?.length, 14, diagnostics);
+    assert.equal(slotErrors?.length, 32, diagnostics);
+    assert.equal(diagnostics.match(/error TS\d+:/g)?.length, 32, diagnostics);
     console.log('Carousel, Galleria, and Timeline slots reject unknown item properties');
     console.log('AutoComplete, CascadeSelect, and DataView reject unknown option and item properties');
     console.log('OrderList and PickList slots reject unknown properties on model items');
     console.log('InputChips, SelectButton, and VirtualScroller slots reject unknown properties on their items');
+    console.log('Listbox, MultiSelect, and Select reject unknown properties on flat options, groups, and their children');
 
     run(['x', '--no-install', 'vite', 'build']);
 

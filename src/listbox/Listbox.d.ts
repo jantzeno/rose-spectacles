@@ -13,6 +13,7 @@ import type { InputIconPassThroughOptions } from 'rose-spectacles/inputicon';
 import type { InputTextPassThroughOptions } from 'rose-spectacles/inputtext';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { VirtualScrollerItemOptions, VirtualScrollerPassThroughOptionType, VirtualScrollerProps } from 'rose-spectacles/virtualscroller';
+import type { ChoiceItem, DisplayedChoice } from '../internal/choice-options';
 import { VNode } from 'vue';
 
 export declare type ListboxPassThroughOptionType<T = any> =
@@ -262,7 +263,7 @@ export interface ListboxContext {
 /**
  * Defines valid properties in Listbox component.
  */
-export interface ListboxProps {
+export interface ListboxProps<T = any, GroupField extends string = string, Child = any> {
     /**
      * Value of the component.
      */
@@ -278,27 +279,27 @@ export interface ListboxProps {
     /**
      * An array of selectitems to display as the available options.
      */
-    options?: any[] | undefined;
+    options?: T[] | undefined;
     /**
      * Property name or getter function to use as the label of an option.
      */
-    optionLabel?: string | ((data: any) => string) | undefined;
+    optionLabel?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => string) | undefined;
     /**
      * Property name or getter function to use as the value of an option, defaults to the option itself when not defined.
      */
-    optionValue?: string | ((data: any) => any) | undefined;
+    optionValue?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => any) | undefined;
     /**
      * Property name or getter function to use as the disabled flag of an option, defaults to false when not defined.
      */
-    optionDisabled?: string | ((data: any) => boolean) | undefined;
+    optionDisabled?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => boolean) | undefined;
     /**
      * Property name or getter function to use as the label of an option group.
      */
-    optionGroupLabel?: string | ((data: any) => string) | undefined;
+    optionGroupLabel?: string | ((data: NoInfer<T>) => string) | undefined;
     /**
      * Property name or getter function that refers to the children options of option group.
      */
-    optionGroupChildren?: string | ((data: any) => any[]) | undefined;
+    optionGroupChildren?: GroupField | ((data: NoInfer<T>) => Child[]) | undefined;
     /**
      * Inline style of inner list element.
      */
@@ -464,7 +465,7 @@ export interface ListboxProps {
 /**
  * Defines valid slots in Listbox component.
  */
-export interface ListboxSlots {
+export interface ListboxSlots<T = any, GroupField extends string = string, Child = never> {
     /**
      * Custom header template.
      * @param {Object} scope - header slot's params.
@@ -477,7 +478,7 @@ export interface ListboxSlots {
         /**
          * Displayed options
          */
-        options: any[];
+        options: DisplayedChoice<T, GroupField, Child>[];
     }): VNode[];
     /**
      * Custom footer template.
@@ -491,7 +492,7 @@ export interface ListboxSlots {
         /**
          * Displayed options
          */
-        options: any[];
+        options: DisplayedChoice<T, GroupField, Child>[];
     }): VNode[];
     /**
      * Custom option template.
@@ -501,7 +502,7 @@ export interface ListboxSlots {
         /**
          * Option instance
          */
-        option: any;
+        option: ChoiceItem<T, GroupField, Child>;
         /**
          * Selection state
          */
@@ -519,7 +520,7 @@ export interface ListboxSlots {
         /**
          * Option instance
          */
-        option: any;
+        option: T;
         /**
          * Index of the option
          */
@@ -541,7 +542,7 @@ export interface ListboxSlots {
         /**
          * An array of objects to display for virtualscroller
          */
-        items: any;
+        items: DisplayedChoice<T, GroupField, Child>[];
         /**
          * Style class of the component
          */
@@ -637,11 +638,15 @@ export declare type ListboxEmits = EmitFn<ListboxEmitsOptions>;
  * @group Component
  *
  */
-declare const Listbox: DefineComponent<ListboxProps, ListboxSlots, ListboxEmits>;
+declare const Listbox: {
+    new <T = any, GroupField extends string = string, Child = never>(
+        props?: ListboxProps<T, GroupField, Child>
+    ): InstanceType<DefineComponent<ListboxProps<T, GroupField, Child>, ListboxSlots<T, GroupField, Child>, ListboxEmits>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        Listbox: DefineComponent<ListboxProps, ListboxSlots, ListboxEmits>;
+        Listbox: typeof Listbox;
     }
 }
 

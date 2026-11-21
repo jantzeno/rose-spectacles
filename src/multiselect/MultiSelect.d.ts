@@ -14,6 +14,7 @@ import type { InputIconPassThroughOptions } from 'rose-spectacles/inputicon';
 import type { InputTextPassThroughOptions } from 'rose-spectacles/inputtext';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
 import type { VirtualScrollerItemOptions, VirtualScrollerPassThroughOptionType, VirtualScrollerProps } from 'rose-spectacles/virtualscroller';
+import type { ChoiceItem, DisplayedChoice } from '../internal/choice-options';
 import { TransitionProps, VNode } from 'vue';
 
 export declare type MultiSelectPassThroughOptionType =
@@ -319,7 +320,7 @@ export interface MultiSelectContext {
 /**
  * Defines valid properties in MultiSelect component.
  */
-export interface MultiSelectProps {
+export interface MultiSelectProps<T = any, GroupField extends string = string, Child = any> {
     /**
      * Value of the component.
      */
@@ -335,27 +336,27 @@ export interface MultiSelectProps {
     /**
      * An array of select items to display as the available options.
      */
-    options?: any[] | undefined;
+    options?: T[] | undefined;
     /**
      * Property name or getter function to use as the label of an option.
      */
-    optionLabel?: string | ((data: any) => string) | undefined;
+    optionLabel?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => string) | undefined;
     /**
      * Property name or getter function to use as the value of an option, defaults to the option itself when not defined.
      */
-    optionValue?: string | ((data: any) => any) | undefined;
+    optionValue?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => any) | undefined;
     /**
      * Property name or getter function to use as the disabled flag of an option, defaults to false when not defined.
      */
-    optionDisabled?: string | ((data: any) => boolean) | undefined;
+    optionDisabled?: string | ((data: NoInfer<ChoiceItem<T, GroupField, Child>>) => boolean) | undefined;
     /**
      * Property name or getter function to use as the label of an option group.
      */
-    optionGroupLabel?: string | ((data: any) => string) | undefined;
+    optionGroupLabel?: string | ((data: NoInfer<T>) => string) | undefined;
     /**
      * Property name or getter function that refers to the children options of option group.
      */
-    optionGroupChildren?: string | ((data: any) => any[]) | undefined;
+    optionGroupChildren?: GroupField | ((data: NoInfer<T>) => Child[]) | undefined;
     /**
      * Height of the viewport, a scrollbar is defined if height of list exceeds this value.
      * @defaultValue 14rem
@@ -608,7 +609,7 @@ export interface MultiSelectProps {
 /**
  * Defines valid slots in MultiSelect component.
  */
-export interface MultiSelectSlots {
+export interface MultiSelectSlots<T = any, GroupField extends string = string, Child = never> {
     /**
      * Custom value template.
      * @param {Object} scope - value slot's params.
@@ -651,7 +652,7 @@ export interface MultiSelectSlots {
         /**
          * Displayed options
          */
-        options: any[];
+        options: DisplayedChoice<T, GroupField, Child>[];
     }): VNode[];
     /**
      * Custom footer template.
@@ -665,7 +666,7 @@ export interface MultiSelectSlots {
         /**
          * Displayed options
          */
-        options: any[];
+        options: DisplayedChoice<T, GroupField, Child>[];
     }): VNode[];
     /**
      * Custom option template.
@@ -675,7 +676,7 @@ export interface MultiSelectSlots {
         /**
          * Option instance
          */
-        option: any;
+        option: ChoiceItem<T, GroupField, Child>;
         /**
          * Selection state
          */
@@ -693,7 +694,7 @@ export interface MultiSelectSlots {
         /**
          * Option instance
          */
-        option: any;
+        option: T;
         /**
          * Index of the option
          */
@@ -715,7 +716,7 @@ export interface MultiSelectSlots {
         /**
          * An array of objects to display for virtualscroller
          */
-        items: any;
+        items: DisplayedChoice<T, GroupField, Child>[];
         /**
          * Style class of the component
          */
@@ -939,11 +940,15 @@ export interface MultiSelectMethods {
  * @group Component
  *
  */
-declare const MultiSelect: DefineComponent<MultiSelectProps, MultiSelectSlots, MultiSelectEmits, MultiSelectMethods>;
+declare const MultiSelect: {
+    new <T = any, GroupField extends string = string, Child = never>(
+        props?: MultiSelectProps<T, GroupField, Child>
+    ): InstanceType<DefineComponent<MultiSelectProps<T, GroupField, Child>, MultiSelectSlots<T, GroupField, Child>, MultiSelectEmits, MultiSelectMethods>>;
+};
 
 declare module 'vue' {
     export interface GlobalComponents {
-        MultiSelect: DefineComponent<MultiSelectProps, MultiSelectSlots, MultiSelectEmits, MultiSelectMethods>;
+        MultiSelect: typeof MultiSelect;
     }
 }
 
