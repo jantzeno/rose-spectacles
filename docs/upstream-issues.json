@@ -725,10 +725,16 @@
             "title": "InputNumber updates the model on blur even if not necessary",
             "labels": ["bug"],
             "component": "InputNumber",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The retained component emitted duplicate update:modelValue events when blur followed spinner or Enter commits. The regression verifies the exact emitted value sequence after both interactions."
+            ],
             "reproducer": "https://stackblitz.com/edit/vitejs-vite-gp9z7mbt?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: InputNumber updates the model on blur even if not necessary."
+            "resolvingCommit": "d07255d4e2ab99da89bc3f7993c0a98c4fd07783",
+            "test": {
+                "path": "src/inputnumber/InputNumber.spec.ts",
+                "name": "does not emit another model update on blur after a spinner or Enter commit"
+            }
         },
         {
             "number": 92,
@@ -3622,10 +3628,16 @@
             "title": "InputNumber: InputMode wrong calculated",
             "labels": ["bug"],
             "component": "InputNumber",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "With minFractionDigits 0 and maxFractionDigits 2, the rendered spinbutton used inputmode=numeric. The regression verifies the decimal keyboard hint for fractions and the numeric hint when maximum fraction digits is zero."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-3-vite-issue-template-zyl468?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised using IOS on IPhone. Verify the reported behavior: InputNumber: InputMode wrong calculated."
+            "resolvingCommit": "d07255d4e2ab99da89bc3f7993c0a98c4fd07783",
+            "test": {
+                "path": "src/inputnumber/InputNumber.spec.ts",
+                "name": "requests a decimal input mode when the formatter permits fractions"
+            }
         },
         {
             "number": 364,
@@ -4796,10 +4808,16 @@
             "title": "InputNumber: maxFractionDigits default is 0 and the documentation says it's 3",
             "labels": ["bug"],
             "component": "InputNumber",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The retained keyboard handler rejected the first decimal separator when maxFractionDigits was undefined, even though Intl.NumberFormat allowed three fractional digits. The regression types and commits all three digits through the native input."
+            ],
             "reproducer": "https://codesandbox.io/p/devbox/upbeat-darkness-j87x8q",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: InputNumber: maxFractionDigits default is 0 and the documentation says it's 3."
+            "resolvingCommit": "d07255d4e2ab99da89bc3f7993c0a98c4fd07783",
+            "test": {
+                "path": "src/inputnumber/InputNumber.spec.ts",
+                "name": "accepts three fractional digits by default"
+            }
         },
         {
             "number": 471,
