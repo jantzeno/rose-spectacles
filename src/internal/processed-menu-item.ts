@@ -19,3 +19,22 @@ export interface MenuItemEvent<E extends Event = MouseEvent | KeyboardEvent> {
     processedItem: MenuNavigationItem;
     isFocus?: boolean;
 }
+
+export interface MegaMenuNode {
+    item: MenuItem;
+    key: string;
+    index: number;
+    level: number;
+    parentKey: string;
+    parent?: MegaMenuNode;
+    columnIndex: number;
+    items: MegaMenuNode[] | MegaMenuNode[][];
+}
+
+export function getMegaMenuColumns(items: MegaMenuNode['items']): MegaMenuNode[][] {
+    return Array.isArray(items[0]) ? (items as MegaMenuNode[][]) : [];
+}
+
+export function getMegaMenuItems(items: MegaMenuNode['items']): MegaMenuNode[] {
+    return Array.isArray(items[0]) ? [] : (items as MegaMenuNode[]);
+}

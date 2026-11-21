@@ -80,7 +80,7 @@
                 <div v-if="isItemVisible(processedItem) && isItemGroup(processedItem)" :class="cx('overlay')" v-bind="ptm('overlay')">
                     <div :class="cx('grid')" v-bind="ptm('grid')">
                         <div
-                            v-for="(col, columnIndex) of processedItem.items"
+                            v-for="(col, columnIndex) of getMegaMenuColumns(processedItem.items)"
                             :key="columnIndex"
                             :class="cx('column', { processedItem })"
                             v-bind="ptm('column')"
@@ -94,7 +94,7 @@
                                 :menuId="menuId"
                                 :focusedItemId="focusedItemId"
                                 :submenu="submenu"
-                                :items="submenu.items"
+                                :items="getMegaMenuItems(submenu.items)"
                                 :templates="templates"
                                 :level="level + 1"
                                 :mobileActive="mobileActive"
@@ -121,20 +121,12 @@
 
 <script lang="ts">
 import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
-import type { MenuItem } from 'rose-spectacles/menuitem';
+import { getMegaMenuColumns, getMegaMenuItems, type MegaMenuNode } from '../internal/processed-menu-item';
 import { isNotEmpty, resolve } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import AngleDownIcon from '../icons/angledown/AngleDownIcon.vue';
 import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
 import Ripple from '../ripple/Ripple';
-
-type MenuNode = { item: MenuItem; key: string };
-interface MegaMenuSection extends MenuNode {
-    items: MegaMenuEntry[];
-}
-interface MegaMenuEntry extends MenuNode {
-    items?: MegaMenuSection[][];
-}
 
 export default defineComponent({
     name: 'MegaMenuSub',
@@ -155,7 +147,7 @@ export default defineComponent({
             default: false
         },
         submenu: {
-            type: Object as PropType<MegaMenuSection>,
+            type: Object as PropType<MegaMenuNode>,
             default: null
         },
         mobileActive: {
@@ -163,7 +155,7 @@ export default defineComponent({
             default: false
         },
         items: {
-            type: Array as PropType<MegaMenuEntry[]>,
+            type: Array as PropType<MegaMenuNode[]>,
             default: () => []
         },
         level: {
@@ -175,7 +167,7 @@ export default defineComponent({
             default: () => ({})
         },
         activeItem: {
-            type: Object as PropType<MegaMenuEntry>,
+            type: Object as PropType<MegaMenuNode>,
             default: null
         },
         tabindex: {
@@ -184,25 +176,27 @@ export default defineComponent({
         }
     },
     methods: {
-        getSubListId(processedItem: MenuNode) {
+        getMegaMenuColumns,
+        getMegaMenuItems,
+        getSubListId(processedItem: MegaMenuNode) {
             return `${this.getItemId(processedItem)}_list`;
         },
-        getSubListKey(processedItem: MenuNode) {
+        getSubListKey(processedItem: MegaMenuNode) {
             return this.getSubListId(processedItem);
         },
-        getItemId(processedItem: MenuNode) {
+        getItemId(processedItem: MegaMenuNode) {
             return `${this.menuId}_${processedItem.key}`;
         },
-        getItemKey(processedItem: MenuNode) {
+        getItemKey(processedItem: MegaMenuNode) {
             return this.getItemId(processedItem);
         },
-        getItemProp(processedItem: MenuNode, name: string, params?: unknown) {
+        getItemProp(processedItem: MegaMenuNode, name: string, params?: unknown) {
             return processedItem && processedItem.item ? resolve(processedItem.item[name], params) : undefined;
         },
-        getItemLabel(processedItem: MenuNode) {
+        getItemLabel(processedItem: MegaMenuNode) {
             return this.getItemProp(processedItem, 'label');
         },
-        getPTOptions(processedItem: MegaMenuEntry, index: number, key: string) {
+        getPTOptions(processedItem: MegaMenuNode, index: number, key: string) {
             return this.ptm(key, {
                 context: {
                     item: processedItem.item,
@@ -213,26 +207,26 @@ export default defineComponent({
                 }
             });
         },
-        isItemActive(processedItem: MenuNode) {
+        isItemActive(processedItem: MegaMenuNode) {
             return this.activeItem?.key === processedItem.key;
         },
-        isItemVisible(processedItem: MenuNode) {
+        isItemVisible(processedItem: MegaMenuNode) {
             return this.getItemProp(processedItem, 'visible') !== false;
         },
-        isItemDisabled(processedItem: MenuNode) {
+        isItemDisabled(processedItem: MegaMenuNode) {
             return this.getItemProp(processedItem, 'disabled');
         },
-        isItemFocused(processedItem: MenuNode) {
+        isItemFocused(processedItem: MegaMenuNode) {
             return this.focusedItemId === this.getItemId(processedItem);
         },
-        isItemGroup(processedItem: MegaMenuEntry) {
+        isItemGroup(processedItem: MegaMenuNode) {
             return isNotEmpty(processedItem.items);
         },
-        onItemClick(event: MouseEvent, processedItem: MegaMenuEntry) {
+        onItemClick(event: MouseEvent, processedItem: MegaMenuNode) {
             this.getItemProp(processedItem, 'command', { originalEvent: event, item: processedItem.item });
             this.$emit('item-click', { originalEvent: event, processedItem, isFocus: true });
         },
-        onItemMouseEnter(event: MouseEvent, processedItem: MegaMenuEntry) {
+        onItemMouseEnter(event: MouseEvent, processedItem: MegaMenuNode) {
             this.$emit('item-mouseenter', { originalEvent: event, processedItem });
         },
         getAriaSetSize() {
@@ -245,7 +239,7 @@ export default defineComponent({
                 1
             );
         },
-        getMenuItemProps(processedItem: MegaMenuEntry, index: number) {
+        getMenuItemProps(processedItem: MegaMenuNode, index: number) {
             return {
                 action: mergeProps(
                     {
