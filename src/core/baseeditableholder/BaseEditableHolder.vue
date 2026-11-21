@@ -1,8 +1,36 @@
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from 'vue';
 import { isEmpty, isNotEmpty } from '../../internal/utils/index';
 import BaseComponent from '../basecomponent/BaseComponent.vue';
 
-export default {
+interface FieldControl {
+    name?: string;
+    novalidate?: boolean;
+}
+
+interface FieldState {
+    value?: unknown;
+    invalid?: boolean;
+}
+
+interface FieldRegistration {
+    onChange?: (info: { originalEvent?: Event; value: unknown }) => void;
+    onBlur?: () => void;
+}
+
+interface InjectedForm {
+    initialValues?: Record<string, unknown>;
+    register?: (name: string | undefined, control?: FieldControl) => FieldRegistration;
+    getFieldState: (name: string | undefined) => FieldState | undefined;
+}
+
+interface InjectedFormField {
+    $field?: FieldState;
+    formControl?: FieldControl;
+    initialValue?: unknown;
+}
+
+export default defineComponent({
     name: 'BaseEditableHolder',
     extends: BaseComponent,
     emits: ['update:modelValue', 'value-change'],
@@ -28,7 +56,7 @@ export default {
             default: false
         },
         formControl: {
-            type: Object,
+            type: Object as PropType<FieldControl>,
             default: undefined
         }
     },
@@ -37,15 +65,16 @@ export default {
             default: undefined
         },
         $pcForm: {
-            default: undefined
+            default: undefined as InjectedForm | undefined
         },
         $pcFormField: {
-            default: undefined
+            default: undefined as InjectedFormField | undefined
         }
     },
     data() {
         return {
-            d_value: this.defaultValue !== undefined ? this.defaultValue : this.modelValue
+            d_value: this.defaultValue !== undefined ? this.defaultValue : this.modelValue,
+            formField: {} as FieldRegistration
         };
     },
     watch: {
@@ -61,13 +90,13 @@ export default {
         $formName: {
             immediate: true,
             handler(newValue) {
-                this.formField = this.$pcForm?.register?.(newValue, this.$formControl) || {};
+                this.formField = this.$formInstance?.register?.(newValue, this.$formControl) || {};
             }
         },
         $formControl: {
             immediate: true,
             handler(newValue) {
-                this.formField = this.$pcForm?.register?.(this.$formName, newValue) || {};
+                this.formField = this.$formInstance?.register?.(this.$formName, newValue) || {};
             }
         },
         $formDefaultValue: {
@@ -79,15 +108,14 @@ export default {
         $formValue: {
             immediate: false,
             handler(newValue) {
-                if (this.$pcForm?.getFieldState(this.$formName) && newValue !== this.d_value) {
+                if (this.$formInstance?.getFieldState(this.$formName) && newValue !== this.d_value) {
                     this.d_value = newValue;
                 }
             }
         }
     },
-    formField: {},
     methods: {
-        writeValue(value, event) {
+        writeValue(value: unknown, event?: Event) {
             if (this.controlled) {
                 this.d_value = value;
                 this.$emit('update:modelValue', value);
@@ -97,35 +125,40 @@ export default {
 
             this.formField.onChange?.({ originalEvent: event, value });
         },
-        // @todo move to @openuxkit/utils
-        findNonEmpty(...values) {
+        findNonEmpty<T>(...values: T[]) {
             return values.find(isNotEmpty);
         }
     },
     computed: {
+        $formInstance(): InjectedForm | undefined {
+            return this.$pcForm as InjectedForm | undefined;
+        },
+        $formFieldInstance(): InjectedFormField | undefined {
+            return this.$pcFormField as InjectedFormField | undefined;
+        },
         $filled() {
             return isNotEmpty(this.d_value);
         },
         $invalid() {
             return (
                 !this.$formNovalidate &&
-                this.findNonEmpty(this.invalid, this.$pcFormField?.$field?.invalid, this.$pcForm?.getFieldState(this.$formName)?.invalid)
+                this.findNonEmpty(this.invalid, this.$formFieldInstance?.$field?.invalid, this.$formInstance?.getFieldState(this.$formName)?.invalid)
             );
         },
         $formName() {
             return !this.$formNovalidate ? this.name || this.$formControl?.name : undefined;
         },
         $formControl() {
-            return this.formControl || this.$pcFormField?.formControl;
+            return this.formControl || this.$formFieldInstance?.formControl;
         },
         $formNovalidate() {
             return this.$formControl?.novalidate;
         },
         $formDefaultValue() {
-            return this.findNonEmpty(this.$pcFormField?.initialValue, this.$pcForm?.initialValues?.[this.$formName]);
+            return this.findNonEmpty(this.$formFieldInstance?.initialValue, this.$formInstance?.initialValues?.[String(this.$formName)]);
         },
         $formValue() {
-            return this.findNonEmpty(this.$pcFormField?.$field?.value, this.$pcForm?.getFieldState(this.$formName)?.value);
+            return this.findNonEmpty(this.$formFieldInstance?.$field?.value, this.$formInstance?.getFieldState(this.$formName)?.value);
         },
         controlled() {
             return this.$inProps.hasOwnProperty('modelValue') || (!this.$inProps.hasOwnProperty('modelValue') && !this.$inProps.hasOwnProperty('defaultValue'));
@@ -135,5 +168,5 @@ export default {
             return this.$filled;
         }
     }
-};
+});
 </script>

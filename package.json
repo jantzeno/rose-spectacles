@@ -1156,7 +1156,7 @@
         },
         "./core/config": {
             "types": "./src/core/config/PrimeVue.d.ts",
-            "default": "./src/core/config/PrimeVue.js"
+            "default": "./src/core/config/PrimeVue.ts"
         },
         "./core/service": {
             "types": "./src/core/service/PrimeVueService.d.ts",
@@ -1392,7 +1392,7 @@
         },
         "./forms/useform": {
             "types": "./src/forms/useform/index.d.ts",
-            "default": "./src/forms/useform/index.js"
+            "default": "./src/forms/useform/index.ts"
         },
         "./package.json": "./package.json",
         "./forms/resolvers/joi": {

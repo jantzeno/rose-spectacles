@@ -4,28 +4,28 @@
     </form>
 </template>
 
-<script>
-import { omit } from '../../internal/utils/index';
+<script lang="ts">
+import type { useFormFieldOptions } from 'rose-spectacles/forms/useform';
 import { useForm } from '../useform/index';
-import { ref } from 'vue';
+import { defineComponent, ref } from 'vue';
 import BaseForm from './BaseForm.vue';
 
-export default {
+export default defineComponent({
     name: 'Form',
     extends: BaseForm,
     inheritAttrs: false,
     emits: ['submit', 'reset'],
     setup(props, { emit }) {
-        const formRef = ref(null);
-        const $form = useForm(props);
+        const formRef = ref<HTMLFormElement | null>(null);
+        const { handleSubmit, handleReset, ...form } = useForm(props);
 
         const submit = () => {
             formRef.value?.requestSubmit();
         };
 
-        const register = (field, options) => {
+        const register = (field?: string, options?: useFormFieldOptions) => {
             if (!options?.novalidate) {
-                const [, fieldProps] = $form.defineField(field, options);
+                const [, fieldProps] = form.defineField(field, options);
 
                 return fieldProps;
             }
@@ -33,11 +33,11 @@ export default {
             return {};
         };
 
-        const onSubmit = $form.handleSubmit((e) => {
+        const onSubmit = handleSubmit((e) => {
             emit('submit', e);
         });
 
-        const onReset = $form.handleReset((e) => {
+        const onReset = handleReset((e) => {
             emit('reset', e);
         });
 
@@ -47,8 +47,8 @@ export default {
             register,
             onSubmit,
             onReset,
-            ...omit($form, ['handleSubmit', 'handleReset'])
+            ...form
         };
     }
-};
+});
 </script>

@@ -1,9 +1,10 @@
+import type { PrimeVueConfiguration } from 'rose-spectacles/core/config';
 import { Theme, ThemeService } from '../../internal/styled/index';
 import { mergeKeys } from '../../internal/utils/index';
 import { FilterMatchMode } from '../api/Api';
 import BaseStyle from '../base/style/BaseStyle';
 import PrimeVueService from '../service/PrimeVueService';
-import { inject, reactive, ref, watch } from 'vue';
+import { inject, reactive, ref, watch, type App, type InjectionKey, type WatchStopHandle } from 'vue';
 
 export const defaultOptions = {
     ripple: false,
@@ -169,7 +170,11 @@ export const defaultOptions = {
     }
 };
 
-const PrimeVueSymbol = Symbol();
+interface InstalledConfig {
+    config: PrimeVueConfiguration;
+}
+
+const PrimeVueSymbol: InjectionKey<InstalledConfig> = Symbol();
 
 export function usePrimeVue() {
     const PrimeVue = inject(PrimeVueSymbol);
@@ -181,7 +186,7 @@ export function usePrimeVue() {
     return PrimeVue;
 }
 
-export function setup(app, options) {
+export function setup(app: App, options: PrimeVueConfiguration) {
     const PrimeVue = {
         config: reactive(options)
     };
@@ -195,7 +200,7 @@ export function setup(app, options) {
     return PrimeVue;
 }
 
-let stopWatchers = [];
+let stopWatchers: WatchStopHandle[] = [];
 
 export function clearConfig() {
     ThemeService.clear();
@@ -204,7 +209,7 @@ export function clearConfig() {
     stopWatchers = [];
 }
 
-export function setupConfig(app, PrimeVue) {
+export function setupConfig(app: App, PrimeVue: InstalledConfig) {
     const isThemeChanged = ref(false);
 
     /*** Methods and Services ***/
@@ -285,8 +290,8 @@ export function setupConfig(app, PrimeVue) {
 }
 
 export default {
-    install: (app, options) => {
-        const configOptions = mergeKeys(defaultOptions, options);
+    install: (app: App, options?: PrimeVueConfiguration) => {
+        const configOptions = mergeKeys(defaultOptions, { ...options });
 
         setup(app, configOptions);
     }

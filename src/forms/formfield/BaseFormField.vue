@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import type { useFormFieldOptions } from 'rose-spectacles/forms/useform';
+import { defineComponent, type PropType } from 'vue';
 import BaseComponent from '../../core/basecomponent/BaseComponent.vue';
 import FormFieldStyle from './style/FormFieldStyle';
 
@@ -13,7 +14,7 @@ export default defineComponent({
             default: undefined
         },
         resolver: {
-            type: Function,
+            type: Function as PropType<useFormFieldOptions['resolver']>,
             default: undefined
         },
         initialValue: {

@@ -5,10 +5,17 @@
     <slot v-else :class="cx('root')" :props="field.props" v-bind="fieldAttrs"></slot>
 </template>
 
-<script>
+<script lang="ts">
+import type { useFormFieldInstance, useFormFieldOptions } from 'rose-spectacles/forms/useform';
+import { defineComponent } from 'vue';
 import BaseFormField from './BaseFormField.vue';
 
-export default {
+interface FormContext {
+    register?: (name: string | undefined, control: useFormFieldOptions) => void;
+    fields?: Record<string, useFormFieldInstance>;
+}
+
+export default defineComponent({
     name: 'FormField',
     extends: BaseFormField,
     inheritAttrs: false,
@@ -21,11 +28,14 @@ export default {
         formControl: {
             immediate: true,
             handler(newValue) {
-                this.$pcForm?.register?.(this.name, newValue);
+                this.formInstance?.register?.(this.name, newValue);
             }
         }
     },
     computed: {
+        formInstance(): FormContext | undefined {
+            return this.$pcForm as FormContext | undefined;
+        },
         formControl() {
             return {
                 name: this.name,
@@ -37,8 +47,8 @@ export default {
                 validateOnSubmit: this.validateOnSubmit
             };
         },
-        field() {
-            return this.$pcForm?.fields?.[this.name] || {};
+        field(): Partial<useFormFieldInstance> {
+            return this.formInstance?.fields?.[String(this.name)] || {};
         },
         fieldAttrs() {
             return {
@@ -47,5 +57,5 @@ export default {
             };
         }
     }
-};
+});
 </script>
