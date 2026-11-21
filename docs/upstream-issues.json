@@ -19,9 +19,15 @@
             "title": "Select, MultiSelect, Listbox: options and slots are untyped (any)",
             "labels": ["enhancement"],
             "component": "Select, MultiSelect, Listbox",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "No runnable fixture was captured from the reproducer field. Construct a local case for N/A (types only) that exercises the reported behavior: Select, MultiSelect, Listbox: options and slots are untyped (any)."
+            "disposition": "fixed",
+            "evidence": [
+                "A packed Vue Vite consumer with strictTemplates enabled accepted misspelled properties in Select, MultiSelect and Listbox slots. It now rejects them in flat options, group labels, group children and displayed option arrays, and accepts scalar v-model values selected through optionValue."
+            ],
+            "resolvingCommit": "af6adb29116409e943230dfa4d269cb816eedaa8",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "Listbox, MultiSelect, and Select reject unknown properties on flat options, groups, and their children"
+            }
         },
         {
             "number": 17,
