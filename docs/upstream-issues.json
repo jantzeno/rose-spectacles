@@ -1388,10 +1388,17 @@
             "title": "Datatable: Frozen columns width not updated correctly",
             "labels": ["bug", "styling"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Firefox measured the first frozen column growing after a container resize while the second column header and body offsets remained stale.",
+                "The same production-gallery check passes with the observer and recalculated offsets."
+            ],
             "reproducer": "https://stackblitz.com/edit/ymnnruvz",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: Datatable: Frozen columns width not updated correctly."
+            "resolvingCommit": "98b0c5a5c09b892424dda7b8e1561bbb46a7beaf",
+            "test": {
+                "path": "scripts/browser-smoke.ts",
+                "name": "Frozen table columns update their offsets after a container resize"
+            }
         },
         {
             "number": 160,
@@ -2431,10 +2438,17 @@
             "title": "TreeTable: Frozen Column with Basic Filtering",
             "labels": ["bug"],
             "component": "TreeTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The retained TreeTable rendered a basic filter in a separate header row without the frozen-column class and offset.",
+                "The regression verifies that the basic filter uses the sticky column class and the same inset as its header."
+            ],
             "reproducer": "https://stackblitz.com/edit/yfvhvh8y?file=src%2FApp.vue",
-            "evidenceGap": "The upstream fixture still needs to be reduced to the fork and exercised. Verify the reported behavior: TreeTable: Frozen Column with Basic Filtering."
+            "resolvingCommit": "1423a733122d8e6ed9f2a9b109b2c07beed6ed11",
+            "test": {
+                "path": "src/treetable/TreeTable.spec.ts",
+                "name": "keeps a basic filter in the frozen TreeTable column"
+            }
         },
         {
             "number": 255,
