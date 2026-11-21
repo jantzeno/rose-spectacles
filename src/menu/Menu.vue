@@ -19,7 +19,7 @@
                     :class="cx('list')"
                     role="menu"
                     :tabindex="tabindex"
-                    :aria-activedescendant="focused ? focusedOptionId : undefined"
+                    :aria-activedescendant="focused ? (focusedOptionId ?? undefined) : undefined"
                     :aria-label="ariaLabel"
                     :aria-labelledby="ariaLabelledby"
                     @focus="onListFocus"
@@ -27,13 +27,13 @@
                     @keydown="onListKeyDown"
                     v-bind="ptm('list')"
                 >
-                    <template v-for="(item, i) of model" :key="label(item) + i.toString()">
+                    <template v-for="(item, i) of model" :key="`${label(item)}${i}`">
                         <template v-if="item.items && visible(item) && !item.separator">
                             <li v-if="item.items" :id="$id + '_' + i" :class="[cx('submenuLabel'), item.class]" role="none" v-bind="ptm('submenuLabel')">
                                 <!--TODO: submenuheader deprecated since v4.0. Use submenulabel-->
                                 <slot :name="$slots.submenulabel ? 'submenulabel' : 'submenuheader'" :item="item">{{ label(item) }}</slot>
                             </li>
-                            <template v-for="(child, j) of item.items" :key="child.label + i + '_' + j">
+                            <template v-for="(child, j) of item.items" :key="`${child.label}${i}_${j}`">
                                 <PVMenuitem
                                     v-if="visible(child) && !child.separator"
                                     :id="$id + '_' + i + '_' + j"
@@ -65,7 +65,7 @@
                         ></li>
                         <PVMenuitem
                             v-else
-                            :key="label(item) + i.toString()"
+                            :key="`${label(item)}${i}`"
                             :id="$id + '_' + i"
                             :item="item"
                             :index="i"
@@ -86,7 +86,9 @@
     </Portal>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
 import { cn } from '../internal/utils/index';
 import { absolutePosition, addStyle, find, findSingle, focus, getOuterWidth, isTouchDevice } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
@@ -94,9 +96,9 @@ import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import Portal from '../portal/Portal.vue';
 import BaseMenu from './BaseMenu.vue';
-import Menuitem from './Menuitem.vue';
+import Menuitem, { type MenuItemInteraction } from './Menuitem.vue';
 
-export default {
+export default defineComponent({
     name: 'Menu',
     extends: BaseMenu,
     inheritAttrs: false,
@@ -105,16 +107,16 @@ export default {
         return {
             overlayVisible: false,
             focused: false,
-            focusedOptionIndex: -1,
-            selectedOptionIndex: -1
+            focusedOptionIndex: -1 as string | -1 | null,
+            selectedOptionIndex: -1,
+            target: null as HTMLElement | null,
+            outsideClickListener: null as ((event: MouseEvent) => void) | null,
+            scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            resizeListener: null as (() => void) | null,
+            container: null as HTMLElement | null,
+            list: null as HTMLElement | null
         };
     },
-    target: null,
-    outsideClickListener: null,
-    scrollHandler: null,
-    resizeListener: null,
-    container: null,
-    list: null,
     mounted() {
         if (!this.popup) {
             this.bindResizeListener();
@@ -139,7 +141,7 @@ export default {
         this.container = null;
     },
     methods: {
-        itemClick(event) {
+        itemClick(event: MenuItemInteraction) {
             const item = event.item;
 
             if (this.disabled(item)) {
@@ -156,23 +158,23 @@ export default {
                 this.focusedOptionIndex = event.id;
             }
         },
-        itemMouseMove(event) {
+        itemMouseMove(event: MenuItemInteraction) {
             if (this.focused) {
                 this.focusedOptionIndex = event.id;
             }
         },
-        onListFocus(event) {
+        onListFocus(event: FocusEvent) {
             this.focused = true;
             !this.popup && this.changeFocusedOptionIndex(0);
 
             this.$emit('focus', event);
         },
-        onListBlur(event) {
+        onListBlur(event: FocusEvent) {
             this.focused = false;
             this.focusedOptionIndex = -1;
             this.$emit('blur', event);
         },
-        onListKeyDown(event) {
+        onListKeyDown(event: KeyboardEvent) {
             switch (event.code) {
                 case 'ArrowDown':
                     this.onArrowDownKey(event);
@@ -201,7 +203,7 @@ export default {
 
                 case 'Escape':
                     if (this.popup) {
-                        focus(this.target);
+                        this.target && focus(this.target);
                         this.hide();
                     }
 
@@ -213,15 +215,15 @@ export default {
                     break;
             }
         },
-        onArrowDownKey(event) {
+        onArrowDownKey(event: KeyboardEvent) {
             const optionIndex = this.findNextOptionIndex(this.focusedOptionIndex);
 
             this.changeFocusedOptionIndex(optionIndex);
             event.preventDefault();
         },
-        onArrowUpKey(event) {
+        onArrowUpKey(event: KeyboardEvent) {
             if (event.altKey && this.popup) {
-                focus(this.target);
+                this.target && focus(this.target);
                 this.hide();
                 event.preventDefault();
             } else {
@@ -231,57 +233,61 @@ export default {
                 event.preventDefault();
             }
         },
-        onHomeKey(event) {
+        onHomeKey(event: KeyboardEvent) {
             this.changeFocusedOptionIndex(0);
             event.preventDefault();
         },
-        onEndKey(event) {
-            this.changeFocusedOptionIndex(find(this.container, 'li[data-pc-section="item"][data-p-disabled="false"]').length - 1);
+        onEndKey(event: KeyboardEvent) {
+            this.changeFocusedOptionIndex(find(this.container as HTMLElement, 'li[data-pc-section="item"][data-p-disabled="false"]').length - 1);
             event.preventDefault();
         },
-        onEnterKey(event) {
-            const element = findSingle(this.list, `li[id="${`${this.focusedOptionIndex}`}"]`);
+        onEnterKey(event: KeyboardEvent) {
+            const element = findSingle(this.list as HTMLElement, `li[id="${`${this.focusedOptionIndex}`}"]`);
             const anchorElement = element && findSingle(element, 'a[data-pc-section="itemlink"]');
 
-            this.popup && focus(this.target);
-            anchorElement ? anchorElement.click() : element && element.click();
+            this.popup && this.target && focus(this.target);
+            const link = anchorElement ?? element;
+
+            if (link instanceof HTMLElement) link.click();
 
             event.preventDefault();
         },
-        onSpaceKey(event) {
+        onSpaceKey(event: KeyboardEvent) {
             this.onEnterKey(event);
         },
-        findNextOptionIndex(index) {
-            const links = find(this.container, 'li[data-pc-section="item"][data-p-disabled="false"]');
+        findNextOptionIndex(index: string | -1 | null) {
+            const links = find(this.container as HTMLElement, 'li[data-pc-section="item"][data-p-disabled="false"]');
             const matchedOptionIndex = [...links].findIndex((link) => link.id === index);
 
             return matchedOptionIndex > -1 ? matchedOptionIndex + 1 : 0;
         },
-        findPrevOptionIndex(index) {
-            const links = find(this.container, 'li[data-pc-section="item"][data-p-disabled="false"]');
+        findPrevOptionIndex(index: string | -1 | null) {
+            const links = find(this.container as HTMLElement, 'li[data-pc-section="item"][data-p-disabled="false"]');
             const matchedOptionIndex = [...links].findIndex((link) => link.id === index);
 
             return matchedOptionIndex > -1 ? matchedOptionIndex - 1 : 0;
         },
-        changeFocusedOptionIndex(index) {
-            const links = find(this.container, 'li[data-pc-section="item"][data-p-disabled="false"]');
+        changeFocusedOptionIndex(index: number) {
+            const links = find(this.container as HTMLElement, 'li[data-pc-section="item"][data-p-disabled="false"]');
             let order = index >= links.length ? links.length - 1 : index < 0 ? 0 : index;
 
             order > -1 && (this.focusedOptionIndex = links[order].getAttribute('id'));
         },
-        toggle(event, target) {
+        toggle(event: Event, target?: HTMLElement) {
             if (this.overlayVisible) this.hide();
             else this.show(event, target);
         },
-        show(event, target) {
+        show(event: Event, target?: HTMLElement) {
             this.overlayVisible = true;
-            this.target = target ?? event.currentTarget;
+            this.target = target ?? (event.currentTarget instanceof HTMLElement ? event.currentTarget : null);
         },
         hide() {
             this.overlayVisible = false;
             this.target = null;
         },
-        onEnter(el) {
+        onEnter(el: Element) {
+            if (!(el instanceof HTMLElement)) return;
+
             addStyle(el, { position: 'absolute', top: '0' });
             this.alignOverlay();
             this.bindOutsideClickListener();
@@ -289,10 +295,10 @@ export default {
             this.bindScrollListener();
 
             if (this.autoZIndex) {
-                ZIndex.set('menu', el, this.baseZIndex || this.$primevue.config.zIndex.menu);
+                ZIndex.set('menu', el, this.baseZIndex || this.$primevue?.config.zIndex?.menu);
             }
 
-            if (this.popup) {
+            if (this.popup && this.list) {
                 focus(this.list);
             }
 
@@ -304,12 +310,14 @@ export default {
             this.unbindScrollListener();
             this.$emit('hide');
         },
-        onAfterLeave(el) {
-            if (this.autoZIndex) {
+        onAfterLeave(el: Element) {
+            if (this.autoZIndex && el instanceof HTMLElement) {
                 ZIndex.clear(el);
             }
         },
         alignOverlay() {
+            if (!this.container || !this.target) return;
+
             absolutePosition(this.container, this.target);
             const targetWidth = getOuterWidth(this.target);
 
@@ -320,8 +328,12 @@ export default {
         bindOutsideClickListener() {
             if (!this.outsideClickListener) {
                 this.outsideClickListener = (event) => {
-                    const isOutsideContainer = this.container && !this.container.contains(event.target);
-                    const isOutsideTarget = !(this.target && (this.target === event.target || this.target.contains(event.target)));
+                    const target = event.target;
+
+                    if (!(target instanceof Node)) return;
+
+                    const isOutsideContainer = this.container && !this.container.contains(target);
+                    const isOutsideTarget = !(this.target && this.target.contains(target));
 
                     if (this.overlayVisible && isOutsideContainer && isOutsideTarget) {
                         this.hide();
@@ -340,7 +352,7 @@ export default {
             }
         },
         bindScrollListener() {
-            if (!this.scrollHandler) {
+            if (!this.scrollHandler && this.target) {
                 this.scrollHandler = new ConnectedOverlayScrollHandler(this.target, () => {
                     if (this.overlayVisible) {
                         this.hide();
@@ -348,7 +360,7 @@ export default {
                 });
             }
 
-            this.scrollHandler.bindScrollListener();
+            this.scrollHandler?.bindScrollListener();
         },
         unbindScrollListener() {
             if (this.scrollHandler) {
@@ -372,26 +384,26 @@ export default {
                 this.resizeListener = null;
             }
         },
-        visible(item) {
+        visible(item: MenuItem) {
             return typeof item.visible === 'function' ? item.visible() : item.visible !== false;
         },
-        disabled(item) {
+        disabled(item: MenuItem) {
             return typeof item.disabled === 'function' ? item.disabled() : item.disabled;
         },
-        label(item) {
+        label(item: MenuItem) {
             return typeof item.label === 'function' ? item.label() : item.label;
         },
-        onOverlayClick(event) {
+        onOverlayClick(event: MouseEvent) {
             OverlayEventBus.emit('overlay-click', {
                 originalEvent: event,
                 target: this.target
             });
         },
-        containerRef(el) {
-            this.container = el;
+        containerRef(el: Element | ComponentPublicInstance | null) {
+            this.container = el instanceof HTMLElement ? el : null;
         },
-        listRef(el) {
-            this.list = el;
+        listRef(el: Element | ComponentPublicInstance | null) {
+            this.list = el instanceof HTMLElement ? el : null;
         }
     },
     computed: {
@@ -408,5 +420,5 @@ export default {
         PVMenuitem: Menuitem,
         Portal: Portal
     }
-};
+});
 </script>

@@ -25,31 +25,40 @@
     </li>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
+import type { MenuItem } from 'rose-spectacles/menuitem';
 import { cn } from '../internal/utils/index';
 import { resolve } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
 
-export default {
+type MenuEntry = MenuItem & { item?: MenuItem };
+
+export interface MenuItemInteraction {
+    originalEvent: MouseEvent;
+    item: MenuItem;
+    id: string;
+}
+
+export default defineComponent({
     name: 'Menuitem',
     hostName: 'Menu',
     extends: BaseComponent,
     inheritAttrs: false,
     emits: ['item-click', 'item-mousemove'],
     props: {
-        item: null,
-        templates: null,
-        id: null,
-        focusedOptionId: null,
-        index: null
+        item: { type: Object as PropType<MenuEntry>, required: true },
+        templates: { type: Object as PropType<Slots>, default: () => ({}) },
+        id: { type: String, required: true },
+        focusedOptionId: null as unknown as PropType<string | null>,
+        index: Number
     },
     methods: {
-        getItemProp(processedItem, name) {
+        getItemProp(processedItem: MenuEntry, name: string): unknown {
             return processedItem && processedItem.item ? resolve(processedItem.item[name]) : undefined;
         },
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             return this.ptm(key, {
                 context: {
                     item: this.item,
@@ -62,14 +71,18 @@ export default {
         isItemFocused() {
             return this.focusedOptionId === this.id;
         },
-        onItemClick(event) {
+        onItemClick(event: MouseEvent) {
             const command = this.getItemProp(this.item, 'command');
+            const interaction: MenuItemInteraction = { originalEvent: event, item: this.item, id: this.id };
 
-            command && command({ originalEvent: event, item: this.item.item });
-            this.$emit('item-click', { originalEvent: event, item: this.item, id: this.id });
+            if (typeof command === 'function') command({ originalEvent: event, item: this.item.item });
+
+            this.$emit('item-click', interaction);
         },
-        onItemMouseMove(event) {
-            this.$emit('item-mousemove', { originalEvent: event, item: this.item, id: this.id });
+        onItemMouseMove(event: MouseEvent) {
+            const interaction: MenuItemInteraction = { originalEvent: event, item: this.item, id: this.id };
+
+            this.$emit('item-mousemove', interaction);
         },
         visible() {
             return typeof this.item.visible === 'function' ? this.item.visible() : this.item.visible !== false;
@@ -80,7 +93,7 @@ export default {
         label() {
             return typeof this.item.label === 'function' ? this.item.label() : this.item.label;
         },
-        getMenuItemProps(item) {
+        getMenuItemProps(item: MenuItem) {
             return {
                 action: mergeProps(
                     {
@@ -115,5 +128,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
