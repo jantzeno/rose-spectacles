@@ -77,14 +77,15 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { isEmpty } from '../internal/utils/object/index';
 import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
 import Button from '../button/Button.vue';
 import TieredMenu from '../tieredmenu/TieredMenu.vue';
 import BaseSplitButton from './BaseSplitButton.vue';
 
-export default {
+export default defineComponent({
     name: 'SplitButton',
     extends: BaseSplitButton,
     inheritAttrs: false,
@@ -98,28 +99,36 @@ export default {
         };
     },
     mounted() {
-        this.$watch('$refs.menu.visible', (newValue) => {
-            this.isExpanded = newValue;
-        });
+        const menu = this.$refs.menu as InstanceType<typeof TieredMenu>;
+
+        this.$watch(
+            () => menu.visible,
+            (visible) => {
+                this.isExpanded = visible;
+            }
+        );
     },
     methods: {
-        onDropdownButtonClick(event) {
-            if (event) {
-                event.preventDefault();
-            }
+        onDropdownButtonClick(event?: MouseEvent) {
+            event?.preventDefault();
 
-            this.$refs.menu.toggle({ currentTarget: this.$el, relatedTarget: this.$refs.button.$el });
-            this.isExpanded = this.$refs.menu.visible;
+            const menu = this.$refs.menu as InstanceType<typeof TieredMenu>;
+            const button = this.$refs.button as InstanceType<typeof Button>;
+
+            menu.toggle({ currentTarget: this.$el, relatedTarget: button.$el });
+            this.isExpanded = menu.visible;
         },
-        onDropdownKeydown(event) {
+        onDropdownKeydown(event: KeyboardEvent) {
             if (event.code === 'ArrowDown' || event.code === 'ArrowUp') {
                 this.onDropdownButtonClick();
                 event.preventDefault();
             }
         },
-        onDefaultButtonClick(event) {
+        onDefaultButtonClick(event: MouseEvent) {
             if (this.isExpanded) {
-                this.$refs.menu.hide(event);
+                const menu = this.$refs.menu as InstanceType<typeof TieredMenu>;
+
+                menu.hide(event, undefined);
             }
 
             this.$emit('click', event);
@@ -138,5 +147,5 @@ export default {
         PVSMenu: TieredMenu,
         ChevronDownIcon: ChevronDownIcon
     }
-};
+});
 </script>

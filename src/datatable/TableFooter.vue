@@ -5,7 +5,7 @@
         :style="sx('tfoot')"
         role="rowgroup"
         v-bind="columnGroup ? { ...ptm('tfoot', ptmTFootOptions), ...getColumnGroupPT('root') } : ptm('tfoot', ptmTFootOptions)"
-        :data-p-scrollable="$parentInstance?.$parentInstance?.scrollable"
+        :data-p-scrollable="ptmTFootOptions.context.scrollable"
         data-pc-section="tfoot"
     >
         <tr v-if="!columnGroup" role="row" v-bind="ptm('footerRow')">
@@ -23,23 +23,23 @@
     </tfoot>
 </template>
 
-<script>
+<script lang="ts">
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { HelperSet, getVNodeProp } from '../core/utils/Utils';
-import { mergeProps } from 'vue';
+import { defineComponent, mergeProps, type PropType, type VNode } from 'vue';
 import FooterCell from './FooterCell.vue';
 
-export default {
+export default defineComponent({
     name: 'TableFooter',
     hostName: 'DataTable',
     extends: BaseComponent,
     props: {
         columnGroup: {
-            type: null,
+            type: null as unknown as PropType<VNode>,
             default: null
         },
         columns: {
-            type: Object,
+            type: Object as PropType<VNode[]>,
             default: null
         }
     },
@@ -60,10 +60,10 @@ export default {
         this.d_footerColumns.clear();
     },
     methods: {
-        columnProp(col, prop) {
+        columnProp(col: VNode, prop: string) {
             return getVNodeProp(col, prop);
         },
-        getColumnGroupPT(key) {
+        getColumnGroupPT(key: string) {
             const columnGroupMetaData = {
                 props: this.getColumnGroupProps(),
                 parent: {
@@ -86,7 +86,7 @@ export default {
         getColumnGroupProps() {
             return this.columnGroup && this.columnGroup.props && this.columnGroup.props.pt ? this.columnGroup.props.pt : undefined; //@todo
         },
-        getRowPT(row, key, index) {
+        getRowPT(row: VNode, key: string, index: number) {
             const rowMetaData = {
                 props: row.props,
                 parent: {
@@ -105,14 +105,14 @@ export default {
                 this.ptmo(this.getRowProp(row), key, rowMetaData)
             );
         },
-        getRowProp(row) {
+        getRowProp(row: VNode) {
             return row.props && row.props.pt ? row.props.pt : undefined; //@todo
         },
         getFooterRows() {
-            return this.d_footerRows?.get(this.columnGroup, this.columnGroup.children);
+            return this.columnGroup ? this.d_footerRows.get(this.columnGroup, this.columnGroup.children) : [];
         },
-        getFooterColumns(row) {
-            return this.d_footerColumns?.get(row, row.children);
+        getFooterColumns(row: VNode) {
+            return this.d_footerColumns.get(row, row.children);
         }
     },
     computed: {
@@ -123,7 +123,9 @@ export default {
                 hasFooter = true;
             } else if (this.columns) {
                 for (let col of this.columns) {
-                    if (this.columnProp(col, 'footer') || (col.children && col.children.footer)) {
+                    const children = col.children;
+
+                    if (this.columnProp(col, 'footer') || (children && typeof children === 'object' && 'footer' in children && children.footer)) {
                         hasFooter = true;
                         break;
                     }
@@ -133,9 +135,11 @@ export default {
             return hasFooter;
         },
         ptmTFootOptions() {
+            const { $parentInstance: parent } = this as typeof this & { $parentInstance?: { $parentInstance?: { scrollable?: boolean } } };
+
             return {
                 context: {
-                    scrollable: this.$parentInstance?.$parentInstance?.scrollable
+                    scrollable: parent?.$parentInstance?.scrollable
                 }
             };
         }
@@ -143,5 +147,5 @@ export default {
     components: {
         DTFooterCell: FooterCell
     }
-};
+});
 </script>
