@@ -13,7 +13,8 @@ import {
     hasClass,
     isExist,
     isTouchDevice,
-    removeClass
+    removeClass,
+    setAttributes
 } from '../internal/utils/dom/index';
 import { isEmpty } from '../internal/utils/object/index';
 import { uuid } from '../internal/utils/uuid/index';
@@ -275,6 +276,7 @@ const Tooltip = BaseTooltip.extend('tooltip', {
             let tooltipElement = this.create(el, options) as HTMLElement;
 
             this.align(el);
+            this.applyArrowPassThrough(el, tooltipElement);
             !this.isUnstyled() && fadeIn(tooltipElement, 250);
 
             window.addEventListener('resize', el.$_pWindowResizeEvent!);
@@ -293,6 +295,25 @@ const Tooltip = BaseTooltip.extend('tooltip', {
 
             this.bindScrollListener(el);
             ZIndex.set('tooltip', tooltipElement, el.$_ptooltipZIndex);
+        },
+        applyArrowPassThrough(el: TooltipTarget, tooltip: HTMLElement) {
+            const arrow = this.getArrowElement(el) as HTMLElement;
+            const position = tooltip.dataset.pPosition;
+            const { top, right, bottom, left } = arrow.style;
+
+            setAttributes(
+                arrow,
+                this.ptm('arrow', {
+                    context: {
+                        ...el.$_ptooltipModifiers,
+                        top: position === 'top',
+                        right: position === 'right',
+                        bottom: position === 'bottom',
+                        left: position === 'left'
+                    }
+                })
+            );
+            Object.assign(arrow.style, { top, right, bottom, left });
         },
         show(el: TooltipTarget, options: Binding, showDelay?: number) {
             clearTimeout(el.$_ptooltipShowTimer);
@@ -335,9 +356,7 @@ const Tooltip = BaseTooltip.extend('tooltip', {
 
             const tooltipArrow = createElement('div', {
                 class: !this.isUnstyled() && this.cx('arrow'),
-                'rs-bind': this.ptm('arrow', {
-                    context: modifiers
-                })
+                'data-pc-section': 'arrow'
             });
 
             const tooltipText = createElement('div', {
