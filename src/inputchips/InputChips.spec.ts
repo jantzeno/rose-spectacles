@@ -61,6 +61,26 @@ describe('InputChips.vue', () => {
         expect(wrapper.emitted('update:modelValue')).toBeUndefined();
     });
 
+    it('waits for text composition to finish before adding a chip', async () => {
+        await wrapper.setProps({ separator: ',' });
+        const input = wrapper.get('input').element;
+
+        input.value = '가나';
+        input.dispatchEvent(new CompositionEvent('compositionstart'));
+        const composingComma = new KeyboardEvent('keydown', { key: ',', code: 'Comma', isComposing: true, cancelable: true });
+
+        input.dispatchEvent(composingComma);
+
+        expect(composingComma.defaultPrevented).toBe(false);
+        expect(input.value).toBe('가나');
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+        input.dispatchEvent(new CompositionEvent('compositionend', { data: '가나' }));
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: ',', code: 'Comma', cancelable: true }));
+        expect(wrapper.emitted('update:modelValue')).toEqual([[['가나']]]);
+        expect(input.value).toBe('');
+    });
+
     it('should prevent separator key on empty input', async () => {
         await wrapper.setProps({ separator: ',' });
 

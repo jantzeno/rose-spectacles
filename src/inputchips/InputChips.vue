@@ -115,6 +115,8 @@ export default {
             this.$emit('blur', event);
         },
         onKeyDown(event) {
+            if (event.isComposing) return;
+
             const inputValue = event.target.value;
 
             switch (event.code) {
@@ -179,6 +181,8 @@ export default {
             this.focused = false;
         },
         onContainerKeyDown(event) {
+            if (event.isComposing) return;
+
             switch (event.code) {
                 case 'ArrowLeft':
                     this.onArrowLeftKeyOn(event);
