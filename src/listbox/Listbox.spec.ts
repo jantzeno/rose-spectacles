@@ -74,6 +74,23 @@ describe('Listbox.vue', () => {
         expect(wrapper.findAll('li.rs-listbox-option')[0].attributes()['aria-label']).toBe('New York');
     });
 
+    it('allows keyboard focus when options have not been supplied', async () => {
+        const empty = mount(Listbox, { props: { emptyMessage: 'No choices' } });
+
+        try {
+            const list = empty.get('[role="listbox"]');
+
+            await list.trigger('focus');
+            await list.trigger('keydown', { code: 'ArrowDown' });
+
+            expect(list.text()).toContain('No choices');
+            expect(list.attributes('aria-activedescendant')).toBeUndefined();
+            expect(empty.findAll('.rs-listbox-option')).toHaveLength(0);
+        } finally {
+            empty.unmount();
+        }
+    });
+
     it('should select a list item', async () => {
         await wrapper.vm.onOptionSelect({}, wrapper.vm.options![0]);
 

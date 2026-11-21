@@ -799,7 +799,7 @@ export default {
         optionsListFlat() {
             return this.filterValue
                 ? FilterService.filter(this.options, this.searchFields, this.filterValue, this.filterMatchMode, this.filterLocale)
-                : this.options;
+                : (this.options ?? []);
         },
         optionsListGroup() {
             const filteredOptions = [];
