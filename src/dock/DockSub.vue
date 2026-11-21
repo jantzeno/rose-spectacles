@@ -63,7 +63,6 @@
 
 <script>
 import { find, findSingle } from '../internal/utils/dom/index';
-import { resolve } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import Ripple from '../ripple/Ripple';
 import Tooltip from '../tooltip/Tooltip';
@@ -116,9 +115,6 @@ export default {
         getItemId(index) {
             return `${this.idx}_${index}`;
         },
-        getItemProp(processedItem, name) {
-            return processedItem && processedItem.item ? resolve(processedItem.item[name]) : undefined;
-        },
         getPTOptions(key, item, index) {
             return this.ptm(key, {
                 context: {
@@ -144,10 +140,10 @@ export default {
             this.currentIndex = index;
         },
         onItemClick(event, processedItem) {
-            if (this.isSameMenuItem(event)) {
-                const command = this.getItemProp(processedItem, 'command');
+            if (this.isSameMenuItem(event) && !this.disabled(processedItem)) {
+                const item = processedItem.item ?? processedItem;
 
-                command && command({ originalEvent: event, item: processedItem.item });
+                item.command?.({ originalEvent: event, item });
             }
         },
         onListFocus(event) {
