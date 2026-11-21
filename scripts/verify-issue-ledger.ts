@@ -74,7 +74,9 @@ for (const issue of issues) {
 
     if (issue.disposition === 'fixed' || issue.disposition === 'already-fixed') {
         assert(issue.test?.path && issue.test?.name, `${label} has a named local regression test`);
-        assert(existsSync(new URL(`../${issue.test.path}`, import.meta.url)), `${label} regression file exists`);
+        const testFile = new URL(`../${issue.test.path}`, import.meta.url);
+        assert(existsSync(testFile), `${label} regression file exists`);
+        assert(readFileSync(testFile, 'utf8').includes(issue.test.name), `${label} regression name exists in its source file`);
         assert(issue.resolvingCommit && /^[a-f0-9]{40}$/.test(issue.resolvingCommit), `${label} records a full resolving commit`);
         const commit = spawnSync('git', ['cat-file', '-e', `${issue.resolvingCommit}^{commit}`], { cwd: root });
         assert.equal(commit.status, 0, `${label} resolving commit is in the repository`);

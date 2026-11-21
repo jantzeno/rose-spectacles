@@ -43,6 +43,8 @@ import Select from 'rose-spectacles/select';
 
 Install `chart.js@4.6.1` before importing Chart from `rose-spectacles/chart`, or `quill@2.0.3` before importing Editor from `rose-spectacles/editor`. Import forms and icons by name from the package root or from their dedicated subpaths such as `rose-spectacles/forms/form` and `rose-spectacles/icons/check`. Schema resolvers use `rose-spectacles/forms/resolvers/<library>` with the corresponding validator installed.
 
+Quill 2.0.3's HTML exporter is affected by CVE-2025-15056. Treat Editor's HTML model and `htmlValue` events as untrusted HTML and sanitize them before displaying them as markup. [Quill advisory](https://github.com/advisories/GHSA-v3m3-f69x-jf25)
+
 ## Gallery and checks
 
 ```sh
