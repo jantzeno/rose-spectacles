@@ -783,7 +783,7 @@ export default {
         modelValue: {
             immediate: true,
             handler(newValue) {
-                this.rawValue = typeof newValue === 'string' ? this.safeParse(newValue) : newValue;
+                this.rawValue = this.valueForSelectionMode(typeof newValue === 'string' ? this.safeParse(newValue) : newValue);
                 this.updateCurrentMetaData();
 
                 if (!this.typeUpdate && !this.inline && this.input) {
@@ -796,6 +796,12 @@ export default {
                     this.$refs.clearIcon.$el.style.display = isEmpty(newValue) ? 'none' : 'block';
                 }
             }
+        },
+        selectionMode() {
+            this.rawValue = this.valueForSelectionMode(this.rawValue);
+            this.updateCurrentMetaData();
+
+            if (this.input && !this.inline) this.input.value = this.formatValue(this.rawValue);
         },
         showTime() {
             this.updateCurrentMetaData();
@@ -895,6 +901,11 @@ export default {
         this.overlay = null;
     },
     methods: {
+        valueForSelectionMode(value) {
+            if (this.isSingleSelection()) return Array.isArray(value) ? (value[0] ?? null) : value;
+
+            return value == null || Array.isArray(value) ? value : [value];
+        },
         isSelected(dateMeta) {
             if (this.rawValue) {
                 if (this.isSingleSelection()) {

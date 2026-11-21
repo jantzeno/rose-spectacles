@@ -3,6 +3,23 @@ import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
+it('keeps the range start visible when selection mode changes to single', async () => {
+    const wrapper = mount(DatePicker, {
+        props: { selectionMode: 'range', modelValue: [new Date(2026, 5, 10), new Date(2026, 5, 15)], dateFormat: 'yy-mm-dd' },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        expect(wrapper.get('input').element.value).toBe('2026-06-10 - 2026-06-15');
+
+        await wrapper.setProps({ selectionMode: 'single' });
+        expect(wrapper.get('input').element.value).toBe('2026-06-10');
+        expect(wrapper.vm.viewDate).toEqual(new Date(2026, 5, 10));
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it.each([
     ['minute', new Date(2026, 5, 10, 12, 30), new Date(2026, 5, 10, 12, 59)],
     ['second', new Date(2026, 5, 10, 12, 30, 15), new Date(2026, 5, 10, 12, 30, 59)]
