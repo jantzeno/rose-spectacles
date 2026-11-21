@@ -94,3 +94,36 @@ describe('SpeedDial.vue', () => {
         expect(wrapper.find('.rs-speeddial-mask').exists()).toBe(true);
     });
 });
+
+it('runs the focused action when earlier actions are hidden', async () => {
+    const hidden = vi.fn();
+    const visible = vi.fn();
+    const wrapper = mount(SpeedDial, {
+        props: {
+            model: [
+                { label: 'Hidden', visible: false, command: hidden },
+                { label: 'Visible', command: visible }
+            ]
+        }
+    });
+
+    try {
+        await wrapper.get('.rs-speeddial-button').trigger('keydown', { code: 'ArrowDown' });
+        await wrapper.get('[role="menuitem"]').trigger('keydown', { code: 'Enter' });
+
+        expect(visible).toHaveBeenCalledOnce();
+        expect(hidden).not.toHaveBeenCalled();
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('can navigate an empty list without throwing', () => {
+    const wrapper = mount(SpeedDial, { props: { model: [] } });
+
+    try {
+        expect(() => wrapper.vm.onTogglerKeydown(new KeyboardEvent('keydown', { code: 'ArrowDown' }))).not.toThrow();
+    } finally {
+        wrapper.unmount();
+    }
+});

@@ -276,11 +276,13 @@ export default {
             event.preventDefault();
         },
         onEnterKey(event) {
-            const items = find(this.container, '[data-pc-section="item"]');
-            const itemIndex = [...items].findIndex((item) => item.id === this.focusedOptionIndex);
+            const item = this.model?.find((_, index) => `${this.$id}_${index}` === this.focusedOptionIndex);
+
+            if (!item) return;
+
             const buttonEl = findSingle(this.container, 'button');
 
-            this.onItemClick(event, this.model[itemIndex]);
+            this.onItemClick(event, item);
             this.onBlur(event);
 
             buttonEl && focus(buttonEl);
@@ -371,23 +373,15 @@ export default {
         },
         findPrevOptionIndex(index) {
             const items = find(this.container, '[data-pc-section="item"]');
-            const filteredItems = [...items].filter((item) => item.getAttribute('data-p-disabled') !== 'true');
-            const newIndex = index === -1 ? filteredItems[filteredItems.length - 1].id : index;
-            let matchedOptionIndex = filteredItems.findIndex((link) => link.getAttribute('id') === newIndex);
+            const enabledItems = items.filter((item) => item.getAttribute('data-p-disabled') !== 'true');
 
-            matchedOptionIndex = index === -1 ? filteredItems.length - 1 : matchedOptionIndex - 1;
-
-            return matchedOptionIndex;
+            return index === -1 ? enabledItems.length - 1 : enabledItems.findIndex((item) => item.id === index) - 1;
         },
         findNextOptionIndex(index) {
             const items = find(this.container, '[data-pc-section="item"]');
-            const filteredItems = [...items].filter((item) => item.getAttribute('data-p-disabled') !== 'true');
-            const newIndex = index === -1 ? filteredItems[0].id : index;
-            let matchedOptionIndex = filteredItems.findIndex((link) => link.getAttribute('id') === newIndex);
+            const enabledItems = items.filter((item) => item.getAttribute('data-p-disabled') !== 'true');
 
-            matchedOptionIndex = index === -1 ? 0 : matchedOptionIndex + 1;
-
-            return matchedOptionIndex;
+            return index === -1 ? 0 : enabledItems.findIndex((item) => item.id === index) + 1;
         },
         calculatePointStyle(index) {
             const type = this.type;
