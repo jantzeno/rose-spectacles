@@ -37,14 +37,18 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { contains, equals } from '../internal/utils/object/index';
 import CheckIcon from '../icons/check/CheckIcon.vue';
 import MinusIcon from '../icons/minus/MinusIcon.vue';
 import BaseCheckbox from './BaseCheckbox.vue';
+import type CheckboxGroup from '../checkboxgroup/CheckboxGroup.vue';
 
-export default {
+type Group = Pick<InstanceType<typeof CheckboxGroup>, 'd_value' | 'writeValue' | 'groupName'>;
+
+export default defineComponent({
     name: 'Checkbox',
     extends: BaseCheckbox,
     inheritAttrs: false,
@@ -73,7 +77,7 @@ export default {
         this.updateIndeterminate();
     },
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             const _ptm = key === 'root' ? this.ptmi : this.ptm;
 
             return _ptm(key, {
@@ -84,16 +88,17 @@ export default {
                 }
             });
         },
-        onChange(event) {
+        onChange(event: Event) {
             if (!this.disabled && !this.readonly) {
-                const value = this.$pcCheckboxGroup ? this.$pcCheckboxGroup.d_value : this.d_value;
+                const value = this.checkboxGroup ? this.checkboxGroup.d_value : this.d_value;
                 let newModelValue;
 
                 if (this.binary) {
                     newModelValue = this.d_indeterminate ? this.trueValue : this.checked ? this.falseValue : this.trueValue;
                 } else {
-                    if (this.checked || this.d_indeterminate) newModelValue = value.filter((val) => !equals(val, this.value));
-                    else newModelValue = value ? [...value, this.value] : [this.value];
+                    const selectedValues = value as unknown[] | null | undefined;
+                    if (this.checked || this.d_indeterminate) newModelValue = selectedValues!.filter((val) => !equals(val, this.value));
+                    else newModelValue = selectedValues ? [...selectedValues, this.value] : [this.value];
                 }
 
                 if (this.d_indeterminate) {
@@ -101,31 +106,35 @@ export default {
                     this.$emit('update:indeterminate', this.d_indeterminate);
                 }
 
-                this.$pcCheckboxGroup ? this.$pcCheckboxGroup.writeValue(newModelValue, event) : this.writeValue(newModelValue, event);
+                this.checkboxGroup ? this.checkboxGroup.writeValue(newModelValue, event) : this.writeValue(newModelValue, event);
                 this.$emit('change', event);
             }
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.$emit('blur', event);
             this.formField.onBlur?.(event);
         },
         updateIndeterminate() {
-            if (this.$refs.input) {
-                this.$refs.input.indeterminate = this.d_indeterminate;
+            const input = this.$refs.input as HTMLInputElement | undefined;
+            if (input) {
+                input.indeterminate = this.d_indeterminate;
             }
         }
     },
     computed: {
+        checkboxGroup() {
+            return this.$pcCheckboxGroup as Group | undefined;
+        },
         groupName() {
-            return this.$pcCheckboxGroup ? this.$pcCheckboxGroup.groupName : this.$formName;
+            return this.checkboxGroup ? this.checkboxGroup.groupName : this.$formName;
         },
         checked() {
-            const value = this.$pcCheckboxGroup ? this.$pcCheckboxGroup.d_value : this.d_value;
+            const value = this.checkboxGroup ? this.checkboxGroup.d_value : this.d_value;
 
-            return this.d_indeterminate ? false : this.binary ? value === this.trueValue : contains(this.value, value);
+            return this.d_indeterminate ? false : this.binary ? value === this.trueValue : contains(this.value, value as unknown[]);
         },
         dataP() {
             return cn({
@@ -141,5 +150,5 @@ export default {
         CheckIcon,
         MinusIcon
     }
-};
+});
 </script>

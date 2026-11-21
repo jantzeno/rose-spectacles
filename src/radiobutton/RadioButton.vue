@@ -25,12 +25,16 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { equals } from '../internal/utils/object/index';
 import BaseRadioButton from './BaseRadioButton.vue';
+import type RadioButtonGroup from '../radiobuttongroup/RadioButtonGroup.vue';
 
-export default {
+type Group = Pick<InstanceType<typeof RadioButtonGroup>, 'd_value' | 'writeValue' | 'groupName'>;
+
+export default defineComponent({
     name: 'RadioButton',
     extends: BaseRadioButton,
     inheritAttrs: false,
@@ -41,7 +45,7 @@ export default {
         }
     },
     methods: {
-        getPTOptions(key) {
+        getPTOptions(key: string) {
             const _ptm = key === 'root' ? this.ptmi : this.ptm;
 
             return _ptm(key, {
@@ -51,28 +55,31 @@ export default {
                 }
             });
         },
-        onChange(event) {
+        onChange(event: Event) {
             if (!this.disabled && !this.readonly) {
                 const newModelValue = this.binary ? !this.checked : this.value;
 
-                this.$pcRadioButtonGroup ? this.$pcRadioButtonGroup.writeValue(newModelValue, event) : this.writeValue(newModelValue, event);
+                this.radioButtonGroup ? this.radioButtonGroup.writeValue(newModelValue, event) : this.writeValue(newModelValue, event);
                 this.$emit('change', event);
             }
         },
-        onFocus(event) {
+        onFocus(event: FocusEvent) {
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.$emit('blur', event);
             this.formField.onBlur?.(event);
         }
     },
     computed: {
+        radioButtonGroup() {
+            return this.$pcRadioButtonGroup as Group | undefined;
+        },
         groupName() {
-            return this.$pcRadioButtonGroup ? this.$pcRadioButtonGroup.groupName : this.$formName;
+            return this.radioButtonGroup ? this.radioButtonGroup.groupName : this.$formName;
         },
         checked() {
-            const value = this.$pcRadioButtonGroup ? this.$pcRadioButtonGroup.d_value : this.d_value;
+            const value = this.radioButtonGroup ? this.radioButtonGroup.d_value : this.d_value;
 
             return value != null && (this.binary ? !!value : equals(value, this.value));
         },
@@ -86,5 +93,5 @@ export default {
             });
         }
     }
-};
+});
 </script>

@@ -22,43 +22,44 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { equals, resolveFieldData } from '../internal/utils/object/index';
 import Ripple from '../ripple/Ripple';
 import ToggleButton from '../togglebutton/ToggleButton.vue';
 import BaseSelectButton from './BaseSelectButton.vue';
 
-export default {
+export default defineComponent({
     name: 'SelectButton',
     extends: BaseSelectButton,
     inheritAttrs: false,
     emits: ['change'],
     methods: {
-        getOptionLabel(option) {
+        getOptionLabel(option: unknown) {
             return this.optionLabel ? resolveFieldData(option, this.optionLabel) : option;
         },
-        getOptionValue(option) {
+        getOptionValue(option: unknown) {
             return this.optionValue ? resolveFieldData(option, this.optionValue) : option;
         },
-        getOptionRenderKey(option) {
+        getOptionRenderKey(option: unknown) {
             return this.dataKey ? resolveFieldData(option, this.dataKey) : this.getOptionLabel(option);
         },
-        isOptionDisabled(option) {
+        isOptionDisabled(option: unknown) {
             return this.optionDisabled ? resolveFieldData(option, this.optionDisabled) : false;
         },
-        isOptionReadonly(option) {
+        isOptionReadonly(option: unknown) {
             if (this.allowEmpty) return false;
 
             let selected = this.isSelected(option);
 
             if (this.multiple) {
-                return selected && this.d_value.length === 1;
+                return selected && (this.d_value as unknown[]).length === 1;
             } else {
                 return selected;
             }
         },
-        onOptionSelect(event, option, index) {
+        onOptionSelect(event: Event, option: unknown, index: number) {
             if (this.disabled || this.isOptionDisabled(option) || this.isOptionReadonly(option)) {
                 return;
             }
@@ -69,7 +70,7 @@ export default {
 
             if (this.multiple) {
                 if (selected) {
-                    newValue = this.d_value.filter((val) => !equals(val, optionValue, this.equalityKey));
+                    newValue = (this.d_value as unknown[]).filter((val) => !equals(val, optionValue, this.equalityKey));
                     if (!this.allowEmpty && newValue.length === 0) return;
                 } else {
                     newValue = this.d_value ? [...this.d_value, optionValue] : [optionValue];
@@ -82,7 +83,7 @@ export default {
             this.writeValue(newValue, event);
             this.$emit('change', { originalEvent: event, value: newValue });
         },
-        isSelected(option) {
+        isSelected(option: unknown) {
             let selected = false;
             let optionValue = this.getOptionValue(option);
 
@@ -118,5 +119,5 @@ export default {
     components: {
         ToggleButton
     }
-};
+});
 </script>

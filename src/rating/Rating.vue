@@ -24,10 +24,10 @@
                         v-bind="ptm('hiddenOptionInput')"
                     />
                 </span>
-                <slot v-if="value <= d_value" name="onicon" :value="value" :toggleCallback="(event) => onChange(event, value)" :class="cx('onIcon')">
+                <slot v-if="value <= d_value" name="onicon" :value="value" :toggleCallback="(event: Event) => onChange(event, value)" :class="cx('onIcon')">
                     <component :is="onIcon ? 'span' : 'StarFillIcon'" :class="[cx('onIcon'), onIcon]" v-bind="ptm('onIcon')" />
                 </slot>
-                <slot v-else name="officon" :value="value" :class="cx('offIcon')" :toggleCallback="(event) => onChange(event, value)">
+                <slot v-else name="officon" :value="value" :class="cx('offIcon')" :toggleCallback="(event: Event) => onChange(event, value)">
                     <component :is="offIcon ? 'span' : 'StarIcon'" :class="[cx('offIcon'), offIcon]" v-bind="ptm('offIcon')" />
                 </slot>
             </div>
@@ -35,7 +35,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { focus, getFirstFocusableElement } from '../internal/utils/dom/index';
 import BanIcon from '../icons/ban/BanIcon.vue';
@@ -43,7 +44,9 @@ import StarIcon from '../icons/star/StarIcon.vue';
 import StarFillIcon from '../icons/starfill/StarFillIcon.vue';
 import BaseRating from './BaseRating.vue';
 
-export default {
+type RatingFocusEvent = FocusEvent & { sourceCapabilities?: { firesTouchEvents?: boolean } };
+
+export default defineComponent({
     name: 'Rating',
     extends: BaseRating,
     inheritAttrs: false,
@@ -55,7 +58,7 @@ export default {
         };
     },
     methods: {
-        getPTOptions(key, value) {
+        getPTOptions(key: string, value: number) {
             return this.ptm(key, {
                 context: {
                     active: value <= this.d_value,
@@ -63,31 +66,31 @@ export default {
                 }
             });
         },
-        onOptionClick(event, value) {
+        onOptionClick(event: MouseEvent, value: number) {
             if (!this.readonly && !this.disabled) {
                 this.onOptionSelect(event, value);
                 this.isFocusVisibleItem = false;
-                const firstFocusableEl = getFirstFocusableElement(event.currentTarget);
+                const firstFocusableEl = getFirstFocusableElement(event.currentTarget as HTMLElement);
 
-                firstFocusableEl && focus(firstFocusableEl);
+                firstFocusableEl && focus(firstFocusableEl as HTMLElement);
             }
         },
-        onFocus(event, value) {
+        onFocus(event: RatingFocusEvent, value: number) {
             this.focusedOptionIndex = value;
             this.isFocusVisibleItem = event.sourceCapabilities?.firesTouchEvents === false;
 
             this.$emit('focus', event);
         },
-        onBlur(event) {
+        onBlur(event: FocusEvent) {
             this.focusedOptionIndex = -1;
             this.$emit('blur', event);
             this.formField.onBlur?.();
         },
-        onChange(event, value) {
+        onChange(event: Event, value: number) {
             this.onOptionSelect(event, value);
             this.isFocusVisibleItem = true;
         },
-        onOptionSelect(event, value) {
+        onOptionSelect(event: Event, value: number) {
             if (this.focusedOptionIndex === value || this.d_value === value) {
                 this.focusedOptionIndex = -1;
                 this.updateModel(event, null);
@@ -96,14 +99,15 @@ export default {
                 this.updateModel(event, value || null);
             }
         },
-        updateModel(event, value) {
+        updateModel(event: Event, value: number | null) {
             this.writeValue(value, event);
             this.$emit('change', { originalEvent: event, value });
         },
-        starAriaLabel(value) {
-            return value === 1 ? this.$primevue.config.locale.aria.star : this.$primevue.config.locale.aria.stars.replace(/{star}/g, value);
+        starAriaLabel(value: number) {
+            const aria = this.$primevue.config.locale?.aria;
+            return value === 1 ? aria?.star : aria?.stars?.replace(/{star}/g, String(value));
         },
-        dataOption(value) {
+        dataOption(value: number) {
             return cn({
                 readonly: this.readonly,
                 disabled: this.disabled,
@@ -128,5 +132,5 @@ export default {
         StarIcon,
         BanIcon
     }
-};
+});
 </script>
