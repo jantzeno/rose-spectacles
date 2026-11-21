@@ -148,13 +148,18 @@ export default {
         return {
             maskVisible: false,
             previewVisible: false,
+            previewTimer: undefined,
+            scrollLocked: false,
             rotate: 0,
             scale: 1
         };
     },
     beforeUnmount() {
+        clearTimeout(this.previewTimer);
+        this.releaseScrollLock();
+
         if (this.mask) {
-            ZIndex.clear(this.container);
+            ZIndex.clear(this.mask);
         }
     },
     methods: {
@@ -166,9 +171,15 @@ export default {
         },
         onImageClick() {
             if (this.preview) {
-                blockBodyScroll();
+                if (!this.scrollLocked) {
+                    blockBodyScroll();
+                    this.scrollLocked = true;
+                }
+
                 this.maskVisible = true;
-                setTimeout(() => {
+                clearTimeout(this.previewTimer);
+                this.previewTimer = setTimeout(() => {
+                    this.previewTimer = undefined;
                     this.previewVisible = true;
                 }, 25);
             }
@@ -233,7 +244,7 @@ export default {
             !this.isUnstyled && addClass(this.mask, 'rs-overlay-mask-leave-active');
         },
         onLeave() {
-            unblockBodyScroll();
+            this.releaseScrollLock();
             this.$emit('hide');
         },
         onAfterLeave(el) {
@@ -251,7 +262,13 @@ export default {
             this.previewVisible = false;
             this.rotate = 0;
             this.scale = 1;
-            unblockBodyScroll();
+            this.releaseScrollLock();
+        },
+        releaseScrollLock() {
+            if (this.scrollLocked) {
+                unblockBodyScroll();
+                this.scrollLocked = false;
+            }
         }
     },
     computed: {
