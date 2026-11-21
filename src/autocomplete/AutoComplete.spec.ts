@@ -2,7 +2,7 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import type { AutoCompleteProps } from 'rose-spectacles/autocomplete';
 import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
-import { defineComponent, nextTick, reactive, toRaw, type Component } from 'vue';
+import { defineComponent, h, nextTick, reactive, toRaw, type Component } from 'vue';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
 import AutoComplete from './AutoComplete.vue';
 
@@ -51,6 +51,32 @@ const selectedLabels = (wrapper: AutoCompleteWrapper) =>
         .map((option) => option.attributes('aria-label'));
 
 const lastEmittedValue = <T = unknown>(wrapper: AutoCompleteWrapper) => wrapper.emitted<[T]>('update:modelValue')?.at(-1)?.[0];
+
+it('renders the content slot in place of the default suggestion list', async () => {
+    const wrapper = mount(AutoComplete, {
+        props: { appendTo: 'self', suggestions: ['Oslo', 'Berlin'] },
+        slots: {
+            content: ({ items, id }: { items: string[]; id: string }) =>
+                h(
+                    'ul',
+                    { id, 'data-custom-suggestions': '' },
+                    items.map((item) => h('li', item))
+                )
+        }
+    });
+
+    try {
+        await openOverlay(wrapper);
+
+        const list = wrapper.get('[data-custom-suggestions]');
+
+        expect(list.findAll('li').map((option) => option.text())).toEqual(['Oslo', 'Berlin']);
+        expect(list.attributes('id')).toBe(wrapper.get('[role="combobox"]').attributes('aria-controls'));
+        expect(wrapper.find('.rs-autocomplete-list').exists()).toBe(false);
+    } finally {
+        wrapper.unmount();
+    }
+});
 
 describe('AutoComplete.vue', () => {
     let wrapper: AutoCompleteWrapper;

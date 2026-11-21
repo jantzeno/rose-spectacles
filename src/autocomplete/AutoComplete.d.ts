@@ -671,24 +671,33 @@ export interface AutoCompleteSlots<T = any, C = T> {
      */
     content(scope: {
         /**
-         * An array of objects to display for virtualscroller
+         * ID of the suggestion list referenced by the combobox.
          */
-        items: any;
+        id: string;
         /**
-         * Style class of the component
+         * Suggestions in the rendered VirtualScroller range, or the full list when virtualization is disabled.
          */
-        styleClass: string;
+        items: T[];
         /**
-         * Referance of the content
-         * @param {HTMLElement} el - Element of 'ref' property
+         * Style class supplied by the VirtualScroller when enabled.
          */
-        contentRef: (el: any) => void;
+        styleClass?: string;
         /**
-         * Options of the items
-         * @param {number} index - Rendered index
-         * @return {VirtualScrollerItemOptions}
+         * Register the element that contains the suggestions.
          */
-        getItemOptions: (index: number) => VirtualScrollerItemOptions;
+        contentRef: (el: Element | null) => void;
+        /**
+         * Item metadata supplied by the VirtualScroller when enabled.
+         */
+        getItemOptions?: (index: number) => VirtualScrollerItemOptions;
+        /**
+         * Inline positioning styles supplied by the VirtualScroller when enabled.
+         */
+        contentStyle?: import('vue').CSSProperties;
+        /**
+         * Size of each rendered item when virtualization is enabled.
+         */
+        itemSize?: number | number[];
     }): VNode[];
     /**
      * Custom loader template.

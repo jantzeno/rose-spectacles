@@ -23,7 +23,7 @@
             aria-haspopup="listbox"
             aria-autocomplete="list"
             :aria-expanded="overlayVisible"
-            :aria-controls="overlayVisible ? panelId : undefined"
+            :aria-controls="overlayVisible ? $id + '_list' : undefined"
             :aria-activedescendant="focused ? focusedOptionId : undefined"
             @focus="onFocus"
             @blur="onBlur"
@@ -186,59 +186,72 @@
                             :pt="ptm('virtualScroller')"
                         >
                             <template v-slot:content="{ styleClass, contentRef, items, getItemOptions, contentStyle, itemSize }">
-                                <ul
-                                    :ref="(el) => listRef(el, contentRef)"
+                                <slot
+                                    name="content"
                                     :id="$id + '_list'"
-                                    :class="[cx('list'), styleClass]"
-                                    :style="contentStyle"
-                                    role="listbox"
-                                    :aria-label="listAriaLabel"
-                                    v-bind="ptm('list')"
+                                    :items="items ?? []"
+                                    :styleClass="styleClass"
+                                    :contentRef="(el) => listRef(el, contentRef)"
+                                    :getItemOptions="getItemOptions"
+                                    :contentStyle="contentStyle"
+                                    :itemSize="itemSize"
                                 >
-                                    <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
-                                        <li
-                                            v-if="isOptionGroup(option)"
-                                            :id="$id + '_' + getOptionIndex(i, getItemOptions)"
-                                            :style="{ height: itemSize ? itemSize + 'px' : undefined }"
-                                            :class="cx('optionGroup')"
-                                            role="option"
-                                            v-bind="ptm('optionGroup')"
-                                        >
-                                            <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{
-                                                getOptionGroupLabel(option.optionGroup)
-                                            }}</slot>
-                                        </li>
-                                        <li
-                                            v-else
-                                            :id="$id + '_' + getOptionIndex(i, getItemOptions)"
-                                            v-ripple
-                                            :style="{ height: itemSize ? itemSize + 'px' : undefined }"
-                                            :class="cx('option', { option, i, getItemOptions })"
-                                            role="option"
-                                            :aria-label="getOptionLabel(option)"
-                                            :aria-selected="isSelected(option)"
-                                            :aria-disabled="isOptionDisabled(option)"
-                                            :aria-setsize="ariaSetSize"
-                                            :aria-posinset="getAriaPosInset(getOptionIndex(i, getItemOptions))"
-                                            @click="onOptionSelect($event, option)"
-                                            @mousemove="onOptionMouseMove($event, getOptionIndex(i, getItemOptions))"
-                                            :data-p-selected="isSelected(option)"
-                                            :data-p-focused="focusedOptionIndex === getOptionIndex(i, getItemOptions)"
-                                            :data-p-disabled="isOptionDisabled(option)"
-                                            v-bind="getPTOptions(option, getItemOptions, i, 'option')"
-                                        >
-                                            <slot name="option" :option="option" :index="getOptionIndex(i, getItemOptions)">{{ getOptionLabel(option) }}</slot>
-                                        </li>
-                                    </template>
-                                    <li
-                                        v-if="showEmptyMessage && (!items || (items && items.length === 0))"
-                                        :class="cx('emptyMessage')"
-                                        role="option"
-                                        v-bind="ptm('emptyMessage')"
+                                    <ul
+                                        :ref="(el) => listRef(el, contentRef)"
+                                        :id="$id + '_list'"
+                                        :class="[cx('list'), styleClass]"
+                                        :style="contentStyle"
+                                        role="listbox"
+                                        :aria-label="listAriaLabel"
+                                        v-bind="ptm('list')"
                                     >
-                                        <slot name="empty">{{ searchResultMessageText }}</slot>
-                                    </li>
-                                </ul>
+                                        <template v-for="(option, i) of items" :key="getOptionRenderKey(option, getOptionIndex(i, getItemOptions))">
+                                            <li
+                                                v-if="isOptionGroup(option)"
+                                                :id="$id + '_' + getOptionIndex(i, getItemOptions)"
+                                                :style="{ height: itemSize ? itemSize + 'px' : undefined }"
+                                                :class="cx('optionGroup')"
+                                                role="option"
+                                                v-bind="ptm('optionGroup')"
+                                            >
+                                                <slot name="optiongroup" :option="option.optionGroup" :index="getOptionIndex(i, getItemOptions)">{{
+                                                    getOptionGroupLabel(option.optionGroup)
+                                                }}</slot>
+                                            </li>
+                                            <li
+                                                v-else
+                                                :id="$id + '_' + getOptionIndex(i, getItemOptions)"
+                                                v-ripple
+                                                :style="{ height: itemSize ? itemSize + 'px' : undefined }"
+                                                :class="cx('option', { option, i, getItemOptions })"
+                                                role="option"
+                                                :aria-label="getOptionLabel(option)"
+                                                :aria-selected="isSelected(option)"
+                                                :aria-disabled="isOptionDisabled(option)"
+                                                :aria-setsize="ariaSetSize"
+                                                :aria-posinset="getAriaPosInset(getOptionIndex(i, getItemOptions))"
+                                                @click="onOptionSelect($event, option)"
+                                                @mousemove="onOptionMouseMove($event, getOptionIndex(i, getItemOptions))"
+                                                :data-p-selected="isSelected(option)"
+                                                :data-p-focused="focusedOptionIndex === getOptionIndex(i, getItemOptions)"
+                                                :data-p-disabled="isOptionDisabled(option)"
+                                                v-bind="getPTOptions(option, getItemOptions, i, 'option')"
+                                            >
+                                                <slot name="option" :option="option" :index="getOptionIndex(i, getItemOptions)">{{
+                                                    getOptionLabel(option)
+                                                }}</slot>
+                                            </li>
+                                        </template>
+                                        <li
+                                            v-if="showEmptyMessage && (!items || (items && items.length === 0))"
+                                            :class="cx('emptyMessage')"
+                                            role="option"
+                                            v-bind="ptm('emptyMessage')"
+                                        >
+                                            <slot name="empty">{{ searchResultMessageText }}</slot>
+                                        </li>
+                                    </ul>
+                                </slot>
                             </template>
                             <template v-if="$slots.loader" v-slot:loader="{ options }">
                                 <slot name="loader" :options="options"></slot>
