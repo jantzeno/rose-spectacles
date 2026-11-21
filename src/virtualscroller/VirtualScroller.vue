@@ -431,10 +431,7 @@ export default {
 
             if (this.lazy) {
                 Promise.resolve().then(() => {
-                    this.lazyLoadState = {
-                        first: this.step ? (both ? { rows: 0, cols: first.cols } : 0) : first,
-                        last: Math.min(this.step ? this.step : last, this.items?.length || 0)
-                    };
+                    this.lazyLoadState = this.getLazyRange(first, last, true);
 
                     this.$emit('lazy-load', this.lazyLoadState);
                 });
@@ -518,7 +515,7 @@ export default {
 
                 if (both) {
                     setProp('height', items, this.itemSize[0], contentPos.y);
-                    setProp('width', this.columns || items[1], this.itemSize[1], contentPos.x);
+                    setProp('width', this.columns || items[0], this.itemSize[1], contentPos.x);
                 } else if (horizontal) {
                     setProp('width', this.columns || items, this.itemSize, contentPos.x);
                 } else if (this.cumulativeSizes) {
@@ -710,10 +707,7 @@ export default {
                 this.$emit('scroll-index-change', newState);
 
                 if (this.lazy && this.isPageChanged(first)) {
-                    const lazyLoadState = {
-                        first: this.step ? Math.min(this.getPageByFirst(first) * this.step, (this.items?.length || 0) - this.step) : first,
-                        last: Math.min(this.step ? (this.getPageByFirst(first) + 1) * this.step : last, this.items?.length || 0)
-                    };
+                    const lazyLoadState = this.getLazyRange(first, last);
                     const isLazyStateChanged = this.lazyLoadState.first !== lazyLoadState.first || this.lazyLoadState.last !== lazyLoadState.last;
 
                     isLazyStateChanged && this.$emit('lazy-load', lazyLoadState);
@@ -832,7 +826,23 @@ export default {
             };
         },
         getPageByFirst(first) {
-            return Math.floor(((first ?? this.first) + this.d_numToleratedItems * 4) / (this.step || 1));
+            const index = first ?? this.first;
+            const row = this.isBoth() ? index.rows : index;
+            const tolerance = Array.isArray(this.d_numToleratedItems) ? this.d_numToleratedItems[0] : this.d_numToleratedItems;
+
+            return Math.floor((row + tolerance * 4) / (this.step || 1));
+        },
+        getLazyRange(first, last, initial = false) {
+            if (!this.step) return { first, last };
+
+            const page = initial ? 0 : this.getPageByFirst(first);
+            const count = this.items?.length ?? 0;
+            const firstRow = Math.min(page * this.step, Math.max(0, count - this.step));
+            const lastRow = Math.min((page + 1) * this.step, count);
+
+            return this.isBoth()
+                ? { first: { rows: firstRow, cols: first.cols }, last: { rows: lastRow, cols: last.cols } }
+                : { first: firstRow, last: lastRow };
         },
         isPageChanged(first) {
             return this.step && !this.lazy ? this.page !== this.getPageByFirst(first ?? this.first) : true;

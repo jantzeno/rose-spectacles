@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils';
-import type { CSSProperties } from 'vue';
+import { nextTick, type CSSProperties } from 'vue';
 import PrimeVue from '../config/Config';
 import VirtualScroller from './VirtualScroller.vue';
 
@@ -28,6 +28,46 @@ const mountScroller = (props: ScrollerOptions = {}) => {
 };
 
 describe('VirtualScroller.vue', () => {
+    it('emits row and column bounds when loading a grid lazily', async () => {
+        const wrapper = mount(VirtualScroller, {
+            props: { orientation: 'both', itemSize: [30, 50], items: Array.from({ length: 6 }, () => buildItems(6)), lazy: true }
+        });
+
+        try {
+            Object.defineProperties(wrapper.element, {
+                offsetHeight: { value: 60 },
+                offsetWidth: { value: 100 }
+            });
+            wrapper.vm.getContentPosition = () => ({ left: 0, right: 0, top: 0, bottom: 0, x: 0, y: 0 });
+            wrapper.vm.init();
+            await nextTick();
+
+            expect(wrapper.emitted('lazy-load')?.at(-1)?.[0]).toEqual({ first: { rows: 0, cols: 0 }, last: { rows: 4, cols: 4 } });
+
+            const scroller = wrapper.get<HTMLElement>('.rs-virtualscroller');
+            scroller.element.scrollTop = 30;
+            scroller.element.scrollLeft = 50;
+            await scroller.trigger('scroll');
+
+            expect(wrapper.emitted('lazy-load')?.at(-1)?.[0]).toEqual({ first: { rows: 0, cols: 0 }, last: { rows: 6, cols: 6 } });
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('sets the horizontal spacer from the only row in a grid', () => {
+        const wrapper = mount(VirtualScroller, { props: { orientation: 'both', itemSize: [30, 50], items: [buildItems(4)] } });
+
+        try {
+            wrapper.vm.getContentPosition = () => ({ left: 0, right: 0, top: 0, bottom: 0, x: 0, y: 0 });
+            wrapper.vm.init();
+
+            expect(wrapper.vm.spacerStyle.width).toBe('200px');
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('should exist', () => {
         const wrapper = mountScroller();
 
