@@ -1,7 +1,7 @@
 <template>
     <td v-if="loading" :style="containerStyle" :class="containerClass" role="cell" v-bind="{ ...getColumnPT('root'), ...getColumnPT('bodyCell') }">
         <component
-            :is="column.children.loading"
+            :is="columnSlots.loading"
             :data="rowData"
             :column="column"
             :field="field"
@@ -26,8 +26,8 @@
         :data-p-frozen-column="columnProp('frozen')"
     >
         <component
-            v-if="column.children && column.children.body && !d_editing"
-            :is="column.children.body"
+            v-if="columnSlots.body && !d_editing"
+            :is="columnSlots.body"
             :data="rowData"
             :column="column"
             :field="field"
@@ -37,8 +37,8 @@
             :rowTogglerCallback="toggleRow"
         />
         <component
-            v-else-if="column.children && column.children.editor && d_editing"
-            :is="column.children.editor"
+            v-else-if="columnSlots.editor && d_editing"
+            :is="columnSlots.editor"
             :data="editingRowData"
             :column="column"
             :field="field"
@@ -48,8 +48,8 @@
             :editorCancelCallback="editorCancelCallback"
         />
         <component
-            v-else-if="column.children && column.children.body && !column.children.editor && d_editing"
-            :is="column.children.body"
+            v-else-if="columnSlots.body && !columnSlots.editor && d_editing"
+            :is="columnSlots.body"
             :data="editingRowData"
             :column="column"
             :field="field"
@@ -72,7 +72,7 @@
                 v-else-if="columnProp('selectionMode') === 'multiple'"
                 :value="rowData"
                 :checked="selected"
-                :rowCheckboxIconTemplate="column.children && column.children.rowcheckboxicon"
+                :rowCheckboxIconTemplate="columnSlots.rowcheckboxicon"
                 :aria-selected="selected ? true : undefined"
                 @change="toggleRowWithCheckbox($event, rowIndex)"
                 :column="column"
@@ -83,8 +83,8 @@
         </template>
         <template v-else-if="columnProp('rowReorder')">
             <component
-                v-if="column.children && column.children.rowreordericon"
-                :is="column.children.rowreordericon"
+                v-if="columnSlots.rowreordericon"
+                :is="columnSlots.rowreordericon"
                 :class="cx('reorderableRowHandle')"
                 v-bind="getColumnPT('reorderableRowHandle')"
             />
@@ -108,19 +108,9 @@
                 v-bind="getColumnPT('rowToggleButton')"
                 data-pc-group-section="rowactionbutton"
             >
-                <component
-                    v-if="column.children && column.children.rowtoggleicon"
-                    :is="column.children.rowtoggleicon"
-                    :class="cx('rowToggleIcon')"
-                    :rowExpanded="isRowExpanded"
-                />
+                <component v-if="columnSlots.rowtoggleicon" :is="columnSlots.rowtoggleicon" :class="cx('rowToggleIcon')" :rowExpanded="isRowExpanded" />
                 <!-- TODO: Deprecated since v4.0-->
-                <component
-                    v-else-if="column.children && column.children.rowtogglericon"
-                    :is="column.children.rowtogglericon"
-                    :class="cx('rowToggleIcon')"
-                    :rowExpanded="isRowExpanded"
-                />
+                <component v-else-if="columnSlots.rowtogglericon" :is="columnSlots.rowtogglericon" :class="cx('rowToggleIcon')" :rowExpanded="isRowExpanded" />
                 <template v-else>
                     <span v-if="isRowExpanded && expandedRowIcon" :class="[cx('rowToggleIcon'), expandedRowIcon]" />
                     <ChevronDownIcon v-else-if="isRowExpanded && !expandedRowIcon" :class="cx('rowToggleIcon')" v-bind="getColumnPT('rowToggleIcon')" />
@@ -141,11 +131,7 @@
                 data-pc-group-section="rowactionbutton"
             >
                 <template #icon="slotProps">
-                    <component
-                        :is="(column.children && column.children.roweditoriniticon) || 'PencilIcon'"
-                        :class="slotProps.class"
-                        v-bind="getColumnPT('pcRowEditorInit')['icon']"
-                    />
+                    <component :is="columnSlots.roweditoriniticon || 'PencilIcon'" :class="slotProps.class" v-bind="getColumnIconPT('pcRowEditorInit')" />
                 </template>
             </Button>
             <Button
@@ -159,11 +145,7 @@
                 data-pc-group-section="rowactionbutton"
             >
                 <template #icon="slotProps">
-                    <component
-                        :is="(column.children && column.children.roweditorsaveicon) || 'CheckIcon'"
-                        :class="slotProps.class"
-                        v-bind="getColumnPT('pcRowEditorSave')['icon']"
-                    />
+                    <component :is="columnSlots.roweditorsaveicon || 'CheckIcon'" :class="slotProps.class" v-bind="getColumnIconPT('pcRowEditorSave')" />
                 </template>
             </Button>
             <Button
@@ -177,11 +159,7 @@
                 data-pc-group-section="rowactionbutton"
             >
                 <template #icon="slotProps">
-                    <component
-                        :is="(column.children && column.children.roweditorcancelicon) || 'TimesIcon'"
-                        :class="slotProps.class"
-                        v-bind="getColumnPT('pcRowEditorCancel')['icon']"
-                    />
+                    <component :is="columnSlots.roweditorcancelicon || 'TimesIcon'" :class="slotProps.class" v-bind="getColumnIconPT('pcRowEditorCancel')" />
                 </template>
             </Button>
         </template>
@@ -189,10 +167,10 @@
     </td>
 </template>
 
-<script>
+<script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/frozen-column-layout';
-import { getAttribute, getFirstFocusableElement, invokeElementMethod } from '../internal/utils/dom/index';
+import { getAttribute, getFirstFocusableElement } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
@@ -205,11 +183,23 @@ import TimesIcon from '../icons/times/TimesIcon.vue';
 import Button from '../button/Button.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import Ripple from '../ripple/Ripple';
-import { mergeProps } from 'vue';
+import { defineComponent, inject, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 import RowCheckbox from './RowCheckbox.vue';
 import RowRadioButton from './RowRadioButton.vue';
+import type { VirtualScrollerContent } from './virtual-scroller-content';
 
-export default {
+interface CellSelectionEvent {
+    originalEvent: Event;
+    data: unknown;
+}
+
+type CellEditSource = 'outside' | 'enter' | 'tab';
+type EditState = Record<number, { data: Record<string, unknown> }>;
+type EditButtons = Partial<Record<'init' | 'save' | 'cancel', Record<string, unknown>>>;
+
+type BodyCellParent = { $parentInstance?: { size?: string; showGridlines?: boolean } };
+
+export default defineComponent({
     name: 'BodyCell',
     hostName: 'DataTable',
     extends: BaseComponent,
@@ -225,10 +215,8 @@ export default {
         'checkbox-change',
         'editing-meta-change'
     ],
-    inject: {
-        $pcDataTable: {
-            default: undefined
-        }
+    setup() {
+        return { table: inject<{ loading?: boolean }>('$pcDataTable', {}) };
     },
     props: {
         rowData: {
@@ -236,8 +224,8 @@ export default {
             default: null
         },
         column: {
-            type: Object,
-            default: null
+            type: Object as PropType<VNode>,
+            required: true
         },
         frozenRow: {
             type: Boolean,
@@ -264,7 +252,7 @@ export default {
             default: false
         },
         editingMeta: {
-            type: Object,
+            type: Object as PropType<EditState>,
             default: null
         },
         editMode: {
@@ -272,7 +260,7 @@ export default {
             default: null
         },
         virtualScrollerContentProps: {
-            type: Object,
+            type: Object as PropType<VirtualScrollerContent>,
             default: null
         },
         ariaControls: {
@@ -292,26 +280,26 @@ export default {
             default: null
         },
         editButtonProps: {
-            type: Object,
+            type: Object as PropType<EditButtons>,
             default: null
         }
     },
-    documentEditListener: null,
-    selfClick: false,
-    overlayEventListener: null,
-    editCompleteTimeout: null,
     data() {
         return {
             d_editing: this.editing,
-            stopFrozenLayout: null,
-            styleObject: {}
+            stopFrozenLayout: null as (() => void) | null,
+            styleObject: {} as CSSProperties,
+            documentEditListener: null as ((event: MouseEvent) => void) | null,
+            selfClick: false,
+            overlayEventListener: null as ((event: unknown) => void) | null,
+            editCompleteTimeout: null as ReturnType<typeof setTimeout> | null
         };
     },
     watch: {
         editing(newValue) {
             this.d_editing = newValue;
         },
-        '$data.d_editing': function (newValue) {
+        d_editing(newValue: boolean) {
             this.$emit('editing-meta-change', { data: this.rowData, field: this.field || `field_${this.index}`, index: this.rowIndex, editing: newValue });
         }
     },
@@ -325,7 +313,7 @@ export default {
             setTimeout(() => {
                 const focusableEl = getFirstFocusableElement(this.$el);
 
-                focusableEl && focusableEl.focus();
+                if (focusableEl instanceof HTMLElement) focusableEl.focus();
             }, 1);
         }
     },
@@ -334,15 +322,16 @@ export default {
         this.unbindDocumentEditListener();
 
         if (this.overlayEventListener) {
-            OverlayEventBus.off('overlay-click', this.overlayEventListener);
+            if (this.overlayEventListener) OverlayEventBus.off('overlay-click', this.overlayEventListener);
             this.overlayEventListener = null;
         }
     },
     methods: {
-        columnProp(prop) {
+        columnProp(prop: string) {
             return getVNodeProp(this.column, prop);
         },
-        getColumnPT(key) {
+        getColumnPT(key: string) {
+            const { $parentInstance: parent } = this as typeof this & { $parentInstance?: BodyCellParent };
             const columnMetaData = {
                 props: getColumnPassThroughProps(this.column),
                 parent: {
@@ -352,8 +341,8 @@ export default {
                 },
                 context: {
                     index: this.index,
-                    size: this.$parentInstance?.$parentInstance?.size,
-                    showGridlines: this.$parentInstance?.$parentInstance?.showGridlines
+                    size: parent?.$parentInstance?.size,
+                    showGridlines: parent?.$parentInstance?.showGridlines
                 }
             };
 
@@ -366,32 +355,36 @@ export default {
         getColumnProp() {
             return this.column.props && this.column.props.pt ? this.column.props.pt : undefined;
         },
+        getColumnIconPT(key: string) {
+            const icon = this.getColumnPT(key).icon;
+
+            return icon && typeof icon === 'object' ? icon : undefined;
+        },
         resolveFieldData() {
             return resolveFieldData(this.rowData, this.field);
         },
-        toggleRow(event) {
+        toggleRow(event: Event) {
             this.$emit('row-toggle', {
                 originalEvent: event,
                 data: this.rowData
             });
         },
-        toggleRowWithRadio(event, index) {
+        toggleRowWithRadio(event: CellSelectionEvent, index: number) {
             this.$emit('radio-change', { originalEvent: event.originalEvent, index: index, data: event.data });
         },
-        toggleRowWithCheckbox(event, index) {
+        toggleRowWithCheckbox(event: CellSelectionEvent, index: number) {
             this.$emit('checkbox-change', { originalEvent: event.originalEvent, index: index, data: event.data });
         },
         isEditable() {
-            return this.column.children && this.column.children.editor != null;
+            return this.columnSlots.editor != null;
         },
         bindDocumentEditListener() {
             if (!this.documentEditListener) {
                 this.documentEditListener = (event) => {
+                    const target = event.target;
                     this.selfClick =
-                        this.$el &&
-                        (this.$el.contains(event.target) ||
-                            event.target.closest('[data-pc-section="overlay"]') ||
-                            event.target.closest('[data-pc-section="panel"]'));
+                        target instanceof Element &&
+                        (this.$el.contains(target) || target.closest('[data-pc-section="overlay"], [data-pc-section="panel"]') != null);
 
                     if (this.editCompleteTimeout) {
                         clearTimeout(this.editCompleteTimeout);
@@ -422,10 +415,10 @@ export default {
         switchCellToViewMode() {
             this.d_editing = false;
             this.unbindDocumentEditListener();
-            OverlayEventBus.off('overlay-click', this.overlayEventListener);
+            if (this.overlayEventListener) OverlayEventBus.off('overlay-click', this.overlayEventListener);
             this.overlayEventListener = null;
         },
-        onClick(event) {
+        onClick(event: MouseEvent) {
             if (this.editMode === 'cell' && this.isEditable()) {
                 if (!this.d_editing) {
                     this.d_editing = true;
@@ -433,20 +426,20 @@ export default {
                     this.$emit('cell-edit-init', { originalEvent: event, data: this.rowData, field: this.field, index: this.rowIndex });
 
                     this.overlayEventListener = (e) => {
-                        this.selfClick = this.$el && this.$el.contains(e.target);
+                        this.selfClick = e != null && typeof e === 'object' && 'target' in e && e.target instanceof Node && this.$el.contains(e.target);
                     };
 
                     OverlayEventBus.on('overlay-click', this.overlayEventListener);
                 }
             }
         },
-        completeEdit(event, type) {
+        completeEdit(event: Event, type: CellEditSource) {
             const completeEvent = {
                 originalEvent: event,
                 data: this.rowData,
                 newData: this.editingRowData,
-                value: this.rowData[this.field],
-                newValue: this.editingRowData[this.field],
+                value: this.rowData?.[String(this.field)],
+                newValue: this.editingRowData?.[String(this.field)],
                 field: this.field,
                 index: this.rowIndex,
                 type: type,
@@ -462,7 +455,7 @@ export default {
                 this.switchCellToViewMode();
             }
         },
-        onKeyDown(event) {
+        onKeyDown(event: KeyboardEvent) {
             if (this.editMode === 'cell') {
                 switch (event.code) {
                     case 'Enter':
@@ -487,29 +480,29 @@ export default {
                 }
             }
         },
-        async moveToPreviousCell(event) {
+        async moveToPreviousCell(event: KeyboardEvent) {
             let currentCell = this.findCell(event.target);
             let targetCell = this.findPreviousEditableColumn(currentCell);
 
             if (targetCell) {
                 await this.$nextTick();
-                invokeElementMethod(targetCell, 'click');
+                targetCell.click();
                 event.preventDefault();
             }
         },
-        async moveToNextCell(event) {
+        async moveToNextCell(event: KeyboardEvent) {
             let currentCell = this.findCell(event.target);
             let targetCell = this.findNextEditableColumn(currentCell);
 
             if (targetCell) {
                 await this.$nextTick();
-                invokeElementMethod(targetCell, 'click');
+                targetCell.click();
                 event.preventDefault();
             }
         },
-        findCell(element) {
-            if (element) {
-                let cell = element;
+        findCell(element: EventTarget | null) {
+            if (element instanceof Element) {
+                let cell: Element | null = element;
 
                 while (cell && !getAttribute(cell, 'data-p-cell-editing')) {
                     cell = cell.parentElement;
@@ -520,11 +513,13 @@ export default {
                 return null;
             }
         },
-        findPreviousEditableColumn(cell) {
+        findPreviousEditableColumn(cell: Element | null): HTMLElement | null {
+            if (!cell) return null;
+
             let prevCell = cell.previousElementSibling;
 
             if (!prevCell) {
-                let previousRow = cell.parentElement.previousElementSibling;
+                const previousRow = cell.parentElement?.previousElementSibling;
 
                 if (previousRow) {
                     prevCell = previousRow.lastElementChild;
@@ -532,17 +527,19 @@ export default {
             }
 
             if (prevCell) {
-                if (getAttribute(prevCell, 'data-p-editable-column')) return prevCell;
+                if (prevCell instanceof HTMLElement && getAttribute(prevCell, 'data-p-editable-column')) return prevCell;
                 else return this.findPreviousEditableColumn(prevCell);
             } else {
                 return null;
             }
         },
-        findNextEditableColumn(cell) {
+        findNextEditableColumn(cell: Element | null): HTMLElement | null {
+            if (!cell) return null;
+
             let nextCell = cell.nextElementSibling;
 
             if (!nextCell) {
-                let nextRow = cell.parentElement.nextElementSibling;
+                const nextRow = cell.parentElement?.nextElementSibling;
 
                 if (nextRow) {
                     nextCell = nextRow.firstElementChild;
@@ -550,25 +547,25 @@ export default {
             }
 
             if (nextCell) {
-                if (getAttribute(nextCell, 'data-p-editable-column')) return nextCell;
+                if (nextCell instanceof HTMLElement && getAttribute(nextCell, 'data-p-editable-column')) return nextCell;
                 else return this.findNextEditableColumn(nextCell);
             } else {
                 return null;
             }
         },
-        onRowEditInit(event) {
+        onRowEditInit(event: Event) {
             this.$emit('row-edit-init', { originalEvent: event, data: this.rowData, newData: this.editingRowData, field: this.field, index: this.rowIndex });
         },
-        onRowEditSave(event) {
+        onRowEditSave(event: Event) {
             this.$emit('row-edit-save', { originalEvent: event, data: this.rowData, newData: this.editingRowData, field: this.field, index: this.rowIndex });
         },
-        onRowEditCancel(event) {
+        onRowEditCancel(event: Event) {
             this.$emit('row-edit-cancel', { originalEvent: event, data: this.rowData, newData: this.editingRowData, field: this.field, index: this.rowIndex });
         },
-        editorInitCallback(event) {
+        editorInitCallback(event: Event) {
             this.$emit('row-edit-init', { originalEvent: event, data: this.rowData, newData: this.editingRowData, field: this.field, index: this.rowIndex });
         },
-        editorSaveCallback(event) {
+        editorSaveCallback(event: Event) {
             if (this.editMode === 'row') {
                 this.$emit('row-edit-save', {
                     originalEvent: event,
@@ -581,7 +578,7 @@ export default {
                 this.completeEdit(event, 'enter');
             }
         },
-        editorCancelCallback(event) {
+        editorCancelCallback(event: Event) {
             if (this.editMode === 'row') {
                 this.$emit('row-edit-cancel', {
                     originalEvent: event,
@@ -608,13 +605,16 @@ export default {
         updateStickyPosition() {
             updateFrozenColumnOffset(this.$el, this.columnProp('alignFrozen'), this.styleObject);
         },
-        getVirtualScrollerProp(option) {
-            return this.virtualScrollerContentProps ? this.virtualScrollerContentProps[option] : null;
+        getVirtualScrollerProp<K extends keyof VirtualScrollerContent>(option: K) {
+            return this.virtualScrollerContentProps?.[option];
         }
     },
     computed: {
+        columnSlots(): Slots {
+            return (this.column.children as Slots | null) ?? {};
+        },
         editingRowData() {
-            return this.editingMeta[this.rowIndex] ? this.editingMeta[this.rowIndex].data : this.rowData;
+            return this.editingMeta?.[this.rowIndex]?.data ?? this.rowData;
         },
         field() {
             return this.columnProp('field');
@@ -629,7 +629,7 @@ export default {
             return this.columnProp('frozen') ? [columnStyle, bodyStyle, this.styleObject] : [columnStyle, bodyStyle];
         },
         loading() {
-            return this.column.children?.loading && (this.getVirtualScrollerProp('loading') || this.$pcDataTable?.loading);
+            return this.columnSlots.loading && (this.getVirtualScrollerProp('loading') || this.table.loading);
         },
         loadingOptions() {
             const getLoaderOptions = this.getVirtualScrollerProp('getLoaderOptions');
@@ -639,7 +639,7 @@ export default {
                 getLoaderOptions(this.rowIndex, {
                     cellIndex: this.index,
                     cellFirst: this.index === 0,
-                    cellLast: this.index === this.getVirtualScrollerProp('columns').length - 1,
+                    cellLast: this.index === (this.getVirtualScrollerProp('columns')?.length ?? 0) - 1,
                     cellEven: this.index % 2 === 0,
                     cellOdd: this.index % 2 !== 0,
                     column: this.column,
@@ -648,20 +648,18 @@ export default {
             );
         },
         expandButtonAriaLabel() {
-            return this.$primevue.config.locale.aria
-                ? this.isRowExpanded
-                    ? this.$primevue.config.locale.aria.expandRow
-                    : this.$primevue.config.locale.aria.collapseRow
-                : undefined;
+            const aria = this.$primevue?.config.locale?.aria;
+
+            return this.isRowExpanded ? aria?.expandRow : aria?.collapseRow;
         },
         initButtonAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.editRow : undefined;
+            return this.$primevue?.config.locale?.aria?.editRow;
         },
         saveButtonAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.saveEdit : undefined;
+            return this.$primevue?.config.locale?.aria?.saveEdit;
         },
         cancelButtonAriaLabel() {
-            return this.$primevue.config.locale.aria ? this.$primevue.config.locale.aria.cancelEdit : undefined;
+            return this.$primevue?.config.locale?.aria?.cancelEdit;
         }
     },
     components: {
@@ -678,5 +676,5 @@ export default {
     directives: {
         ripple: Ripple
     }
-};
+});
 </script>
