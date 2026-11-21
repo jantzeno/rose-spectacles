@@ -28,7 +28,7 @@ export default function setAttributes(element: HTMLElement, attributes: { [key: 
 
                 if (matchedEvent) {
                     element.addEventListener(matchedEvent[1].toLowerCase(), value);
-                } else if (key === 'rs-bind' || key === 'pBind') {
+                } else if (key === 'rs-bind' || key === 'p-bind' || key === 'pBind') {
                     setAttributes(element, value);
                 } else {
                     value = key === 'class' ? [...new Set(computedStyles('class', value))].join(' ').trim() : key === 'style' ? computedStyles('style', value).join(';').trim() : value;
