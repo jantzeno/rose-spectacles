@@ -186,6 +186,7 @@ import Ripple from '../ripple/Ripple';
 import { defineComponent, inject, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 import RowCheckbox from './RowCheckbox.vue';
 import RowRadioButton from './RowRadioButton.vue';
+import type { EditingDrafts, EditingRowKey } from './editing-drafts';
 import type { VirtualScrollerContent } from './virtual-scroller-content';
 
 interface CellSelectionEvent {
@@ -194,7 +195,6 @@ interface CellSelectionEvent {
 }
 
 type CellEditSource = 'outside' | 'enter' | 'tab';
-type EditState = Record<number, { data: Record<string, unknown> }>;
 type EditButtons = Partial<Record<'init' | 'save' | 'cancel', Record<string, unknown>>>;
 
 type BodyCellParent = { $parentInstance?: { size?: string; showGridlines?: boolean } };
@@ -252,7 +252,11 @@ export default defineComponent({
             default: false
         },
         editingMeta: {
-            type: Object as PropType<EditState>,
+            type: Map as PropType<EditingDrafts>,
+            default: null
+        },
+        editingKey: {
+            type: [String, Number, Symbol] as PropType<EditingRowKey>,
             default: null
         },
         editMode: {
@@ -287,6 +291,7 @@ export default defineComponent({
     data() {
         return {
             d_editing: this.editing,
+            editingCell: Symbol(),
             stopFrozenLayout: null as (() => void) | null,
             styleObject: {} as CSSProperties,
             documentEditListener: null as ((event: MouseEvent) => void) | null,
@@ -299,8 +304,17 @@ export default defineComponent({
         editing(newValue) {
             this.d_editing = newValue;
         },
-        d_editing(newValue: boolean) {
-            this.$emit('editing-meta-change', { data: this.rowData, field: this.field || `field_${this.index}`, index: this.rowIndex, editing: newValue });
+        editMode() {
+            this.switchCellToViewMode();
+            this.d_editing = this.editing;
+
+            if (this.d_editing) this.updateEditingMeta(true);
+        },
+        d_editing: {
+            immediate: true,
+            handler(editing: boolean, previous?: boolean) {
+                if (editing || previous) this.updateEditingMeta(editing);
+            }
         }
     },
     mounted() {
@@ -320,6 +334,7 @@ export default defineComponent({
     beforeUnmount() {
         this.stopFrozenLayout?.();
         this.unbindDocumentEditListener();
+        if (this.d_editing && this.editMode === 'cell') this.updateEditingMeta(false);
 
         if (this.overlayEventListener) {
             if (this.overlayEventListener) OverlayEventBus.off('overlay-click', this.overlayEventListener);
@@ -327,6 +342,9 @@ export default defineComponent({
         }
     },
     methods: {
+        updateEditingMeta(editing: boolean) {
+            this.$emit('editing-meta-change', { key: this.editingKey, data: this.rowData, cell: this.editingCell, editing });
+        },
         columnProp(prop: string) {
             return getVNodeProp(this.column, prop);
         },
@@ -614,7 +632,7 @@ export default defineComponent({
             return (this.column.children as Slots | null) ?? {};
         },
         editingRowData() {
-            return this.editingMeta?.[this.rowIndex]?.data ?? this.rowData;
+            return this.editingMeta?.get(this.editingKey)?.data ?? this.rowData;
         },
         field() {
             return this.columnProp('field');

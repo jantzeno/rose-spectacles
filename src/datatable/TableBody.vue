@@ -4,6 +4,7 @@
             <template v-for="(rowData, rowIndex) of value" :key="getRowKey(rowData, rowIndex)">
                 <DTBodyRow
                     :rowData="rowData"
+                    :editingKey="getRowKey(rowData, rowIndex)"
                     :index="rowIndex"
                     :value="value"
                     :groupRowsValue="groupRowsValue"
@@ -76,7 +77,9 @@ import { cn } from '../internal/utils/index';
 import { getOuterHeight } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
+import type { TableField } from './BaseDataTable.vue';
 import BodyRow from './BodyRow.vue';
+import { getEditingRowKey, type EditingDrafts } from './editing-drafts';
 import type { VirtualScrollerContent } from './virtual-scroller-content';
 
 type TableBodyRef = Element | ComponentPublicInstance | null;
@@ -151,7 +154,7 @@ export default defineComponent({
             default: 0
         },
         dataKey: {
-            type: [String, Function],
+            type: [String, Function] as PropType<TableField>,
             default: null
         },
         expandedRowIcon: {
@@ -215,7 +218,7 @@ export default defineComponent({
             default: null
         },
         editingMeta: {
-            type: Object,
+            type: Map as PropType<EditingDrafts>,
             default: null
         },
         templates: {
@@ -264,6 +267,8 @@ export default defineComponent({
     },
     methods: {
         getRowKey(rowData: unknown, rowIndex: number) {
+            if (this.editMode) return getEditingRowKey(rowData, this.dataKey) ?? rowIndex;
+
             return this.dataKey ? resolveFieldData(rowData, this.dataKey) : rowIndex;
         },
         updateFrozenRowStickyPosition() {

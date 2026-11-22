@@ -65,6 +65,7 @@
                     :rowspan="rowGroupMode === 'rowspan' ? calculateRowGroupSize(col) : null"
                     :editMode="editMode"
                     :editing="editMode === 'row' && isRowEditing"
+                    :editingKey="editingKey"
                     :editingMeta="editingMeta"
                     :virtualScrollerContentProps="virtualScrollerContentProps"
                     :ariaControls="expandedRowId + '_' + rowIndex + '_expansion'"
@@ -125,6 +126,7 @@ import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
 import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
 import { defineComponent, mergeProps, type PropType, type Slots, type StyleValue, type VNode } from 'vue';
 import BodyCell from './BodyCell.vue';
+import type { EditingDrafts, EditingRowKey } from './editing-drafts';
 import type { VirtualScrollerContent } from './virtual-scroller-content';
 
 type ExpandedRows = unknown[] | Record<PropertyKey, unknown>;
@@ -273,7 +275,11 @@ export default defineComponent({
             default: null
         },
         editingMeta: {
-            type: Object,
+            type: Map as PropType<EditingDrafts>,
+            default: null
+        },
+        editingKey: {
+            type: [String, Number, Symbol] as PropType<EditingRowKey>,
             default: null
         },
         templates: {

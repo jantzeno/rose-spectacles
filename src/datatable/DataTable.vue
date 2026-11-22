@@ -188,8 +188,8 @@
                             @row-edit-init="onRowEditInit($event)"
                             @row-edit-save="onRowEditSave($event)"
                             @row-edit-cancel="onRowEditCancel($event)"
-                            :editingMeta="d_editingMeta"
-                            @editing-meta-change="onEditingMetaChange"
+                            :editingMeta="d_frozenEditingMeta"
+                            @editing-meta-change="onEditingMetaChange($event, d_frozenEditingMeta)"
                             :unstyled="unstyled"
                             :pt="pt"
                         />
@@ -248,7 +248,7 @@
                             @row-edit-save="onRowEditSave($event)"
                             @row-edit-cancel="onRowEditCancel($event)"
                             :editingMeta="d_editingMeta"
-                            @editing-meta-change="onEditingMetaChange"
+                            @editing-meta-change="onEditingMetaChange($event, d_editingMeta)"
                             :unstyled="unstyled"
                             :pt="pt"
                         />
@@ -383,6 +383,7 @@ import BaseDataTable, { type TableField, type TableRow, type TableSortMeta } fro
 import TableBody from './TableBody.vue';
 import TableFooter from './TableFooter.vue';
 import TableHeader from './TableHeader.vue';
+import { getEditingRowKey, type EditingDraftChange, type EditingDrafts } from './editing-drafts';
 import type {
     DataTableCellEditCancelEvent,
     DataTableCellEditCompleteEvent,
@@ -514,7 +515,8 @@ export default defineComponent({
             d_selectionKeys: null as KeyFlags | null,
             d_columnOrder: null as ColumnKey[] | null,
             d_editingRowKeys: null as KeyFlags | null,
-            d_editingMeta: {} as Record<number, { data: TableRow; fields: string[] }>,
+            d_editingMeta: new Map() as EditingDrafts,
+            d_frozenEditingMeta: new Map() as EditingDrafts,
             d_filters: this.cloneFilters(this.filters),
             d_columns: new HelperSet({ type: 'Column' }),
             d_columnGroups: new HelperSet({ type: 'ColumnGroup' }),
@@ -578,7 +580,13 @@ export default defineComponent({
                 if (this.dataKey) {
                     this.updateEditingRowKeys(newValue);
                 }
+
+                if (this.editMode === 'row') this.removeClosedRowDrafts(newValue);
             }
+        },
+        editMode() {
+            this.d_editingMeta.clear();
+            this.d_frozenEditingMeta.clear();
         },
         filters: {
             deep: true,
@@ -628,8 +636,6 @@ export default defineComponent({
             return getVNodeProp(col, prop);
         },
         onPage(event: PageState) {
-            this.clearEditingMetaData();
-
             this.d_first = event.first;
             this.d_rows = event.rows;
 
@@ -704,8 +710,6 @@ export default defineComponent({
             }
         },
         sortSingle(value: TableRow[]): TableRow[] {
-            this.clearEditingMetaData();
-
             if (this.groupRowsBy && this.groupRowsBy === this.sortField) {
                 this.d_multiSortMeta = [
                     { field: this.sortField, order: this.sortOrder || this.defaultSortOrder },
@@ -734,8 +738,6 @@ export default defineComponent({
             return data;
         },
         sortMultiple(value: TableRow[]): TableRow[] {
-            this.clearEditingMetaData();
-
             if (this.groupRowsBy && (this.d_groupRowsSortMeta || (this.d_multiSortMeta.length && this.groupRowsBy === this.d_multiSortMeta[0].field))) {
                 const firstSortMeta = this.d_multiSortMeta[0];
 
@@ -802,8 +804,6 @@ export default defineComponent({
         },
         filter(data: TableRow[]): TableRow[] {
             if (!data) return [];
-
-            this.clearEditingMetaData();
 
             const activeFilters = this.getActiveFilters(this.filters);
             const globalFilter = activeFilters.global as DataTableFilterMetaData | undefined;
@@ -2174,38 +2174,39 @@ export default defineComponent({
             this.$emit('row-edit-init', event);
         },
         onRowEditSave(event: DataTableRowEditInitEvent<TableRow>) {
-            const _editingRows = [...(this.editingRows ?? [])];
-
-            _editingRows.splice(this.findIndex(event.data, _editingRows), 1);
-            this.$emit('update:editingRows', _editingRows);
-            this.$emit('row-edit-save', event);
+            this.finishRowEdit(event, 'row-edit-save');
         },
         onRowEditCancel(event: DataTableRowEditInitEvent<TableRow>) {
-            const _editingRows = [...(this.editingRows ?? [])];
-
-            _editingRows.splice(this.findIndex(event.data, _editingRows), 1);
-            this.$emit('update:editingRows', _editingRows);
-            this.$emit('row-edit-cancel', event);
+            this.finishRowEdit(event, 'row-edit-cancel');
         },
-        onEditingMetaChange(event: { data: TableRow; field: string; index: number; editing: boolean }) {
-            let { data, field, index, editing } = event;
-            let editingMeta = { ...this.d_editingMeta };
-            let meta = editingMeta[index];
+        finishRowEdit(event: DataTableRowEditInitEvent<TableRow>, type: 'row-edit-save' | 'row-edit-cancel') {
+            const rows = [...(this.editingRows ?? [])];
+            const key = this.dataKey ? getEditingRowKey(event.data, this.dataKey) : undefined;
+            const index = key === undefined ? this.findIndex(event.data, rows) : rows.findIndex((row) => getEditingRowKey(row, this.dataKey) === key);
+
+            if (index >= 0) rows.splice(index, 1);
+
+            this.$emit('update:editingRows', rows);
+            this.$emit(type, event);
+        },
+        onEditingMetaChange({ key, data, cell, editing }: EditingDraftChange, drafts: EditingDrafts) {
+            const draft = drafts.get(key);
 
             if (editing) {
-                !meta && (meta = editingMeta[index] = { data: { ...data }, fields: [] });
-                meta['fields'].push(field);
-            } else if (meta) {
-                const fields = meta['fields'].filter((f) => f !== field);
-
-                !fields.length ? delete editingMeta[index] : (meta['fields'] = fields);
+                if (!draft) drafts.set(key, { source: data, data: { ...data }, cells: new Set(this.editMode === 'cell' ? [cell] : []) });
+                else if (this.editMode === 'cell') draft.cells.add(cell);
+            } else if (this.editMode === 'cell' && draft) {
+                draft.cells.delete(cell);
+                if (!draft.cells.size) drafts.delete(key);
             }
-
-            this.d_editingMeta = editingMeta;
         },
-        clearEditingMetaData() {
-            if (this.editMode) {
-                this.d_editingMeta = {};
+        removeClosedRowDrafts(editingRows: TableRow[] | null) {
+            const keys = new Set((editingRows ?? []).map((row) => getEditingRowKey(row, this.dataKey)));
+
+            for (const drafts of [this.d_editingMeta, this.d_frozenEditingMeta]) {
+                for (const [key, draft] of drafts) {
+                    if (!keys.has(key) && (this.dataKey || this.findIndex(draft.source, editingRows) === -1)) drafts.delete(key);
+                }
             }
         },
         createLazyLoadEvent(event?: Event | PageState): LazyLoadEvent {
