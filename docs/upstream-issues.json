@@ -811,10 +811,17 @@
             "title": "Dropdown/Select/Autocomplete: Component keeps focus when an option is selected with tab",
             "labels": ["bug", "accessibility"],
             "component": "Dropdown, Select, AutoComplete, Tab",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Select, Dropdown, and AutoComplete all committed the active option on Tab and returned focus to the combobox when their deferred overlay dismissal ran. The regression verifies the same model update, no cancellation of Tab, and focus remaining on the next control after dismissal.",
+                "The production Dropdown example also committed the active option and kept focus on the next control after native Tab in headless Firefox. Focus and the active option were prepared with DOM events."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-3r2dpyee?file=src%2FApp.vue",
-            "evidenceGap": "Check “Dropdown/Select/Autocomplete: Component keeps focus when an option is selected with tab” in the retained component after the reported step “The current option is selected, and the next element is focused for…”."
+            "resolvingCommit": "0595bb229ad31683f6b9dd88626c81e8dd5ac639",
+            "test": {
+                "path": "src/select/TabSelection.spec.ts",
+                "name": "commits the active %s option on Tab without taking focus back"
+            }
         },
         {
             "number": 97,
@@ -1733,10 +1740,16 @@
             "title": "Wrong value returned with AutoComplete in a Form",
             "labels": ["bug"],
             "component": "AutoComplete, Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The inner InputText registered independently with FormField even when the controlling AutoComplete opted out. The query entered Form state as a string. The regression instead preserves the tag array until the suggestion callback supplies a selected value."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-njb3f2kn?file=src%2FApp.vue",
-            "evidenceGap": "Check “Wrong value returned with AutoComplete in a Form” in the retained component after the reported step “When trying to write inside of the AutoComplete it'll change the form…”."
+            "resolvingCommit": "0f7fbb23ef62a90c5a065258d408231bf562455e",
+            "test": {
+                "path": "src/autocomplete/AutoComplete.spec.ts",
+                "name": "keeps a custom tag picker query out of the enclosing FormField"
+            }
         },
         {
             "number": 180,
@@ -2078,10 +2091,16 @@
             "title": "AutoComplete: Enter should submit form if TextInput is empty (PrimeVue 4.3.6)",
             "labels": ["bug", "regression"],
             "component": "AutoComplete, Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "In multiple mode with typeahead disabled, Enter was cancelled even with an empty input. An empty input now leaves the form submission default action available, and a nonempty input cancels Enter, emits one new chip, and clears the query."
+            ],
             "reproducer": "https://stackblitz.com",
-            "evidenceGap": "Recreate “<AutoComplete v-model=\"value2\" inputId=\"multiple-ac-2\" multiple fluid @complete=\"search\" :typeahead=\"false\" />” in the retained component. Verify the expected result “When a text input is empty, pressing Enter should submit the form”."
+            "resolvingCommit": "7fadc4005d6e8946a595829c3d6ec9aac7ed97aa",
+            "test": {
+                "path": "src/autocomplete/AutoComplete.spec.ts",
+                "name": "allows the Enter default action in an empty chip input and consumes it when adding a chip"
+            }
         },
         {
             "number": 211,
@@ -2110,9 +2129,15 @@
             "title": "ToggleSwitch and ToggleButton not respecting modelValue state while in controlled mode",
             "labels": ["bug"],
             "component": "ToggleSwitch, ToggleButton",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Check “ToggleSwitch and ToggleButton not respecting modelValue state while in controlled mode” in the retained component with the reported setup “I have this issue as well, the ToggleSwitch is an uncontrolled component…”."
+            "disposition": "fixed",
+            "evidence": [
+                "Both toggles rendered a new local selection after emitting an unaccepted model update. The switch regression covers native checkbox state and custom true and false values. The ToggleButton test independently verifies its pressed state and repeated requests before a parent update."
+            ],
+            "resolvingCommit": "4b142cf2647c2f7bd94def45f073cf456ab439f6",
+            "test": {
+                "path": "src/toggleswitch/ToggleSwitch.spec.ts",
+                "name": "restores the controlled checkbox until its model prop changes"
+            }
         },
         {
             "number": 214,
@@ -2181,10 +2206,16 @@
             "title": "AutoComplete on Form: typing exactly the same value as an option value shows [object Object]",
             "labels": ["bug"],
             "component": "AutoComplete, Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "When the query already equalled the option label, the internal text input received the selected object through its own Form registration and displayed [object Object]. The regression verifies that Form stores the object and the input keeps its string label."
+            ],
             "reproducer": "https://stackblitz.com/edit/h7dsthtz?file=package.json",
-            "evidenceGap": "Recreate “When you type in a value that exactly matches the option…” in the retained component. Verify the expected result “The same as when the typed value is not exactly the same”."
+            "resolvingCommit": "0f7fbb23ef62a90c5a065258d408231bf562455e",
+            "test": {
+                "path": "src/autocomplete/AutoComplete.spec.ts",
+                "name": "keeps the selected label in Form when it equals the typed query"
+            }
         },
         {
             "number": 220,
@@ -2673,10 +2704,16 @@
             "title": "AutoComplete in PrimeVue Form component with initial values cannot be cleared",
             "labels": ["bug"],
             "component": "AutoComplete, Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The fork baseline no longer derives the Form default from the live editable value. The retained AutoComplete regression passed before the new Form isolation and checks that clearing and blurring preserve the empty display and form value."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-eeqtqzws?file=src%2FApp.vue",
-            "evidenceGap": "Check “AutoComplete in PrimeVue Form component with initial values cannot be cleared” in the retained component with the reported setup “When a user clears the input of an AutoComplete in a PrimeVue…”."
+            "resolvingCommit": "c7a7cbc68470b6870e6e379f46dc045f1db1e5f6",
+            "test": {
+                "path": "src/autocomplete/AutoComplete.spec.ts",
+                "name": "keeps an initial Form AutoComplete selection empty after clearing the input"
+            }
         },
         {
             "number": 260,
@@ -3018,10 +3055,16 @@
             "title": "SelectButton breaks when multiple and nested in FormField",
             "labels": ["bug", "styling"],
             "component": "SelectButton, FormField",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Nested ToggleButtons read and wrote the same FormField as their SelectButton parent. The regression verifies each button stays pressed after later selections, and a synchronous observer receives only the successive selection arrays."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-uqgtfw37?file=src%2FApp.vue",
-            "evidenceGap": "Check “SelectButton breaks when multiple and nested in FormField” in the retained component after the reported step “Click on an option in the select button (Option 1)”."
+            "resolvingCommit": "89a270f5edf08243c7cf6663b6fb4694cb17c5d8",
+            "test": {
+                "path": "src/selectbutton/SelectButton.spec.ts",
+                "name": "keeps every selected button pressed inside a multiple FormField"
+            }
         },
         {
             "number": 291,
@@ -5861,10 +5904,16 @@
             "title": "SelectButton: the multiple and allowempty combo should make it possible to deselect values as long as at least 1 remains.",
             "labels": ["bug"],
             "component": "SelectButton",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The fork baseline permits deselection in multiple mode with allowEmpty disabled when another option remains. The retained regression passed before the new SelectButton change and verifies that removing the final option leaves the value unchanged."
+            ],
             "reproducer": "https://stackblitz.com/edit/ea9fy2?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “SelectButton with 3 options: (X => selected, 0 => unselected)” in the retained component. Verify the expected result “SelectButton with 3 options: (X => selected, 0 => unselected)”."
+            "resolvingCommit": "b88f80b0f50bd2b2d68926a83861841dfbedc2c7",
+            "test": {
+                "path": "src/selectbutton/SelectButton.spec.ts",
+                "name": "allows multiple options to be deselected while keeping the last selection"
+            }
         },
         {
             "number": 558,
