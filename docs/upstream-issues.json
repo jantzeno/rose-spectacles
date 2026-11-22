@@ -3176,9 +3176,12 @@
             "labels": ["bug"],
             "component": "DataTable, Column",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "Firefox rendered two resize handles in the flat-header table and zero with ColumnGroup under the same resize settings.",
+                "A header drag and drop moved Price before Product in the flat table. The grouped table kept the original body order. The grouped TableHeader branch forwards mouse-down and omits the resize and drag/drop bindings."
+            ],
             "reproducer": "https://stackblitz.com/edit/nm732nw6?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “3.can I adjust column width or drag column” in the retained component. Verify the expected result “I want to adjust column width and drag column”."
+            "evidenceGap": "Verify the expected sizing and movement of leaf columns under merged headers, including whether dragging across groups should move a parent group or preserve group membership."
         },
         {
             "number": 295,
