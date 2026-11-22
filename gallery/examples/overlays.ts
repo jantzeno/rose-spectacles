@@ -1,7 +1,7 @@
-import { h, onUnmounted, ref, withDirectives, type Directive } from 'vue';
+import { h, nextTick, onUnmounted, ref, withDirectives, type Directive } from 'vue';
 import { useConfirm, useDialog, useToast } from 'rose-spectacles';
 import TerminalService from 'rose-spectacles/terminalservice';
-import { component, demo, example, menu, sample, type ComponentName, type Example } from './shared';
+import { component, demo, example, locations, menu, sample, type ComponentName, type Example } from './shared';
 
 function overlay(name: ComponentName, headless = false): Example {
     return example(name, [name], () => {
@@ -80,6 +80,41 @@ export const overlays: Example[] = [
     overlay('Sidebar', true),
     anchored('Popover'),
     anchored('OverlayPanel'),
+    example('Popover choice menus', ['Popover', 'Select', 'MultiSelect'], () => {
+        const popover = ref<{ show: (event: MouseEvent) => void }>();
+        const picker = ref<{ show: () => void }>();
+        const multiple = ref(false);
+        const openPicker = async (event: MouseEvent, allowMultiple: boolean) => {
+            multiple.value = allowMultiple;
+            popover.value?.show(event);
+            await nextTick();
+            picker.value?.show();
+        };
+
+        return () =>
+            h('div', [
+                h(
+                    'button',
+                    { type: 'button', 'data-testid': 'open-select-popover', onClick: (event: MouseEvent) => openPicker(event, false) },
+                    'Choose a city'
+                ),
+                h(
+                    'button',
+                    { type: 'button', 'data-testid': 'open-multiselect-popover', onClick: (event: MouseEvent) => openPicker(event, true) },
+                    'Choose cities'
+                ),
+                demo('Popover', { ref: popover, style: { width: 'min(22rem, 90vw)' } }, () =>
+                    demo(multiple.value ? 'MultiSelect' : 'Select', {
+                        ref: picker,
+                        options: locations,
+                        optionLabel: 'name',
+                        ariaLabel: 'Cities',
+                        placeholder: 'Select a city',
+                        style: { width: '12rem' }
+                    })
+                )
+            ]);
+    }),
     confirmation('ConfirmDialog'),
     confirmation('ConfirmPopup'),
     example('Dynamic dialog', ['DynamicDialog', 'DialogService'], () => {

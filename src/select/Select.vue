@@ -921,6 +921,7 @@ export default defineComponent({
             }, 1);
         },
         onOverlayAfterEnter() {
+            this.alignOverlay();
             this.bindOutsideClickListener();
             this.bindScrollListener();
             this.bindResizeListener();

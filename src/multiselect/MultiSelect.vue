@@ -947,6 +947,7 @@ export default defineComponent({
             OverlayEventBus.on('overlay-click', this.overlayEventListener);
         },
         onOverlayAfterEnter() {
+            this.alignOverlay();
             this.bindOutsideClickListener();
             this.bindScrollListener();
             this.bindResizeListener();

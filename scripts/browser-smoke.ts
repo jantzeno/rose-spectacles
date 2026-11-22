@@ -195,6 +195,30 @@ try {
             'Popover stays inside the viewport as its content widens'
         );
         console.log('Popover stays inside the viewport as its content widens');
+
+        for (const component of ['select', 'multiselect']) {
+            await show('#popover-choice-menus');
+            const trigger = `[data-example="popover-choice-menus"] [data-testid="open-${component}-popover"]`;
+            await browser.evaluate(`Object.assign(document.querySelector(${JSON.stringify(trigger)}).style, {
+                position: 'fixed', top: '8rem', right: '1rem'
+            })`);
+            await browser.click(trigger);
+            await wait(
+                `(() => {
+                    const popover = document.querySelector('.rs-popover');
+                    const anchor = popover?.querySelector('.rs-${component}');
+                    const panel = document.querySelector('.rs-${component}-overlay');
+                    const entering = 'rs-anchored-overlay-enter-active';
+                    if (!anchor || !panel || popover.classList.contains(entering) || panel.classList.contains(entering)) return false;
+                    const anchorRect = anchor.getBoundingClientRect();
+                    const panelRect = panel.getBoundingClientRect();
+                    return Math.min(Math.abs(anchorRect.left - panelRect.left), Math.abs(anchorRect.right - panelRect.right)) <= 1;
+                })()`,
+                'Programmatically opened choice menus stay aligned inside a popover'
+            );
+            await show('#button');
+        }
+        console.log('Programmatically opened Select and MultiSelect panels stay aligned inside a popover');
     } finally {
         await browser.close();
     }
