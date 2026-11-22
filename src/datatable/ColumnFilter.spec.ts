@@ -45,6 +45,47 @@ const mountTable = () =>
     );
 
 describe('ColumnFilter', () => {
+    it('renders inline filters and empty spacers as data cells under the column headers', async () => {
+        const width = vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(120);
+        const wrapper = mount(
+            {
+                components: { DataTable, Column },
+                data: () => ({ products, filters: { name: { value: null, matchMode: FilterMatchMode.STARTS_WITH } } }),
+                template: `
+                    <DataTable :value="products" v-model:filters="filters" filterDisplay="row" scrollable resizableColumns>
+                        <Column field="id" header="Code" frozen />
+                        <Column field="name" header="Name" frozen :showFilterMenu="false">
+                            <template #filter="{ filterModel, filterCallback }">
+                                <input aria-label="Filter name" v-model="filterModel.value" @input="filterCallback()" />
+                            </template>
+                        </Column>
+                        <Column header="Notes" />
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue] } }
+        );
+
+        try {
+            await nextTick();
+            const [headings, filters] = wrapper.findAll('thead tr');
+            const cells = filters.findAll<HTMLTableCellElement>('td');
+
+            expect(headings.findAll('th').map((cell) => cell.text())).toEqual(['Code', 'Name', 'Notes']);
+            expect(filters.findAll('th')).toHaveLength(0);
+            expect(cells).toHaveLength(3);
+            expect(cells[0].text()).toBe('');
+            expect(cells[1].element.style.insetInlineStart).toBe('120px');
+            expect(cells[2].text()).toBe('');
+
+            await cells[1].get<HTMLInputElement>('input[aria-label="Filter name"]').setValue('Black');
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['1001Black Watch']);
+        } finally {
+            wrapper.unmount();
+            width.mockRestore();
+        }
+    });
+
     it('keeps the filter menu open while expanding, collapsing, and selecting nested TreeSelect nodes', async () => {
         const wrapper = mount(
             {

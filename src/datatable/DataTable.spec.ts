@@ -1208,7 +1208,6 @@ describe('DataTable.vue', () => {
 
     // column width identity
 
-    // Reasoning: mirrors resizeTableCells, which measures every header cell the selector finds, so a filter row is included exactly as it is at runtime.
     interface ResizableTable {
         $refs: { table: HTMLTableElement };
         cacheColumnWidthsByKey(widths: number[]): void;
@@ -1217,12 +1216,10 @@ describe('DataTable.vue', () => {
     }
 
     const seedResizedWidths = (table: ResizableTable, widthByColumn: number[]) => {
-        const headers = table.$refs.table.querySelectorAll('thead[data-pc-section="thead"] > tr > th');
+        const headers = table.$refs.table.tHead?.rows[0]?.cells ?? [];
         const widths = [...headers].map((header, index) => widthByColumn[index % widthByColumn.length]);
 
-        const columnCount = table.$refs.table.querySelectorAll('thead[data-pc-section="thead"] > tr:first-child > th').length;
-
-        table.cacheColumnWidthsByKey(widths.slice(0, columnCount));
+        table.cacheColumnWidthsByKey(widths);
         table.addColumnWidthStyles(widths);
     };
 

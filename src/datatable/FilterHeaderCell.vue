@@ -1,5 +1,5 @@
 <template>
-    <th
+    <td
         v-if="!columnProp('hidden') && (rowGroupMode !== 'subheader' || groupRowsBy !== columnProp('field'))"
         :style="getFilterColumnHeaderStyle"
         :class="getFilterColumnHeaderClass"
@@ -54,7 +54,7 @@
             :unstyled="unstyled"
             :pt="pt"
         />
-    </th>
+    </td>
 </template>
 
 <script lang="ts">

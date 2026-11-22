@@ -1558,16 +1558,12 @@ export default defineComponent({
             }
 
             const colIndex = getIndex(resizeColumn);
-            const widths: number[] = [];
-            const headers = find(this.$refs.table as HTMLTableElement, 'thead[data-pc-section="thead"] > tr > th');
-            const columnCount = resizeColumn.parentElement?.children.length ?? 0;
-
-            headers.forEach((header) => widths.push(getOuterWidth(header)));
+            const widths = Array.from(resizeColumn.parentElement?.children ?? [], (cell) => getOuterWidth(cell));
 
             widths[colIndex] = newColumnWidth;
             nextColumnWidth && (widths[colIndex + 1] = nextColumnWidth);
 
-            this.cacheColumnWidthsByKey(widths.slice(0, columnCount));
+            this.cacheColumnWidthsByKey(widths);
             this.addColumnWidthStyles(widths);
         },
         getVisibleColumnKeys(): ColumnKey[] | null {
@@ -2248,7 +2244,7 @@ export default defineComponent({
                 ? this.groupedColumnWidths.length
                     ? this.groupedColumnWidths
                     : this.measureGroupedColumnWidths()
-                : find(this.$el, 'thead[data-pc-section="thead"] > tr > th').map((header) => getOuterWidth(header));
+                : Array.from((this.$refs.table as HTMLTableElement).tHead?.rows[0]?.cells ?? [], (cell) => getOuterWidth(cell));
             state.columnWidths = widths.join(',');
 
             const widthsByKey = this.getPersistableColumnWidths();
@@ -2291,6 +2287,7 @@ export default defineComponent({
 
                 innerHTML += `
         ${selector} > thead[data-pc-section="thead"] > tr > th:nth-child(${index + 1}),
+        ${selector} > thead[data-pc-section="thead"] > tr > td:nth-child(${index + 1}),
         ${selector} > tbody[data-pc-section="tbody"] > tr > td:nth-child(${index + 1}),
         ${selector} > tfoot[data-pc-section="tfoot"] > tr > td:nth-child(${index + 1}) {
             ${style}

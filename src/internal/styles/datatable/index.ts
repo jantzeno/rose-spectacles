@@ -33,11 +33,11 @@ export const style = /*css*/ `
         position: sticky;
     }
 
-    .rs-datatable-scrollable th.rs-datatable-frozen-column {
+    .rs-datatable-scrollable .rs-datatable-thead > tr > .rs-datatable-frozen-column {
         z-index: 1;
     }
 
-    .rs-datatable-scrollable td.rs-datatable-frozen-column {
+    .rs-datatable-scrollable td.rs-datatable-frozen-column:not(:where(thead *)) {
         background: inherit;
     }
 
@@ -69,7 +69,7 @@ export const style = /*css*/ `
         z-index: 1;
     }
 
-    .rs-datatable-resizable-table > .rs-datatable-thead > tr > th,
+    .rs-datatable-resizable-table > .rs-datatable-thead > tr > :is(th, td),
     .rs-datatable-resizable-table > .rs-datatable-tfoot > tr > td,
     .rs-datatable-resizable-table > .rs-datatable-tbody > tr > td {
         overflow: hidden;
@@ -453,11 +453,11 @@ export const style = /*css*/ `
         border-width: 0 1px 1px 1px;
     }
 
-    .rs-datatable-gridlines .rs-datatable-thead > tr > th {
+    .rs-datatable-gridlines .rs-datatable-thead > tr > :is(th, td) {
         border-width: 1px 0 1px 1px;
     }
 
-    .rs-datatable-gridlines .rs-datatable-thead > tr > th:last-child {
+    .rs-datatable-gridlines .rs-datatable-thead > tr > :is(th, td):last-child {
         border-width: 1px;
     }
 
@@ -527,7 +527,7 @@ export const style = /*css*/ `
         padding: dt('datatable.header.sm.padding');
     }
 
-    .rs-datatable.rs-datatable-sm .rs-datatable-thead > tr > th {
+    .rs-datatable.rs-datatable-sm .rs-datatable-thead > tr > :is(th, td) {
         padding: dt('datatable.header.cell.sm.padding');
     }
 
@@ -547,7 +547,7 @@ export const style = /*css*/ `
         padding: dt('datatable.header.lg.padding');
     }
 
-    .rs-datatable.rs-datatable-lg .rs-datatable-thead > tr > th {
+    .rs-datatable.rs-datatable-lg .rs-datatable-thead > tr > :is(th, td) {
         padding: dt('datatable.header.cell.lg.padding');
     }
 
