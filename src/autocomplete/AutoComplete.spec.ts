@@ -1,6 +1,8 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import type { AutoCompleteProps } from 'rose-spectacles/autocomplete';
 import PrimeVue from '../config/Config';
+import Form from '../forms/form/Form.vue';
+import FormField from '../forms/formfield/FormField.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import { defineComponent, h, nextTick, reactive, toRaw, type Component } from 'vue';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
@@ -51,6 +53,79 @@ const selectedLabels = (wrapper: AutoCompleteWrapper) =>
         .map((option) => option.attributes('aria-label'));
 
 const lastEmittedValue = <T = unknown>(wrapper: AutoCompleteWrapper) => wrapper.emitted<[T]>('update:modelValue')?.at(-1)?.[0];
+
+it('keeps a custom tag picker query out of the enclosing FormField', async () => {
+    const tag = { name: 'Berlin', code: 'BER' };
+    const wrapper = mount(Form, {
+        props: { initialValues: { tags: [] } },
+        slots: {
+            default: () =>
+                h(
+                    FormField,
+                    { name: 'tags' },
+                    {
+                        default: ({ onChange }: { onChange: (event: { value: City[] }) => void }) =>
+                            h(AutoComplete, {
+                                appendTo: 'self',
+                                optionLabel: 'name',
+                                suggestions: [tag],
+                                formControl: { novalidate: true },
+                                onOptionSelect: ({ value }: { value: City }) => onChange({ value: [value] })
+                            })
+                    }
+                )
+        }
+    });
+
+    try {
+        await wrapper.get('input').setValue('Ber');
+        expect(wrapper.vm.getFieldState('tags')?.value).toEqual([]);
+
+        await openOverlay(wrapper.getComponent(AutoComplete));
+        await wrapper.get('li[aria-label="Berlin"]').trigger('click');
+        expect(wrapper.vm.getFieldState('tags')?.value).toEqual([tag]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('keeps the selected label in Form when it equals the typed query', async () => {
+    const berlin = { name: 'Berlin', code: 'BER' };
+    const wrapper = mount(Form, {
+        slots: { default: () => h(AutoComplete, { name: 'city', appendTo: 'self', optionLabel: 'name', suggestions: [berlin] }) }
+    });
+
+    try {
+        const input = wrapper.get('input');
+        await input.setValue('Berlin');
+        await openOverlay(wrapper.getComponent(AutoComplete));
+        await wrapper.get('li[aria-label="Berlin"]').trigger('click');
+
+        expect(wrapper.vm.getFieldState('city')?.value).toEqual(berlin);
+        expect(input.element.value).toBe('Berlin');
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('keeps an initial Form AutoComplete selection empty after clearing the input', async () => {
+    const wrapper = mount(Form, {
+        props: { initialValues: { city: { name: 'Berlin', code: 'BER' } } },
+        slots: { default: () => h(AutoComplete, { name: 'city', optionLabel: 'name' }) }
+    });
+
+    try {
+        const input = wrapper.get('input');
+        expect(input.element.value).toBe('Berlin');
+        await input.setValue('');
+        await input.trigger('blur');
+
+        expect(input.element.value).toBe('');
+        expect(wrapper.vm.getFieldState('city')?.value).toBe('');
+    } finally {
+        wrapper.unmount();
+    }
+});
 
 it('renders the content slot in place of the default suggestion list', async () => {
     const wrapper = mount(AutoComplete, {
