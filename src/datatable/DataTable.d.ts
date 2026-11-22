@@ -758,6 +758,10 @@ export interface DataTablePassThroughOptions {
      */
     rowGroupHeaderCell?: DataTablePassThroughOptionType;
     /**
+     * Used to pass attributes to the row group toggle button.
+     */
+    rowToggleButton?: DataTablePassThroughOptionType;
+    /**
      * Used to pass attributes to the body row's DOM element.
      */
     bodyRow?: DataTablePassThroughOptionType;

@@ -136,7 +136,7 @@ try {
         <script setup lang="ts">
         import { ref } from 'vue';
         import { ${menuComponents.join(', ')}, Calendar, DatePicker, Form, InputText, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
-        import DataTable, { type DataTableFilterMetaData } from 'rose-spectacles/datatable';
+        import DataTable, { type DataTableFilterMetaData, type DataTablePassThroughOptions } from 'rose-spectacles/datatable';
         import type { FormSubmitEvent } from 'rose-spectacles/forms/form';
         import type { MenuItem } from 'rose-spectacles/menuitem';
         import type { OrganizationChartNode } from 'rose-spectacles/organizationchart';
@@ -160,6 +160,7 @@ try {
         const acceptFilters = (value: ReportFilters) => { filters.value = value; };
         const records = [{ name: 'Copper', location: { city: 'Perth' } }];
         const groups = ref<string[][]>([['Perth', 'Copper']]);
+        const groupPassThrough = { rowToggleButton: { class: 'group-toggle' } } satisfies DataTablePassThroughOptions;
         const label = ref('Reports');
         const acceptLabel = (value: string) => { label.value = value; };
         const day = ref<Date | null>(null);
@@ -171,6 +172,7 @@ try {
             <DataTable
                 :value="records"
                 :group-rows-by="(record) => inferred(record.name).toUpperCase()"
+                :pt="groupPassThrough"
                 @rowgroup-expand="({ data }) => inferred(data).toLowerCase()"
             />
             <DataTable :value="records" :group-rows-by="['location.city', 'name']" v-model:expanded-row-groups="groups" />
@@ -265,6 +267,7 @@ try {
     console.log('Form infers the submit event and field slot types from its resolver');
     console.log('A packed DataTable instance returns CSV text from generateCSV');
     console.log('Packed DataTable grouping accepts nested fields and infers callback rows with string group keys');
+    console.log('Packed DataTable pass-through accepts attributes for the group toggle button');
     console.log('Packed filter and date models preserve their value types and InputText emits strings');
 
     await write('SlotTypes.vue', slotTypes.replaceAll('.title', '.missingField'));
