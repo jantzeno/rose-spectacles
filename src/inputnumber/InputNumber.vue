@@ -3,7 +3,7 @@
         <InputText
             ref="input"
             :id="inputId"
-            :name="$formName"
+            :name="name || $formName"
             role="spinbutton"
             :class="[cx('pcInputText'), inputClass]"
             :style="inputStyle"
@@ -19,7 +19,7 @@
             :aria-label="ariaLabel"
             :required="required"
             :size="size"
-            :invalid="invalid"
+            :invalid="$invalid"
             :variant="variant"
             @input="onUserInput"
             @keydown="onInputKeyDown"
@@ -28,6 +28,7 @@
             @click="onInputClick"
             @focus="onInputFocus"
             @blur="onInputBlur"
+            :formControl="{ novalidate: true }"
             :pt="ptm('pcInputText')"
             :unstyled="unstyled"
             :data-p="dataP"
@@ -1197,7 +1198,6 @@ export default defineComponent({
             const newValue = this.validateValue(this.parseValue(input.value));
 
             this.$emit('blur', { originalEvent: event, value: input.value });
-            this.formField.onBlur?.(event);
 
             input.value = this.formatValue(newValue);
             setAriaValue(input, newValue);
@@ -1206,6 +1206,8 @@ export default defineComponent({
             const unchanged = modelValue === null ? this.lastCommittedValue == null : compareDecimal(modelValue, this.lastCommittedValue) === 0;
 
             if (!unchanged) this.updateModel(event, newValue);
+
+            this.formField.onBlur?.(event);
 
             if (!this.disabled && !this.readonly && this.highlightOnFocus) {
                 clearSelection();

@@ -2,7 +2,31 @@ import Form from '../forms/form/Form.vue';
 import { mount, type VueWrapper } from '@vue/test-utils';
 import type { InputNumberInputEvent } from 'rose-spectacles/inputnumber';
 import { h, nextTick, type Component } from 'vue';
+import FormField from '../forms/formfield/FormField.vue';
 import InputNumber from './InputNumber.vue';
+
+it('validates the committed number under the FormField name on input blur', async () => {
+    const resolver = vi.fn(({ values }: { values: Record<string, unknown> }) => ({ values, errors: {} }));
+    const wrapper = mount(Form, {
+        props: { initialValues: { amount: 5 }, validateOnBlur: true, validateOnValueUpdate: false, resolver },
+        slots: { default: () => h(FormField, { name: 'amount' }, () => h(InputNumber)) }
+    });
+
+    try {
+        const input = wrapper.get('input[role="spinbutton"]');
+        expect(input.attributes('name')).toBe('amount');
+
+        await input.setValue('27');
+        expect(wrapper.vm.getFieldState('amount')?.value).toBe(5);
+        await input.trigger('blur');
+
+        expect(resolver).toHaveBeenCalledTimes(1);
+        expect(resolver).toHaveBeenCalledWith({ names: ['amount'], values: { amount: 27 } });
+        expect(wrapper.vm.getFieldState('amount')?.value).toBe(27);
+    } finally {
+        wrapper.unmount();
+    }
+});
 
 describe('InputNumber.vue', () => {
     let wrapper: VueWrapper<InstanceType<typeof InputNumber>>;
