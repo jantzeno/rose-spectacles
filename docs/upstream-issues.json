@@ -1017,9 +1017,9 @@
             "labels": ["bug"],
             "component": "DataTable",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": ["The retained sort regression for #604 reproduced and fixed loss of an unsaved draft when saving another row reordered the table."],
             "reproducer": "https://stackblitz.com/edit/u2xri1pb?file=src%2FApp.vue",
-            "evidenceGap": "Check “Datatable edit row mode and sort field overwrite data” in the retained component after the reported step “change the status of row 3 to \"low stock\" and save”."
+            "evidenceGap": "The linked StackBlitz was inaccessible. Recreate the four concurrent edits and the original save handler to determine whether the reported duplicate fifth row is a draft mix-up or the application writing at a displayed rather than source index."
         },
         {
             "number": 116,
@@ -1038,10 +1038,16 @@
             "title": "Datatable with frozen row and edit row overwrite data",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Editing the first row in each section exposed the same draft because both rows had index zero. The regression reproduces both edit orders and verifies they retain independent data and unsaved edits."
+            ],
             "reproducer": "https://stackblitz.com/edit/tvxkgpve?file=src%2FApp.vue",
-            "evidenceGap": "Edit a row in each of the frozen and scrollable sections of one DataTable. Check the edited and untouched records after saving, using the distinct row keys from the fixture."
+            "resolvingCommit": "55608bace7e7c560c110357ee77533bcba9541e9",
+            "test": {
+                "path": "src/datatable/EditingRows.spec.ts",
+                "name": "keeps frozen and scrollable row drafts separate when editing row %i before row %i"
+            }
         },
         {
             "number": 118,
@@ -2063,10 +2069,16 @@
             "title": "DataTable is not working as expected when a new row is inserted while editing any existing item.",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Inserting ahead of the active row lost its draft under the displayed-index lookup. The regression verifies all three IDs appear once and the original editor retains its text after insertion, even without dataKey."
+            ],
             "reproducer": "https://stackblitz.com/edit/datatable-edit-insert-issue?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “After editing the first item, adding a new item should insert…” in the retained component in Edge, Chrome. Verify the expected result “Each id should appear exactly once”."
+            "resolvingCommit": "55608bace7e7c560c110357ee77533bcba9541e9",
+            "test": {
+                "path": "src/datatable/EditingRows.spec.ts",
+                "name": "inserts a distinct row before an edited row without reusing its draft"
+            }
         },
         {
             "number": 209,
@@ -4290,10 +4302,16 @@
             "title": "DataTable: wrong cell value when both FrozenRow and cell edit mode are used",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The first scrollable cell loaded the pending draft of the first frozen cell during the pointer sequence. A separate store now keeps each section’s drafts independent."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-ts-vite-issue-template-du1abw",
-            "evidenceGap": "Check “DataTable: wrong cell value when both FrozenRow and cell edit mode are…” in the retained component after the reported step “There are at least 3 different cases if we click the cells…”."
+            "resolvingCommit": "55608bace7e7c560c110357ee77533bcba9541e9",
+            "test": {
+                "path": "src/datatable/EditingRows.spec.ts",
+                "name": "uses the scrollable cell value when entering it from a frozen row"
+            }
         },
         {
             "number": 406,
@@ -5722,10 +5740,16 @@
             "title": "Datatable: cell edit-mode issues when rows move while editing",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The visible cell editor stayed at its previous numeric position when its object row moved. It now follows the original row and emits that row and its draft at commit. The mode-switch regression also checks that a single active editor cannot mutate the original row while creating the replacement draft."
+            ],
             "reproducer": "https://stackblitz.com/edit/xu6mk7?file=src%2FApp.vue",
-            "evidenceGap": "Check “Datatable: cell edit-mode issues when rows move while editing” in the retained component after the reported step “Start editing any cell on the table. And wait for the rows…”."
+            "resolvingCommit": "55608bace7e7c560c110357ee77533bcba9541e9",
+            "test": {
+                "path": "src/datatable/EditingRows.spec.ts",
+                "name": "follows the edited cell when object rows move without a data key"
+            }
         },
         {
             "number": 538,
@@ -6312,10 +6336,16 @@
             "title": "DataTable: Setting sortField or v-model:filters Attributes Causes Data to Revert/Save Incorrectly When Editing Multiple Rows",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Sorting and filtering recomputed the table after the first save and erased the other active draft. Both variants preserve the other draft now and cancel without changing its original row. Temporary filtering out and reopening a row are also covered."
+            ],
             "reproducer": "https://codesandbox.io/s/optimistic-https-0mbwcu?file=/src/App.vue",
-            "evidenceGap": "Check “DataTable: Setting sortField or v-model:filters Attributes Causes Data to Revert/Save Incorrectly When…” in the retained component in FireFox 109.0 , Chrome 109.0 with the reported setup “On a DataTable with editMode=\"row\" and the sortField attribute set, if you…”."
+            "resolvingCommit": "55608bace7e7c560c110357ee77533bcba9541e9",
+            "test": {
+                "path": "src/datatable/EditingRows.spec.ts",
+                "name": "preserves a second row draft after saving the first with %s active"
+            }
         },
         {
             "number": 605,
