@@ -1,3 +1,4 @@
+import { commerce } from './examples/commerce';
 import { data } from './examples/data';
 import { display } from './examples/display';
 import { inputs } from './examples/inputs';
@@ -10,7 +11,8 @@ export const catalog: Readonly<Record<string, Example[]>> = {
     Layout: layout,
     Data: data,
     Overlays: overlays,
-    Display: display
+    Display: display,
+    Commerce: commerce
 };
 
 export const idFor = (name: string) => name.toLowerCase().replaceAll(' ', '-');

@@ -45,6 +45,14 @@ export { default as AnimateOnScroll } from './animateonscroll/AnimateOnScroll';
 export * from './animateonscroll/style/AnimateOnScrollStyle';
 export { default as AnimateOnScrollStyle } from './animateonscroll/style/AnimateOnScrollStyle';
 
+// AppSidebar
+export type * from './appsidebar/types';
+export { default as AppSidebar } from './appsidebar/AppSidebar.vue';
+
+// AttachmentItem
+export type * from './attachmentitem/types';
+export { default as AttachmentItem } from './attachmentitem/AttachmentItem.vue';
+
 // AutoComplete
 export * from './autocomplete/AutoComplete.vue';
 export { default as AutoComplete } from './autocomplete/AutoComplete.vue';
@@ -134,6 +142,10 @@ export * from './colorpicker/ColorPicker.vue';
 export { default as ColorPicker } from './colorpicker/ColorPicker.vue';
 export * from './colorpicker/style/ColorPickerStyle';
 export { default as ColorPickerStyle } from './colorpicker/style/ColorPickerStyle';
+
+// CommandPalette
+export type * from './commandpalette/types';
+export { default as CommandPalette } from './commandpalette/CommandPalette.vue';
 
 // Column
 export * from './column/Column.vue';
@@ -238,6 +250,10 @@ export { default as DynamicDialogStyle } from './dynamicdialog/style/DynamicDial
 // DynamicDialogEventBus
 export * from './dynamicdialogeventbus/DynamicDialogEventBus';
 export { default as DynamicDialogEventBus } from './dynamicdialogeventbus/DynamicDialogEventBus';
+
+// EmptyState
+export type * from './emptystate/types';
+export { default as EmptyState } from './emptystate/EmptyState.vue';
 
 // Fieldset
 export * from './fieldset/Fieldset.vue';
@@ -394,6 +410,10 @@ export * from './message/Message.vue';
 export { default as Message } from './message/Message.vue';
 export * from './message/style/MessageStyle';
 export { default as MessageStyle } from './message/style/MessageStyle';
+
+// MetricCard
+export type * from './metriccard/types';
+export { default as MetricCard } from './metriccard/MetricCard.vue';
 
 // MeterGroup
 export * from './metergroup/MeterGroup.vue';

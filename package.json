@@ -66,6 +66,14 @@
             "types": "./src/animateonscroll/style/AnimateOnScrollStyle.d.ts",
             "default": "./src/animateonscroll/style/AnimateOnScrollStyle.ts"
         },
+        "./appsidebar": {
+            "types": "./src/appsidebar/AppSidebar.d.ts",
+            "default": "./src/appsidebar/AppSidebar.vue"
+        },
+        "./attachmentitem": {
+            "types": "./src/attachmentitem/AttachmentItem.d.ts",
+            "default": "./src/attachmentitem/AttachmentItem.vue"
+        },
         "./autocomplete": {
             "types": "./src/autocomplete/AutoComplete.d.ts",
             "default": "./src/autocomplete/AutoComplete.vue"
@@ -193,6 +201,10 @@
         "./colorpicker/style": {
             "types": "./src/colorpicker/style/ColorPickerStyle.d.ts",
             "default": "./src/colorpicker/style/ColorPickerStyle.ts"
+        },
+        "./commandpalette": {
+            "types": "./src/commandpalette/CommandPalette.d.ts",
+            "default": "./src/commandpalette/CommandPalette.vue"
         },
         "./column": {
             "types": "./src/column/Column.d.ts",
@@ -333,6 +345,10 @@
         "./editor/style": {
             "types": "./src/editor/style/EditorStyle.d.ts",
             "default": "./src/editor/style/EditorStyle.ts"
+        },
+        "./emptystate": {
+            "types": "./src/emptystate/EmptyState.d.ts",
+            "default": "./src/emptystate/EmptyState.vue"
         },
         "./fieldset": {
             "types": "./src/fieldset/Fieldset.d.ts",
@@ -541,6 +557,10 @@
         "./message/style": {
             "types": "./src/message/style/MessageStyle.d.ts",
             "default": "./src/message/style/MessageStyle.ts"
+        },
+        "./metriccard": {
+            "types": "./src/metriccard/MetricCard.d.ts",
+            "default": "./src/metriccard/MetricCard.vue"
         },
         "./metergroup": {
             "types": "./src/metergroup/MeterGroup.d.ts",

@@ -223,6 +223,51 @@ try {
             await show('#button');
         }
         console.log('Programmatically opened Select and MultiSelect panels stay aligned inside a popover');
+
+        await show('#command-palette');
+        await browser.evaluate('window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, cancelable: true }))');
+        await wait('document.activeElement?.matches(".rs-command-palette input[role=combobox]")', 'The command shortcut focuses the search input');
+        await browser.keys(['ArrowDown', 'Enter']);
+        await wait(
+            'document.querySelector(\'[data-example="command-palette"] [role="status"]\').textContent === "Selected: Search products"',
+            'Command palette supports selection by keyboard'
+        );
+
+        await browser.navigate(base + '?catalog-category=Drinkware&ref=sample#product-discovery');
+        const productResults = '[data-example="product-discovery"] .commerce-applied-filters [role="status"]';
+        await wait(`document.querySelector(${JSON.stringify(productResults)})?.textContent.trim() === '1 product'`, 'Catalog filters hydrate from the URL');
+        await browser.click('[data-example="product-discovery"] button[aria-label="Remove Drinkware"]');
+        await wait(
+            `document.querySelector(${JSON.stringify(productResults)})?.textContent.trim() === '4 products' &&
+                location.search === '?ref=sample'`,
+            'Removing a catalog filter updates the results and the URL'
+        );
+
+        await show('#product-variants');
+        await browser.click('[data-example="product-variants"] button[aria-label="View zipper detail"]');
+        await wait(
+            'document.querySelector(".commerce-variant-photo")?.getAttribute("aria-label")?.includes("zipper")',
+            'Product photography can be switched by button'
+        );
+
+        await show('#orders-and-inventory');
+        await browser.click('[data-example="orders-and-inventory"] tbody tr:first-child .rs-checkbox');
+        await browser.click('[data-example="orders-and-inventory"] .commerce-order-actions button');
+        await wait(
+            'document.querySelector(".commerce-order-view .commerce-feedback")?.textContent === "Fulfilled 1 order."',
+            'The orders toolbar applies a bulk action to selected rows'
+        );
+
+        await browser.setViewport(390, 844);
+        await show('#app-sidebar');
+        await browser.click('[data-example="app-sidebar"] button[aria-label="Open navigation"]');
+        await wait('!!document.querySelector(\'.rs-drawer[aria-label="Workspace navigation"]\')', 'The app sidebar opens as a drawer on a narrow viewport');
+        await browser.click('.rs-drawer[aria-label="Workspace navigation"] .rs-app-sidebar-group li:nth-child(2) button');
+        await wait(
+            'document.querySelector(".commerce-sidebar-content h2")?.textContent === "Products" && !document.querySelector(\'.rs-drawer[aria-label="Workspace navigation"]\')',
+            'Selecting mobile navigation updates the active page and closes the drawer'
+        );
+        console.log('Commerce examples support keyboard commands, shareable filters, product previews, order actions, and mobile navigation');
     } finally {
         await browser.close();
     }

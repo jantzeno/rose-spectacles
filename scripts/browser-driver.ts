@@ -10,6 +10,7 @@ import { chromium } from 'playwright-core';
 export interface BrowserDriver {
     name: string;
     navigate(url: string): Promise<void>;
+    setViewport(width: number, height: number): Promise<void>;
     evaluate<T>(expression: string): Promise<T>;
     click(selector: string): Promise<void>;
     keys(values: string[]): Promise<void>;
@@ -32,11 +33,12 @@ export async function browserDriver(): Promise<BrowserDriver> {
             async navigate(url) {
                 await page.goto(url);
             },
+            setViewport: (width, height) => page.setViewportSize({ width, height }),
             evaluate: (expression) => page.evaluate(expression),
             click: (selector) => page.locator(selector).click(),
             async keys(values) {
                 for (const value of values) {
-                    if (['End', 'Escape', 'Tab'].includes(value)) await page.keyboard.press(value);
+                    if (['ArrowDown', 'ArrowUp', 'End', 'Enter', 'Escape', 'Tab'].includes(value)) await page.keyboard.press(value);
                     else await page.keyboard.insertText(value);
                 }
             },
@@ -192,6 +194,9 @@ async function firefoxDriver(): Promise<BrowserDriver> {
             async navigate(url) {
                 await command('browsingContext.navigate', { context, url, wait: 'complete' });
             },
+            async setViewport(width, height) {
+                await command('browsingContext.setViewport', { context, viewport: { width, height } });
+            },
             evaluate,
             async click(selector) {
                 const point = await evaluate<{ x: number; y: number }>(`(async () => {
@@ -227,7 +232,14 @@ async function firefoxDriver(): Promise<BrowserDriver> {
                 ]);
             },
             async keys(values) {
-                const special: Record<string, string> = { Escape: '\uE00C', End: '\uE010', Tab: '\uE004' };
+                const special: Record<string, string> = {
+                    ArrowDown: '\uE015',
+                    ArrowUp: '\uE013',
+                    End: '\uE010',
+                    Enter: '\uE007',
+                    Escape: '\uE00C',
+                    Tab: '\uE004'
+                };
                 await actions([
                     {
                         type: 'key',

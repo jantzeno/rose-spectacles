@@ -57,7 +57,7 @@ try {
         JSON.stringify({
             compilerOptions: { target: 'ES2022', module: 'ESNext', moduleResolution: 'Bundler', strict: true, noEmit: true },
             vueCompilerOptions: { strictTemplates: true },
-            include: ['main.ts', 'App.vue', 'SlotTypes.vue', 'ModelTypes.vue']
+            include: ['main.ts', 'App.vue', 'SlotTypes.vue', 'ModelTypes.vue', 'CommerceTypes.vue']
         })
     );
     const slotTypes = `
@@ -129,6 +129,37 @@ try {
         </template>
     `;
     await write('SlotTypes.vue', slotTypes);
+    await write(
+        'CommerceTypes.vue',
+        `
+        <script setup lang="ts">
+        import { ref } from 'vue';
+        import { AppSidebar, CommandPalette, type AppSidebarGroup, type CommandPaletteItem } from 'rose-spectacles';
+        import AttachmentItem from 'rose-spectacles/attachmentitem';
+        import EmptyState from 'rose-spectacles/emptystate';
+        import MetricCard from 'rose-spectacles/metriccard';
+        const groups: AppSidebarGroup[] = [{ label: 'Store', items: [{ id: 'orders', label: 'Orders' }] }];
+        const commands: CommandPaletteItem[] = [{ id: 'find', label: 'Find an order' }];
+        const activeId = ref('orders');
+        const collapsed = ref(false);
+        const visible = ref(false);
+        const query = ref('');
+        const selected = ref('');
+        </script>
+        <template>
+            <AppSidebar :groups="groups" v-model:active-id="activeId" v-model:collapsed="collapsed">
+                <EmptyState title="No orders"><template #actions><button>Browse</button></template></EmptyState>
+            </AppSidebar>
+            <CommandPalette v-model:visible="visible" v-model:query="query" :items="commands" @select="(item) => { selected = item.label; }">
+                <template #item="{ item, active }"><span :class="{ 'is-active': active }">{{ item.label }}</span></template>
+            </CommandPalette>
+            <AttachmentItem name="Packing list" status="uploading" :progress="42" removable />
+            <MetricCard label="Returns" :value="6" :trend="{ direction: 'down', label: '4 fewer', tone: 'positive' }">
+                <template #chart><div>{{ selected }}</div></template>
+            </MetricCard>
+        </template>
+    `
+    );
     const menuComponents = ['Breadcrumb', 'ContextMenu', 'MegaMenu', 'Menu', 'Menubar', 'PanelMenu', 'SplitButton', 'TieredMenu'];
     await write(
         'ModelTypes.vue',
@@ -218,7 +249,7 @@ try {
         `
         <script setup lang="ts">
         import { useTemplateRef } from 'vue';
-        import { Button, Form, Toast, useToast } from 'rose-spectacles';
+        import { Button, EmptyState, Form, Toast, useToast } from 'rose-spectacles';
         import Select from 'rose-spectacles/select';
         import ToastEventBus from 'rose-spectacles/toasteventbus';
         import OverlayEventBus from 'rose-spectacles/overlayeventbus';
@@ -245,6 +276,7 @@ try {
         <template>
             <Form ref="form">
                 <Button label="Checking" loading />
+                <EmptyState title="No orders yet" heading="h3" />
                 <Select :options="['draft', 'ready']" />
                 <Button label="Create" type="button" @click="validateThroughTheFormRef" />
                 <Button label="Show progress" type="button" @click="showProgress" />

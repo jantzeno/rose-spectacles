@@ -60,6 +60,20 @@ Radar and polar-area charts, Chart.js plugins, canvas access, and PNG export wer
 
 Import Editor from `rose-spectacles/editor`. Its `v-model` value is HTML. Use `extensions` to add Tiptap extensions and the `#toolbar="{ editor }"` slot to build a toolbar with native commands. The load and change events expose the Tiptap instance. Text-change events provide a ProseMirror transaction, and selection ranges use `from` and `to` document positions. Quill modules, Deltas, and toolbar classes need to be migrated to those APIs.
 
+### Commerce components
+
+Import these components by name or from their individual subpaths.
+
+| Component        | Usage                                                                                                                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EmptyState`     | Set a title and optional description. Use the `icon` and `actions` slots to customize the state.                                                                                    |
+| `AppSidebar`     | Pass groups of destinations. Bind `v-model:active-id` and `v-model:collapsed` to manage navigation and the desktop rail. On small screens the same destinations appear in a drawer. |
+| `CommandPalette` | Pass command items and handle `select`. Enable `shortcut` for Ctrl/⌘+K. For remote search, bind `v-model:query`, turn off `filter-locally`, and set `loading` while updating items. |
+| `AttachmentItem` | Pass a file name and any available size, thumbnail, or download URL. Use upload states and handle `retry` and `remove` in the application.                                          |
+| `MetricCard`     | Pass a label, value, and optional trend. The trend direction controls its arrow and the tone controls its color. Use the optional `chart` slot for a sparkline.                     |
+
+The gallery’s **Commerce** section includes Product Discovery, Product Variants, and Orders and Inventory. The examples use sample data, share catalog filters through the URL, and save named order views in the browser.
+
 ## Gallery and checks
 
 ```sh

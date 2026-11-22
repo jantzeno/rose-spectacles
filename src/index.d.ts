@@ -45,6 +45,14 @@ export { default as AnimateOnScroll } from 'rose-spectacles/animateonscroll';
 export * from 'rose-spectacles/animateonscroll/style';
 export { default as AnimateOnScrollStyle } from 'rose-spectacles/animateonscroll/style';
 
+// AppSidebar
+export * from 'rose-spectacles/appsidebar';
+export { default as AppSidebar } from 'rose-spectacles/appsidebar';
+
+// AttachmentItem
+export * from 'rose-spectacles/attachmentitem';
+export { default as AttachmentItem } from 'rose-spectacles/attachmentitem';
+
 // AutoComplete
 export * from 'rose-spectacles/autocomplete';
 export { default as AutoComplete } from 'rose-spectacles/autocomplete';
@@ -134,6 +142,10 @@ export * from 'rose-spectacles/colorpicker';
 export { default as ColorPicker } from 'rose-spectacles/colorpicker';
 export * from 'rose-spectacles/colorpicker/style';
 export { default as ColorPickerStyle } from 'rose-spectacles/colorpicker/style';
+
+// CommandPalette
+export * from 'rose-spectacles/commandpalette';
+export { default as CommandPalette } from 'rose-spectacles/commandpalette';
 
 // Column
 export * from 'rose-spectacles/column';
@@ -238,6 +250,10 @@ export { default as DynamicDialogStyle } from 'rose-spectacles/dynamicdialog/sty
 // DynamicDialogEventBus
 export * from 'rose-spectacles/dynamicdialogeventbus';
 export { default as DynamicDialogEventBus } from 'rose-spectacles/dynamicdialogeventbus';
+
+// EmptyState
+export * from 'rose-spectacles/emptystate';
+export { default as EmptyState } from 'rose-spectacles/emptystate';
 
 // Fieldset
 export * from 'rose-spectacles/fieldset';
@@ -394,6 +410,10 @@ export * from 'rose-spectacles/message';
 export { default as Message } from 'rose-spectacles/message';
 export * from 'rose-spectacles/message/style';
 export { default as MessageStyle } from 'rose-spectacles/message/style';
+
+// MetricCard
+export * from 'rose-spectacles/metriccard';
+export { default as MetricCard } from 'rose-spectacles/metriccard';
 
 // MeterGroup
 export * from 'rose-spectacles/metergroup';
