@@ -84,9 +84,11 @@
             "title": "Column: #body/#editor/#node slot data is any, even with typed DataTable",
             "labels": ["enhancement"],
             "component": "Editor, DataTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Check “Column: #body/#editor/#node slot data is any, even with typed DataTable” in the retained component after the reported step “The slot's data parameter is typed as any instead of the array…”."
+            "disposition": "enhancement",
+            "evidence": [
+                "The retained Column declares its slot data independently of DataTable. Its body, editor, node, and loading slot values are any even when the parent DataTable has typed rows.",
+                "The proposed of prop would add a public opt-in API for type inference. Existing Column slots declare no link to the DataTable component generic."
+            ]
         },
         {
             "number": 23,
@@ -147,10 +149,17 @@
             "title": "InputGroupAddon doesn't resize properly when the addon is text and InputGroup size is set to small.",
             "labels": ["bug", "styling"],
             "component": "InputGroupAddon, InputGroup",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A Firefox fixture showed that a small InputText used the app-supplied small size tokens while its text add-on retained the regular font size and padding. The add-on now takes the same font and padding tokens.",
+                "The production gallery checks the small text and input together. The isolated fixture also verified regular add-ons and zero padding for an add-on containing a button."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-mu5x9hmt?file=src%2FApp.vue",
-            "evidenceGap": "Check “InputGroupAddon doesn't resize properly when the addon is text and InputGroup size…” in the retained component in Opera, Chrome, Firefox, Edge after the reported step “Create a InputGroup with an input field like InputText and an InputGroupAddon…”."
+            "resolvingCommit": "7a3604c30370306dca28175fd96829a50eed900f",
+            "test": {
+                "path": "scripts/browser-smoke.ts",
+                "name": "A small input group gives its text add-on the same font size and padding"
+            }
         },
         {
             "number": 41,
@@ -167,10 +176,17 @@
             "title": "Scoped Design Tokens don't apply correctly in dark mode",
             "labels": ["bug", "regression", "styling"],
             "component": "Shared Vue behavior",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The retained styling helper reproduced the unqualified :root branch when concatenating an attribute-based dark selector with a component qualifier.",
+                "The regression checks both root and shadow-host selectors, including a comma inside the attribute value. In Firefox, the dark token changed the scoped Card and left its sibling on the default color."
+            ],
             "reproducer": "https://stackblitz.com/edit/v2pp6mzf-xy6dkrfs?file=package.json",
-            "evidenceGap": "Recreate “click on the dark mode toggle” in the retained component. Verify the expected result “When switching to dark mode”."
+            "resolvingCommit": "e0d5d4127374de57abf11622fa9552b310adcd88",
+            "test": {
+                "path": "src/internal/styled/utils/themeUtils.spec.ts",
+                "name": "scopes attribute-based dark tokens to the target component"
+            }
         },
         {
             "number": 44,
@@ -373,10 +389,17 @@
             "title": "MultiSelect dropdown misaligned when opened programmatically inside Popover (v4.5.4)",
             "labels": ["bug", "regression", "styling"],
             "component": "MultiSelect, Dropdown, Popover",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Select and MultiSelect opened with a Popover were both about 11 px off after the opening animation in Firefox. Manually reopening each one aligned it.",
+                "Both panels now align again when their opening transition ends. Firefox verified that the initial and manually reopened positions agree, and the production gallery covers both panels."
+            ],
             "reproducer": "https://stackblitz.com/edit/vcmfatgk?file=src%2FApp.vue",
-            "evidenceGap": "Check “MultiSelect dropdown misaligned when opened programmatically inside Popover (v4.5.4)” in the retained component after the reported step “Observe that the dropdown panel is horizontally misaligned”."
+            "resolvingCommit": "8b53ff3864b8ef9833d9787e65077fcdd2662481",
+            "test": {
+                "path": "scripts/browser-smoke.ts",
+                "name": "Programmatically opened choice menus stay aligned inside a popover"
+            }
         },
         {
             "number": 59,
