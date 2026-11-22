@@ -9,9 +9,9 @@
             :style="inputStyle"
             :defaultValue="inputFieldValue"
             :placeholder="placeholder"
-            :name="name"
+            :name="name || $formName"
             :size="size"
-            :invalid="invalid"
+            :invalid="$invalid"
             :variant="variant"
             :fluid="fluid"
             :required="required"
@@ -32,6 +32,7 @@
             @focus="onFocus"
             @blur="onBlur"
             @keydown="onKeyDown"
+            :formControl="{ novalidate: true }"
             :data-p-has-dropdown="showIcon && iconDisplay === 'button' && !inline"
             :data-p-has-e-icon="showIcon && iconDisplay === 'input' && !inline"
             :pt="ptm('pcInputText')"
@@ -818,8 +819,9 @@ export default defineComponent({
         };
     },
     watch: {
-        modelValue: {
+        d_value: {
             immediate: true,
+            deep: true,
             handler(newValue: ModelInput) {
                 this.rawValue = this.valueForSelectionMode(newValue);
                 this.updateCurrentMetaData();

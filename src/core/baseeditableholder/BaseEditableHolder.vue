@@ -157,10 +157,14 @@ export default defineComponent({
             return this.$formControl?.novalidate;
         },
         $formDefaultValue() {
-            return this.findNonEmpty(this.$formFieldInstance?.initialValue, getValueByPath(this.$formInstance?.initialValues, this.$formName));
+            if (!this.$formNovalidate) {
+                return this.findNonEmpty(this.$formFieldInstance?.initialValue, getValueByPath(this.$formInstance?.initialValues, this.$formName));
+            }
         },
         $formValue() {
-            return this.findNonEmpty(this.$formFieldInstance?.$field?.value, this.$formInstance?.getFieldState(this.$formName)?.value);
+            if (!this.$formNovalidate) {
+                return this.findNonEmpty(this.$formFieldInstance?.$field?.value, this.$formInstance?.getFieldState(this.$formName)?.value);
+            }
         },
         controlled() {
             return this.$inProps.hasOwnProperty('modelValue') || (!this.$inProps.hasOwnProperty('modelValue') && !this.$inProps.hasOwnProperty('defaultValue'));

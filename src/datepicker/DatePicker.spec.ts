@@ -1,7 +1,94 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
+import { h, nextTick } from 'vue';
 import PrimeVue from '../config/Config';
+import Form from '../forms/form/Form.vue';
+import FormField from '../forms/formfield/FormField.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
+
+it('uses Form values for the displayed date, selected calendar day, and time', async () => {
+    const initial = new Date(2026, 5, 10, 9, 30);
+    const next = new Date(2026, 5, 15, 14, 45);
+    const wrapper = mount(Form, {
+        props: { initialValues: { appointment: initial } },
+        slots: { default: () => h(DatePicker, { name: 'appointment', showTime: true, dateFormat: 'yy-mm-dd', appendTo: 'self' }) },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        const input = wrapper.get('input');
+
+        await input.trigger('focus');
+        expect(input.element.value).toBe('2026-06-10 09:30');
+        expect(wrapper.get('[data-pc-section="day"][aria-selected="true"]').text()).toBe('10');
+
+        wrapper.vm.setFieldValue('appointment', next);
+        await nextTick();
+        expect(input.element.value).toBe('2026-06-15 14:45');
+        expect(wrapper.get('[data-pc-section="day"][aria-selected="true"]').text()).toBe('15');
+
+        wrapper.vm.setFieldValue('appointment', null);
+        await nextTick();
+        expect(input.element.value).toBe('');
+        expect(wrapper.find('[data-pc-section="day"][aria-selected="true"]').exists()).toBe(false);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('keeps incomplete FormField date text out of the form value while typing', async () => {
+    const wrapper = mount(Form, {
+        slots: {
+            default: () => h(FormField, { name: 'appointment' }, () => h(DatePicker, { dateFormat: 'dd.mm.yy', appendTo: 'self' }))
+        },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        const input = wrapper.get('input');
+        const initialValue = wrapper.vm.getFieldState('appointment')?.value;
+
+        expect(input.attributes('name')).toBe('appointment');
+        await input.trigger('focus');
+        await input.setValue('2');
+        expect(input.element.value).toBe('2');
+        expect(wrapper.vm.getFieldState('appointment')?.value).toBe(initialValue);
+
+        await input.setValue('25.02.2026');
+        expect(wrapper.vm.getFieldState('appointment')?.value).toEqual(new Date(2026, 1, 25));
+        expect(input.element.value).toBe('25.02.2026');
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('clears an initial FormField date without restoring its original text', async () => {
+    const wrapper = mount(Form, {
+        slots: {
+            default: () =>
+                h(FormField, { name: 'appointment', initialValue: '2026-06-10' }, () =>
+                    h(DatePicker, { showButtonBar: true, dateFormat: 'dd.mm.yy', appendTo: 'self' })
+                )
+        },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        const input = wrapper.get('input');
+
+        await input.trigger('focus');
+        expect(input.element.value).not.toBe('');
+        await wrapper.get('.rs-datepicker-buttonbar button:last-child').trigger('click');
+        expect(wrapper.vm.getFieldState('appointment')?.value).toBeNull();
+        expect(input.element.value).toBe('');
+
+        await input.trigger('focus');
+        await input.trigger('blur');
+        expect(input.element.value).toBe('');
+    } finally {
+        wrapper.unmount();
+    }
+});
 
 it.each([10, 11, 12])('preserves the first typed month digit until month %i is complete', async (month) => {
     const wrapper = mount(DatePicker, {
