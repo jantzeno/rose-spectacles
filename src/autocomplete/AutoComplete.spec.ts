@@ -127,6 +127,25 @@ it('keeps an initial Form AutoComplete selection empty after clearing the input'
     }
 });
 
+it('allows the Enter default action in an empty chip input and consumes it when adding a chip', () => {
+    const wrapper = mountAutoComplete({ multiple: true, typeahead: false });
+
+    try {
+        const input = wrapper.get('input').element;
+        const pressEnter = () => input.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true, cancelable: true }));
+
+        expect(pressEnter()).toBe(true);
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+        input.value = ' Berlin ';
+        expect(pressEnter()).toBe(false);
+        expect(wrapper.emitted('update:modelValue')).toEqual([[['Berlin']]]);
+        expect(input.value).toBe('');
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it('renders the content slot in place of the default suggestion list', async () => {
     const wrapper = mount(AutoComplete, {
         props: { appendTo: 'self', suggestions: ['Oslo', 'Berlin'] },

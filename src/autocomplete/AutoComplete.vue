@@ -879,9 +879,8 @@ export default defineComponent({
                     if (input && query) {
                         this.updateModel(event, [...this.modelValues, query]);
                         input.value = '';
+                        event.preventDefault();
                     }
-
-                    event.preventDefault();
                 }
             } else {
                 if (!this.overlayVisible) {
