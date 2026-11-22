@@ -1174,10 +1174,16 @@
             "title": "<TreeSelect> As a filter component in <DataTable> select bug",
             "labels": ["bug"],
             "component": "TreeSelect, DataTable, Select",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The retained filter already recognized TreeSelect as a nested portalled panel. Baseline and current tests verify expanding and collapsing Documents, expanding Work, and selecting Work without dismissing the parent filter."
+            ],
             "reproducer": "https://stackblitz.com/edit/jdk9v2di-aajs64lo?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “When clicking on the filter icon in the column header, it…” in the retained component. Verify the expected result “It shall not close DataTable filter”."
+            "resolvingCommit": "d077026d394f6f738ccf3c9598b294cd61abd026",
+            "test": {
+                "path": "src/datatable/ColumnFilter.spec.ts",
+                "name": "keeps the filter menu open while expanding, collapsing, and selecting nested TreeSelect nodes"
+            }
         },
         {
             "number": 131,
@@ -1250,10 +1256,16 @@
             "title": "DataTable: Select input hides on focus filter input",
             "labels": ["bug"],
             "component": "DataTable, Select",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The retained Select filter already received focus and filtered to the typed option without completing the cell. The regression verifies the editor and overlay remain open across the pointer, focus, and input sequence."
+            ],
             "reproducer": "https://stackblitz.com/edit/px7xyfd9?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Click on filter field of select input” in the retained component in Edge 140.0.3485.94, Firefox 143.0.4. Verify the expected result “The select must remain visible when the filter field is focused”."
+            "resolvingCommit": "e96df8117a7e76002f2fd2a28eb04283185cfd6a",
+            "test": {
+                "path": "src/datatable/CellEditorOverlays.spec.ts",
+                "name": "keeps a portalled Select filter and its cell editor open while filtering"
+            }
         },
         {
             "number": 138,
@@ -1795,10 +1807,16 @@
             "title": "DataTable edit cell with datepicker not working well",
             "labels": ["bug"],
             "component": "DataTable, DatePicker",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The retained DatePicker grid already allowed pointer selection followed immediately by a move to another cell. Baseline and current tests verify a single calendar remains and both cell completions carry their own chosen dates. The test uses the retained Vue component."
+            ],
             "reproducer": "https://stackblitz.com/edit/ecgo8wxo",
-            "evidenceGap": "Check “DataTable edit cell with datepicker not working well” in the retained component with the reported setup “with volt the datepicker in datatable all actions on popup date are…”."
+            "resolvingCommit": "cebb8ed84ffb7e78e94647690889c867ea87d3b5",
+            "test": {
+                "path": "src/datatable/CellEditorOverlays.spec.ts",
+                "name": "opens only the next DatePicker when moving quickly between date cells"
+            }
         },
         {
             "number": 184,
@@ -2270,10 +2288,17 @@
             "title": "Multiselect in DataTable with cell edit closes after clicking 1 item since update to PrimeVue 4.3",
             "labels": ["bug", "regression"],
             "component": "MultiSelect, DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "Two successive pointer selections already remained in the editor until an outside click committed them. The related keyboard case is also covered separately and now keeps the cell open when MultiSelect consumes Enter.",
+                "A disposable Vite application in isolated Firefox accepted two native pointer selections and committed the combined value only after clicking a separate overlay."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-multiselect-in-datatable-issue-4-3-5?file=src%2FApp.vue",
-            "evidenceGap": "Check “Multiselect in DataTable with cell edit closes after clicking 1 item since…” in the retained component in Chrome 137.0.7151.104 after the reported step “Click on the multiselect. You'll see 3 options: IT, Board gaming and…”."
+            "resolvingCommit": "e96df8117a7e76002f2fd2a28eb04283185cfd6a",
+            "test": {
+                "path": "src/datatable/CellEditorOverlays.spec.ts",
+                "name": "allows several portalled MultiSelect pointer choices before an outside click commits the cell"
+            }
         },
         {
             "number": 223,
@@ -2679,9 +2704,15 @@
             "title": "Can not use Select with fiilter or auto complete to do datatable cell edit.",
             "labels": ["bug"],
             "component": "Select, AutoComplete, DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Check “Can not use Select with fiilter or auto complete to do datatable…” in the retained component with the reported setup “If I use autocomplete, I can use mouse to select the item…”."
+            "disposition": "already-fixed",
+            "evidence": [
+                "The retained AutoComplete already accepted the pointer selection before committing on an outside click. The paired Select regression verifies that focusing and typing into its portalled filter also leaves the cell editor open."
+            ],
+            "resolvingCommit": "e96df8117a7e76002f2fd2a28eb04283185cfd6a",
+            "test": {
+                "path": "src/datatable/CellEditorOverlays.spec.ts",
+                "name": "stores an AutoComplete pointer selection before committing the edited cell"
+            }
         },
         {
             "number": 257,
