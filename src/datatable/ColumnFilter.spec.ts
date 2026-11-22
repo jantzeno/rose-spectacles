@@ -148,6 +148,64 @@ describe('ColumnFilter', () => {
         }
     });
 
+    it('restores saved filters and initializes filters for newly added columns', async () => {
+        const stateKey = 'datatable-new-column-filter';
+        const storedFilter = { value: 'A', matchMode: FilterMatchMode.STARTS_WITH };
+        localStorage.setItem(stateKey, JSON.stringify({ filters: { id: storedFilter } }));
+
+        const wrapper = mount(
+            {
+                components: { DataTable, Column },
+                data: () => ({
+                    stateKey,
+                    rows: [
+                        { id: 'A1', name: 'Game Controller' },
+                        { id: 'A2', name: 'Black Watch' },
+                        { id: 'B1', name: 'Black Shirt' }
+                    ],
+                    filters: {
+                        id: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+                        name: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+                    }
+                }),
+                template: `
+                    <DataTable :value="rows" v-model:filters="filters" filterDisplay="menu" stateStorage="local" :stateKey="stateKey">
+                        <Column field="id" header="Code" />
+                        <Column field="name" header="Name" :showFilterMatchModes="false">
+                            <template #filter="{ filterModel }">
+                                <input aria-label="Filter name" v-model="filterModel.value" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue], stubs: { teleport: false } }, attachTo: document.body }
+        );
+
+        try {
+            await nextTick();
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['A1Game Controller', 'A2Black Watch']);
+
+            await wrapper.get('thead th:nth-child(2) button[aria-haspopup]').trigger('click');
+            const overlay = elementWithin(document, '.rs-datatable-filter-overlay');
+            const input = elementWithin(overlay, '[aria-label="Filter name"]') as HTMLInputElement;
+            expect(input.value).toBe('');
+            input.value = 'Black';
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            (elementWithin(overlay, 'button[aria-label="Apply"]') as HTMLButtonElement).click();
+            await nextTick();
+
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['A2Black Watch']);
+            expect(JSON.parse(localStorage.getItem(stateKey) ?? '{}').filters).toEqual({
+                id: storedFilter,
+                name: { value: 'Black', matchMode: FilterMatchMode.STARTS_WITH }
+            });
+        } finally {
+            wrapper.unmount();
+            localStorage.removeItem(stateKey);
+        }
+    });
+
     it('keeps the filter menu open while expanding, collapsing, and selecting nested TreeSelect nodes', async () => {
         const wrapper = mount(
             {

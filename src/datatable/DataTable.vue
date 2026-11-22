@@ -2193,7 +2193,7 @@ export default defineComponent({
             }
 
             if (this.hasFilters && typeof parsedState.filters === 'object' && parsedState.filters !== null) {
-                this.d_filters = this.cloneFilters(parsedState.filters);
+                this.d_filters = this.cloneFilters({ ...this.filters, ...parsedState.filters });
                 this.$emit('update:filters', this.d_filters);
                 restoredState.filters = this.d_filters;
             }
