@@ -39,12 +39,12 @@ it('removes the outside edit listener when the active cell unmounts', async () =
 
         await wrapper.setProps({ value: [] });
 
-        expect(removeListener).toHaveBeenCalledWith('mousedown', editListener);
+        expect(removeListener).toHaveBeenCalledWith('mousedown', editListener, true);
     } finally {
         wrapper.unmount();
         addListener.mockRestore();
         removeListener.mockRestore();
-        if (editListener) document.removeEventListener('mousedown', editListener);
+        if (editListener) document.removeEventListener('mousedown', editListener, true);
     }
 });
 

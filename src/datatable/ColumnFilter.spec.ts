@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import { h, nextTick } from 'vue';
 import Column from '../column/Column.vue';
+import TreeSelect from '../treeselect/TreeSelect.vue';
 import DataTable from './DataTable.vue';
 import ColumnFilter from './ColumnFilter.vue';
 
@@ -44,6 +45,57 @@ const mountTable = () =>
     );
 
 describe('ColumnFilter', () => {
+    it('keeps the filter menu open while expanding, collapsing, and selecting nested TreeSelect nodes', async () => {
+        const wrapper = mount(
+            {
+                components: { DataTable, Column, TreeSelect },
+                data: () => ({
+                    products,
+                    filters: { name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] } },
+                    nodes: [{ key: 'documents', label: 'Documents', children: [{ key: 'work', label: 'Work', children: [{ key: 'notes', label: 'Notes' }] }] }]
+                }),
+                template: `
+                    <DataTable :value="products" v-model:filters="filters" filterDisplay="menu">
+                        <Column field="name">
+                            <template #filter="{ filterModel }">
+                                <TreeSelect v-model="filterModel.value" :options="nodes" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue], stubs: { teleport: false, transition: false } }, attachTo: document.body }
+        );
+
+        try {
+            await wrapper.get('[data-pc-section="filter"] button').trigger('click');
+            const filter = elementWithin(document, '.rs-datatable-filter-overlay');
+            const click = async (element: Element) => {
+                element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                await nextTick();
+            };
+            await click(elementWithin(filter, '.rs-treeselect'));
+            const panel = elementWithin(document, '.rs-treeselect-overlay');
+            const documents = elementWithin(panel, '[aria-label="Documents"] [data-pc-section="nodetogglebutton"]');
+
+            await click(documents);
+            expect(filter.isConnected && panel.isConnected).toBe(true);
+            await click(documents);
+            expect(filter.isConnected && panel.isConnected).toBe(true);
+            expect(panel.querySelector('[aria-label="Work"]')).toBeNull();
+            await click(documents);
+            await click(elementWithin(panel, '[aria-label="Work"] [data-pc-section="nodetogglebutton"]'));
+            expect(elementWithin(panel, '[aria-label="Notes"]').isConnected).toBe(true);
+
+            await click(elementWithin(panel, '[aria-label="Work"] [data-pc-section="nodelabel"]'));
+            expect(filter.isConnected).toBe(true);
+            expect(elementWithin(filter, '.rs-treeselect-label').textContent).toContain('Work');
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('clears a row filter when Enter activates the last menu item', async () => {
         const wrapper = mount(ColumnFilter, {
             props: {

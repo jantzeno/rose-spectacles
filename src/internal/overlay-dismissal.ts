@@ -18,6 +18,25 @@ function isNestedOverlayPress(event: unknown): event is NestedOverlayPress {
     );
 }
 
+export function isOwnedOverlayTarget(owner: Element, target: Element) {
+    for (let node: Element | null = target; node && node !== owner.ownerDocument.body; node = node.parentElement) {
+        for (const { name, value } of node.attributes) {
+            if (value === '' && /^pc\w+$/.test(name) && owner.querySelector(`[${name}]`)) return true;
+        }
+    }
+
+    const overlay = target.closest('[data-pc-section="overlay"], [data-pc-section="panel"]');
+    if (!overlay || overlay.contains(owner)) return false;
+
+    for (const trigger of owner.querySelectorAll('[aria-controls], [aria-owns]')) {
+        const ids = `${trigger.getAttribute('aria-controls') ?? ''} ${trigger.getAttribute('aria-owns') ?? ''}`.trim().split(/\s+/);
+
+        if (ids.some((id) => overlay.contains(owner.ownerDocument.getElementById(id)))) return true;
+    }
+
+    return false;
+}
+
 export function listenForOutsideOverlayClick(trigger: HTMLElement, overlay: HTMLElement, dismiss: () => void) {
     const document = trigger.ownerDocument;
     let nestedPress = false;

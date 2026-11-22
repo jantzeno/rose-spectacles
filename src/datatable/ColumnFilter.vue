@@ -199,6 +199,7 @@ import TrashIcon from '../icons/trash/TrashIcon.vue';
 import Button from '../button/Button.vue';
 import FocusTrap from '../focustrap/FocusTrap';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
+import { isOwnedOverlayTarget } from '../internal/overlay-dismissal';
 import Portal from '../portal/Portal.vue';
 import Select from '../select/Select.vue';
 import { defineComponent, mergeProps, type ComponentPublicInstance, type PropType, type VNode } from 'vue';
@@ -646,17 +647,7 @@ export default defineComponent({
             );
         },
         isNestedOverlayClicked(target: Element) {
-            let node: Element | null = target;
-
-            while (node && node !== document.body) {
-                const attrSelectors = [...(node.attributes || [])].filter((attr) => attr.value === '' && /^pc\w+$/.test(attr.name)).map((attr) => attr.name);
-
-                if (attrSelectors.some((attrSelector) => this.overlay?.querySelector(`[${attrSelector}]`))) return true;
-
-                node = node.parentElement;
-            }
-
-            return false;
+            return this.overlay !== null && isOwnedOverlayTarget(this.overlay, target);
         },
         getIconElement(): HTMLElement | undefined {
             return (this.$refs.icon as ComponentPublicInstance | undefined)?.$el as HTMLElement | undefined;

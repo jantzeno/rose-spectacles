@@ -170,6 +170,7 @@
 <script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/frozen-column-layout';
+import { isOwnedOverlayTarget } from '../internal/overlay-dismissal';
 import { getAttribute, getFirstFocusableElement } from '../internal/utils/dom/index';
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
@@ -181,7 +182,6 @@ import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
 import PencilIcon from '../icons/pencil/PencilIcon.vue';
 import TimesIcon from '../icons/times/TimesIcon.vue';
 import Button from '../button/Button.vue';
-import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import Ripple from '../ripple/Ripple';
 import { defineComponent, inject, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 import RowCheckbox from './RowCheckbox.vue';
@@ -295,8 +295,6 @@ export default defineComponent({
             stopFrozenLayout: null as (() => void) | null,
             styleObject: {} as CSSProperties,
             documentEditListener: null as ((event: MouseEvent) => void) | null,
-            selfClick: false,
-            overlayEventListener: null as ((event: unknown) => void) | null,
             editCompleteTimeout: null as ReturnType<typeof setTimeout> | null
         };
     },
@@ -335,11 +333,6 @@ export default defineComponent({
         this.stopFrozenLayout?.();
         this.unbindDocumentEditListener();
         if (this.d_editing && this.editMode === 'cell') this.updateEditingMeta(false);
-
-        if (this.overlayEventListener) {
-            if (this.overlayEventListener) OverlayEventBus.off('overlay-click', this.overlayEventListener);
-            this.overlayEventListener = null;
-        }
     },
     methods: {
         updateEditingMeta(editing: boolean) {
@@ -398,31 +391,32 @@ export default defineComponent({
         },
         bindDocumentEditListener() {
             if (!this.documentEditListener) {
-                this.documentEditListener = (event) => {
-                    const target = event.target;
-                    this.selfClick =
-                        target instanceof Element &&
-                        (this.$el.contains(target) || target.closest('[data-pc-section="overlay"], [data-pc-section="panel"]') != null);
+                const cell = this.$el as HTMLElement;
 
+                this.documentEditListener = (event) => {
                     if (this.editCompleteTimeout) {
                         clearTimeout(this.editCompleteTimeout);
+                        this.editCompleteTimeout = null;
                     }
 
-                    if (!this.selfClick) {
-                        this.editCompleteTimeout = setTimeout(() => {
-                            this.completeEdit(event, 'outside');
-                        }, 1);
-                    }
+                    const path = event.composedPath();
+                    const [target] = path;
+
+                    if (path.includes(cell) || (target instanceof Element && isOwnedOverlayTarget(cell, target))) return;
+
+                    this.editCompleteTimeout = setTimeout(() => {
+                        this.editCompleteTimeout = null;
+                        this.completeEdit(event, 'outside');
+                    }, 1);
                 };
 
-                document.addEventListener('mousedown', this.documentEditListener);
+                cell.ownerDocument.addEventListener('mousedown', this.documentEditListener, true);
             }
         },
         unbindDocumentEditListener() {
             if (this.documentEditListener) {
-                document.removeEventListener('mousedown', this.documentEditListener);
+                (this.$el as HTMLElement).ownerDocument.removeEventListener('mousedown', this.documentEditListener, true);
                 this.documentEditListener = null;
-                this.selfClick = false;
 
                 if (this.editCompleteTimeout) {
                     clearTimeout(this.editCompleteTimeout);
@@ -433,8 +427,6 @@ export default defineComponent({
         switchCellToViewMode() {
             this.d_editing = false;
             this.unbindDocumentEditListener();
-            if (this.overlayEventListener) OverlayEventBus.off('overlay-click', this.overlayEventListener);
-            this.overlayEventListener = null;
         },
         onClick(event: MouseEvent) {
             if (this.editMode === 'cell' && this.isEditable()) {
@@ -442,12 +434,6 @@ export default defineComponent({
                     this.d_editing = true;
                     this.bindDocumentEditListener();
                     this.$emit('cell-edit-init', { originalEvent: event, data: this.rowData, field: this.field, index: this.rowIndex });
-
-                    this.overlayEventListener = (e) => {
-                        this.selfClick = e != null && typeof e === 'object' && 'target' in e && e.target instanceof Node && this.$el.contains(e.target);
-                    };
-
-                    OverlayEventBus.on('overlay-click', this.overlayEventListener);
                 }
             }
         },
@@ -474,7 +460,7 @@ export default defineComponent({
             }
         },
         onKeyDown(event: KeyboardEvent) {
-            if (this.editMode === 'cell') {
+            if (this.editMode === 'cell' && this.d_editing && !event.defaultPrevented) {
                 switch (event.code) {
                     case 'Enter':
                     case 'NumpadEnter':
