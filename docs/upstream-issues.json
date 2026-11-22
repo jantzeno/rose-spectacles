@@ -1511,10 +1511,12 @@
             "title": "DataTable unselect events not firing",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/3qyrdzqn?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable unselect events not firing” in the retained component with the reported setup “Unselecting a checkbox does not trigger the row-unselect event, but the row-select…”."
+            "disposition": "not-reproducible",
+            "evidence": [
+                "A Firefox table with a checkbox selection column and v-model:selection emitted the full selection arrays after two checks and one uncheck. It emitted row-select for each check and row-unselect for the uncheck.",
+                "The original StackBlitz was unavailable, so the original selection binding could not be compared to the local fixture."
+            ],
+            "reproducer": "https://stackblitz.com/edit/3qyrdzqn?file=src%2FApp.vue"
         },
         {
             "number": 157,
@@ -2879,9 +2881,12 @@
             "labels": ["bug"],
             "component": "DataTable",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "In Firefox, a lazy table mounted with zero records, then showed the restored third page after first and an in-range total arrived. No page event fired until Next was clicked.",
+                "Reducing totalRecords below the displayed offset did emit a page event and clamp to the last available page."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-ts-vite-issue-template-ww8hvbhj?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable fires @page on mount even with :first and lazy set” in the retained component in Chrome 123, Firefox 124, Edge 122 after the reported step “On component mount, restore a previous state from localStorage or similar, including…”."
+            "evidenceGap": "The original StackBlitz was unavailable. The totalRecords values and their timing relative to first are needed to distinguish the reported reset from the bounds correction."
         },
         {
             "number": 264,
@@ -5747,10 +5752,17 @@
             "title": "DataTable: Does not display columns with blank names",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A column with field set to the empty string rendered a blank cell even though the row contained that key, and CSV omitted that column.",
+                "The regression and Firefox verify the row values and the blank header in the table and CSV. Columns without a field remain absent from CSV."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-create-vue-issue-template-lde87q?file=src%2FApp.vue",
-            "evidenceGap": "A retained Vue/Vite fixture must verify “DataTable: Does not display columns with blank names”. The linked fixture needs to be reduced to local props, state, and interactions."
+            "resolvingCommit": "00e032a912658d98c769fe908c32dfd9aa0cabaa",
+            "test": {
+                "path": "src/datatable/DataTable.spec.ts",
+                "name": "renders and exports values whose column field is an empty string"
+            }
         },
         {
             "number": 518,
