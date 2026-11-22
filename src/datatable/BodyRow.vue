@@ -63,6 +63,7 @@
                     :selected="isSelected"
                     :frozenRow="frozenRow"
                     :rowspan="rowGroupMode === 'rowspan' ? calculateRowGroupSize(col) : null"
+                    :rowspanGroup="rowGroupMode === 'rowspan'"
                     :editMode="editMode"
                     :editing="editMode === 'row' && isRowEditing"
                     :editingKey="editingKey"

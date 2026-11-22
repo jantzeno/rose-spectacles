@@ -1,5 +1,12 @@
 <template>
-    <td v-if="loading" :style="containerStyle" :class="containerClass" role="cell" v-bind="{ ...getColumnPT('root'), ...getColumnPT('bodyCell') }">
+    <td
+        v-if="loading"
+        :style="containerStyle"
+        :class="containerClass"
+        :rowspan="rowspan ?? columnProp('rowspan')"
+        role="cell"
+        v-bind="{ ...getColumnPT('root'), ...getColumnPT('bodyCell') }"
+    >
         <component
             :is="columnSlots.loading"
             :data="rowData"
@@ -15,7 +22,7 @@
         :style="containerStyle"
         :class="containerClass"
         :colspan="columnProp('colspan')"
-        :rowspan="columnProp('rowspan')"
+        :rowspan="rowspan ?? columnProp('rowspan')"
         @click="onClick"
         @keydown="onKeyDown"
         role="cell"
@@ -24,6 +31,7 @@
         :data-p-editable-column="isEditable()"
         :data-p-cell-editing="d_editing"
         :data-p-frozen-column="columnProp('frozen')"
+        :data-p-column-index="rowspanGroup && columnProp('frozen') ? index : undefined"
     >
         <component
             v-if="columnSlots.body && !d_editing"
@@ -238,6 +246,14 @@ export default defineComponent({
         index: {
             type: Number,
             default: null
+        },
+        rowspan: {
+            type: [Number, String] as PropType<number | string | null>,
+            default: null
+        },
+        rowspanGroup: {
+            type: Boolean,
+            default: false
         },
         isRowExpanded: {
             type: Boolean,
@@ -607,7 +623,12 @@ export default defineComponent({
             this.updateStickyPosition();
         },
         updateStickyPosition() {
-            updateFrozenColumnOffset(this.$el, this.columnProp('alignFrozen'), this.styleObject);
+            const cell = this.$el as HTMLTableCellElement;
+            // The first row contains the grouped cells that later rows omit under their rowspans.
+            const firstRow = this.rowspanGroup ? cell.closest('tbody')?.rows[0] : undefined;
+            const reference = firstRow?.querySelector<HTMLTableCellElement>(`:scope > [data-p-column-index="${this.index}"]`);
+
+            updateFrozenColumnOffset(reference ?? cell, this.columnProp('alignFrozen'), this.styleObject);
         },
         getVirtualScrollerProp<K extends keyof VirtualScrollerContent>(option: K) {
             return this.virtualScrollerContentProps?.[option];
