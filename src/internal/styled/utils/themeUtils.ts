@@ -14,7 +14,7 @@ export default {
             attr: {
                 pattern: /^\[(.*)\]$/,
                 resolve(value: string) {
-                    return { type: 'attr', selector: `:root${value},:host${value}`, matched: this.pattern.test(value.trim()) };
+                    return { type: 'attr', selector: value, matched: this.pattern.test(value.trim()) };
                 }
             },
             media: {
@@ -329,10 +329,14 @@ export default {
                   return acc;
               }, undefined);
     },
-    getSelectorRule(selector1: any, selector2: any, type: string, css: string) {
-        return type === 'class' || type === 'attr'
-            ? getRule(isNotEmpty(selector2) ? `${selector1}${selector2},${selector1} ${selector2}` : selector1, css)
-            : getRule(selector1, getRule(selector2 ?? ':root,:host', css));
+    getSelectorRule(selector1: string, selector2: string | undefined, type: string, css: string) {
+        if (type === 'class' || type === 'attr') {
+            const selectors = type === 'attr' ? [`:root${selector1}`, `:host${selector1}`] : [selector1];
+            const scopedSelectors = selector2 ? selectors.flatMap((selector) => [`${selector}${selector2}`, `${selector} ${selector2}`]) : selectors;
+            return getRule(scopedSelectors.join(','), css);
+        }
+
+        return getRule(selector1, getRule(selector2 ?? ':root,:host', css));
     },
     transformCSS(name: string, css: string, mode?: string, type?: string, options: any = {}, set?: any, defaults?: any, selector?: string) {
         if (isNotEmpty(css)) {
