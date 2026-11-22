@@ -803,6 +803,7 @@ export default defineComponent({
             timePickerTimer: null as ReturnType<typeof setTimeout> | null,
             preventFocus: false,
             typeUpdate: false,
+            inputDraft: null as string | null,
             responsiveStyleElement: null as HTMLStyleElement | null,
             selectionStart: null as number | null,
             selectionEnd: null as number | null,
@@ -823,8 +824,10 @@ export default defineComponent({
                 this.rawValue = this.valueForSelectionMode(newValue);
                 this.updateCurrentMetaData();
 
-                if (!this.typeUpdate && !this.inline && this.input) {
-                    this.input.value = this.formatValue(this.rawValue);
+                if (!this.typeUpdate) {
+                    this.inputDraft = null;
+
+                    if (!this.inline && this.input) this.input.value = this.formatValue(this.rawValue);
                 }
 
                 this.typeUpdate = false;
@@ -833,6 +836,7 @@ export default defineComponent({
             }
         },
         selectionMode() {
+            this.inputDraft = null;
             this.rawValue = this.valueForSelectionMode(this.rawValue);
             this.updateCurrentMetaData();
 
@@ -1533,7 +1537,8 @@ export default defineComponent({
 
             this.$emit('date-select', date);
         },
-        updateModel(value: DateSelection) {
+        updateModel(value: DateSelection, draft: string | null = null) {
+            this.inputDraft = draft;
             this.rawValue = value;
 
             if (this.updateModelType === 'date') {
@@ -2843,18 +2848,21 @@ export default defineComponent({
         onInput(event: Event) {
             if (!(event.target instanceof HTMLInputElement)) return;
 
+            const draft = event.target.value;
+            this.inputDraft = draft;
             try {
                 this.selectionStart = this.input?.selectionStart ?? null;
                 this.selectionEnd = this.input?.selectionEnd ?? null;
 
-                this.updateClearIconVisibility(!isEmpty(event.target.value));
+                this.updateClearIconVisibility(!isEmpty(draft));
 
-                let value = this.parseValue(event.target.value);
+                const value = this.parseValue(draft);
 
                 if (this.isValidSelection(value)) {
                     this.typeUpdate = true;
-                    this.updateModel(value);
+                    this.updateModel(value, draft);
                     this.updateCurrentMetaData();
+                    this.$nextTick(() => (this.typeUpdate = false));
                 }
             } catch (err) {
                 /* NoOp */
@@ -2882,6 +2890,7 @@ export default defineComponent({
             this.formField.onBlur?.();
 
             this.focused = false;
+            this.inputDraft = null;
             event.target.value = this.formatValue(this.rawValue);
 
             this.updateClearIconVisibility(!isEmpty(event.target.value));
@@ -3065,7 +3074,7 @@ export default defineComponent({
             return today;
         },
         inputFieldValue() {
-            return this.formatValue(this.rawValue);
+            return this.inputDraft ?? this.formatValue(this.rawValue);
         },
         months(): CalendarMonth[] {
             const months: CalendarMonth[] = [];

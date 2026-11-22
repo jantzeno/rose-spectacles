@@ -3,6 +3,61 @@ import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import DatePicker from './DatePicker.vue';
 
+it.each([10, 11, 12])('preserves the first typed month digit until month %i is complete', async (month) => {
+    const wrapper = mount(DatePicker, {
+        props: {
+            modelValue: null,
+            view: 'month',
+            dateFormat: 'yy/mm',
+            'onUpdate:modelValue': (value: Date | null): void => {
+                void wrapper.setProps({ modelValue: value });
+            }
+        },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        const input = wrapper.get('input');
+
+        await input.trigger('focus');
+        await input.setValue('2024/1');
+        expect(input.element.value).toBe('2024/1');
+
+        await input.setValue(`${input.element.value}${month % 10}`);
+        await input.trigger('blur');
+
+        expect(input.element.value).toBe(`2024/${month}`);
+        expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([new Date(2024, month - 1, 1)]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('changes the range end time on successive hour increments without changing the start', async () => {
+    const start = new Date(2026, 5, 10, 9, 30);
+    const wrapper = mount(DatePicker, {
+        props: { inline: true, selectionMode: 'range', showTime: true, hourFormat: '24', modelValue: [start, null] },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        await wrapper.get('td[aria-label="15"] [data-pc-section="day"]').trigger('click');
+        const readRange = () => wrapper.emitted<[[Date, Date | null]]>('update:modelValue')!.at(-1)![0];
+        expect(readRange()).toEqual([start, new Date(2026, 5, 15, 9, 30)]);
+        await wrapper.setProps({ modelValue: readRange() });
+
+        const increment = wrapper.get('.rs-datepicker-hour-picker button:first-child');
+        for (const hour of [10, 11]) {
+            await increment.trigger('mousedown');
+            await increment.trigger('mouseup');
+            expect(readRange()).toEqual([start, new Date(2026, 5, 15, hour, 30)]);
+            await wrapper.setProps({ modelValue: readRange() });
+        }
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it.each([
     ['2026-06-10', new Date(2026, 5, 10)],
     ['2026-06-10T01:00:00Z', new Date('2026-06-10T01:00:00Z')]
