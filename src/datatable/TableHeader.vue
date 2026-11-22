@@ -5,6 +5,7 @@
         role="rowgroup"
         v-bind="columnGroup ? { ...ptm('thead', ptmTHeadOptions), ...getColumnGroupPT('root') } : ptm('thead', ptmTHeadOptions)"
         :data-p-scrollable="ptmTHeadOptions.context.scrollable"
+        :data-p-column-group="columnGroup ? true : undefined"
         data-pc-section="thead"
     >
         <template v-if="!columnGroup">
@@ -52,13 +53,23 @@
             </tr>
         </template>
         <template v-else>
-            <tr v-for="(row, i) of getHeaderRows()" :key="i" role="row" v-bind="{ ...ptm('headerRow'), ...getRowPT(row, 'root', i) }">
-                <template v-for="(col, j) of getHeaderColumns(row)" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || j">
+            <tr v-for="({ row, cells }, i) of groupedHeaderRows" :key="i" role="row" v-bind="{ ...ptm('headerRow'), ...getRowPT(row, 'root', i) }">
+                <template v-for="{ column: col, start, end } of cells" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || start">
                     <DTHeaderCell
-                        v-if="isColumnVisible(col) && typeof col.children !== 'string'"
                         :column="col"
+                        :index="start"
+                        :data-p-column-start="start"
+                        :data-p-column-end="end"
+                        :reorderableColumns="reorderableColumns"
+                        :resizableColumns="resizableColumns && end <= visibleColumnCount && (columnResizeMode !== 'fit' || end < visibleColumnCount)"
                         @column-click="$emit('column-click', $event)"
                         @column-mousedown="$emit('column-mousedown', $event)"
+                        @column-dragstart="$emit('column-dragstart', $event)"
+                        @column-dragover="$emit('column-dragover', $event)"
+                        @column-dragleave="$emit('column-dragleave', $event)"
+                        @column-drop="$emit('column-drop', $event)"
+                        @dragend="$emit('column-dragend')"
+                        @column-resizestart="$emit('column-resizestart', $event, end - 1)"
                         :groupRowsBy="groupRowsBy"
                         :groupRowSortField="groupRowSortField"
                         :sortMode="sortMode"
@@ -123,6 +134,7 @@ import { HelperSet, getVNodeProp } from '../core/utils/Utils';
 import { defineComponent, mergeProps, type PropType, type VNode } from 'vue';
 import FilterHeaderCell from './FilterHeaderCell.vue';
 import HeaderCell from './HeaderCell.vue';
+import { getColumnGroupLayout, projectColumnGroupLayout } from './column-group-layout';
 import { isRowGroupField, type RowGroupFields } from './row-groups';
 
 export default defineComponent({
@@ -135,6 +147,7 @@ export default defineComponent({
         'column-dragstart',
         'column-dragover',
         'column-dragleave',
+        'column-dragend',
         'column-drop',
         'column-resizestart',
         'checkbox-change',
@@ -152,6 +165,10 @@ export default defineComponent({
             type: null as unknown as PropType<VNode>,
             default: null
         },
+        columnOrder: {
+            type: Array as PropType<number[] | null>,
+            default: null
+        },
         columns: {
             type: null as unknown as PropType<VNode[]>,
             default: null
@@ -167,6 +184,10 @@ export default defineComponent({
         resizableColumns: {
             type: Boolean,
             default: false
+        },
+        columnResizeMode: {
+            type: String,
+            default: 'fit'
         },
         allRowsSelected: {
             type: Boolean,
@@ -324,14 +345,27 @@ export default defineComponent({
         getFilterColumnHeaderStyle(column: VNode) {
             return [this.columnProp(column, 'filterHeaderStyle'), this.columnProp(column, 'style')];
         },
-        getHeaderRows() {
-            return this.columnGroup ? this.d_headerRows.get(this.columnGroup, this.columnGroup.children) : [];
-        },
         getHeaderColumns(row: VNode) {
-            return this.d_headerColumns.get(row, row.children);
+            return this.d_headerColumns.get(row, row.children) ?? [];
         }
     },
     computed: {
+        headerRows() {
+            return this.columnGroup ? (this.d_headerRows.get(this.columnGroup, this.columnGroup.children) ?? []) : [];
+        },
+        visibleColumnCount() {
+            return this.columns?.filter(this.isColumnVisible).length ?? 0;
+        },
+        columnGroupLayout() {
+            return getColumnGroupLayout(
+                this.headerRows.map((row) => this.getHeaderColumns(row).filter((column) => this.isColumnVisible(column) && typeof column.children !== 'string'))
+            );
+        },
+        groupedHeaderRows() {
+            const layout = projectColumnGroupLayout(this.columnGroupLayout, this.columnOrder) ?? this.columnGroupLayout;
+
+            return this.headerRows.map((row, index) => ({ row, cells: layout[index] }));
+        },
         ptmTHeadOptions() {
             const { $parentInstance: parent } = this as typeof this & { $parentInstance?: { $parentInstance?: { scrollable?: boolean } } };
 

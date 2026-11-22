@@ -102,15 +102,25 @@
                         :style="[tableStyle, slotProps.spacerStyle]"
                         v-bind="{ ...tableProps, ...ptm('table') }"
                     >
+                        <colgroup v-if="headerColumnGroup && resizableColumns">
+                            <col
+                                v-for="(_, index) of visibleColumns"
+                                :key="index"
+                                :style="{ width: groupedColumnWidths[index] == null ? undefined : `${groupedColumnWidths[index]}px` }"
+                            />
+                        </colgroup>
                         <DTTableHeader
                             v-if="showHeaders"
+                            ref="tableHeader"
                             :columnGroup="headerColumnGroup"
+                            :columnOrder="groupedColumnOrder"
                             :columns="slotProps.columns"
                             :rowGroupMode="rowGroupMode"
                             :groupRowsBy="groupRowsBy"
                             :groupRowSortField="groupRowSortField ?? undefined"
                             :reorderableColumns="reorderableColumns"
                             :resizableColumns="resizableColumns"
+                            :columnResizeMode="columnResizeMode"
                             :allRowsSelected="allRowsSelected"
                             :empty="empty"
                             :sortMode="sortMode"
@@ -130,8 +140,9 @@
                             @column-dragstart="onColumnHeaderDragStart($event)"
                             @column-dragover="onColumnHeaderDragOver($event)"
                             @column-dragleave="onColumnHeaderDragLeave($event)"
+                            @column-dragend="endGroupedColumnDrag"
                             @column-drop="onColumnHeaderDrop($event)"
-                            @column-resizestart="onColumnResizeStart($event)"
+                            @column-resizestart="onColumnResizeStart"
                             @checkbox-change="toggleRowsWithCheckbox($event)"
                             :unstyled="unstyled"
                             :pt="pt"
@@ -258,7 +269,13 @@
                             :style="{ height: `calc(${slotProps.spacerStyle.height} - ${getRenderedWindowSize(slotProps)}px)` }"
                             v-bind="ptm('virtualScrollerSpacer')"
                         ></tbody>
-                        <DTTableFooter :columnGroup="footerColumnGroup" :columns="slotProps.columns" :pt="pt" />
+                        <DTTableFooter
+                            ref="tableFooter"
+                            :columnGroup="footerColumnGroup"
+                            :columnOrder="groupedColumnOrder"
+                            :columns="slotProps.columns"
+                            :pt="pt"
+                        />
                     </table>
                 </template>
             </DTVirtualScroller>
@@ -384,6 +401,7 @@ import TableBody from './TableBody.vue';
 import TableFooter from './TableFooter.vue';
 import TableHeader from './TableHeader.vue';
 import { getEditingRowKey, type EditingDraftChange, type EditingDrafts } from './editing-drafts';
+import { getColumnGroupMove, projectColumnGroupLayout, type GroupedColumn } from './column-group-layout';
 import { isRowGroupField, rowGroupKey, sameRowGroup } from './row-groups';
 import type {
     DataTableCellEditCancelEvent,
@@ -400,6 +418,7 @@ type ColumnKey = NonNullable<VNode['key']>;
 type FilterValue = DataTableFilterMeta[string];
 type KeyFlags = Record<string, number>;
 type ColumnWidth = string | number | undefined;
+type ColumnGroupView = { columnGroupLayout: GroupedColumn[][] };
 
 interface ColumnEvent<T extends Event> {
     originalEvent: T;
@@ -530,6 +549,9 @@ export default defineComponent({
             documentColumnResizeEndListener: null as (() => void) | null,
             lastResizeHelperX: 0,
             resizeColumnElement: null as HTMLElement | null,
+            resizeColumnIndex: null as number | null,
+            resizeColumnDelta: 0,
+            groupedColumnWidths: [] as ColumnWidth[],
             columnResizing: false,
             colReorderIconWidth: 0,
             colReorderIconHeight: 0,
@@ -629,6 +651,17 @@ export default defineComponent({
         this.d_columnGroups.clear();
     },
     updated() {
+        const order = this.groupedColumnOrder;
+        if (order && !this.acceptsGroupedColumnOrder(order)) this.d_columnOrder = null;
+
+        if (this.resizableColumns && this.headerColumnGroup && this.styleElement) {
+            this.destroyStyleElement();
+            this.columnWidthsKeys = null;
+        } else if (!this.headerColumnGroup && this.groupedColumnWidths.length) {
+            this.groupedColumnWidths = [];
+            this.columnWidthsKeys = null;
+        }
+
         this.restoreColumnWidthsByKey();
 
         if (this.isStateful()) {
@@ -1423,26 +1456,31 @@ export default defineComponent({
             this.d_first = 0;
             this.$emit('update:first', this.d_first);
         },
-        onColumnResizeStart(event: MouseEvent) {
+        onColumnResizeStart(event: MouseEvent, columnIndex?: number) {
             let containerLeft = getOffset(this.$el).left;
 
             if (!(event.target instanceof Element) || !event.target.parentElement) return;
 
             this.resizeColumnElement = event.target.parentElement;
+            this.resizeColumnIndex = columnIndex ?? null;
+            this.resizeColumnDelta = 0;
             this.columnResizing = true;
-            this.lastResizeHelperX = event.pageX - containerLeft + this.$el.scrollLeft;
+            this.lastResizeHelperX = (event.pageX ?? event.clientX + window.pageXOffset) - containerLeft + this.$el.scrollLeft;
 
             this.bindColumnResizeEvents();
         },
         onColumnResize(event: MouseEvent) {
             const resizeHelper = this.$refs.resizeHelper as HTMLElement;
             let containerLeft = getOffset(this.$el).left;
+            const helperX = (event.pageX ?? event.clientX + window.pageXOffset) - containerLeft + this.$el.scrollLeft;
+
+            this.resizeColumnDelta = helperX - this.lastResizeHelperX;
 
             this.$el.setAttribute('data-p-unselectable-text', 'true');
             !this.isUnstyled && addStyle(this.$el, { 'user-select': 'none' });
             resizeHelper.style.height = this.$el.offsetHeight + 'px';
             resizeHelper.style.top = 0 + 'px';
-            resizeHelper.style.left = event.pageX - containerLeft + this.$el.scrollLeft + 'px';
+            resizeHelper.style.left = helperX + 'px';
 
             resizeHelper.style.display = 'block';
         },
@@ -1452,24 +1490,33 @@ export default defineComponent({
 
             if (!resizeColumn) return;
 
-            let delta = isRTL(this.$el) ? this.lastResizeHelperX - resizeHelper.offsetLeft : resizeHelper.offsetLeft - this.lastResizeHelperX;
-            let columnWidth = resizeColumn.offsetWidth;
+            const columnIndex = this.resizeColumnIndex;
+            const groupedWidths = columnIndex == null ? undefined : this.measureGroupedColumnWidths();
+            const offset = columnIndex == null ? resizeHelper.offsetLeft - this.lastResizeHelperX : this.resizeColumnDelta;
+            const delta = isRTL(this.$el) ? -offset : offset;
+            let columnWidth = groupedWidths && columnIndex != null ? groupedWidths[columnIndex] : resizeColumn.offsetWidth;
             let newColumnWidth = columnWidth + delta;
-            let minWidth = resizeColumn.style.minWidth || 15;
+            const minWidth = parseInt(resizeColumn.style.minWidth || '15', 10);
+            const minColumnWidth = columnIndex == null ? minWidth : Math.max(15, minWidth - (resizeColumn.offsetWidth - columnWidth));
 
-            if (columnWidth + delta > parseInt(String(minWidth), 10)) {
+            if (newColumnWidth > minColumnWidth) {
                 if (this.columnResizeMode === 'fit') {
                     let nextColumn = resizeColumn.nextElementSibling;
-                    const nextColumnWidth = nextColumn instanceof HTMLElement ? nextColumn.offsetWidth - delta : 0;
+                    const nextColumnWidth =
+                        groupedWidths && columnIndex != null
+                            ? groupedWidths[columnIndex + 1] - delta
+                            : nextColumn instanceof HTMLElement
+                              ? nextColumn.offsetWidth - delta
+                              : 0;
 
                     if (newColumnWidth > 15 && nextColumnWidth > 15) {
-                        this.resizeTableCells(newColumnWidth, nextColumnWidth);
+                        this.resizeTableCells(newColumnWidth, nextColumnWidth, groupedWidths);
                     }
                 } else if (this.columnResizeMode === 'expand') {
                     const tableWidth = (this.$refs.table as HTMLTableElement).offsetWidth + delta + 'px';
 
                     // Reasoning: resize table cells before updating the table width so that it can use existing computed cell widths and adjust only the one column.
-                    this.resizeTableCells(newColumnWidth);
+                    this.resizeTableCells(newColumnWidth, undefined, groupedWidths);
                     this.updateTableWidth(tableWidth);
                 }
 
@@ -1481,6 +1528,7 @@ export default defineComponent({
 
             resizeHelper.style.display = 'none';
             this.resizeColumnElement = null;
+            this.resizeColumnIndex = null;
             this.$el.removeAttribute('data-p-unselectable-text');
             !this.isUnstyled && (this.$el.style['user-select'] = '');
 
@@ -1490,10 +1538,20 @@ export default defineComponent({
                 this.saveState();
             }
         },
-        resizeTableCells(newColumnWidth: number, nextColumnWidth?: number) {
+        resizeTableCells(newColumnWidth: number, nextColumnWidth?: number, groupedWidths?: number[]) {
             const resizeColumn = this.resizeColumnElement;
 
             if (!resizeColumn) return;
+
+            if (groupedWidths && this.resizeColumnIndex != null) {
+                groupedWidths[this.resizeColumnIndex] = newColumnWidth;
+                if (nextColumnWidth !== undefined) groupedWidths[this.resizeColumnIndex + 1] = nextColumnWidth;
+
+                this.cacheColumnWidthsByKey(groupedWidths);
+                this.addColumnWidthStyles(groupedWidths);
+
+                return;
+            }
 
             const colIndex = getIndex(resizeColumn);
             const widths: number[] = [];
@@ -1509,24 +1567,32 @@ export default defineComponent({
             this.addColumnWidthStyles(widths);
         },
         getVisibleColumnKeys(): ColumnKey[] | null {
-            if (this.headerColumnGroup) {
-                return null;
-            }
-
             const keys: ColumnKey[] = [];
 
             (this.columns || []).forEach((column, index) => {
-                if (
-                    this.columnProp(column, 'hidden') ||
-                    (this.rowGroupMode === 'subheader' && isRowGroupField(this.groupRowsBy, this.columnProp(column, 'field')))
-                ) {
-                    return;
+                if (this.isVisibleColumn(column)) {
+                    const key = this.headerColumnGroup
+                        ? this.groupedColumnKeys.get(column)
+                        : this.columnProp(column, 'columnKey') || this.columnProp(column, 'field');
+                    keys.push(key ?? index);
                 }
-
-                keys.push(this.columnProp(column, 'columnKey') || this.columnProp(column, 'field') || index);
             });
 
             return keys.length > 0 && new Set(keys).size === keys.length ? keys : null;
+        },
+        isVisibleColumn(column: VNode) {
+            return (
+                !this.columnProp(column, 'hidden') &&
+                (this.rowGroupMode !== 'subheader' || !isRowGroupField(this.groupRowsBy, this.columnProp(column, 'field')))
+            );
+        },
+        measureGroupedColumnWidths() {
+            const table = this.$refs.table as HTMLTableElement;
+
+            return Array.from(
+                table.querySelectorAll<HTMLTableColElement>(':scope > colgroup > col'),
+                (column) => column.getBoundingClientRect().width || column.offsetWidth
+            );
         },
         cacheColumnWidthsByKey(widths: ColumnWidth[]) {
             const keys = this.getVisibleColumnKeys();
@@ -1633,7 +1699,7 @@ export default defineComponent({
         onColumnHeaderDragStart(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event, column } = e;
 
-            if (this.columnResizing) {
+            if (!this.reorderableColumns || this.columnResizing || this.columnProp(column, 'reorderableColumn') === false) {
                 event.preventDefault();
 
                 return;
@@ -1648,36 +1714,45 @@ export default defineComponent({
         },
         onColumnHeaderDragOver(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event, column } = e;
-            const upIndicator = this.$refs.reorderIndicatorUp as HTMLElement;
-            const downIndicator = this.$refs.reorderIndicatorDown as HTMLElement;
-            let dropHeader = this.findParentHeader(event.target);
+            const dropHeader = this.findParentHeader(event.target);
 
-            if (this.reorderableColumns && this.draggedColumnElement && dropHeader && !this.columnProp(column, 'frozen')) {
+            if (!this.reorderableColumns || !this.draggedColumnElement || !dropHeader || this.columnProp(column, 'frozen')) return;
+
+            if (this.headerColumnGroup) {
+                const move = this.getGroupedColumnDrop(e, dropHeader);
+
+                if (!move) {
+                    this.onColumnHeaderDragLeave(e);
+                    return;
+                }
+
+                const { start, end } = move.destination;
+                const table = this.$refs.table as HTMLTableElement;
+                const destination = table.tHead?.querySelector<HTMLTableCellElement>(`th[data-p-column-start="${start}"][data-p-column-end="${end}"]`);
+
                 event.preventDefault();
-                let containerOffset = getOffset(this.$el);
-                let dropHeaderOffset = getOffset(dropHeader);
-
+                this.showColumnReorderIndicators(destination ?? dropHeader, move.right);
+            } else {
+                event.preventDefault();
                 if (this.draggedColumnElement !== dropHeader) {
-                    let targetLeft = dropHeaderOffset.left - containerOffset.left;
-                    let columnCenter = dropHeaderOffset.left + dropHeader.offsetWidth / 2;
-
-                    upIndicator.style.top = dropHeaderOffset.top - containerOffset.top - (this.colReorderIconHeight - 1) + 'px';
-                    downIndicator.style.top = dropHeaderOffset.top - containerOffset.top + dropHeader.offsetHeight + 'px';
-
-                    if (event.pageX > columnCenter) {
-                        upIndicator.style.left = targetLeft + dropHeader.offsetWidth - Math.ceil(this.colReorderIconWidth / 2) + 'px';
-                        downIndicator.style.left = targetLeft + dropHeader.offsetWidth - Math.ceil(this.colReorderIconWidth / 2) + 'px';
-                        this.dropPosition = 1;
-                    } else {
-                        upIndicator.style.left = targetLeft - Math.ceil(this.colReorderIconWidth / 2) + 'px';
-                        downIndicator.style.left = targetLeft - Math.ceil(this.colReorderIconWidth / 2) + 'px';
-                        this.dropPosition = -1;
-                    }
-
-                    upIndicator.style.display = 'block';
-                    downIndicator.style.display = 'block';
+                    const center = getOffset(dropHeader).left + dropHeader.offsetWidth / 2;
+                    this.showColumnReorderIndicators(dropHeader, event.pageX > center);
                 }
             }
+        },
+        showColumnReorderIndicators(header: HTMLTableCellElement, right: boolean) {
+            const upIndicator = this.$refs.reorderIndicatorUp as HTMLElement;
+            const downIndicator = this.$refs.reorderIndicatorDown as HTMLElement;
+            const containerOffset = getOffset(this.$el);
+            const headerOffset = getOffset(header);
+            const top = headerOffset.top - containerOffset.top;
+            const left = headerOffset.left - containerOffset.left + (right ? header.offsetWidth : 0) - Math.ceil(this.colReorderIconWidth / 2);
+
+            upIndicator.style.top = top - (this.colReorderIconHeight - 1) + 'px';
+            downIndicator.style.top = top + header.offsetHeight + 'px';
+            upIndicator.style.left = downIndicator.style.left = left + 'px';
+            upIndicator.style.display = downIndicator.style.display = 'block';
+            this.dropPosition = right ? 1 : -1;
         },
         onColumnHeaderDragLeave(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event } = e;
@@ -1692,12 +1767,18 @@ export default defineComponent({
         },
         onColumnHeaderDrop(e: ColumnEvent<DragEvent>) {
             const { originalEvent: event, column } = e;
+            const dropHeader = this.findParentHeader(event.target);
+
+            if (this.headerColumnGroup) {
+                if (dropHeader) this.reorderGroupedColumns(e, dropHeader);
+                this.endGroupedColumnDrag();
+                return;
+            }
+
             const upIndicator = this.$refs.reorderIndicatorUp as HTMLElement;
             const downIndicator = this.$refs.reorderIndicatorDown as HTMLElement;
 
             event.preventDefault();
-
-            const dropHeader = this.findParentHeader(event.target);
 
             if (this.draggedColumnElement && dropHeader) {
                 let dragIndex = getIndex(this.draggedColumnElement);
@@ -1750,6 +1831,67 @@ export default defineComponent({
                 this.draggedColumn = null;
                 this.dropPosition = null;
             }
+        },
+        acceptsGroupedColumnOrder(order: number[]) {
+            const header = this.$refs.tableHeader as ColumnGroupView | undefined;
+            const footer = this.$refs.tableFooter as ColumnGroupView | undefined;
+
+            return [header, footer].every((view) => !view || projectColumnGroupLayout(view.columnGroupLayout, order) !== null);
+        },
+        getGroupedColumnDrop(e: ColumnEvent<DragEvent>, dropHeader: HTMLTableCellElement) {
+            const header = this.$refs.tableHeader as ColumnGroupView | undefined;
+            if (!this.reorderableColumns || !this.draggedColumn || !header) return null;
+
+            const layout = projectColumnGroupLayout(header.columnGroupLayout, this.groupedColumnOrder);
+            const cells = layout?.flat() ?? [];
+            const from = cells.find((cell) => cell.column === this.draggedColumn);
+            const to = cells.find((cell) => cell.column === e.column);
+            if (!from || !to || this.columnProp(from.column, 'frozen') || this.columnProp(to.column, 'frozen')) return null;
+
+            const rect = dropHeader.getBoundingClientRect();
+            const right = e.originalEvent.clientX > rect.left + rect.width / 2;
+            const move = getColumnGroupMove(cells, from, to, this.visibleColumns.length, right !== isRTL(this.$el));
+            if (!move) return null;
+
+            const affected = this.visibleColumns.slice(Math.min(move.source.start, move.destination.start), Math.max(move.source.end, move.destination.end));
+            if (affected.some((column) => this.columnProp(column, 'frozen') || this.columnProp(column, 'reorderableColumn') === false)) return null;
+
+            const order = move.order.map((index) => this.groupedColumnOrder?.[index] ?? index);
+
+            return this.acceptsGroupedColumnOrder(order) ? { ...move, right } : null;
+        },
+        reorderGroupedColumns(e: ColumnEvent<DragEvent>, dropHeader: HTMLTableCellElement) {
+            const move = this.getGroupedColumnDrop(e, dropHeader);
+            if (!move) return;
+
+            const widths = this.resizableColumns ? this.measureGroupedColumnWidths() : [];
+            const reordered = move.order.map((index) => this.visibleColumns[index]);
+            const dragIndex = this.columns.indexOf(this.visibleColumns[move.source.start]);
+            const dropIndex = this.columns.indexOf(this.visibleColumns[move.insertAt]);
+            let visibleIndex = 0;
+
+            this.d_columnOrder = this.columns.map((column) => this.groupedColumnKeys.get(this.isVisibleColumn(column) ? reordered[visibleIndex++] : column)!);
+
+            if (widths.length === reordered.length) {
+                const orderedWidths = move.order.map((index) => widths[index]);
+                this.cacheColumnWidthsByKey(orderedWidths);
+                this.addColumnWidthStyles(orderedWidths);
+            }
+
+            e.originalEvent.preventDefault();
+            this.$emit('column-reorder', { originalEvent: e.originalEvent, dragIndex, dropIndex });
+        },
+        endGroupedColumnDrag() {
+            if (!this.draggedColumnElement) return;
+
+            const up = this.$refs.reorderIndicatorUp as HTMLElement | undefined;
+            const down = this.$refs.reorderIndicatorDown as HTMLElement | undefined;
+            if (up) up.style.display = 'none';
+            if (down) down.style.display = 'none';
+            this.draggedColumnElement.draggable = false;
+            this.draggedColumnElement = null;
+            this.draggedColumn = null;
+            this.dropPosition = null;
         },
         findParentHeader(element: EventTarget | null): HTMLTableCellElement | null {
             return element instanceof Element ? element.closest<HTMLTableCellElement>('th') : null;
@@ -2091,10 +2233,11 @@ export default defineComponent({
             this.$emit('state-restore', restoredState);
         },
         saveColumnWidths(state: PersistedState) {
-            const widths: number[] = [];
-            let headers = find(this.$el, 'thead[data-pc-section="thead"] > tr > th');
-
-            headers.forEach((header) => widths.push(getOuterWidth(header)));
+            const widths = this.headerColumnGroup
+                ? this.groupedColumnWidths.length
+                    ? this.groupedColumnWidths
+                    : this.measureGroupedColumnWidths()
+                : find(this.$el, 'thead[data-pc-section="thead"] > tr > th').map((header) => getOuterWidth(header));
             state.columnWidths = widths.join(',');
 
             const widthsByKey = this.getPersistableColumnWidths();
@@ -2116,6 +2259,13 @@ export default defineComponent({
             return Object.keys(widths).length ? widths : null;
         },
         addColumnWidthStyles(widths: ColumnWidth[]) {
+            if (this.headerColumnGroup) {
+                this.destroyStyleElement();
+                this.groupedColumnWidths = widths;
+
+                return;
+            }
+
             this.createStyleElement();
 
             let innerHTML = '';
@@ -2347,14 +2497,54 @@ export default defineComponent({
         }
     },
     computed: {
-        columns(): VNode[] {
-            const cols = this.d_columns.get(this);
+        visibleColumns() {
+            return this.columns.filter(this.isVisibleColumn);
+        },
+        sourceColumns(): VNode[] {
+            return this.d_columns.get(this) ?? [];
+        },
+        groupedColumnKeys(): Map<VNode, ColumnKey> {
+            const identifiers: (ColumnKey | null | undefined)[] = this.sourceColumns.map(
+                (column) => this.columnProp(column, 'columnKey') ?? this.columnProp(column, 'field') ?? column.key
+            );
+            const counts = new Map<ColumnKey, number>();
+            const keys = new Map<VNode, ColumnKey>();
 
-            if (cols && this.reorderableColumns && this.d_columnOrder) {
+            identifiers.forEach((key) => {
+                if (key != null) counts.set(key, (counts.get(key) ?? 0) + 1);
+            });
+
+            this.sourceColumns.forEach((column, index) => {
+                const key = identifiers[index];
+
+                if (key != null && counts.get(key) === 1) {
+                    keys.set(column, key);
+                } else {
+                    let ordinal = index;
+                    while (counts.has(ordinal)) ordinal += this.sourceColumns.length;
+                    keys.set(column, ordinal);
+                }
+            });
+
+            return keys;
+        },
+        groupedColumnOrder(): number[] | null {
+            if (!this.reorderableColumns || !this.d_columnOrder || !this.headerColumnGroup) return null;
+
+            const original = this.sourceColumns.filter(this.isVisibleColumn);
+            const order = this.visibleColumns.map((column) => original.indexOf(column));
+
+            return order.every((index, position) => index === position) ? null : order;
+        },
+        columns(): VNode[] {
+            const cols = this.headerColumnGroup ? this.sourceColumns : (this.d_columns.get(this) ?? []);
+
+            if (this.reorderableColumns && this.d_columnOrder) {
                 const orderedColumns: VNode[] = [];
+                const grouped = this.headerColumnGroup ? new Map(Array.from(this.groupedColumnKeys, ([column, key]) => [key, column] as const)) : null;
 
                 for (let columnKey of this.d_columnOrder) {
-                    let column = this.findColumnByKey(cols, columnKey);
+                    let column = grouped ? grouped.get(columnKey) : this.findColumnByKey(cols, columnKey);
 
                     if (column && !this.columnProp(column, 'hidden')) {
                         orderedColumns.push(column);
@@ -2364,7 +2554,7 @@ export default defineComponent({
                 return [...orderedColumns, ...cols.filter((item) => orderedColumns.indexOf(item) < 0)];
             }
 
-            return cols ?? [];
+            return cols;
         },
         columnGroups() {
             return this.d_columnGroups.get(this);

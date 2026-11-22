@@ -14,9 +14,9 @@
             </template>
         </tr>
         <template v-else>
-            <tr v-for="(row, i) of getFooterRows()" :key="i" role="row" v-bind="{ ...ptm('footerRow'), ...getRowPT(row, 'root', i) }">
-                <template v-for="(col, j) of getFooterColumns(row)" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || j">
-                    <DTFooterCell v-if="!columnProp(col, 'hidden')" :column="col" :index="i" :pt="pt" />
+            <tr v-for="({ row, cells }, i) of groupedFooterRows" :key="i" role="row" v-bind="{ ...ptm('footerRow'), ...getRowPT(row, 'root', i) }">
+                <template v-for="{ column: col, start } of cells" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || start">
+                    <DTFooterCell :column="col" :index="i" :pt="pt" />
                 </template>
             </tr>
         </template>
@@ -28,6 +28,7 @@ import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { HelperSet, getVNodeProp } from '../core/utils/Utils';
 import { defineComponent, mergeProps, type PropType, type VNode } from 'vue';
 import FooterCell from './FooterCell.vue';
+import { getColumnGroupLayout, projectColumnGroupLayout } from './column-group-layout';
 
 export default defineComponent({
     name: 'TableFooter',
@@ -36,6 +37,10 @@ export default defineComponent({
     props: {
         columnGroup: {
             type: null as unknown as PropType<VNode>,
+            default: null
+        },
+        columnOrder: {
+            type: Array as PropType<number[] | null>,
             default: null
         },
         columns: {
@@ -108,14 +113,22 @@ export default defineComponent({
         getRowProp(row: VNode) {
             return row.props && row.props.pt ? row.props.pt : undefined; //@todo
         },
-        getFooterRows() {
-            return this.columnGroup ? this.d_footerRows.get(this.columnGroup, this.columnGroup.children) : [];
-        },
         getFooterColumns(row: VNode) {
-            return this.d_footerColumns.get(row, row.children);
+            return this.d_footerColumns.get(row, row.children) ?? [];
         }
     },
     computed: {
+        footerRows() {
+            return this.columnGroup ? (this.d_footerRows.get(this.columnGroup, this.columnGroup.children) ?? []) : [];
+        },
+        columnGroupLayout() {
+            return getColumnGroupLayout(this.footerRows.map((row) => this.getFooterColumns(row).filter((column) => !this.columnProp(column, 'hidden'))));
+        },
+        groupedFooterRows() {
+            const layout = projectColumnGroupLayout(this.columnGroupLayout, this.columnOrder) ?? this.columnGroupLayout;
+
+            return this.footerRows.map((row, index) => ({ row, cells: layout[index] }));
+        },
         hasFooter() {
             let hasFooter = false;
 

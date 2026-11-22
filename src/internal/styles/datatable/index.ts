@@ -81,7 +81,7 @@ export const style = /*css*/ `
         position: relative;
     }
 
-    .rs-datatable-resizable-table-fit > .rs-datatable-thead > tr > th.rs-datatable-resizable-column:last-child .rs-datatable-column-resizer {
+    .rs-datatable-resizable-table-fit > .rs-datatable-thead:not([data-p-column-group="true"]) > tr > th.rs-datatable-resizable-column:last-child .rs-datatable-column-resizer {
         display: none;
     }
 
