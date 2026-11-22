@@ -523,7 +523,7 @@ export interface ColumnProps {
     rowReorderIcon?: string | undefined;
     /**
      * Defines if the column itself can be reordered with dragging.
-     * @defaultValue false
+     * @defaultValue true
      */
     reorderableColumn?: boolean | undefined;
     /**
