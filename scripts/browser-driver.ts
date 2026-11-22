@@ -197,10 +197,21 @@ async function firefoxDriver(): Promise<BrowserDriver> {
                 const point = await evaluate<{ x: number; y: number }>(`(async () => {
                     const target = document.querySelector(${JSON.stringify(selector)});
                     if (!target) throw new Error('Missing click target');
-                    target.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
-                    await new Promise(requestAnimationFrame);
-                    const rect = target.getBoundingClientRect();
-                    return { x: Math.round(rect.x + rect.width / 2), y: Math.round(rect.y + rect.height / 2) };
+
+                    const deadline = performance.now() + 2000;
+                    do {
+                        target.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' });
+                        await new Promise(requestAnimationFrame);
+
+                        const rect = target.getBoundingClientRect();
+                        const left = Math.max(0, rect.left), top = Math.max(0, rect.top);
+                        const right = Math.min(innerWidth, rect.right), bottom = Math.min(innerHeight, rect.bottom);
+                        const x = Math.floor((left + right) / 2), y = Math.floor((top + bottom) / 2);
+
+                        if (left < right && top < bottom && target.contains(document.elementFromPoint(x, y))) return { x, y };
+                    } while (performance.now() < deadline);
+
+                    throw new Error('Click target did not become visible: ' + ${JSON.stringify(selector)});
                 })()`);
                 await actions([
                     {
