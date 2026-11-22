@@ -2249,10 +2249,16 @@
             "title": "Nested data is not supported in the initialValues and setValues props of the Form component. ",
             "labels": ["bug"],
             "component": "Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The bracketed field already initialized from nested initialValues, but setValues ignored an update to the same nested path. The regression also verifies that omitted sibling fields keep their values and explicit empty nested and literal values clear their registered fields."
+            ],
             "reproducer": "https://stackblitz.com/edit/pgshym-yrzdhvvc?file=src%2FApp.vue",
-            "evidenceGap": "Check “Nested data is not supported in the initialValues and setValues props of…” in the retained component after the reported step “The value \"123\" from data.emails[0].title is expected to render in the nested…”."
+            "resolvingCommit": "7d019646a5b23fe9c36a073036e3b29a14f2819b",
+            "test": {
+                "path": "src/forms/form/FormInitialValue.spec.ts",
+                "name": "sets nested form values without clearing omitted fields and accepts literal paths"
+            }
         },
         {
             "number": 226,
@@ -2288,10 +2294,16 @@
             "title": "DatePicker not populated correctly when wrapped in Form",
             "labels": ["bug"],
             "component": "DatePicker, Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "DatePicker presented an unformatted Form Date and failed to use Form as the source of its calendar state. The regression verifies matching displayed date, time and selected calendar cell after initial registration, setFieldValue, and clearing."
+            ],
             "reproducer": "https://stackblitz.com/edit/w7r4g3mv?file=src%2FApp.vue",
-            "evidenceGap": "Check “DatePicker not populated correctly when wrapped in Form” in the retained component after the reported step “Open each DatePicker pop-up and compare selected values with the value from…”."
+            "resolvingCommit": "4353565231670f9d921ddf348891f74af3201329",
+            "test": {
+                "path": "src/datepicker/DatePicker.spec.ts",
+                "name": "uses Form values for the displayed date, selected calendar day, and time"
+            }
         },
         {
             "number": 229,
@@ -2505,10 +2517,16 @@
             "title": "fix(FormField): DatePicker - When used inside the forms(Form and FormField) component, the DatePicker automatically substitutes the date 02.01.2001.",
             "labels": ["bug"],
             "component": "FormField, DatePicker, Form",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Typing a single digit in the named FormField wrote that raw text into Form state before DatePicker could parse a date. The internal text input now remains isolated from Form. The regression verifies that the field retains the draft and its previous Form value, then stores a Date after entry is complete."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-a2af9paa?file=src%2FApp.vue",
-            "evidenceGap": "Check “fix(FormField): DatePicker - When used inside the forms(Form and FormField) component, the…” in the retained component after the reported step “The date should be entered automatically in the field as 02.01.2001”."
+            "resolvingCommit": "4353565231670f9d921ddf348891f74af3201329",
+            "test": {
+                "path": "src/datepicker/DatePicker.spec.ts",
+                "name": "keeps incomplete FormField date text out of the form value while typing"
+            }
         },
         {
             "number": 248,
@@ -2786,9 +2804,15 @@
             "title": "InputNumber cannot be customized to set the name attribute.",
             "labels": ["bug"],
             "component": "InputNumber",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Mount the named InputNumber inside the retained Form with the reported validation setup, then check both the native input name and the field value delivered to the resolver."
+            "disposition": "fixed",
+            "evidence": [
+                "The default input registered under the resolved name and forwarded unparsed strings into the numeric state. The regression verifies that the named native input displays the edits and that blur validation runs once with the committed number registered under that name."
+            ],
+            "resolvingCommit": "38e2a749ea925bd03fb834dcb7c24f9ba31ece82",
+            "test": {
+                "path": "src/inputnumber/InputNumber.spec.ts",
+                "name": "validates the committed number under the FormField name on input blur"
+            }
         },
         {
             "number": 271,
@@ -2951,10 +2975,16 @@
             "title": "PrimeVue Forms + Datepicker: \"Clear\" button sets date to initial value date-string - breaks input-format",
             "labels": ["bug"],
             "component": "DatePicker, Button",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The fork already clears through the button bar without replaying the initial string. The retained regression passed before the new DatePicker changes and verifies that a subsequent open and blur keep the displayed date empty."
+            ],
             "reproducer": "https://stackblitz.com/edit/pymk7jfu?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “add \":initialValue\" to PrimeVue form to preset the Datepicker-input to the…” in the retained component in Chrome 134.0.6998.118. Verify the expected result “date input field should be empty after hitting \"Clear\"”."
+            "resolvingCommit": "c408614fa30410f5b419594ab436d0da3d7c4d77",
+            "test": {
+                "path": "src/datepicker/DatePicker.spec.ts",
+                "name": "clears an initial FormField date without restoring its original text"
+            }
         },
         {
             "number": 288,
