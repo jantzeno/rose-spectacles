@@ -1978,10 +1978,16 @@
             "title": "DatePicker: can't type months like 10, 11, or 12  (view=\"month\", yy/mm format)",
             "labels": ["bug"],
             "component": "DatePicker",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Typing 2024/1 in the month view changed the draft to 2024/01 before the next digit could be entered. The regression uses a controlled model and verifies October, November, and December remain editable and emit the correct dates."
+            ],
             "reproducer": "https://stackblitz.com/edit/m9vkvmx2-g5pxmk5x?file=src%2FApp.vue",
-            "evidenceGap": "Check “DatePicker: can't type months like 10, 11, or 12 (view=\"month\", yy/mm format)” in the retained component in Edge, Versión 138.0.3351.77 after the reported step “Use the DatePicker component with view=\"month\" and dateFormat=\"yy/mm\"”."
+            "resolvingCommit": "7593bc89cd08c4a17f5fb487a24462350a898fa8",
+            "test": {
+                "path": "src/datepicker/DatePicker.spec.ts",
+                "name": "preserves the first typed month digit until month %i is complete"
+            }
         },
         {
             "number": 203,
@@ -2055,10 +2061,16 @@
             "title": "DatePicker: Unable to pick end time when using range selection with showTime",
             "labels": ["bug", "regression"],
             "component": "DatePicker",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The upstream fix is in the fork baseline. Before the new DatePicker changes, the retained calendar and time buttons already advanced the selected end to 10:30 and 11:30 while preserving the 09:30 start, including a controlled model update after each action."
+            ],
             "reproducer": "https://stackblitz.com/edit/c6vhndst-bvzgmuwc?file=src%2FApp.vue",
-            "evidenceGap": "Set a range in DatePicker with showTime, select an end date, and verify the end endpoint changes across successive hour adjustments without changing the start."
+            "resolvingCommit": "10d6a35898f5b57917c9a269776ca1b97d4f5ccd",
+            "test": {
+                "path": "src/datepicker/DatePicker.spec.ts",
+                "name": "changes the range end time on successive hour increments without changing the start"
+            }
         },
         {
             "number": 210,
@@ -2180,10 +2192,16 @@
             "title": "MutliSelect OptionDisabled value bypassed by chips remove icon",
             "labels": ["bug"],
             "component": "Chips",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The default selected chip exposed removal even when its option was disabled. The control is now absent for that chip and still removes enabled values. The grouped custom chip regression verifies that calling its removal callback also preserves the disabled scalar model value."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-89eftbjh?file=src%2FApp.vue",
-            "evidenceGap": "Check “MutliSelect OptionDisabled value bypassed by chips remove icon” in the retained component after the reported step “Add mutliselect with optionDisabled attribute and display:chips attribute then click the X…”."
+            "resolvingCommit": "3c325fb3961ed9ef44369786b7bef624621d5fbe",
+            "test": {
+                "path": "src/multiselect/MultiSelect.spec.ts",
+                "name": "hides removal for selected disabled chips and keeps enabled chips removable"
+            }
         },
         {
             "number": 221,
@@ -3225,10 +3243,16 @@
             "title": "Primevue DatePicker DisabledDates doesn't work when in monthly view mode",
             "labels": ["bug"],
             "component": "DatePicker",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The month-only picker accepted February 1 through the grid even when that date was disabled. The regression verifies that both pointer and keyboard activation leave the model unchanged and that an enabled March remains selectable."
+            ],
             "reproducer": "https://stackblitz.com/edit/3mrnf6a8?file=src%2FApp.vue",
-            "evidenceGap": "Check “Primevue DatePicker DisabledDates doesn't work when in monthly view mode” in the retained component after the reported step “February is filled in as 02/01/2025 even though every day in February…”."
+            "resolvingCommit": "83d48c936771b972597a05340fcf1bc97669322f",
+            "test": {
+                "path": "src/datepicker/DatePicker.spec.ts",
+                "name": "blocks click and keyboard selection of a month whose model date is disabled"
+            }
         },
         {
             "number": 315,
