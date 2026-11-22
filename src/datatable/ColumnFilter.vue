@@ -559,7 +559,7 @@ export default defineComponent({
             }
         },
         onMenuMatchModeChange(value: string, index: number) {
-            const constraint = this.fieldFilter?.constraints?.[index];
+            const constraint = this.fieldConstraints[index];
             if (!constraint) return;
 
             constraint.matchMode = value;

@@ -246,6 +246,44 @@ describe('ColumnFilter', () => {
         }
     });
 
+    it('changes the match mode of a menu filter with a single value', async () => {
+        const wrapper = mount(
+            {
+                components: { DataTable, Column },
+                data: () => ({ products, filters: { name: { value: 'Watch', matchMode: FilterMatchMode.STARTS_WITH } } }),
+                template: `
+                    <DataTable :value="products" v-model:filters="filters" filterDisplay="menu">
+                        <Column field="name" header="Name" :showFilterOperator="false" :showAddButton="false" :showApplyButton="false">
+                            <template #filter="{ filterModel }">
+                                <input aria-label="Filter name" v-model="filterModel.value" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue], stubs: { teleport: false } }, attachTo: document.body }
+        );
+
+        try {
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).not.toContain('Black Watch');
+            await wrapper.get('thead button[aria-haspopup]').trigger('click');
+            const overlay = elementWithin(document, '.rs-datatable-filter-overlay');
+            elementWithin(overlay, '.rs-select').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            await nextTick();
+
+            const options = elementWithin(document, '.rs-select-overlay').querySelectorAll<HTMLElement>('[role="option"]');
+            const contains = [...options].find((option) => option.textContent?.trim() === 'Contains');
+            assert(contains, 'Missing Contains match mode');
+            contains.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+            await nextTick();
+
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['Black Watch']);
+            expect(wrapper.getComponent(DataTable).emitted('update:filters')).toEqual([[{ name: { value: 'Watch', matchMode: FilterMatchMode.CONTAINS } }]]);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('keeps the filter menu open while expanding, collapsing, and selecting nested TreeSelect nodes', async () => {
         const wrapper = mount(
             {
