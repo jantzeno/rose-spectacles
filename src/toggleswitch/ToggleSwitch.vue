@@ -52,9 +52,11 @@ export default defineComponent({
             if (!this.disabled && !this.readonly) {
                 const newValue = this.checked ? this.falseValue : this.trueValue;
 
-                this.writeValue(newValue, event);
+                this.writeValue(newValue, event, !this.hasModelValue);
                 this.$emit('change', event);
             }
+
+            if (event.target instanceof HTMLInputElement) event.target.checked = this.checked;
         },
         onFocus(event: FocusEvent) {
             this.$emit('focus', event);
@@ -66,7 +68,7 @@ export default defineComponent({
     },
     computed: {
         checked() {
-            return this.d_value === this.trueValue;
+            return (this.hasModelValue ? this.modelValue : this.d_value) === this.trueValue;
         },
         dataP() {
             return cn({

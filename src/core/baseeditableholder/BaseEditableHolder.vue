@@ -117,11 +117,9 @@ export default defineComponent({
         }
     },
     methods: {
-        writeValue(value: unknown, event?: Event) {
-            if (this.controlled) {
-                this.d_value = value;
-                this.$emit('update:modelValue', value);
-            }
+        writeValue(value: unknown, event?: Event, updateLocalValue = this.controlled) {
+            if (updateLocalValue) this.d_value = value;
+            if (this.controlled) this.$emit('update:modelValue', value);
 
             this.$emit('value-change', value);
 
@@ -166,8 +164,13 @@ export default defineComponent({
                 return this.findNonEmpty(this.$formFieldInstance?.$field?.value, this.$formInstance?.getFieldState(this.$formName)?.value);
             }
         },
+        hasModelValue() {
+            const props = this.$.vnode.props;
+
+            return !!props && (Object.hasOwn(props, 'modelValue') || Object.hasOwn(props, 'model-value'));
+        },
         controlled() {
-            return this.$inProps.hasOwnProperty('modelValue') || (!this.$inProps.hasOwnProperty('modelValue') && !this.$inProps.hasOwnProperty('defaultValue'));
+            return this.hasModelValue || !Object.hasOwn(this.$inProps, 'defaultValue');
         },
         // @deprecated use $filled instead
         filled() {

@@ -1,6 +1,38 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import ToggleButton from './ToggleButton.vue';
 
+it('keeps the controlled button unpressed until the model prop changes', async () => {
+    const wrapper = mount(ToggleButton, { props: { modelValue: false } });
+
+    try {
+        const button = wrapper.get('button');
+        await button.trigger('click');
+        await button.trigger('click');
+
+        expect(wrapper.emitted('update:modelValue')).toEqual([[true], [true]]);
+        expect(button.attributes('aria-pressed')).toBe('false');
+
+        await wrapper.setProps({ modelValue: true });
+        expect(button.attributes('aria-pressed')).toBe('true');
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('toggles local button state initialized through defaultValue', async () => {
+    const wrapper = mount(ToggleButton, { props: { defaultValue: false } });
+
+    try {
+        const button = wrapper.get('button');
+        expect(button.attributes('aria-pressed')).toBe('false');
+        await button.trigger('click');
+        expect(button.attributes('aria-pressed')).toBe('true');
+        expect(wrapper.emitted('value-change')).toEqual([[true]]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 describe('ToggleButton', () => {
     let wrapper: VueWrapper<any>;
 

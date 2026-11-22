@@ -5,7 +5,7 @@
         :class="cx('root')"
         :tabindex="tabindex"
         :disabled="disabled"
-        :aria-pressed="d_value"
+        :aria-pressed="active"
         @click="onChange"
         @blur="onBlur"
         v-bind="getPTOptions('root')"
@@ -17,8 +17,8 @@
     >
         <span :class="cx('content')" v-bind="getPTOptions('content')" :data-p="dataP">
             <slot>
-                <slot name="icon" :value="d_value" :class="cx('icon')">
-                    <span v-if="onIcon || offIcon" :class="[cx('icon'), d_value ? onIcon : offIcon]" v-bind="getPTOptions('icon')" />
+                <slot name="icon" :value="toggleValue" :class="cx('icon')">
+                    <span v-if="onIcon || offIcon" :class="[cx('icon'), active ? onIcon : offIcon]" v-bind="getPTOptions('icon')" />
                 </slot>
                 <span :class="cx('label')" v-bind="getPTOptions('label')">{{ label }}</span>
             </slot>
@@ -51,7 +51,7 @@ export default defineComponent({
         },
         onChange(event: Event) {
             if (!this.disabled && !this.readonly) {
-                this.writeValue(!this.d_value, event);
+                this.writeValue(!this.active, event, !this.hasModelValue);
                 this.$emit('change', event);
             }
         },
@@ -60,14 +60,17 @@ export default defineComponent({
         }
     },
     computed: {
+        toggleValue() {
+            return this.hasModelValue ? this.modelValue : this.d_value;
+        },
         active() {
-            return this.d_value === true;
+            return this.toggleValue === true;
         },
         hasLabel() {
             return isNotEmpty(this.onLabel) && isNotEmpty(this.offLabel);
         },
         label() {
-            return this.hasLabel ? (this.d_value ? this.onLabel : this.offLabel) : '\u00A0';
+            return this.hasLabel ? (this.active ? this.onLabel : this.offLabel) : '\u00A0';
         },
         dataP() {
             return cn({
