@@ -9,6 +9,7 @@
                 :unstyled="unstyled"
                 :size="size"
                 :readonly="isOptionReadonly(option)"
+                :formControl="{ novalidate: true }"
                 @change="onOptionSelect($event, option, index)"
                 :pt="ptm('pcToggleButton')"
             >
