@@ -1396,12 +1396,13 @@ export default defineComponent({
 
             for (let i = 0; i < this.columns.length; i++) {
                 let column = this.columns[i];
+                const field = this.columnProp(column, 'field');
 
-                if (this.columnProp(column, 'exportable') !== false && this.columnProp(column, 'field')) {
+                if (this.columnProp(column, 'exportable') !== false && (field || field === '')) {
                     if (headerInitiated) csv += this.csvSeparator;
                     else headerInitiated = true;
 
-                    csv += '"' + (this.columnProp(column, 'exportHeader') || this.columnProp(column, 'header') || this.columnProp(column, 'field')) + '"';
+                    csv += '"' + (this.columnProp(column, 'exportHeader') || this.columnProp(column, 'header') || field) + '"';
                 }
             }
 
@@ -1413,18 +1414,19 @@ export default defineComponent({
 
                     for (let i = 0; i < this.columns.length; i++) {
                         let column = this.columns[i];
+                        const field = this.columnProp(column, 'field');
 
-                        if (this.columnProp(column, 'exportable') !== false && this.columnProp(column, 'field')) {
+                        if (this.columnProp(column, 'exportable') !== false && (field || field === '')) {
                             if (rowInitiated) csv += this.csvSeparator;
                             else rowInitiated = true;
 
-                            let cellData = resolveFieldData(record, this.columnProp(column, 'field'));
+                            let cellData = resolveFieldData(record, field);
 
                             if (cellData != null) {
                                 if (this.exportFunction) {
                                     cellData = this.exportFunction({
                                         data: cellData,
-                                        field: this.columnProp(column, 'field')
+                                        field
                                     });
                                 } else cellData = String(cellData).replace(/"/g, '""');
                             } else cellData = '';

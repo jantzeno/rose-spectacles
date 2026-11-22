@@ -544,6 +544,22 @@ describe('DataTable.vue', () => {
         expect(sortableTH.attributes()['aria-sort']).toBe('none');
     });
 
+    it('renders and exports values whose column field is an empty string', () => {
+        const table = mount(DataTable, {
+            global: { components: { Column } },
+            props: { value: [{ '': 'A-01', name: 'Copper' }] },
+            slots: { default: '<Column field="" /><Column field="name" header="Name" /><Column header="Action" />' }
+        });
+
+        try {
+            expect(table.findAll('thead th').map((cell) => cell.text())).toEqual(['', 'Name', 'Action']);
+            expect(table.findAll('tbody td').map((cell) => cell.text())).toEqual(['A-01', 'Copper', '']);
+            expect(table.vm.generateCSV()).toBe('\ufeff"","Name"\n"A-01","Copper"\n');
+        } finally {
+            table.unmount();
+        }
+    });
+
     // filtering
     it.each(['single', 'multiple'])('emits the displayed sort order when filtering a %s-sort table', async (sortMode) => {
         const rows = [
