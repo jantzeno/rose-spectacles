@@ -107,7 +107,7 @@ it('rejects removal of a grouped disabled option through a custom chip callback'
             optionValue: 'code',
             optionGroupLabel: 'label',
             optionGroupChildren: 'items',
-            optionDisabled: (option: City) => option.disabled === true,
+            optionDisabled: (option: unknown) => typeof option === 'object' && option !== null && 'disabled' in option && option.disabled === true,
             modelValue: ['RM', 'PRS'],
             display: 'chip'
         },
