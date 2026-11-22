@@ -32,7 +32,7 @@ const mountAutoComplete = (props: AutoCompleteProps = {}, component: Component =
         props: { multiple: true, suggestions: cities(), optionLabel: 'name', ...props }
     }) as unknown as AutoCompleteWrapper;
 
-const openOverlay = async (wrapper: AutoCompleteWrapper) => {
+const openOverlay = async (wrapper: { vm: { show: () => void } }) => {
     wrapper.vm.show();
     await nextTick();
 };

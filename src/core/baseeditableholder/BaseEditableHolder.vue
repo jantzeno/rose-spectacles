@@ -117,8 +117,8 @@ export default defineComponent({
         }
     },
     methods: {
-        writeValue(value: unknown, event?: Event, updateLocalValue = this.controlled) {
-            if (updateLocalValue) this.d_value = value;
+        writeValue(value: unknown, event?: Event, updateLocalValue?: boolean) {
+            if (updateLocalValue ?? this.controlled) this.d_value = value;
             if (this.controlled) this.$emit('update:modelValue', value);
 
             this.$emit('value-change', value);
