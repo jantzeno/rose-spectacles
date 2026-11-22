@@ -3774,10 +3774,11 @@
             "title": "In DataTable, frozen columns prevent the full row from being highlighted when a row is selected",
             "labels": ["bug", "styling"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/svqjyt?file=src%2FApp.vue",
-            "evidenceGap": "Check “In DataTable, frozen columns prevent the full row from being highlighted when…” in the retained component with the reported setup “Requirement: Ensure that when a row is selected in the DataTable, the…”."
+            "disposition": "not-reproducible",
+            "evidence": [
+                "In headless Firefox, clicking a scrollable cell selected the entire row. The app supplied the selected-background token. After horizontal scrolling, the frozen cell had the same computed background as its row, and the transparent scrollable cells showed the row background."
+            ],
+            "reproducer": "https://stackblitz.com/edit/svqjyt?file=src%2FApp.vue"
         },
         {
             "number": 350,
@@ -4378,13 +4379,17 @@
             "title": "DataTable: rowGroupToggler styling from pt in Column not applied",
             "labels": ["bug"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
+            "disposition": "fixed",
             "evidence": [
-                "Firefox applied the retained DataTable-level rowToggleButton pass-through to the group button and Column-level rowToggleButton to the separate record button.",
-                "The report names the PrimeVue 3 Column key rowGroupToggler. The retained runtime uses its DataTable-level section for group buttons."
+                "The report uses the PrimeVue 3 Column option rowGroupToggler. Firefox verified group button styling through the retained DataTable-level rowToggleButton section and separate record button styling through the Column-level section.",
+                "The strict packed consumer rejected rowToggleButton in a DataTablePassThroughOptions object even though the retained runtime applied it. The public DataTable type now declares that section."
             ],
             "reproducer": "https://stackblitz.com/edit/dkmxlv?file=src%2FApp.vue",
-            "evidenceGap": "Test the DataTable-level rowToggleButton section in a strict packed Vue consumer. The public DataTablePassThroughOptions currently omits that section."
+            "resolvingCommit": "2d6b47301a2311a3c2f74db63f2988c05ca099f6",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "Packed DataTable pass-through accepts attributes for the group toggle button"
+            }
         },
         {
             "number": 405,
