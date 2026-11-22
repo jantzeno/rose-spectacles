@@ -562,6 +562,7 @@ export default defineComponent({
             dropPosition: null as number | null,
             draggedRowIndex: null as number | null,
             droppedRowIndex: null as number | null,
+            rowDropIndicator: null as { row: HTMLElement; edge: 'top' | 'bottom' } | null,
             rowDragging: false,
             columnWidthsState: null as string | null,
             columnWidthsByKeyState: null as PersistedState['columnWidthsByKey'] | null,
@@ -648,6 +649,7 @@ export default defineComponent({
     beforeUnmount() {
         this.unbindColumnResizeEvents();
         this.destroyStyleElement();
+        this.setRowDropIndicator();
 
         this.d_columns.clear();
         this.d_columnGroups.clear();
@@ -1935,72 +1937,70 @@ export default defineComponent({
             const event = e.originalEvent;
             const index = e.index;
 
+            this.setRowDropIndicator();
+            this.droppedRowIndex = null;
             this.rowDragging = true;
             this.draggedRowIndex = index;
             event.dataTransfer?.setData('text', 'b'); // For firefox
         },
         onRowDragOver(e: RowDragEvent) {
-            const event = e.originalEvent;
-            const index = e.index;
+            const { originalEvent: event, index } = e;
+            const row = event.currentTarget;
 
-            if (this.rowDragging && this.draggedRowIndex !== index) {
-                const rowElement = event.currentTarget;
-
-                if (!(rowElement instanceof HTMLElement)) return;
-
-                let rowY = getOffset(rowElement).top;
-                let pageY = event.pageY;
-                let rowMidY = rowY + getOuterHeight(rowElement) / 2;
-                let prevRowElement = rowElement.previousElementSibling;
-
-                if (pageY < rowMidY) {
-                    rowElement.setAttribute('data-p-datatable-dragpoint-bottom', 'false');
-                    !this.isUnstyled && removeClass(rowElement, 'rs-datatable-dragpoint-bottom');
-
-                    this.droppedRowIndex = index;
-
-                    if (prevRowElement) {
-                        prevRowElement.setAttribute('data-p-datatable-dragpoint-bottom', 'true');
-                        !this.isUnstyled && addClass(prevRowElement, 'rs-datatable-dragpoint-bottom');
-                    } else {
-                        rowElement.setAttribute('data-p-datatable-dragpoint-top', 'true');
-                        !this.isUnstyled && addClass(rowElement, 'rs-datatable-dragpoint-top');
-                    }
-                } else {
-                    if (prevRowElement) {
-                        prevRowElement.setAttribute('data-p-datatable-dragpoint-bottom', 'false');
-                        !this.isUnstyled && removeClass(prevRowElement, 'rs-datatable-dragpoint-bottom');
-                    } else {
-                        rowElement.setAttribute('data-p-datatable-dragpoint-top', 'true');
-                        !this.isUnstyled && addClass(rowElement, 'rs-datatable-dragpoint-top');
-                    }
-
-                    this.droppedRowIndex = index + 1;
-                    rowElement.setAttribute('data-p-datatable-dragpoint-bottom', 'true');
-                    !this.isUnstyled && addClass(rowElement, 'rs-datatable-dragpoint-bottom');
-                }
-
-                event.preventDefault();
+            if (!this.rowDragging || !(row instanceof HTMLElement)) return;
+            if (this.draggedRowIndex === index) {
+                this.setRowDropIndicator();
+                this.droppedRowIndex = null;
+                return;
             }
+
+            const rect = row.getBoundingClientRect();
+            const before = event.clientY < rect.top + rect.height / 2;
+            const previous = row.previousElementSibling;
+            const previousRow = previous instanceof HTMLElement && previous.hasAttribute('data-p-index') ? previous : null;
+
+            this.droppedRowIndex = before ? index : index + 1;
+            // Either side of the same boundary between rows uses the same marker.
+            if (before) this.setRowDropIndicator(previousRow ?? row, previousRow ? 'bottom' : 'top');
+            else this.setRowDropIndicator(row);
+
+            event.preventDefault();
         },
         onRowDragLeave(event: DragEvent) {
-            const rowElement = event.currentTarget;
+            const row = event.currentTarget;
+            if (!(row instanceof HTMLElement) || !this.rowDragging) return;
 
-            if (!(rowElement instanceof HTMLElement)) return;
+            const related = event.relatedTarget;
+            const nextRow = related instanceof Element ? related.closest('tr[data-p-index]') : null;
+            if (nextRow?.parentElement === row.parentElement) return;
 
-            let prevRowElement = rowElement.previousElementSibling;
-
-            if (prevRowElement) {
-                prevRowElement.setAttribute('data-p-datatable-dragpoint-bottom', 'false');
-                !this.isUnstyled && removeClass(prevRowElement, 'rs-datatable-dragpoint-bottom');
+            if (!related && row.parentElement) {
+                const { left, right, top, bottom } = row.parentElement.getBoundingClientRect();
+                if (event.clientX >= left && event.clientX < right && event.clientY >= top && event.clientY < bottom) return;
             }
 
-            rowElement.setAttribute('data-p-datatable-dragpoint-bottom', 'false');
-            !this.isUnstyled && removeClass(rowElement, 'rs-datatable-dragpoint-bottom');
-            rowElement.setAttribute('data-p-datatable-dragpoint-top', 'false');
-            !this.isUnstyled && removeClass(rowElement, 'rs-datatable-dragpoint-top');
+            this.setRowDropIndicator();
+            this.droppedRowIndex = null;
+        },
+        setRowDropIndicator(row?: HTMLElement, edge: 'top' | 'bottom' = 'bottom') {
+            const previous = this.rowDropIndicator;
+
+            if (previous && previous.row === row && previous.edge === edge) return;
+
+            if (previous) {
+                previous.row.setAttribute(`data-p-datatable-dragpoint-${previous.edge}`, 'false');
+                removeClass(previous.row, `rs-datatable-dragpoint-${previous.edge}`);
+            }
+
+            if (row) {
+                row.setAttribute(`data-p-datatable-dragpoint-${edge}`, 'true');
+                if (!this.isUnstyled) addClass(row, `rs-datatable-dragpoint-${edge}`);
+            }
+
+            this.rowDropIndicator = row ? { row, edge } : null;
         },
         onRowDragEnd(event: DragEvent) {
+            this.setRowDropIndicator();
             this.rowDragging = false;
             this.draggedRowIndex = null;
             this.droppedRowIndex = null;
@@ -2021,8 +2021,6 @@ export default defineComponent({
                 });
             }
 
-            //cleanup
-            this.onRowDragLeave(event);
             this.onRowDragEnd(event);
             event.preventDefault();
         },
