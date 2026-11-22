@@ -102,6 +102,7 @@ export const style = /*css*/ `
 
     .rs-listbox-option-blank-icon {
         flex-shrink: 0;
+        inline-size: var(--rs-icon-size, 14px);
     }
 
     .rs-listbox-option-check-icon {

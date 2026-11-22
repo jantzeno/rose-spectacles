@@ -117,10 +117,7 @@ import { absolutePosition, addStyle, findSingle, focus, getOuterWidth, isTouchDe
 import { equals, findLastIndex, isEmpty, isNotEmpty, isPrintableCharacter, resolveFieldData } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
-import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { AngleRightIcon, ChevronDownIcon, SpinnerIcon, TimesIcon } from '../internal/lucide';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import { listenForOutsideOverlayClick } from '../internal/overlay-dismissal';
 import Portal from '../portal/Portal.vue';

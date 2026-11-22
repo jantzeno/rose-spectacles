@@ -110,9 +110,7 @@
 import { cn } from '../internal/utils/index';
 import { addClass, addStyle, focus, getOuterHeight, getOuterWidth, getViewport, setAttribute } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
-import TimesIcon from '../icons/times/TimesIcon.vue';
-import WindowMaximizeIcon from '../icons/windowmaximize/WindowMaximizeIcon.vue';
-import WindowMinimizeIcon from '../icons/windowminimize/WindowMinimizeIcon.vue';
+import { TimesIcon, WindowMaximizeIcon, WindowMinimizeIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import FocusTrap from '../focustrap/FocusTrap';
 import Portal from '../portal/Portal.vue';

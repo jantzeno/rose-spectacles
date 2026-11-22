@@ -61,7 +61,7 @@ import { findSingle, focus, isTouchDevice } from '../internal/utils/dom/index';
 import { findLastIndex, isEmpty, isNotEmpty, isPrintableCharacter, resolve } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { SafeTriangle } from '../core/utils/Utils';
-import BarsIcon from '../icons/bars/BarsIcon.vue';
+import { BarsIcon } from '../internal/lucide';
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 import type { MenuItem } from '../menuitem/MenuItem';
 import type { MenuItemEvent, MenuNavigationItem } from '../internal/processed-menu-item';

@@ -253,7 +253,7 @@ import {
 import { localeComparator, resolveFieldData, sort } from '../internal/utils/object/index';
 import { FilterMatchMode, FilterOperator, FilterService } from '../core/api/Api';
 import { getVNodeProp, HelperSet } from '../core/utils/Utils';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
+import { SpinnerIcon } from '../internal/lucide';
 import Paginator from '../paginator/Paginator.vue';
 import type { PageState } from '../paginator/Paginator';
 import type { TreeNode } from '../treenode/TreeNode';

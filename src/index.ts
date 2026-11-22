@@ -741,8 +741,7 @@ export { default as VirtualScroller } from './virtualscroller/VirtualScroller.vu
 export * from './virtualscroller/style/VirtualScrollerStyle';
 export { default as VirtualScrollerStyle } from './virtualscroller/style/VirtualScrollerStyle';
 
-// Forms and icons
+// Forms
 export * from './forms/index';
-export * from './icons/index';
 export { default as RoseSpectacles } from './config/Config';
 export { default } from './config/Config';

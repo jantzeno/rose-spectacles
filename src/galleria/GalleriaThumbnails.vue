@@ -84,10 +84,7 @@ import type { GalleriaResponsiveOptions } from 'rose-spectacles/galleria';
 import { addClass, find, findSingle, getAttribute, removeClass, setAttribute } from '../internal/utils/dom/index';
 import { localeComparator, sort } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import ChevronLeftIcon from '../icons/chevronleft/ChevronLeftIcon.vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
-import ChevronUpIcon from '../icons/chevronup/ChevronUpIcon.vue';
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 export default defineComponent({

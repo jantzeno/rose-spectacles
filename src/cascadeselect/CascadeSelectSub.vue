@@ -79,7 +79,7 @@
 import { defineComponent, type ComponentPublicInstance, type PropType, type Slots } from 'vue';
 import { equals, isNotEmpty, resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
+import { AngleRightIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 import type { OptionResolver, ProcessedOption } from './processed-option';

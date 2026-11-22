@@ -70,6 +70,20 @@ describe('Button.vue', () => {
 });
 
 describe('Button.vue', () => {
+    it('renders a decorative Lucide spinner and forwards loading icon attributes', () => {
+        const wrapper = mount(Button, { props: { label: 'Checking', loading: true, pt: { loadingIcon: { class: 'loader-test' } } } });
+
+        try {
+            const icon = wrapper.get('svg.lucide-loader-circle.rs-button-loading-icon');
+            expect(icon.classes()).toEqual(expect.arrayContaining(['rs-icon', 'rs-icon-spin', 'loader-test']));
+            expect(icon.attributes('aria-hidden')).toBe('true');
+            expect(icon.attributes('fill')).toBe('none');
+            expect(wrapper.get('button').attributes('aria-label')).toBe('Checking');
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('is loading working', async () => {
         const loadingIcon = 'pi pi-discord';
         const wrapper = mount(Button, {

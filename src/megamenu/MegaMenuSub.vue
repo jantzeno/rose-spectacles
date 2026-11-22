@@ -125,8 +125,7 @@ import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
 import { getMegaMenuColumns, getMegaMenuItems, type MegaMenuNode } from '../internal/processed-menu-item';
 import { isNotEmpty, resolve } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import AngleDownIcon from '../icons/angledown/AngleDownIcon.vue';
-import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
+import { AngleDownIcon, AngleRightIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 export default defineComponent({

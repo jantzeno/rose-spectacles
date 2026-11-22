@@ -184,9 +184,7 @@
 
 <script lang="ts">
 import { addClass, removeClass } from '../internal/utils/dom/index';
-import PlusIcon from '../icons/plus/PlusIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
-import UploadIcon from '../icons/upload/UploadIcon.vue';
+import { PlusIcon, TimesIcon, UploadIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import Message from '../message/Message.vue';
 import ProgressBar from '../progressbar/ProgressBar.vue';

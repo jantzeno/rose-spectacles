@@ -347,11 +347,7 @@ import { equals, findLastIndex, isEmpty, isNotEmpty, isPrintableCharacter, resol
 import { ZIndex } from '../internal/utils/zindex/index';
 import { FilterService } from '../core/api/Api';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
-import CheckIcon from '../icons/check/CheckIcon.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import SearchIcon from '../icons/search/SearchIcon.vue';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { CheckIcon, ChevronDownIcon, SearchIcon, SpinnerIcon, TimesIcon } from '../internal/lucide';
 import Checkbox from '../checkbox/Checkbox.vue';
 import Chip from '../chip/Chip.vue';
 import IconField from '../iconfield/IconField.vue';

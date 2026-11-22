@@ -284,9 +284,7 @@ import { absolutePosition, addStyle, findSingle, focus, getOuterWidth, isTouchDe
 import { equals, findLastIndex, isEmpty, isNotEmpty, resolveFieldData } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { ChevronDownIcon, SpinnerIcon, TimesIcon } from '../internal/lucide';
 import Chip from '../chip/Chip.vue';
 import InputText from '../inputtext/InputText.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';

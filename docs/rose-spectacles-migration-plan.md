@@ -8,7 +8,7 @@
 
 ## Vue, TypeScript, and the gallery
 
-- Consolidate the Vue 3 catalog into one Bun-managed `rose-spectacles` source package. Keep components, forms, icons, directives, and services. Declare Vue 3.5 as a peer, preserve named and direct imports for retained entries, and document Git commit pinning and Vite configuration. Defer installation in Mission Control and Box Please.
+- Consolidate the Vue 3 catalog into one Bun-managed `rose-spectacles` source package. Keep components, forms, directives, and services. Use Lucide for built-in component icons and import application icons directly from `@lucide/vue`. Declare Vue 3.5 as a peer, preserve named and direct imports for retained entries, and document Git commit pinning and Vite configuration. Defer installation in Mission Control and Box Please.
 - Convert all retained JavaScript, Vue script blocks, configs, tests, and examples to TypeScript. Preserve public component contracts. Use strict `vue-tsc`, Oxlint, and Oxfmt.
 - Use **Unovis 1.8.1** for Chart and **Tiptap 3.35.0** for Editor. Keep their dependencies as optional peers behind dedicated imports, with both present in the gallery and test environment. [Unovis](https://github.com/f5/unovis) · [Tiptap](https://github.com/ueberdosis/tiptap)
 - Replace OpenUX dependencies with local helpers. Remove upstream themes, branding, sites, and distribution tooling while preserving required MIT attribution. Keep structural CSS and `rs-` styling hooks for app-owned visuals. Retain one Vite gallery with examples for every public component. Remove the legacy components and document their [replacements](components.md).

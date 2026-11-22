@@ -74,8 +74,7 @@ import type { OrganizationChartNode as OrganizationChartNodeModel } from 'rose-s
 import { defineComponent, type CSSProperties } from 'vue';
 import { isAttributeEquals } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import ChevronUpIcon from '../icons/chevronup/ChevronUpIcon.vue';
+import { ChevronDownIcon, ChevronUpIcon } from '../internal/lucide';
 
 export default defineComponent({
     name: 'OrganizationChartNode',

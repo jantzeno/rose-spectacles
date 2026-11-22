@@ -76,8 +76,7 @@
 <script lang="ts">
 import { cn } from '../internal/utils/index';
 import { resolveFieldData } from '../internal/utils/object/index';
-import SearchIcon from '../icons/search/SearchIcon.vue';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
+import { SearchIcon, SpinnerIcon } from '../internal/lucide';
 import IconField from '../iconfield/IconField.vue';
 import InputIcon from '../inputicon/InputIcon.vue';
 import InputText from '../inputtext/InputText.vue';

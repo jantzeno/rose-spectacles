@@ -76,8 +76,7 @@
 import { defineComponent, type PropType, type Slots } from 'vue';
 import { find, findSingle, getAttribute } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import ChevronLeftIcon from '../icons/chevronleft/ChevronLeftIcon.vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
+import { ChevronLeftIcon, ChevronRightIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 export default defineComponent({

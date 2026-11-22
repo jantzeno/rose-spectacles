@@ -204,6 +204,7 @@ export const style = /*css*/ `
 
     .rs-select-option-blank-icon {
         flex-shrink: 0;
+        inline-size: var(--rs-icon-size, 14px);
     }
 
     .rs-select-option-check-icon {

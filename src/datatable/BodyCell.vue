@@ -183,12 +183,7 @@ import { getAttribute, getFirstFocusableElement } from '../internal/utils/dom/in
 import { resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
-import BarsIcon from '../icons/bars/BarsIcon.vue';
-import CheckIcon from '../icons/check/CheckIcon.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
-import PencilIcon from '../icons/pencil/PencilIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { BarsIcon, CheckIcon, ChevronDownIcon, ChevronRightIcon, PencilIcon, TimesIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import Ripple from '../ripple/Ripple';
 import { defineComponent, inject, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';

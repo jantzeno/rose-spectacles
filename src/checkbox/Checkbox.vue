@@ -41,8 +41,7 @@
 import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { contains, equals } from '../internal/utils/object/index';
-import CheckIcon from '../icons/check/CheckIcon.vue';
-import MinusIcon from '../icons/minus/MinusIcon.vue';
+import { CheckIcon, MinusIcon } from '../internal/lucide';
 import BaseCheckbox from './BaseCheckbox.vue';
 import type CheckboxGroup from '../checkboxgroup/CheckboxGroup.vue';
 

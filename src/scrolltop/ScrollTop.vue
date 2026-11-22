@@ -28,7 +28,7 @@
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { getWindowScrollTop } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
-import ChevronUpIcon from '../icons/chevronup/ChevronUpIcon.vue';
+import { ChevronUpIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import BaseScrollTop from './BaseScrollTop.vue';
 

@@ -102,9 +102,7 @@ import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/froze
 import { getAttribute } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
-import SortAltIcon from '../icons/sortalt/SortAltIcon.vue';
-import SortAmountDownIcon from '../icons/sortamountdown/SortAmountDownIcon.vue';
-import SortAmountUpAltIcon from '../icons/sortamountupalt/SortAmountUpAltIcon.vue';
+import { SortAltIcon, SortAmountDownIcon, SortAmountUpAltIcon } from '../internal/lucide';
 import Badge from '../badge/Badge.vue';
 import { defineComponent, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 import ColumnFilter from './ColumnFilter.vue';

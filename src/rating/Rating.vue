@@ -39,9 +39,7 @@
 import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { focus, getFirstFocusableElement } from '../internal/utils/dom/index';
-import BanIcon from '../icons/ban/BanIcon.vue';
-import StarIcon from '../icons/star/StarIcon.vue';
-import StarFillIcon from '../icons/starfill/StarFillIcon.vue';
+import { BanIcon, StarFillIcon, StarIcon } from '../internal/lucide';
 import BaseRating from './BaseRating.vue';
 
 type RatingFocusEvent = FocusEvent & { sourceCapabilities?: { firesTouchEvents?: boolean } };

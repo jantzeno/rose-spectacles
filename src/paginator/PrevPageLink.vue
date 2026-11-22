@@ -7,7 +7,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import AngleLeftIcon from '../icons/angleleft/AngleLeftIcon.vue';
+import { AngleLeftIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 export default defineComponent({

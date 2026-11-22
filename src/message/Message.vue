@@ -34,7 +34,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { TimesIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 import BaseMessage from './BaseMessage.vue';
 

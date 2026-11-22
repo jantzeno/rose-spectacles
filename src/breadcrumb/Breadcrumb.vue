@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
+import { ChevronRightIcon } from '../internal/lucide';
 import BaseBreadcrumb from './BaseBreadcrumb.vue';
 import BreadcrumbItem from './BreadcrumbItem.vue';
 

@@ -46,8 +46,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
-import MinusIcon from '../icons/minus/MinusIcon.vue';
-import PlusIcon from '../icons/plus/PlusIcon.vue';
+import { MinusIcon, PlusIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 import BaseFieldset from './BaseFieldset.vue';
 

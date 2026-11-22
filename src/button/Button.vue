@@ -18,7 +18,7 @@
 <script lang="ts">
 import { cn } from '../internal/utils/index';
 import { isEmpty } from '../internal/utils/object/index';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
+import { SpinnerIcon } from '../internal/lucide';
 import Badge from '../badge/Badge.vue';
 import Ripple from '../ripple/Ripple';
 import { defineComponent, mergeProps } from 'vue';

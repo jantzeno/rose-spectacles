@@ -5,7 +5,7 @@ import ConfirmationService from 'rose-spectacles/confirmationservice';
 import DialogService from 'rose-spectacles/dialogservice';
 import ToastService from 'rose-spectacles/toastservice';
 import { catalog, idFor } from './catalog';
-import { demo, type Example } from './examples/shared';
+import type { Example } from './examples/shared';
 import manifest from '../package.json';
 
 const examples = Object.values(catalog).flat();
@@ -20,37 +20,11 @@ describe('catalog coverage', () => {
         const missing = Object.entries(manifest.exports).filter(([key, entry]) => {
             const path = getPath(entry);
             if (!path?.endsWith('.vue') || key.startsWith('./core/')) return false;
-            if (key.startsWith('./icons/')) return !coveredPaths.has(`${key.split('/').at(-1)}icon`) && key !== './icons/baseicon';
             return !coveredPaths.has(key.split('/').at(-1) ?? '');
         });
 
         expect(missing.map(([key]) => key)).toEqual([]);
         expect(new Set(examples.map(({ name }) => idFor(name))).size).toBe(examples.length);
-    });
-
-    const iconEntries = catalog.Icons.filter(({ name }) => name !== 'Base icon');
-    for (const icon of iconEntries) {
-        it(`draws the ${icon.name} glyph and exposes its label to assistive technology`, () => {
-            const name = icon.names[0];
-            const wrapper = mount({ render: () => demo(name, { label: 'Note action', spin: true }) });
-
-            try {
-                const svg = wrapper.get('svg');
-                expect(svg.get('path, circle, rect, g').element.namespaceURI).toBe('http://www.w3.org/2000/svg');
-                expect(svg.attributes('role')).toBe('img');
-                expect(svg.attributes('aria-label')).toBe('Note action');
-                expect(svg.classes()).toContain('rs-icon-spin');
-            } finally {
-                wrapper.unmount();
-            }
-        });
-    }
-
-    it('lets BaseIcon subclasses provide an accessible custom glyph', () => {
-        return mountCase('Base icon', (wrapper) => {
-            expect(wrapper.get('svg').attributes('aria-label')).toBe('Diamond');
-            expect(wrapper.get('svg path').attributes('d')).toContain('7 13');
-        });
     });
 });
 
@@ -138,7 +112,7 @@ const examplesWithSelectors = [
     ['Button group', 'button', ['Previous', 'Next']],
     ['Checkbox group', 'label', ['maps', 'notes']],
     ['Input group', '.rs-inputgroupaddon', ['https://']],
-    ['Icon field', '.rs-inputicon svg', ['']],
+    ['Icon field', '.rs-inputicon svg.lucide-search[aria-hidden="true"]', ['']],
     ['Ifta label', 'label', ['Title']],
     ['Float label', 'label', ['Title']],
     ['Dock', 'a', ['O', 'A', 'S']],

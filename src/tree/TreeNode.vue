@@ -150,11 +150,7 @@
 <script lang="ts">
 import { getAttribute, getOuterHeight, getOuterWidth } from '../internal/utils/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import CheckIcon from '../icons/check/CheckIcon.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
-import MinusIcon from '../icons/minus/MinusIcon.vue';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
+import { CheckIcon, ChevronDownIcon, ChevronRightIcon, MinusIcon, SpinnerIcon } from '../internal/lucide';
 import Checkbox from '../checkbox/Checkbox.vue';
 import Ripple from '../ripple/Ripple';
 import { defineComponent, inject, type PropType, type Slots } from 'vue';

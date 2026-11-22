@@ -18,7 +18,7 @@
 <script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import CheckIcon from '../icons/check/CheckIcon.vue';
+import { CheckIcon } from '../internal/lucide';
 import Checkbox from '../checkbox/Checkbox.vue';
 import { defineComponent, mergeProps } from 'vue';
 

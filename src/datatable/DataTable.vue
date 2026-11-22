@@ -391,9 +391,7 @@ import {
 import { equals, findIndexInList, isEmpty, isNotEmpty, localeComparator, reorderArray, resolveFieldData, sort } from '../internal/utils/object/index';
 import { FilterMatchMode, FilterOperator, FilterService } from '../core/api/Api';
 import { HelperSet, getVNodeProp } from '../core/utils/Utils';
-import ArrowDownIcon from '../icons/arrowdown/ArrowDownIcon.vue';
-import ArrowUpIcon from '../icons/arrowup/ArrowUpIcon.vue';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
+import { ArrowDownIcon, ArrowUpIcon, SpinnerIcon } from '../internal/lucide';
 import Paginator from '../paginator/Paginator.vue';
 import type { PageState } from '../paginator/Paginator';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';

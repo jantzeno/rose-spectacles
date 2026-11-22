@@ -224,9 +224,10 @@
                                                     :class="cx('optionCheckIcon')"
                                                     v-bind="getPTItemOptions(option, getItemOptions, i, 'optionCheckIcon')"
                                                 />
-                                                <BlankIcon
+                                                <span
                                                     v-else
                                                     :class="cx('optionBlankIcon')"
+                                                    aria-hidden="true"
                                                     v-bind="getPTItemOptions(option, getItemOptions, i, 'optionBlankIcon')"
                                                 />
                                             </template>
@@ -320,12 +321,7 @@ import { equals, findLastIndex, isNotEmpty, isPrintableCharacter, resolveFieldDa
 import { ZIndex } from '../internal/utils/zindex/index';
 import { FilterService } from '../core/api/Api';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
-import BlankIcon from '../icons/blank/BlankIcon.vue';
-import CheckIcon from '../icons/check/CheckIcon.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import SearchIcon from '../icons/search/SearchIcon.vue';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { CheckIcon, ChevronDownIcon, SearchIcon, SpinnerIcon, TimesIcon } from '../internal/lucide';
 import IconField from '../iconfield/IconField.vue';
 import InputIcon from '../inputicon/InputIcon.vue';
 import InputText from '../inputtext/InputText.vue';
@@ -1344,8 +1340,7 @@ export default defineComponent({
         ChevronDownIcon,
         SpinnerIcon,
         SearchIcon,
-        CheckIcon,
-        BlankIcon
+        CheckIcon
     }
 });
 </script>

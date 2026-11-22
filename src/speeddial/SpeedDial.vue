@@ -98,7 +98,7 @@
 <script lang="ts">
 import { $dt } from '../internal/styled/index';
 import { find, findSingle, focus } from '../internal/utils/dom/index';
-import PlusIcon from '../icons/plus/PlusIcon.vue';
+import { PlusIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import Ripple from '../ripple/Ripple';
 import Tooltip from '../tooltip/Tooltip';

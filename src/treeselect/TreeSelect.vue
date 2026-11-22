@@ -175,8 +175,7 @@ import {
 import { isEmpty, isNotEmpty } from '../internal/utils/object/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { ConnectedOverlayScrollHandler } from '../core/utils/Utils';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { ChevronDownIcon, TimesIcon } from '../internal/lucide';
 import Chip from '../chip/Chip.vue';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
 import { listenForOutsideOverlayClick } from '../internal/overlay-dismissal';

@@ -1,6 +1,6 @@
 # Rose Spectacles
 
-Rose Spectacles brings Vue 3 components, forms, icons, directives, and services together in one source package. It includes structural styles and exposes `rs-` classes and CSS custom properties for your application styles.
+Rose Spectacles brings Vue 3 components, forms, directives, and services together in one source package. It includes structural styles and exposes `rs-` classes and CSS custom properties for your application styles.
 
 ## Install
 
@@ -41,7 +41,9 @@ import Select from 'rose-spectacles/select';
 </script>
 ```
 
-Import forms and icons by name from the package root or from their dedicated subpaths such as `rose-spectacles/forms/form` and `rose-spectacles/icons/check`. Schema resolvers use `rose-spectacles/forms/resolvers/<library>` with the corresponding validator installed.
+Import forms by name from the package root or from dedicated subpaths such as `rose-spectacles/forms/form`. Schema resolvers use `rose-spectacles/forms/resolvers/<library>` with the corresponding validator installed.
+
+Import application icons directly from `@lucide/vue`, for example `import { Check, Search } from '@lucide/vue'`. `IconField` and `InputIcon` still provide layout and accept Lucide icons in their slots.
 
 ### Chart and Editor
 

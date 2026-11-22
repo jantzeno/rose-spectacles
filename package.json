@@ -1,7 +1,7 @@
 {
     "name": "rose-spectacles",
     "version": "0.1.0",
-    "description": "Vue 3 components, directives, forms, and icons for Vite applications.",
+    "description": "Vue 3 components, directives, and forms for Vite applications.",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -21,10 +21,6 @@
         ".": {
             "types": "./src/index.d.ts",
             "default": "./src/index.ts"
-        },
-        "./icons": {
-            "types": "./src/icons/index.d.ts",
-            "default": "./src/icons/index.ts"
         },
         "./core": {
             "types": "./src/core/index.d.ts",
@@ -1078,202 +1074,6 @@
             "types": "./src/core/utils/Utils.d.ts",
             "default": "./src/core/utils/Utils.ts"
         },
-        "./icons/angledoubledown": {
-            "types": "./src/icons/angledoubledown/AngleDoubleDownIcon.d.ts",
-            "default": "./src/icons/angledoubledown/AngleDoubleDownIcon.vue"
-        },
-        "./icons/angledoubleleft": {
-            "types": "./src/icons/angledoubleleft/AngleDoubleLeftIcon.d.ts",
-            "default": "./src/icons/angledoubleleft/AngleDoubleLeftIcon.vue"
-        },
-        "./icons/angledoubleright": {
-            "types": "./src/icons/angledoubleright/AngleDoubleRightIcon.d.ts",
-            "default": "./src/icons/angledoubleright/AngleDoubleRightIcon.vue"
-        },
-        "./icons/angledoubleup": {
-            "types": "./src/icons/angledoubleup/AngleDoubleUpIcon.d.ts",
-            "default": "./src/icons/angledoubleup/AngleDoubleUpIcon.vue"
-        },
-        "./icons/angledown": {
-            "types": "./src/icons/angledown/AngleDownIcon.d.ts",
-            "default": "./src/icons/angledown/AngleDownIcon.vue"
-        },
-        "./icons/angleleft": {
-            "types": "./src/icons/angleleft/AngleLeftIcon.d.ts",
-            "default": "./src/icons/angleleft/AngleLeftIcon.vue"
-        },
-        "./icons/angleright": {
-            "types": "./src/icons/angleright/AngleRightIcon.d.ts",
-            "default": "./src/icons/angleright/AngleRightIcon.vue"
-        },
-        "./icons/angleup": {
-            "types": "./src/icons/angleup/AngleUpIcon.d.ts",
-            "default": "./src/icons/angleup/AngleUpIcon.vue"
-        },
-        "./icons/arrowdown": {
-            "types": "./src/icons/arrowdown/ArrowDownIcon.d.ts",
-            "default": "./src/icons/arrowdown/ArrowDownIcon.vue"
-        },
-        "./icons/arrowup": {
-            "types": "./src/icons/arrowup/ArrowUpIcon.d.ts",
-            "default": "./src/icons/arrowup/ArrowUpIcon.vue"
-        },
-        "./icons/ban": {
-            "types": "./src/icons/ban/BanIcon.d.ts",
-            "default": "./src/icons/ban/BanIcon.vue"
-        },
-        "./icons/bars": {
-            "types": "./src/icons/bars/BarsIcon.d.ts",
-            "default": "./src/icons/bars/BarsIcon.vue"
-        },
-        "./icons/baseicon": {
-            "types": "./src/icons/baseicon/BaseIcon.d.ts",
-            "default": "./src/icons/baseicon/BaseIcon.vue"
-        },
-        "./icons/baseicon/style": {
-            "types": "./src/icons/baseicon/style/BaseIconStyle.d.ts",
-            "default": "./src/icons/baseicon/style/BaseIconStyle.ts"
-        },
-        "./icons/blank": {
-            "types": "./src/icons/blank/BlankIcon.d.ts",
-            "default": "./src/icons/blank/BlankIcon.vue"
-        },
-        "./icons/calendar": {
-            "types": "./src/icons/calendar/CalendarIcon.d.ts",
-            "default": "./src/icons/calendar/CalendarIcon.vue"
-        },
-        "./icons/check": {
-            "types": "./src/icons/check/CheckIcon.d.ts",
-            "default": "./src/icons/check/CheckIcon.vue"
-        },
-        "./icons/chevrondown": {
-            "types": "./src/icons/chevrondown/ChevronDownIcon.d.ts",
-            "default": "./src/icons/chevrondown/ChevronDownIcon.vue"
-        },
-        "./icons/chevronleft": {
-            "types": "./src/icons/chevronleft/ChevronLeftIcon.d.ts",
-            "default": "./src/icons/chevronleft/ChevronLeftIcon.vue"
-        },
-        "./icons/chevronright": {
-            "types": "./src/icons/chevronright/ChevronRightIcon.d.ts",
-            "default": "./src/icons/chevronright/ChevronRightIcon.vue"
-        },
-        "./icons/chevronup": {
-            "types": "./src/icons/chevronup/ChevronUpIcon.d.ts",
-            "default": "./src/icons/chevronup/ChevronUpIcon.vue"
-        },
-        "./icons/exclamationtriangle": {
-            "types": "./src/icons/exclamationtriangle/ExclamationTriangleIcon.d.ts",
-            "default": "./src/icons/exclamationtriangle/ExclamationTriangleIcon.vue"
-        },
-        "./icons/eye": {
-            "types": "./src/icons/eye/EyeIcon.d.ts",
-            "default": "./src/icons/eye/EyeIcon.vue"
-        },
-        "./icons/eyeslash": {
-            "types": "./src/icons/eyeslash/EyeSlashIcon.d.ts",
-            "default": "./src/icons/eyeslash/EyeSlashIcon.vue"
-        },
-        "./icons/filter": {
-            "types": "./src/icons/filter/FilterIcon.d.ts",
-            "default": "./src/icons/filter/FilterIcon.vue"
-        },
-        "./icons/filterfill": {
-            "types": "./src/icons/filterfill/FilterFillIcon.d.ts",
-            "default": "./src/icons/filterfill/FilterFillIcon.vue"
-        },
-        "./icons/filterslash": {
-            "types": "./src/icons/filterslash/FilterSlashIcon.d.ts",
-            "default": "./src/icons/filterslash/FilterSlashIcon.vue"
-        },
-        "./icons/infocircle": {
-            "types": "./src/icons/infocircle/InfoCircleIcon.d.ts",
-            "default": "./src/icons/infocircle/InfoCircleIcon.vue"
-        },
-        "./icons/minus": {
-            "types": "./src/icons/minus/MinusIcon.d.ts",
-            "default": "./src/icons/minus/MinusIcon.vue"
-        },
-        "./icons/pencil": {
-            "types": "./src/icons/pencil/PencilIcon.d.ts",
-            "default": "./src/icons/pencil/PencilIcon.vue"
-        },
-        "./icons/plus": {
-            "types": "./src/icons/plus/PlusIcon.d.ts",
-            "default": "./src/icons/plus/PlusIcon.vue"
-        },
-        "./icons/refresh": {
-            "types": "./src/icons/refresh/RefreshIcon.d.ts",
-            "default": "./src/icons/refresh/RefreshIcon.vue"
-        },
-        "./icons/search": {
-            "types": "./src/icons/search/SearchIcon.d.ts",
-            "default": "./src/icons/search/SearchIcon.vue"
-        },
-        "./icons/searchminus": {
-            "types": "./src/icons/searchminus/SearchMinusIcon.d.ts",
-            "default": "./src/icons/searchminus/SearchMinusIcon.vue"
-        },
-        "./icons/searchplus": {
-            "types": "./src/icons/searchplus/SearchPlusIcon.d.ts",
-            "default": "./src/icons/searchplus/SearchPlusIcon.vue"
-        },
-        "./icons/sortalt": {
-            "types": "./src/icons/sortalt/SortAltIcon.d.ts",
-            "default": "./src/icons/sortalt/SortAltIcon.vue"
-        },
-        "./icons/sortamountdown": {
-            "types": "./src/icons/sortamountdown/SortAmountDownIcon.d.ts",
-            "default": "./src/icons/sortamountdown/SortAmountDownIcon.vue"
-        },
-        "./icons/sortamountupalt": {
-            "types": "./src/icons/sortamountupalt/SortAmountUpAltIcon.d.ts",
-            "default": "./src/icons/sortamountupalt/SortAmountUpAltIcon.vue"
-        },
-        "./icons/spinner": {
-            "types": "./src/icons/spinner/SpinnerIcon.d.ts",
-            "default": "./src/icons/spinner/SpinnerIcon.vue"
-        },
-        "./icons/star": {
-            "types": "./src/icons/star/StarIcon.d.ts",
-            "default": "./src/icons/star/StarIcon.vue"
-        },
-        "./icons/starfill": {
-            "types": "./src/icons/starfill/StarFillIcon.d.ts",
-            "default": "./src/icons/starfill/StarFillIcon.vue"
-        },
-        "./icons/thlarge": {
-            "types": "./src/icons/thlarge/ThLargeIcon.d.ts",
-            "default": "./src/icons/thlarge/ThLargeIcon.vue"
-        },
-        "./icons/times": {
-            "types": "./src/icons/times/TimesIcon.d.ts",
-            "default": "./src/icons/times/TimesIcon.vue"
-        },
-        "./icons/timescircle": {
-            "types": "./src/icons/timescircle/TimesCircleIcon.d.ts",
-            "default": "./src/icons/timescircle/TimesCircleIcon.vue"
-        },
-        "./icons/trash": {
-            "types": "./src/icons/trash/TrashIcon.d.ts",
-            "default": "./src/icons/trash/TrashIcon.vue"
-        },
-        "./icons/undo": {
-            "types": "./src/icons/undo/UndoIcon.d.ts",
-            "default": "./src/icons/undo/UndoIcon.vue"
-        },
-        "./icons/upload": {
-            "types": "./src/icons/upload/UploadIcon.d.ts",
-            "default": "./src/icons/upload/UploadIcon.vue"
-        },
-        "./icons/windowmaximize": {
-            "types": "./src/icons/windowmaximize/WindowMaximizeIcon.d.ts",
-            "default": "./src/icons/windowmaximize/WindowMaximizeIcon.vue"
-        },
-        "./icons/windowminimize": {
-            "types": "./src/icons/windowminimize/WindowMinimizeIcon.d.ts",
-            "default": "./src/icons/windowminimize/WindowMinimizeIcon.vue"
-        },
         "./forms": {
             "types": "./src/forms/index.d.ts",
             "default": "./src/forms/index.ts"
@@ -1348,6 +1148,9 @@
         "test:browser": "bun scripts/browser-smoke.ts",
         "test:consumer": "bun scripts/consumer-smoke.ts",
         "verify:issues": "bun scripts/verify-issue-ledger.ts"
+    },
+    "dependencies": {
+        "@lucide/vue": "1.77.0"
     },
     "devDependencies": {
         "@tiptap/core": "3.35.0",

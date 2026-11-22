@@ -1,3 +1,4 @@
+import { Search } from '@lucide/vue';
 import { h, ref } from 'vue';
 import { demo, example, locations, sample, tree, type ComponentName, type Example } from './shared';
 
@@ -113,7 +114,7 @@ export const inputs: Example[] = [
         ['IconField', 'InputIcon'],
         () => () =>
             demo('IconField', {}, () => [
-                demo('InputIcon', {}, () => demo('SearchIcon')),
+                demo('InputIcon', {}, () => h(Search, { 'aria-hidden': 'true', size: 16 })),
                 demo('InputText', { placeholder: 'Find an entry', 'aria-label': 'Search entries' })
             ])
     ),

@@ -71,7 +71,7 @@
 <script lang="ts">
 import { defineComponent, type PropType, type Slots } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { TimesIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 import { galleriaProps } from './BaseGalleria.vue';
 import GalleriaItem from './GalleriaItem.vue';

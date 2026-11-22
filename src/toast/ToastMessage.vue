@@ -47,11 +47,7 @@ import { defineComponent, type Component, type PropType, type Slots } from 'vue'
 import type { ToastMessageOptions } from 'rose-spectacles/toast';
 import { cn } from '../internal/utils/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import CheckIcon from '../icons/check/CheckIcon.vue';
-import ExclamationTriangleIcon from '../icons/exclamationtriangle/ExclamationTriangleIcon.vue';
-import InfoCircleIcon from '../icons/infocircle/InfoCircleIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
-import TimesCircleIcon from '../icons/timescircle/TimesCircleIcon.vue';
+import { CheckIcon, ExclamationTriangleIcon, InfoCircleIcon, TimesCircleIcon, TimesIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 export type ToastRemoval = { message: ToastMessageOptions; type: 'close' | 'life-end' };

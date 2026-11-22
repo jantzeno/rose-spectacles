@@ -268,14 +268,16 @@
 <script lang="ts">
 import { scrollInView, setAttribute } from '../internal/utils/dom/index';
 import { findIndexInList, isEmpty } from '../internal/utils/object/index';
-import AngleDoubleDownIcon from '../icons/angledoubledown/AngleDoubleDownIcon.vue';
-import AngleDoubleLeftIcon from '../icons/angledoubleleft/AngleDoubleLeftIcon.vue';
-import AngleDoubleRightIcon from '../icons/angledoubleright/AngleDoubleRightIcon.vue';
-import AngleDoubleUpIcon from '../icons/angledoubleup/AngleDoubleUpIcon.vue';
-import AngleDownIcon from '../icons/angledown/AngleDownIcon.vue';
-import AngleLeftIcon from '../icons/angleleft/AngleLeftIcon.vue';
-import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
-import AngleUpIcon from '../icons/angleup/AngleUpIcon.vue';
+import {
+    AngleDoubleDownIcon,
+    AngleDoubleLeftIcon,
+    AngleDoubleRightIcon,
+    AngleDoubleUpIcon,
+    AngleDownIcon,
+    AngleLeftIcon,
+    AngleRightIcon,
+    AngleUpIcon
+} from '../internal/lucide';
 import Button from '../button/Button.vue';
 import Listbox from '../listbox/Listbox.vue';
 import Ripple from '../ripple/Ripple';

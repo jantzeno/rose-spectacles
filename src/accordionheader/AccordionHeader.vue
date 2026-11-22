@@ -24,8 +24,7 @@
 <script lang="ts">
 import { cn } from '../internal/utils/index';
 import { findSingle, focus, getAttribute } from '../internal/utils/dom/index';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import ChevronUpIcon from '../icons/chevronup/ChevronUpIcon.vue';
+import { ChevronDownIcon, ChevronUpIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 import type { AccordionContext, AccordionPanelContext } from '../accordion/context';
 import { defineComponent, mergeProps } from 'vue';

@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { getHeight, getWidth, isVisible } from '../internal/utils/dom/index';
-import SpinnerIcon from '../icons/spinner/SpinnerIcon.vue';
+import { SpinnerIcon } from '../internal/lucide';
 import { defineComponent, type ComponentPublicInstance, type CSSProperties } from 'vue';
 import BaseVirtualScroller from './BaseVirtualScroller.vue';
 

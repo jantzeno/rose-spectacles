@@ -22,6 +22,20 @@ const css = ({ dt }: { dt: CssParameters['dt'] }) => `
     overflow: hidden;
     padding-right: ${dt('scrollbar.width')};
 }
+
+.rs-icon {
+    display: inline-block;
+    vertical-align: baseline;
+    flex-shrink: 0;
+}
+
+.rs-icon-spin {
+    animation: rs-icon-spin 2s infinite linear;
+}
+
+@keyframes rs-icon-spin {
+    to { transform: rotate(1turn); }
+}
 `;
 
 type CssParameters = { dt: typeof dt };

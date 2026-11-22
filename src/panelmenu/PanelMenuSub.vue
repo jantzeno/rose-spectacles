@@ -106,8 +106,7 @@ import { defineComponent, mergeProps, type PropType, type Slots } from 'vue';
 import type { ProcessedMenuItem } from '../internal/processed-menu-item';
 import { isNotEmpty, resolve } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
+import { ChevronDownIcon, ChevronRightIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 export default defineComponent({

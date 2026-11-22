@@ -105,7 +105,7 @@ import type { ProcessedMenuItem } from '../internal/processed-menu-item';
 import { nestedPosition } from '../internal/utils/dom/index';
 import { isNotEmpty, resolve } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
-import AngleRightIcon from '../icons/angleright/AngleRightIcon.vue';
+import { AngleRightIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 
 export default defineComponent({

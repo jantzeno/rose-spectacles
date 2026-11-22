@@ -97,10 +97,7 @@
 <script lang="ts">
 import { find, findSingle, scrollInView, setAttribute } from '../internal/utils/dom/index';
 import { findIndexInList, isNotEmpty } from '../internal/utils/object/index';
-import AngleDoubleDownIcon from '../icons/angledoubledown/AngleDoubleDownIcon.vue';
-import AngleDoubleUpIcon from '../icons/angledoubleup/AngleDoubleUpIcon.vue';
-import AngleDownIcon from '../icons/angledown/AngleDownIcon.vue';
-import AngleUpIcon from '../icons/angleup/AngleUpIcon.vue';
+import { AngleDoubleDownIcon, AngleDoubleUpIcon, AngleDownIcon, AngleUpIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import Listbox from '../listbox/Listbox.vue';
 import Ripple from '../ripple/Ripple';

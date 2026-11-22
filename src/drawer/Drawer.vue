@@ -79,7 +79,7 @@ import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { cn } from '../internal/utils/index';
 import { addClass, focus } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
-import TimesIcon from '../icons/times/TimesIcon.vue';
+import { TimesIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import FocusTrap from '../focustrap/FocusTrap';
 import Portal from '../portal/Portal.vue';

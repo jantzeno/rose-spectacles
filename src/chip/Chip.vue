@@ -30,7 +30,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
-import TimesCircleIcon from '../icons/timescircle/TimesCircleIcon.vue';
+import { TimesCircleIcon } from '../internal/lucide';
 import BaseChip from './BaseChip.vue';
 
 export default defineComponent({

@@ -134,12 +134,7 @@
 import { defineComponent, type ComponentPublicInstance } from 'vue';
 import { addClass, focus, isAttributeEquals } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
-import EyeIcon from '../icons/eye/EyeIcon.vue';
-import RefreshIcon from '../icons/refresh/RefreshIcon.vue';
-import SearchMinusIcon from '../icons/searchminus/SearchMinusIcon.vue';
-import SearchPlusIcon from '../icons/searchplus/SearchPlusIcon.vue';
-import TimesIcon from '../icons/times/TimesIcon.vue';
-import UndoIcon from '../icons/undo/UndoIcon.vue';
+import { EyeIcon, RefreshIcon, SearchMinusIcon, SearchPlusIcon, TimesIcon, UndoIcon } from '../internal/lucide';
 import FocusTrap from '../focustrap/FocusTrap';
 import Portal from '../portal/Portal.vue';
 import { blockBodyScroll, unblockBodyScroll } from '../utils/Utils';

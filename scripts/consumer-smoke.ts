@@ -218,7 +218,7 @@ try {
         `
         <script setup lang="ts">
         import { useTemplateRef } from 'vue';
-        import { Button, Form, CheckIcon, Toast, useToast } from 'rose-spectacles';
+        import { Button, Form, Toast, useToast } from 'rose-spectacles';
         import Select from 'rose-spectacles/select';
         import ToastEventBus from 'rose-spectacles/toasteventbus';
         import OverlayEventBus from 'rose-spectacles/overlayeventbus';
@@ -244,7 +244,7 @@ try {
         </script>
         <template>
             <Form ref="form">
-                <CheckIcon label="Included" />
+                <Button label="Checking" loading />
                 <Select :options="['draft', 'ready']" />
                 <Button label="Create" type="button" @click="validateThroughTheFormRef" />
                 <Button label="Show progress" type="button" @click="showProgress" />

@@ -42,8 +42,7 @@ import type { TabsContext } from '../tabs/context';
 import { defineComponent } from 'vue';
 import { cn } from '../internal/utils/index';
 import { findSingle, getHeight, getOffset, getOuterHeight, getOuterWidth, getWidth, isRTL } from '../internal/utils/dom/index';
-import ChevronLeftIcon from '../icons/chevronleft/ChevronLeftIcon.vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
+import { ChevronLeftIcon, ChevronRightIcon } from '../internal/lucide';
 import Ripple from '../ripple/Ripple';
 import BaseTabList from './BaseTabList.vue';
 

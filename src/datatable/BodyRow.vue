@@ -123,8 +123,7 @@
 import { equals, isNotEmpty, resolveFieldData } from '../internal/utils/object/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
-import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
+import { ChevronDownIcon, ChevronRightIcon } from '../internal/lucide';
 import { defineComponent, mergeProps, type PropType, type Slots, type StyleValue, type VNode } from 'vue';
 import BodyCell from './BodyCell.vue';
 import type { EditingDrafts, EditingRowKey } from './editing-drafts';

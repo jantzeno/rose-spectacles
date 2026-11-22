@@ -80,7 +80,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { isEmpty } from '../internal/utils/object/index';
-import ChevronDownIcon from '../icons/chevrondown/ChevronDownIcon.vue';
+import { ChevronDownIcon } from '../internal/lucide';
 import Button from '../button/Button.vue';
 import TieredMenu from '../tieredmenu/TieredMenu.vue';
 import BaseSplitButton from './BaseSplitButton.vue';

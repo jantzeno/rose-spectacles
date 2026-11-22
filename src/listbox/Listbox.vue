@@ -117,7 +117,7 @@
                             >
                                 <template v-if="checkmark">
                                     <CheckIcon v-if="isSelected(option)" :class="cx('optionCheckIcon')" v-bind="ptm('optionCheckIcon')" />
-                                    <BlankIcon v-else :class="cx('optionBlankIcon')" v-bind="ptm('optionBlankIcon')" />
+                                    <span v-else :class="cx('optionBlankIcon')" aria-hidden="true" v-bind="ptm('optionBlankIcon')" />
                                 </template>
                                 <slot name="option" :option="option" :selected="isSelected(option)" :index="index">{{ getOptionLabel(option) }}</slot>
                             </li>
@@ -173,9 +173,7 @@ import { cn } from '../internal/utils/index';
 import { findSingle, focus, getFirstFocusableElement } from '../internal/utils/dom/index';
 import { equals, findLastIndex, isNotEmpty, isPrintableCharacter, resolveFieldData } from '../internal/utils/object/index';
 import { FilterService } from '../core/api/Api';
-import BlankIcon from '../icons/blank/BlankIcon.vue';
-import CheckIcon from '../icons/check/CheckIcon.vue';
-import SearchIcon from '../icons/search/SearchIcon.vue';
+import { CheckIcon, SearchIcon } from '../internal/lucide';
 import IconField from '../iconfield/IconField.vue';
 import InputIcon from '../inputicon/InputIcon.vue';
 import InputText from '../inputtext/InputText.vue';
@@ -988,8 +986,7 @@ export default defineComponent({
         InputIcon,
         IconField,
         SearchIcon,
-        CheckIcon,
-        BlankIcon
+        CheckIcon
     }
 });
 </script>
