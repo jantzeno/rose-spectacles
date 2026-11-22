@@ -256,7 +256,13 @@ export const useForm = (options: useFormOptions = {}) => {
     };
 
     const setValues = (values: Record<string, unknown>) => {
-        Object.keys(values).forEach((field) => setFieldValue(field, values[field]));
+        const missing = Symbol();
+
+        for (const field of Object.keys(_states)) {
+            const value = getValueByPath(values, field, missing);
+
+            if (value !== missing) setFieldValue(field, value);
+        }
     };
 
     const validateOnMounted = () => {
