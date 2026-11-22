@@ -9,6 +9,12 @@
     --accent: #8c2d4a;
     --line: #ded4d6;
     --muted: #685d60;
+    --rs-content-background: var(--paper);
+    --rs-content-border-color: var(--line);
+    --rs-text-muted-color: var(--muted);
+    --rs-primary-color: var(--accent);
+    --rs-primary-contrast-color: #fff;
+    --rs-highlight-background: #f5e5ea;
     --rs-icon-size: 1rem;
     --rs-mask-background: rgb(33 23 26 / 45%);
     --rs-mask-transition-duration: 120ms;
@@ -63,6 +69,12 @@ h1 {
     min-height: calc(100vh - 4.25rem);
 }
 .navigation {
+    position: sticky;
+    align-self: start;
+    inset-block-start: 0;
+    display: flex;
+    flex-direction: column;
+    max-block-size: 100dvh;
     padding: 1.5rem clamp(1rem, 3vw, 2rem);
     border-right: 1px solid var(--line);
 }
@@ -75,29 +87,36 @@ h1 {
 .navigation input {
     width: 100%;
 }
-nav h2 {
+.navigation nav {
+    min-block-size: 0;
+    overflow: auto;
+    margin-inline: -0.5rem;
+    padding-inline: 0.5rem;
+}
+.navigation h2 {
     color: var(--muted);
     font-size: 0.875rem;
     margin: 1.4rem 0 0.4rem;
 }
-nav ul {
+.navigation ul {
     padding: 0;
     margin: 0;
     list-style: none;
 }
-nav a {
+.navigation a {
     display: block;
     color: var(--ink);
     text-decoration: none;
     padding: 0.3rem 0.55rem;
     border-radius: 0.35rem;
 }
-nav a:is(:hover, :focus-visible, [aria-current]) {
+.navigation a:is(:hover, :focus-visible, [aria-current]) {
     background: #f0dce3;
     color: #681b35;
 }
 
 main {
+    min-inline-size: 0;
     padding: clamp(1.25rem, 6vw, 4rem);
 }
 h1 {
@@ -268,11 +287,11 @@ button {
 
 @media (max-width: 680px) {
     .shell {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
     .navigation {
+        position: static;
         max-height: 14rem;
-        overflow: auto;
         border-right: 0;
         border-bottom: 1px solid var(--line);
     }

@@ -101,22 +101,24 @@ onUnmounted(() => window.removeEventListener('keydown', onShortcut));
 
 <template>
     <Dialog v-model:visible="visible" :header="title" class="rs-command-palette" :modal="true" :block-scroll="true">
-        <IconField class="rs-command-palette-search">
-            <InputIcon><Search :size="18" aria-hidden="true" /></InputIcon>
-            <InputText
-                v-model="query"
-                role="combobox"
-                :aria-label="placeholder"
-                :placeholder="placeholder"
-                :aria-controls="listId"
-                :aria-expanded="true"
-                :aria-activedescendant="active && optionId(active.id)"
-                aria-autocomplete="list"
-                autocomplete="off"
-                autofocus
-                @keydown="onInputKeydown"
-            />
-        </IconField>
+        <div class="rs-command-palette-toolbar">
+            <IconField class="rs-command-palette-search">
+                <InputIcon><Search :size="18" aria-hidden="true" /></InputIcon>
+                <InputText
+                    v-model="query"
+                    role="combobox"
+                    :aria-label="placeholder"
+                    :placeholder="placeholder"
+                    :aria-controls="listId"
+                    :aria-expanded="true"
+                    :aria-activedescendant="active && optionId(active.id)"
+                    aria-autocomplete="list"
+                    autocomplete="off"
+                    autofocus
+                    @keydown="onInputKeydown"
+                />
+            </IconField>
+        </div>
 
         <div v-if="loading" class="rs-command-palette-status" role="status">Searching…</div>
         <div v-else-if="!groups.size" class="rs-command-palette-status" role="status"><slot name="empty">{{ emptyMessage }}</slot></div>
@@ -154,13 +156,22 @@ onUnmounted(() => window.removeEventListener('keydown', onShortcut));
 .rs-command-palette {
     width: min(34rem, calc(100vw - 2rem));
 }
-.rs-command-palette-search input {
+.rs-command-palette-toolbar {
+    padding-block-end: 0.75rem;
+    border-block-end: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 16%, transparent));
+}
+.rs-command-palette-search.rs-iconfield .rs-inputtext {
     width: 100%;
 }
 .rs-command-palette-list {
     max-height: min(23rem, 50vh);
-    margin-top: 0.55rem;
+    margin-top: 0.5rem;
     overflow: auto;
+}
+.rs-command-palette-list [role='group'] + [role='group'] {
+    margin-block-start: 0.55rem;
+    padding-block-start: 0.45rem;
+    border-block-start: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 14%, transparent));
 }
 .rs-command-palette-group {
     margin: 0.6rem 0.55rem 0.25rem;
@@ -172,13 +183,14 @@ onUnmounted(() => window.removeEventListener('keydown', onShortcut));
     display: flex;
     gap: 0.65rem;
     align-items: center;
-    min-height: 2.6rem;
-    padding: 0.5rem 0.6rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.65rem;
     border-radius: 0.45rem;
     cursor: pointer;
 }
 .rs-command-palette-item[aria-selected='true'] {
-    background: var(--rs-command-palette-active-background, color-mix(in srgb, currentColor 12%, transparent));
+    background: var(--rs-command-palette-active-background, var(--rs-highlight-background, color-mix(in srgb, currentColor 10%, transparent)));
+    color: var(--rs-highlight-color, inherit);
 }
 .rs-command-palette-item[aria-disabled='true'] {
     opacity: 0.55;
@@ -188,6 +200,11 @@ onUnmounted(() => window.removeEventListener('keydown', onShortcut));
     display: grid;
     flex: 1;
     min-width: 0;
+    gap: 0.1rem;
+    overflow-wrap: anywhere;
+}
+.rs-command-palette-item-body > span {
+    font-weight: 550;
 }
 .rs-command-palette-item small,
 .rs-command-palette-status {

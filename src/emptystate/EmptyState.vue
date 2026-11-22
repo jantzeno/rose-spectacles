@@ -15,9 +15,11 @@ const id = useId();
         <div class="rs-empty-state-icon" aria-hidden="true">
             <slot name="icon"><Inbox :size="24" /></slot>
         </div>
-        <component :is="heading" :id="id" class="rs-empty-state-title">{{ title }}</component>
-        <p v-if="description" :id="id + '-description'" class="rs-empty-state-description">{{ description }}</p>
-        <slot />
+        <div class="rs-empty-state-heading">
+            <component :is="heading" :id="id" class="rs-empty-state-title">{{ title }}</component>
+            <p v-if="description" :id="id + '-description'" class="rs-empty-state-description">{{ description }}</p>
+        </div>
+        <div v-if="$slots.default" class="rs-empty-state-content"><slot /></div>
         <div v-if="$slots.actions" class="rs-empty-state-actions">
             <slot name="actions" />
         </div>
@@ -28,8 +30,9 @@ const id = useId();
 .rs-empty-state {
     display: grid;
     justify-items: center;
-    gap: 0.6rem;
-    padding: clamp(1.5rem, 5vw, 3.5rem) 1rem;
+    gap: 0.9rem;
+    padding: clamp(1.5rem, 4vw, 2.75rem) 1rem;
+    overflow-wrap: anywhere;
     text-align: center;
 }
 .rs-empty-state-icon {
@@ -37,13 +40,19 @@ const id = useId();
     place-items: center;
     width: 3rem;
     height: 3rem;
-    border-radius: 0.85rem;
-    background: color-mix(in srgb, currentColor 8%, transparent);
+    border: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 18%, transparent));
+    border-radius: 0.75rem;
+    background: var(--rs-content-hover-background, color-mix(in srgb, currentColor 6%, transparent));
+}
+.rs-empty-state-heading {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
 }
 .rs-empty-state-title {
-    margin: 0.2rem 0 0;
-    font-size: 1.125rem;
-    line-height: 1.4;
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.3;
 }
 .rs-empty-state-description {
     max-width: 38ch;
@@ -55,6 +64,6 @@ const id = useId();
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.6rem;
-    margin-top: 0.45rem;
+    margin-top: 0.15rem;
 }
 </style>

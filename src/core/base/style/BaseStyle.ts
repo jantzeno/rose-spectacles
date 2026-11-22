@@ -1,6 +1,6 @@
 import { css as Css, Theme, dt } from '../../../internal/styled/index';
 import { style } from '../../../internal/styles/base/index';
-import { isNotEmpty, minifyCSS, resolve } from '../../../internal/utils/object/index';
+import { isNotEmpty, minifyCSS } from '../../../internal/utils/object/index';
 import { useStyle, type StyleOptions } from '../../usestyle/UseStyle';
 
 const css = ({ dt }: { dt: CssParameters['dt'] }) => `
@@ -106,8 +106,7 @@ const baseStyle = {
     },
     getStyleSheet(extendedCSS = '', props = {}) {
         if (this.css) {
-            const _css = resolve(this.css, { dt }) || '';
-            const _style = minifyCSS(Css`${_css}${extendedCSS}`);
+            const _style = minifyCSS(Css`${this.css}${extendedCSS}`);
             const _props = Object.entries(props)
                 .map(([key, value]) => `${key}="${value}"`)
                 .join(' ');
@@ -125,7 +124,7 @@ const baseStyle = {
 
         if (this.style) {
             const name = this.name === 'base' ? 'global-style' : `${this.name}-style`;
-            const _css = Css`${resolve(this.style, { dt })}`;
+            const _css = Css`${this.style}`;
             const _style = minifyCSS(Theme.transformCSS(name, _css ?? ''));
             const _props = Object.entries(props)
                 .map(([key, value]) => `${key}="${value}"`)

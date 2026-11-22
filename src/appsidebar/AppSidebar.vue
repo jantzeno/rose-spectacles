@@ -111,7 +111,9 @@ function restoreMobileFocus() {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    background: var(--rs-app-sidebar-background, var(--rs-content-background, Canvas));
     border-inline-end: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 16%, transparent));
+    border-radius: 0.5rem 0 0 0.5rem;
 }
 .rs-app-sidebar-header,
 .rs-app-sidebar-footer,
@@ -123,6 +125,14 @@ function restoreMobileFocus() {
     align-items: center;
     justify-content: space-between;
     gap: 0.4rem;
+    border-block-end: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 16%, transparent));
+}
+.rs-app-sidebar[data-collapsed] .rs-app-sidebar-header {
+    justify-content: center;
+    padding-inline: 0.25rem;
+}
+.rs-app-sidebar-header .rs-button {
+    flex-shrink: 0;
 }
 .rs-app-sidebar-heading {
     min-width: 0;
@@ -132,14 +142,19 @@ function restoreMobileFocus() {
 }
 .rs-app-sidebar-footer {
     margin-block-start: auto;
+    border-block-start: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 16%, transparent));
 }
 .rs-app-sidebar-nav {
     display: grid;
-    gap: 0.75rem;
-    padding: 0.45rem;
+    gap: 0.65rem;
+    padding: 0.65rem 0.45rem;
+}
+.rs-app-sidebar-group + .rs-app-sidebar-group {
+    padding-block-start: 0.55rem;
+    border-block-start: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 12%, transparent));
 }
 .rs-app-sidebar-group-label {
-    padding: 0.45rem 0.5rem;
+    padding: 0.2rem 0.65rem 0.35rem;
     color: var(--rs-text-muted-color, inherit);
     font-size: 0.75rem;
     font-weight: 650;
@@ -161,11 +176,27 @@ function restoreMobileFocus() {
     gap: 0.65rem;
     width: 100%;
     min-height: 2.5rem;
+    padding: 0.45rem 0.65rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
     text-align: start;
     text-decoration: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
-.rs-app-sidebar-nav .rs-app-sidebar-link[aria-current='page'] {
-    background: var(--rs-app-sidebar-active-background, color-mix(in srgb, currentColor 12%, transparent));
+.rs-app-sidebar-nav .rs-app-sidebar-link svg {
+    flex-shrink: 0;
+}
+.rs-app-sidebar-nav .rs-app-sidebar-link:not(:disabled):hover {
+    background: var(--rs-content-hover-background, color-mix(in srgb, currentColor 6%, transparent));
+}
+.rs-app-sidebar-nav .rs-app-sidebar-link[aria-current='page'],
+.rs-app-sidebar-nav .rs-app-sidebar-link[aria-current='page']:hover {
+    background: var(--rs-app-sidebar-active-background, var(--rs-highlight-background, color-mix(in srgb, currentColor 10%, transparent)));
+    color: var(--rs-highlight-color, inherit);
+    border-inline-start: 2px solid var(--rs-primary-color, currentColor);
+    padding-inline-start: calc(0.65rem - 2px);
     font-weight: 650;
 }
 .rs-app-sidebar-nav[data-compact] .rs-app-sidebar-link {
@@ -177,6 +208,7 @@ function restoreMobileFocus() {
 }
 .rs-app-sidebar-mobile {
     display: none;
+    border-block-end: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 16%, transparent));
 }
 @media (max-width: 48rem) {
     .rs-app-sidebar,

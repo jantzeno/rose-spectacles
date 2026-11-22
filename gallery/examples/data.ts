@@ -160,10 +160,10 @@ export const data: Example[] = [
                 h('button', { type: 'button', 'data-testid': 'chart-update', onClick: () => (values.value = [7, 2, 6]) }, 'Update chart'),
                 demo('Chart', {
                     type: 'bar',
-                    width: 440,
+                    style: { maxWidth: '27.5rem' },
                     height: 180,
                     data: { labels: ['Drafts', 'In review', 'Published'], datasets: [{ label: 'Notes', backgroundColor: '#a73d5c', data: values.value }] },
-                    options: { animation: false, responsive: false },
+                    options: { animation: false },
                     containerProps: { 'aria-label': 'Field notes by status' },
                     onSelect: ({ dataset, point }: ChartSelectEvent) => (selected.value = `${dataset.label}: ${point}`)
                 }),

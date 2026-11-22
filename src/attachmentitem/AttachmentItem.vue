@@ -33,7 +33,7 @@ const progressValue = computed(() =>
 </script>
 
 <template>
-    <div class="rs-attachment-item">
+    <div class="rs-attachment-item" :data-status="status">
         <span class="rs-attachment-item-preview" aria-hidden="true">
             <slot name="icon">
                 <img v-if="thumbnail" :src="thumbnail" alt="" />
@@ -41,41 +41,47 @@ const progressValue = computed(() =>
             </slot>
         </span>
         <div class="rs-attachment-item-content">
-            <div class="rs-attachment-item-name">{{ name }}</div>
-            <div class="rs-attachment-item-meta">
-                <span v-if="fileSize">{{ fileSize }}</span>
-                <span aria-live="polite"><Badge :value="statuses[status].label" :severity="statuses[status].severity" /></span>
+            <div class="rs-attachment-item-row">
+                <div class="rs-attachment-item-identity">
+                    <div class="rs-attachment-item-name">{{ name }}</div>
+                    <div class="rs-attachment-item-meta">
+                        <span v-if="fileSize">{{ fileSize }}</span>
+                        <span aria-live="polite"><Badge :value="statuses[status].label" :severity="statuses[status].severity" /></span>
+                    </div>
+                </div>
+                <div v-if="(status === 'ready' && url) || (status === 'error' && retryable) || removable || $slots.actions" class="rs-attachment-item-actions">
+                    <Button v-if="status === 'ready' && url" as="a" :href="url" :download="name" text :aria-label="'Download ' + name">
+                        <template #icon><Download :size="17" aria-hidden="true" /></template>
+                    </Button>
+                    <Button v-if="status === 'error' && retryable" text :aria-label="'Retry ' + name" @click="emit('retry')">
+                        <template #icon><RotateCcw :size="17" aria-hidden="true" /></template>
+                    </Button>
+                    <Button v-if="removable" text :aria-label="'Remove ' + name" @click="emit('remove')">
+                        <template #icon><X :size="17" aria-hidden="true" /></template>
+                    </Button>
+                    <slot name="actions" />
+                </div>
             </div>
-            <p v-if="status === 'error' && error" class="rs-attachment-item-error">{{ error }}</p>
-            <ProgressBar
-                v-if="status === 'uploading'"
-                class="rs-attachment-item-progress"
-                :mode="progressValue === undefined ? 'indeterminate' : 'determinate'"
-                :value="progressValue"
-                :show-value="false"
-                :aria-label="'Uploading ' + name"
-            />
-        </div>
-        <div v-if="(status === 'ready' && url) || (status === 'error' && retryable) || removable || $slots.actions" class="rs-attachment-item-actions">
-            <Button v-if="status === 'ready' && url" as="a" :href="url" :download="name" text :aria-label="'Download ' + name">
-                <template #icon><Download :size="17" aria-hidden="true" /></template>
-            </Button>
-            <Button v-if="status === 'error' && retryable" text :aria-label="'Retry ' + name" @click="emit('retry')">
-                <template #icon><RotateCcw :size="17" aria-hidden="true" /></template>
-            </Button>
-            <Button v-if="removable" text :aria-label="'Remove ' + name" @click="emit('remove')">
-                <template #icon><X :size="17" aria-hidden="true" /></template>
-            </Button>
-            <slot name="actions" />
+            <div v-if="(status === 'error' && error) || status === 'uploading'" class="rs-attachment-item-feedback">
+                <p v-if="status === 'error'" class="rs-attachment-item-error">{{ error }}</p>
+                <ProgressBar
+                    v-else
+                    class="rs-attachment-item-progress"
+                    :mode="progressValue === undefined ? 'indeterminate' : 'determinate'"
+                    :value="progressValue"
+                    :show-value="false"
+                    :aria-label="'Uploading ' + name"
+                />
+            </div>
         </div>
     </div>
 </template>
 
 <style>
 .rs-attachment-item {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
     gap: 0.75rem;
     padding: 0.8rem;
     border: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 18%, transparent));
@@ -97,7 +103,17 @@ const progressValue = computed(() =>
     object-fit: cover;
 }
 .rs-attachment-item-content {
-    flex: 1 1 8rem;
+    min-width: 0;
+}
+.rs-attachment-item-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.75rem;
+    align-items: center;
+    min-height: 2.65rem;
+}
+.rs-attachment-item-identity {
+    flex: 1 1 9rem;
     min-width: 0;
 }
 .rs-attachment-item-name {
@@ -113,13 +129,29 @@ const progressValue = computed(() =>
 }
 .rs-attachment-item-meta,
 .rs-attachment-item-error {
-    margin: 0.25rem 0 0;
     font-size: 0.8rem;
+}
+.rs-attachment-item-meta {
+    margin-block-start: 0.2rem;
+    color: var(--rs-text-muted-color, inherit);
 }
 .rs-attachment-item-actions {
     margin-inline-start: auto;
 }
-.rs-attachment-item-progress {
-    margin-top: 0.45rem;
+.rs-attachment-item-actions .rs-button {
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0.25rem;
+}
+.rs-attachment-item-feedback {
+    margin-block-start: 0.55rem;
+    padding-block-start: 0.55rem;
+    border-block-start: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 16%, transparent));
+}
+.rs-attachment-item-error {
+    margin: 0;
+}
+.rs-attachment-item[data-status='error'] .rs-attachment-item-error {
+    color: var(--rs-message-error-color, light-dark(#84223c, #ffa9ba));
 }
 </style>

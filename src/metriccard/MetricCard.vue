@@ -15,19 +15,21 @@ const directionIcons = { up: ArrowUpRight, down: ArrowDownRight, flat: ArrowRigh
 <template>
     <Card class="rs-metric-card" role="group" :aria-labelledby="id">
         <template #content>
-            <div class="rs-metric-card-top">
-                <div :id="id" class="rs-metric-card-label">{{ label }}</div>
-                <div v-if="$slots.icon" class="rs-metric-card-icon" aria-hidden="true">
-                    <slot name="icon" />
+            <div class="rs-metric-card-summary">
+                <div class="rs-metric-card-top">
+                    <div :id="id" class="rs-metric-card-label">{{ label }}</div>
+                    <div v-if="$slots.icon" class="rs-metric-card-icon" aria-hidden="true">
+                        <slot name="icon" />
+                    </div>
                 </div>
-            </div>
-            <div class="rs-metric-card-value">{{ value }}</div>
-            <div v-if="trend || description" class="rs-metric-card-context">
-                <span v-if="trend" class="rs-metric-card-trend" :data-tone="trend.tone ?? 'neutral'">
-                    <component :is="directionIcons[trend.direction]" :size="16" aria-hidden="true" />
-                    {{ trend.label }}
-                </span>
-                <span v-if="description">{{ description }}</span>
+                <div class="rs-metric-card-value">{{ value }}</div>
+                <div v-if="trend || description" class="rs-metric-card-context">
+                    <span v-if="trend" class="rs-metric-card-trend" :data-tone="trend.tone ?? 'neutral'">
+                        <component :is="directionIcons[trend.direction]" :size="16" aria-hidden="true" />
+                        {{ trend.label }}
+                    </span>
+                    <span v-if="description">{{ description }}</span>
+                </div>
             </div>
             <div v-if="$slots.chart" class="rs-metric-card-chart"><slot name="chart" /></div>
         </template>
@@ -35,8 +37,13 @@ const directionIcons = { up: ArrowUpRight, down: ArrowDownRight, flat: ArrowRigh
 </template>
 
 <style>
-.rs-metric-card {
+.rs-card.rs-metric-card {
     min-width: 0;
+    border: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 18%, transparent));
+}
+.rs-metric-card-summary {
+    display: grid;
+    gap: 0.65rem;
 }
 .rs-metric-card-top,
 .rs-metric-card-context,
@@ -53,6 +60,10 @@ const directionIcons = { up: ArrowUpRight, down: ArrowDownRight, flat: ArrowRigh
     font-size: 0.875rem;
     color: var(--rs-text-muted-color, inherit);
 }
+.rs-metric-card-label {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
 .rs-metric-card-icon {
     display: inline-grid;
     place-items: center;
@@ -61,8 +72,8 @@ const directionIcons = { up: ArrowUpRight, down: ArrowDownRight, flat: ArrowRigh
     background: color-mix(in srgb, currentColor 8%, transparent);
 }
 .rs-metric-card-value {
-    margin-block: 0.35rem;
     font-size: clamp(1.65rem, 4vw, 2.6rem);
+    line-height: 1.1;
     font-weight: 650;
     font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
@@ -72,6 +83,9 @@ const directionIcons = { up: ArrowUpRight, down: ArrowDownRight, flat: ArrowRigh
 }
 .rs-metric-card-trend {
     font-weight: 650;
+    padding: 0.2rem 0.45rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, currentColor 8%, transparent);
 }
 .rs-metric-card-trend[data-tone='positive'] {
     color: var(--rs-metric-card-positive-color, light-dark(#22613d, #8bd5a6));
@@ -81,6 +95,8 @@ const directionIcons = { up: ArrowUpRight, down: ArrowDownRight, flat: ArrowRigh
 }
 .rs-metric-card-chart {
     min-width: 0;
-    margin-top: 0.85rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--rs-content-border-color, color-mix(in srgb, currentColor 18%, transparent));
 }
 </style>

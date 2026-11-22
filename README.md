@@ -45,6 +45,8 @@ Import forms by name from the package root or from dedicated subpaths such as `r
 
 Import application icons directly from `@lucide/vue`, for example `import { Check, Search } from '@lucide/vue'`. `IconField` and `InputIcon` still provide layout and accept Lucide icons in their slots.
 
+Styled components have default spacing, control sizes, borders, and focus rings when a theme leaves those values unspecified. Application themes and existing `--rs-*` custom properties take precedence, so controls, panels, overlays, and tables can inherit an app’s visual design.
+
 ### Chart and Editor
 
 Install the optional peers for the component you use.
