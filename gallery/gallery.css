@@ -112,9 +112,6 @@ h1 {
     background: var(--paper);
     border-radius: 0.75rem;
 }
-.legacy {
-    color: var(--muted);
-}
 .control-example {
     display: grid;
     justify-items: start;

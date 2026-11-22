@@ -3,8 +3,8 @@ import { useConfirm, useDialog, useToast } from 'rose-spectacles';
 import TerminalService from 'rose-spectacles/terminalservice';
 import { component, demo, example, locations, menu, sample, type ComponentName, type Example } from './shared';
 
-function overlay(name: ComponentName, headless = false): Example {
-    return example(name, [name], () => {
+function overlay(name: 'Dialog' | 'Drawer', headless = false): Example {
+    return example(headless ? 'Headless drawer' : name, [name], () => {
         const visible = ref(false);
         const close = () => (visible.value = false);
         const content = () => [
@@ -29,17 +29,6 @@ function overlay(name: ComponentName, headless = false): Example {
                           }
                         : content
                 )
-            ]);
-    });
-}
-
-function anchored(name: ComponentName): Example {
-    return example(name, [name], () => {
-        const positioner = ref<{ toggle: (event: MouseEvent) => void }>();
-        return () =>
-            h('div', [
-                h('button', { type: 'button', onClick: (event: MouseEvent) => positioner.value?.toggle(event) }, `Open ${name}`),
-                demo(name, { ref: positioner }, () => h('p', 'Positioned next to the trigger.'))
             ]);
     });
 }
@@ -77,9 +66,15 @@ function directive(name: ComponentName): Directive {
 export const overlays: Example[] = [
     overlay('Dialog'),
     overlay('Drawer'),
-    overlay('Sidebar', true),
-    anchored('Popover'),
-    anchored('OverlayPanel'),
+    overlay('Drawer', true),
+    example('Popover', ['Popover'], () => {
+        const popover = ref<{ toggle: (event: MouseEvent) => void }>();
+        return () =>
+            h('div', [
+                h('button', { type: 'button', onClick: (event: MouseEvent) => popover.value?.toggle(event) }, 'Open Popover'),
+                demo('Popover', { ref: popover }, () => h('p', 'Positioned next to the trigger.'))
+            ]);
+    }),
     example('Popover choice menus', ['Popover', 'Select', 'MultiSelect'], () => {
         const popover = ref<{ show: (event: MouseEvent) => void }>();
         const picker = ref<{ show: () => void }>();
@@ -166,7 +161,6 @@ export const overlays: Example[] = [
         ['Portal'],
         () => () => demo('Portal', { appendTo: 'self' }, () => h('p', 'The portal can render its content locally or in another container.'))
     ),
-    example('Badge directive', ['BadgeDirective'], () => () => withDirectives(h('button', { type: 'button' }, 'Messages'), [[directive('BadgeDirective'), 3]])),
     example(
         'Ripple',
         ['Ripple'],

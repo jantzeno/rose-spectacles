@@ -1,64 +1,45 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
-import { expect, it } from 'vitest';
-import AccordionTab from '../accordiontab/AccordionTab.vue';
+import { h } from 'vue';
+import AccordionContent from '../accordioncontent/AccordionContent.vue';
+import AccordionHeader from '../accordionheader/AccordionHeader.vue';
+import AccordionPanel from '../accordionpanel/AccordionPanel.vue';
 import Accordion from './Accordion.vue';
 
-describe('Accordion.vue', () => {
-    let wrapper: VueWrapper<any>;
+describe('Accordion', () => {
+    let wrapper: VueWrapper;
 
     beforeEach(() => {
         wrapper = mount(Accordion, {
-            global: {
-                components: {
-                    AccordionTab
-                }
-            },
             slots: {
-                default: `
-                    <AccordionTab header="Header I">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                            ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    </AccordionTab>
-                    <AccordionTab header="Header II">
-                        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi
-                            architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione
-                            voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.</p>
-                    </AccordionTab>
-                    <AccordionTab header="Header III">
-                        <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati
-                            cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.
-                            Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus.</p>
-                    </AccordionTab>`
+                default: () =>
+                    ['Field notes', 'Details', 'Review'].map((label, index) =>
+                        h(AccordionPanel, { key: label, value: index }, () => [
+                            h(AccordionHeader, {}, () => label),
+                            h(AccordionContent, {}, () => `${label} content`)
+                        ])
+                    )
             }
         });
     });
 
-    afterEach(() => {
-        vi.clearAllMocks();
+    afterEach(() => wrapper.unmount());
+
+    it('renders the headers of its AccordionPanel children', () => {
+        expect(wrapper.findAll('button.rs-accordionheader').map((button) => button.text())).toEqual(['Field notes', 'Details', 'Review']);
     });
 
-    it('should Accordion and AccordionTab component exist', () => {
-        expect(wrapper.find('.rs-accordion.rs-component').exists()).toBe(true);
-        expect(wrapper.find('.rs-accordionpanel').exists()).toBe(true);
-        expect(wrapper.findAll('.rs-accordionpanel').length).toBe(3);
+    it('activates the matching panel when its value changes', async () => {
+        await wrapper.setProps({ value: 1 });
+
+        const headers = wrapper.findAll('button.rs-accordionheader');
+        expect(headers.map((header) => header.attributes('aria-expanded'))).toEqual(['false', 'true', 'false']);
     });
 
-    it('should activeIndex change', async () => {
-        await wrapper.setProps({ activeIndex: 1 });
+    it('emits the panel value when a header is clicked', async () => {
+        const header = wrapper.get('button.rs-accordionheader');
+        await header.trigger('click');
 
-        const allTabs = wrapper.findAll('.rs-accordionpanel');
-
-        expect(allTabs[0].classes()).not.toContain('rs-accordionpanel-active');
-        expect(allTabs[1].classes()).toContain('rs-accordionpanel-active');
-    });
-
-    it('should work panel click', async () => {
-        const firstHeader = wrapper.find('button.rs-accordionheader');
-
-        await firstHeader.trigger('click');
-
-        expect(wrapper.emitted()['update:activeIndex'][0]).toEqual([0]);
-        expect(wrapper.emitted('tab-click')?.[0]?.[0]).toMatchObject({ index: 0 });
+        expect(wrapper.emitted('update:value')).toEqual([[0]]);
+        expect(header.attributes('aria-expanded')).toBe('true');
     });
 });

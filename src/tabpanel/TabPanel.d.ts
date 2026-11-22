@@ -9,7 +9,7 @@
 import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spectacles/core';
 import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
-import type { AnchorHTMLAttributes, Component, HTMLAttributes, LiHTMLAttributes, VNode } from 'vue';
+import type { Component, VNode } from 'vue';
 
 export declare type TabPanelPassThroughOptionType =
     | TabPanelPassThroughAttributes
@@ -58,26 +58,6 @@ export interface TabPanelPassThroughOptions {
      */
     root?: TabPanelPassThroughOptionType;
     /**
-     * Used to pass attributes to the header's DOM element.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    header?: TabPanelPassThroughOptionType;
-    /**
-     * Used to pass attributes to the header action's DOM element.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    headerAction?: TabPanelPassThroughOptionType;
-    /**
-     * Used to pass attributes to the title's DOM element.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    headerTitle?: TabPanelPassThroughOptionType;
-    /**
-     * Used to pass attributes to the list's DOM element.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    content?: TabPanelPassThroughOptionType;
-    /**
      * Used to manage all lifecycle hooks.
      * @see {@link BaseComponent.ComponentHooks}
      */
@@ -107,52 +87,6 @@ export interface TabPanelProps {
      */
     asChild?: boolean | undefined;
     /**
-     * Orientation of tab headers.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    header?: string | undefined;
-    /**
-     * Inline style of the tab header.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    headerStyle?: any;
-    /**
-     * Style class of the tab header.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    headerClass?: any;
-    /**
-     * Used to pass all properties of the HTMLLiElement to the tab header.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    headerProps?: LiHTMLAttributes | undefined;
-    /**
-     * Used to pass all properties of the HTMLAnchorElement to the focusable anchor element inside the tab header.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    headerActionProps?: AnchorHTMLAttributes | undefined;
-    /**
-     * Inline style of the tab content.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    contentStyle?: any;
-    /**
-     * Style class of the tab content.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    contentClass?: any;
-    /**
-     * Used to pass all properties of the HTMLDivElement to the tab content.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    contentProps?: HTMLAttributes | undefined;
-    /**
-     * Whether the tab is disabled.
-     * @defaultValue false
-     * @deprecated since v4. Only supported by TabView.
-     */
-    disabled?: boolean | undefined;
-    /**
      * It generates scoped CSS variables using design tokens for the component.
      */
     dt?: DesignToken<any>;
@@ -172,26 +106,6 @@ export interface TabPanelProps {
  * Defines current options in TabPanel component.
  */
 export interface TabPanelContext {
-    /**
-     * Current index of the tab.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    index: number;
-    /**
-     * Count of tabs
-     * @deprecated since v4. Only supported by TabView.
-     */
-    count: number;
-    /**
-     * Whether the tab is first.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    first: boolean;
-    /**
-     * Whether the tab is last.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    last: boolean;
     /**
      * Whether the tab is active.
      */
@@ -219,11 +133,6 @@ export interface TabPanelSlots {
          */
         a11yAttrs: any;
     }): VNode[];
-    /**
-     * Custom header template.
-     * @deprecated since v4. Only supported by TabView.
-     */
-    header(): VNode[];
 }
 
 export interface TabPanelEmitsOptions {}

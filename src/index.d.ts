@@ -39,12 +39,6 @@ export { default as AccordionPanel } from 'rose-spectacles/accordionpanel';
 export * from 'rose-spectacles/accordionpanel/style';
 export { default as AccordionPanelStyle } from 'rose-spectacles/accordionpanel/style';
 
-// AccordionTab
-export * from 'rose-spectacles/accordiontab';
-export { default as AccordionTab } from 'rose-spectacles/accordiontab';
-export * from 'rose-spectacles/accordiontab/style';
-export { default as AccordionTabStyle } from 'rose-spectacles/accordiontab/style';
-
 // AnimateOnScroll
 export * from 'rose-spectacles/animateonscroll';
 export { default as AnimateOnScroll } from 'rose-spectacles/animateonscroll';
@@ -75,12 +69,6 @@ export { default as Badge } from 'rose-spectacles/badge';
 export * from 'rose-spectacles/badge/style';
 export { default as BadgeStyle } from 'rose-spectacles/badge/style';
 
-// BadgeDirective
-export * from 'rose-spectacles/badgedirective';
-export { default as BadgeDirective } from 'rose-spectacles/badgedirective';
-export * from 'rose-spectacles/badgedirective/style';
-export { default as BadgeDirectiveStyle } from 'rose-spectacles/badgedirective/style';
-
 // BlockUI
 export * from 'rose-spectacles/blockui';
 export { default as BlockUI } from 'rose-spectacles/blockui';
@@ -104,12 +92,6 @@ export * from 'rose-spectacles/buttongroup';
 export { default as ButtonGroup } from 'rose-spectacles/buttongroup';
 export * from 'rose-spectacles/buttongroup/style';
 export { default as ButtonGroupStyle } from 'rose-spectacles/buttongroup/style';
-
-// Calendar
-export * from 'rose-spectacles/calendar';
-export { default as Calendar } from 'rose-spectacles/calendar';
-export * from 'rose-spectacles/calendar/style';
-export { default as CalendarStyle } from 'rose-spectacles/calendar/style';
 
 // Card
 export * from 'rose-spectacles/card';
@@ -146,12 +128,6 @@ export * from 'rose-spectacles/chip';
 export { default as Chip } from 'rose-spectacles/chip';
 export * from 'rose-spectacles/chip/style';
 export { default as ChipStyle } from 'rose-spectacles/chip/style';
-
-// Chips
-export * from 'rose-spectacles/chips';
-export { default as Chips } from 'rose-spectacles/chips';
-export * from 'rose-spectacles/chips/style';
-export { default as ChipsStyle } from 'rose-spectacles/chips/style';
 
 // ColorPicker
 export * from 'rose-spectacles/colorpicker';
@@ -253,12 +229,6 @@ export { default as Drawer } from 'rose-spectacles/drawer';
 export * from 'rose-spectacles/drawer/style';
 export { default as DrawerStyle } from 'rose-spectacles/drawer/style';
 
-// Dropdown
-export * from 'rose-spectacles/dropdown';
-export { default as Dropdown } from 'rose-spectacles/dropdown';
-export * from 'rose-spectacles/dropdown/style';
-export { default as DropdownStyle } from 'rose-spectacles/dropdown/style';
-
 // DynamicDialog
 export * from 'rose-spectacles/dynamicdialog';
 export { default as DynamicDialog } from 'rose-spectacles/dynamicdialog';
@@ -329,12 +299,6 @@ export { default as ImageCompare } from 'rose-spectacles/imagecompare';
 export * from 'rose-spectacles/imagecompare/style';
 export { default as ImageCompareStyle } from 'rose-spectacles/imagecompare/style';
 
-// InlineMessage
-export * from 'rose-spectacles/inlinemessage';
-export { default as InlineMessage } from 'rose-spectacles/inlinemessage';
-export * from 'rose-spectacles/inlinemessage/style';
-export { default as InlineMessageStyle } from 'rose-spectacles/inlinemessage/style';
-
 // Inplace
 export * from 'rose-spectacles/inplace';
 export { default as Inplace } from 'rose-spectacles/inplace';
@@ -382,12 +346,6 @@ export * from 'rose-spectacles/inputotp';
 export { default as InputOtp } from 'rose-spectacles/inputotp';
 export * from 'rose-spectacles/inputotp/style';
 export { default as InputOtpStyle } from 'rose-spectacles/inputotp/style';
-
-// InputSwitch
-export * from 'rose-spectacles/inputswitch';
-export { default as InputSwitch } from 'rose-spectacles/inputswitch';
-export * from 'rose-spectacles/inputswitch/style';
-export { default as InputSwitchStyle } from 'rose-spectacles/inputswitch/style';
 
 // InputText
 export * from 'rose-spectacles/inputtext';
@@ -470,12 +428,6 @@ export { default as OverlayBadgeStyle } from 'rose-spectacles/overlaybadge/style
 // OverlayEventBus
 export * from 'rose-spectacles/overlayeventbus';
 export { default as OverlayEventBus } from 'rose-spectacles/overlayeventbus';
-
-// OverlayPanel
-export * from 'rose-spectacles/overlaypanel';
-export { default as OverlayPanel } from 'rose-spectacles/overlaypanel';
-export * from 'rose-spectacles/overlaypanel/style';
-export { default as OverlayPanelStyle } from 'rose-spectacles/overlaypanel/style';
 
 // Paginator
 export * from 'rose-spectacles/paginator';
@@ -585,12 +537,6 @@ export { default as SelectButton } from 'rose-spectacles/selectbutton';
 export * from 'rose-spectacles/selectbutton/style';
 export { default as SelectButtonStyle } from 'rose-spectacles/selectbutton/style';
 
-// Sidebar
-export * from 'rose-spectacles/sidebar';
-export { default as Sidebar } from 'rose-spectacles/sidebar';
-export * from 'rose-spectacles/sidebar/style';
-export { default as SidebarStyle } from 'rose-spectacles/sidebar/style';
-
 // Skeleton
 export * from 'rose-spectacles/skeleton';
 export { default as Skeleton } from 'rose-spectacles/skeleton';
@@ -663,12 +609,6 @@ export { default as Stepper } from 'rose-spectacles/stepper';
 export * from 'rose-spectacles/stepper/style';
 export { default as StepperStyle } from 'rose-spectacles/stepper/style';
 
-// Steps
-export * from 'rose-spectacles/steps';
-export { default as Steps } from 'rose-spectacles/steps';
-export * from 'rose-spectacles/steps/style';
-export { default as StepsStyle } from 'rose-spectacles/steps/style';
-
 // StyleClass
 export * from 'rose-spectacles/styleclass';
 export { default as StyleClass } from 'rose-spectacles/styleclass';
@@ -687,12 +627,6 @@ export { default as TabList } from 'rose-spectacles/tablist';
 export * from 'rose-spectacles/tablist/style';
 export { default as TabListStyle } from 'rose-spectacles/tablist/style';
 
-// TabMenu
-export * from 'rose-spectacles/tabmenu';
-export { default as TabMenu } from 'rose-spectacles/tabmenu';
-export * from 'rose-spectacles/tabmenu/style';
-export { default as TabMenuStyle } from 'rose-spectacles/tabmenu/style';
-
 // TabPanel
 export * from 'rose-spectacles/tabpanel';
 export { default as TabPanel } from 'rose-spectacles/tabpanel';
@@ -710,12 +644,6 @@ export * from 'rose-spectacles/tabs';
 export { default as Tabs } from 'rose-spectacles/tabs';
 export * from 'rose-spectacles/tabs/style';
 export { default as TabsStyle } from 'rose-spectacles/tabs/style';
-
-// TabView
-export * from 'rose-spectacles/tabview';
-export { default as TabView } from 'rose-spectacles/tabview';
-export * from 'rose-spectacles/tabview/style';
-export { default as TabViewStyle } from 'rose-spectacles/tabview/style';
 
 // Tag
 export * from 'rose-spectacles/tag';

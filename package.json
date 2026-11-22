@@ -62,14 +62,6 @@
             "types": "./src/accordionpanel/style/AccordionPanelStyle.d.ts",
             "default": "./src/accordionpanel/style/AccordionPanelStyle.ts"
         },
-        "./accordiontab": {
-            "types": "./src/accordiontab/AccordionTab.d.ts",
-            "default": "./src/accordiontab/AccordionTab.vue"
-        },
-        "./accordiontab/style": {
-            "types": "./src/accordiontab/style/AccordionTabStyle.d.ts",
-            "default": "./src/accordiontab/style/AccordionTabStyle.ts"
-        },
         "./animateonscroll": {
             "types": "./src/animateonscroll/AnimateOnScroll.d.ts",
             "default": "./src/animateonscroll/AnimateOnScroll.ts"
@@ -110,14 +102,6 @@
             "types": "./src/badge/style/BadgeStyle.d.ts",
             "default": "./src/badge/style/BadgeStyle.ts"
         },
-        "./badgedirective": {
-            "types": "./src/badgedirective/BadgeDirective.d.ts",
-            "default": "./src/badgedirective/BadgeDirective.ts"
-        },
-        "./badgedirective/style": {
-            "types": "./src/badgedirective/style/BadgeDirectiveStyle.d.ts",
-            "default": "./src/badgedirective/style/BadgeDirectiveStyle.ts"
-        },
         "./blockui": {
             "types": "./src/blockui/BlockUI.d.ts",
             "default": "./src/blockui/BlockUI.vue"
@@ -149,14 +133,6 @@
         "./buttongroup/style": {
             "types": "./src/buttongroup/style/ButtonGroupStyle.d.ts",
             "default": "./src/buttongroup/style/ButtonGroupStyle.ts"
-        },
-        "./calendar": {
-            "types": "./src/calendar/Calendar.d.ts",
-            "default": "./src/calendar/Calendar.vue"
-        },
-        "./calendar/style": {
-            "types": "./src/calendar/style/CalendarStyle.d.ts",
-            "default": "./src/calendar/style/CalendarStyle.ts"
         },
         "./card": {
             "types": "./src/card/Card.d.ts",
@@ -213,14 +189,6 @@
         "./chip/style": {
             "types": "./src/chip/style/ChipStyle.d.ts",
             "default": "./src/chip/style/ChipStyle.ts"
-        },
-        "./chips": {
-            "types": "./src/chips/Chips.d.ts",
-            "default": "./src/chips/Chips.vue"
-        },
-        "./chips/style": {
-            "types": "./src/chips/style/ChipsStyle.d.ts",
-            "default": "./src/chips/style/ChipsStyle.ts"
         },
         "./colorpicker": {
             "types": "./src/colorpicker/ColorPicker.d.ts",
@@ -350,14 +318,6 @@
             "types": "./src/drawer/style/DrawerStyle.d.ts",
             "default": "./src/drawer/style/DrawerStyle.ts"
         },
-        "./dropdown": {
-            "types": "./src/dropdown/Dropdown.d.ts",
-            "default": "./src/dropdown/Dropdown.vue"
-        },
-        "./dropdown/style": {
-            "types": "./src/dropdown/style/DropdownStyle.d.ts",
-            "default": "./src/dropdown/style/DropdownStyle.ts"
-        },
         "./dynamicdialog": {
             "types": "./src/dynamicdialog/DynamicDialog.d.ts",
             "default": "./src/dynamicdialog/DynamicDialog.vue"
@@ -458,14 +418,6 @@
             "types": "./src/imagecompare/style/ImageCompareStyle.d.ts",
             "default": "./src/imagecompare/style/ImageCompareStyle.ts"
         },
-        "./inlinemessage": {
-            "types": "./src/inlinemessage/InlineMessage.d.ts",
-            "default": "./src/inlinemessage/InlineMessage.vue"
-        },
-        "./inlinemessage/style": {
-            "types": "./src/inlinemessage/style/InlineMessageStyle.d.ts",
-            "default": "./src/inlinemessage/style/InlineMessageStyle.ts"
-        },
         "./inplace": {
             "types": "./src/inplace/Inplace.d.ts",
             "default": "./src/inplace/Inplace.vue"
@@ -529,14 +481,6 @@
         "./inputotp/style": {
             "types": "./src/inputotp/style/InputOtpStyle.d.ts",
             "default": "./src/inputotp/style/InputOtpStyle.ts"
-        },
-        "./inputswitch": {
-            "types": "./src/inputswitch/InputSwitch.d.ts",
-            "default": "./src/inputswitch/InputSwitch.vue"
-        },
-        "./inputswitch/style": {
-            "types": "./src/inputswitch/style/InputSwitchStyle.d.ts",
-            "default": "./src/inputswitch/style/InputSwitchStyle.ts"
         },
         "./inputtext": {
             "types": "./src/inputtext/InputText.d.ts",
@@ -645,14 +589,6 @@
         "./overlayeventbus": {
             "types": "./src/overlayeventbus/OverlayEventBus.d.ts",
             "default": "./src/overlayeventbus/OverlayEventBus.ts"
-        },
-        "./overlaypanel": {
-            "types": "./src/overlaypanel/OverlayPanel.d.ts",
-            "default": "./src/overlaypanel/OverlayPanel.vue"
-        },
-        "./overlaypanel/style": {
-            "types": "./src/overlaypanel/style/OverlayPanelStyle.d.ts",
-            "default": "./src/overlaypanel/style/OverlayPanelStyle.ts"
         },
         "./paginator": {
             "types": "./src/paginator/Paginator.d.ts",
@@ -798,14 +734,6 @@
             "types": "./src/selectbutton/style/SelectButtonStyle.d.ts",
             "default": "./src/selectbutton/style/SelectButtonStyle.ts"
         },
-        "./sidebar": {
-            "types": "./src/sidebar/Sidebar.d.ts",
-            "default": "./src/sidebar/Sidebar.vue"
-        },
-        "./sidebar/style": {
-            "types": "./src/sidebar/style/SidebarStyle.d.ts",
-            "default": "./src/sidebar/style/SidebarStyle.ts"
-        },
         "./skeleton": {
             "types": "./src/skeleton/Skeleton.d.ts",
             "default": "./src/skeleton/Skeleton.vue"
@@ -902,14 +830,6 @@
             "types": "./src/stepper/style/StepperStyle.d.ts",
             "default": "./src/stepper/style/StepperStyle.ts"
         },
-        "./steps": {
-            "types": "./src/steps/Steps.d.ts",
-            "default": "./src/steps/Steps.vue"
-        },
-        "./steps/style": {
-            "types": "./src/steps/style/StepsStyle.d.ts",
-            "default": "./src/steps/style/StepsStyle.ts"
-        },
         "./styleclass": {
             "types": "./src/styleclass/StyleClass.d.ts",
             "default": "./src/styleclass/StyleClass.ts"
@@ -934,14 +854,6 @@
             "types": "./src/tablist/style/TabListStyle.d.ts",
             "default": "./src/tablist/style/TabListStyle.ts"
         },
-        "./tabmenu": {
-            "types": "./src/tabmenu/TabMenu.d.ts",
-            "default": "./src/tabmenu/TabMenu.vue"
-        },
-        "./tabmenu/style": {
-            "types": "./src/tabmenu/style/TabMenuStyle.d.ts",
-            "default": "./src/tabmenu/style/TabMenuStyle.ts"
-        },
         "./tabpanel": {
             "types": "./src/tabpanel/TabPanel.d.ts",
             "default": "./src/tabpanel/TabPanel.vue"
@@ -965,14 +877,6 @@
         "./tabs/style": {
             "types": "./src/tabs/style/TabsStyle.d.ts",
             "default": "./src/tabs/style/TabsStyle.ts"
-        },
-        "./tabview": {
-            "types": "./src/tabview/TabView.d.ts",
-            "default": "./src/tabview/TabView.vue"
-        },
-        "./tabview/style": {
-            "types": "./src/tabview/style/TabViewStyle.d.ts",
-            "default": "./src/tabview/style/TabViewStyle.ts"
         },
         "./tag": {
             "types": "./src/tag/Tag.d.ts",

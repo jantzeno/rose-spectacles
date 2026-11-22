@@ -1,6 +1,6 @@
-# Legacy components
+# Removed legacy components
 
-Rose Spectacles retains these Vue 3 components and their direct imports. The gallery includes examples for both generations of each family.
+Use the replacements below in named imports and component subpaths. Update pass-through configuration to target the replacement component.
 
 | Legacy component | Current alternative                                   |
 | ---------------- | ----------------------------------------------------- |
@@ -17,4 +17,4 @@ Rose Spectacles retains these Vue 3 components and their direct imports. The gal
 | TabView          | Tabs, TabList, Tab, TabPanels, and TabPanel           |
 | Badge directive  | OverlayBadge                                          |
 
-Review these components before changing or removing their public entry points.
+For Accordion, use `value` and matching panel values. For Tabs, put headers in `Tab` and content in `TabPanel`, pairing them by `value`. Replace `v-badge` with an `OverlayBadge` wrapping the element.

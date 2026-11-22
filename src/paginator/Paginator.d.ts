@@ -8,9 +8,9 @@
  */
 import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spectacles/core';
 import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
-import type { DropdownPassThroughOptions } from 'rose-spectacles/dropdown';
 import type { InputNumberPassThroughOptions } from 'rose-spectacles/inputnumber';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
+import type { SelectPassThroughOptions } from 'rose-spectacles/select';
 import { VNode } from 'vue';
 
 export declare type PaginatorPassThroughOptionType<T = any> =
@@ -130,17 +130,17 @@ export interface PaginatorPassThroughOptions<T = any> {
      */
     current?: PaginatorPassThroughOptionType<T>;
     /**
-     * Used to pass attributes to the Dropdown component.
-     * @see {@link DropdownPassThroughOptions}
+     * Used to pass attributes to the rows-per-page Select.
+     * @see {@link SelectPassThroughOptions}
      */
-    pcRowPerPageDropdown?: DropdownPassThroughOptions<PaginatorSharedPassThroughMethodOptions>;
+    pcRowPerPageDropdown?: SelectPassThroughOptions<PaginatorSharedPassThroughMethodOptions>;
     /**
-     * Used to pass attributes to the Dropdown component.
-     * @see {@link DropdownPassThroughOptions}
+     * Used to pass attributes to the page selection control.
+     * @see {@link SelectPassThroughOptions}
      */
-    pcJumpToPageDropdown?: DropdownPassThroughOptions<PaginatorSharedPassThroughMethodOptions>;
+    pcJumpToPageDropdown?: SelectPassThroughOptions<PaginatorSharedPassThroughMethodOptions>;
     /**
-     * Used to pass attributes to the Dropdown component.
+     * Used to pass attributes to the page number input.
      * @see {@link InputNumberPassThroughOptions}
      */
     pcJumpToPageInputText?: InputNumberPassThroughOptions<PaginatorSharedPassThroughMethodOptions>;

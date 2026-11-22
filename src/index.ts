@@ -39,12 +39,6 @@ export { default as AccordionPanel } from './accordionpanel/AccordionPanel.vue';
 export * from './accordionpanel/style/AccordionPanelStyle';
 export { default as AccordionPanelStyle } from './accordionpanel/style/AccordionPanelStyle';
 
-// AccordionTab
-export * from './accordiontab/AccordionTab.vue';
-export { default as AccordionTab } from './accordiontab/AccordionTab.vue';
-export * from './accordiontab/style/AccordionTabStyle';
-export { default as AccordionTabStyle } from './accordiontab/style/AccordionTabStyle';
-
 // AnimateOnScroll
 export * from './animateonscroll/AnimateOnScroll';
 export { default as AnimateOnScroll } from './animateonscroll/AnimateOnScroll';
@@ -75,12 +69,6 @@ export { default as Badge } from './badge/Badge.vue';
 export * from './badge/style/BadgeStyle';
 export { default as BadgeStyle } from './badge/style/BadgeStyle';
 
-// BadgeDirective
-export * from './badgedirective/BadgeDirective';
-export { default as BadgeDirective } from './badgedirective/BadgeDirective';
-export * from './badgedirective/style/BadgeDirectiveStyle';
-export { default as BadgeDirectiveStyle } from './badgedirective/style/BadgeDirectiveStyle';
-
 // BlockUI
 export * from './blockui/BlockUI.vue';
 export { default as BlockUI } from './blockui/BlockUI.vue';
@@ -104,12 +92,6 @@ export * from './buttongroup/ButtonGroup.vue';
 export { default as ButtonGroup } from './buttongroup/ButtonGroup.vue';
 export * from './buttongroup/style/ButtonGroupStyle';
 export { default as ButtonGroupStyle } from './buttongroup/style/ButtonGroupStyle';
-
-// Calendar
-export * from './calendar/Calendar.vue';
-export { default as Calendar } from './calendar/Calendar.vue';
-export * from './calendar/style/CalendarStyle';
-export { default as CalendarStyle } from './calendar/style/CalendarStyle';
 
 // Card
 export * from './card/Card.vue';
@@ -146,12 +128,6 @@ export * from './chip/Chip.vue';
 export { default as Chip } from './chip/Chip.vue';
 export * from './chip/style/ChipStyle';
 export { default as ChipStyle } from './chip/style/ChipStyle';
-
-// Chips
-export * from './chips/Chips.vue';
-export { default as Chips } from './chips/Chips.vue';
-export * from './chips/style/ChipsStyle';
-export { default as ChipsStyle } from './chips/style/ChipsStyle';
 
 // ColorPicker
 export * from './colorpicker/ColorPicker.vue';
@@ -253,12 +229,6 @@ export { default as Drawer } from './drawer/Drawer.vue';
 export * from './drawer/style/DrawerStyle';
 export { default as DrawerStyle } from './drawer/style/DrawerStyle';
 
-// Dropdown
-export * from './dropdown/Dropdown.vue';
-export { default as Dropdown } from './dropdown/Dropdown.vue';
-export * from './dropdown/style/DropdownStyle';
-export { default as DropdownStyle } from './dropdown/style/DropdownStyle';
-
 // DynamicDialog
 export * from './dynamicdialog/DynamicDialog.vue';
 export { default as DynamicDialog } from './dynamicdialog/DynamicDialog.vue';
@@ -329,12 +299,6 @@ export { default as ImageCompare } from './imagecompare/ImageCompare.vue';
 export * from './imagecompare/style/ImageCompareStyle';
 export { default as ImageCompareStyle } from './imagecompare/style/ImageCompareStyle';
 
-// InlineMessage
-export * from './inlinemessage/InlineMessage.vue';
-export { default as InlineMessage } from './inlinemessage/InlineMessage.vue';
-export * from './inlinemessage/style/InlineMessageStyle';
-export { default as InlineMessageStyle } from './inlinemessage/style/InlineMessageStyle';
-
 // Inplace
 export * from './inplace/Inplace.vue';
 export { default as Inplace } from './inplace/Inplace.vue';
@@ -382,12 +346,6 @@ export * from './inputotp/InputOtp.vue';
 export { default as InputOtp } from './inputotp/InputOtp.vue';
 export * from './inputotp/style/InputOtpStyle';
 export { default as InputOtpStyle } from './inputotp/style/InputOtpStyle';
-
-// InputSwitch
-export * from './inputswitch/InputSwitch.vue';
-export { default as InputSwitch } from './inputswitch/InputSwitch.vue';
-export * from './inputswitch/style/InputSwitchStyle';
-export { default as InputSwitchStyle } from './inputswitch/style/InputSwitchStyle';
 
 // InputText
 export * from './inputtext/InputText.vue';
@@ -470,12 +428,6 @@ export { default as OverlayBadgeStyle } from './overlaybadge/style/OverlayBadgeS
 // OverlayEventBus
 export * from './overlayeventbus/OverlayEventBus';
 export { default as OverlayEventBus } from './overlayeventbus/OverlayEventBus';
-
-// OverlayPanel
-export * from './overlaypanel/OverlayPanel.vue';
-export { default as OverlayPanel } from './overlaypanel/OverlayPanel.vue';
-export * from './overlaypanel/style/OverlayPanelStyle';
-export { default as OverlayPanelStyle } from './overlaypanel/style/OverlayPanelStyle';
 
 // Paginator
 export * from './paginator/Paginator.vue';
@@ -585,12 +537,6 @@ export { default as SelectButton } from './selectbutton/SelectButton.vue';
 export * from './selectbutton/style/SelectButtonStyle';
 export { default as SelectButtonStyle } from './selectbutton/style/SelectButtonStyle';
 
-// Sidebar
-export * from './sidebar/Sidebar.vue';
-export { default as Sidebar } from './sidebar/Sidebar.vue';
-export * from './sidebar/style/SidebarStyle';
-export { default as SidebarStyle } from './sidebar/style/SidebarStyle';
-
 // Skeleton
 export * from './skeleton/Skeleton.vue';
 export { default as Skeleton } from './skeleton/Skeleton.vue';
@@ -663,12 +609,6 @@ export { default as Stepper } from './stepper/Stepper.vue';
 export * from './stepper/style/StepperStyle';
 export { default as StepperStyle } from './stepper/style/StepperStyle';
 
-// Steps
-export * from './steps/Steps.vue';
-export { default as Steps } from './steps/Steps.vue';
-export * from './steps/style/StepsStyle';
-export { default as StepsStyle } from './steps/style/StepsStyle';
-
 // StyleClass
 export * from './styleclass/StyleClass';
 export { default as StyleClass } from './styleclass/StyleClass';
@@ -687,12 +627,6 @@ export { default as TabList } from './tablist/TabList.vue';
 export * from './tablist/style/TabListStyle';
 export { default as TabListStyle } from './tablist/style/TabListStyle';
 
-// TabMenu
-export * from './tabmenu/TabMenu.vue';
-export { default as TabMenu } from './tabmenu/TabMenu.vue';
-export * from './tabmenu/style/TabMenuStyle';
-export { default as TabMenuStyle } from './tabmenu/style/TabMenuStyle';
-
 // TabPanel
 export * from './tabpanel/TabPanel.vue';
 export { default as TabPanel } from './tabpanel/TabPanel.vue';
@@ -710,12 +644,6 @@ export * from './tabs/Tabs.vue';
 export { default as Tabs } from './tabs/Tabs.vue';
 export * from './tabs/style/TabsStyle';
 export { default as TabsStyle } from './tabs/style/TabsStyle';
-
-// TabView
-export * from './tabview/TabView.vue';
-export { default as TabView } from './tabview/TabView.vue';
-export * from './tabview/style/TabViewStyle';
-export { default as TabViewStyle } from './tabview/style/TabViewStyle';
 
 // Tag
 export * from './tag/Tag.vue';

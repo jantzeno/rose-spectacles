@@ -34,11 +34,6 @@ export default defineComponent({
         collapseIcon: {
             type: String,
             default: undefined
-        },
-        // @deprecated since v4.
-        activeIndex: {
-            type: [Number, Array],
-            default: null
         }
     },
     style: AccordionStyle,

@@ -15,7 +15,6 @@ export const display: Example[] = [
     sample('Chip', { label: 'Field notes', removable: true }),
     sample('Tag', { value: 'Ready for review', severity: 'success' }),
     sample('Message', { severity: 'success' }, 'Field notes saved.'),
-    sample('InlineMessage', { severity: 'info' }, 'Review the changes.'),
     sample('ProgressBar', { value: 58 }),
     sample('ProgressSpinner', { 'aria-label': 'Saving notes', style: { width: '44px', height: '44px' } }),
     sample('MeterGroup', {
@@ -30,8 +29,6 @@ export const display: Example[] = [
     sample('MegaMenu', { model: [{ label: 'Journal', items: [[{ label: 'Entries', items: [{ label: 'Field notes' }] }]] }] }),
     sample('PanelMenu', { model: items }),
     sample('TieredMenu', { model: items }),
-    sample('TabMenu', { model: menu }),
-    sample('Steps', { model: menu, activeStep: 1 }),
     example(
         'Dock',
         ['Dock'],

@@ -59,16 +59,17 @@ try {
         );
         console.log('Tab reaches the Select clear button, and activating it clears the value and restores focus');
 
-        await show('#chips');
+        await show('#inputchips');
+        const longTag = 'LongTag'.repeat(18);
         await browser.evaluate(`(() => {
-            const root = document.querySelector('[data-example="chips"] .rs-inputchips');
+            const root = document.querySelector('[data-example="inputchips"] .rs-inputchips');
             root.style.inlineSize = '12rem';
             const input = root.querySelector('input');
-            input.value = 'LongTag'.repeat(18);
+            input.value = ${JSON.stringify(longTag)};
             input.dispatchEvent(new InputEvent('input', { bubbles: true }));
             return input.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true, cancelable: true }));
         })()`);
-        const longChip = '[data-example="chips"] .rs-inputchips-chip-item:nth-child(2)';
+        const longChip = `[data-example="inputchips"] .rs-inputchips-chip-item[aria-label="${longTag}"]`;
         const removeChip = `${longChip} .rs-chip-remove-icon`;
         await wait(
             `(() => {
@@ -167,18 +168,18 @@ try {
         );
         console.log('Escape closes the dialog and restores trigger focus');
 
-        await show('#sidebar');
-        await browser.click('[data-example="sidebar"] [data-testid="overlay-open"]');
+        await show('#headless-drawer');
+        await browser.click('[data-example="headless-drawer"] [data-testid="overlay-open"]');
         await wait(
             `(() => {
                 const panel = document.querySelector('.rs-drawer');
                 return panel && panel.scrollHeight > panel.clientHeight && getComputedStyle(panel).overflowY === 'auto';
             })()`,
-            'Overflowing headless Sidebar content can scroll'
+            'Overflowing headless Drawer content can scroll'
         );
         await browser.evaluate(`document.querySelector('.rs-drawer').scrollTop = 300`);
         assert.ok((await browser.evaluate<number>(`document.querySelector('.rs-drawer').scrollTop`)) > 0);
-        console.log('Overflowing headless Sidebar content can scroll');
+        console.log('Overflowing headless Drawer content can scroll');
 
         await show('#popover');
         await browser.evaluate(`Object.assign(document.querySelector('[data-example="popover"] button').style, {

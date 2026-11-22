@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, defineComponent, onMounted, onUnmounted, ref } from 'vue';
-import { catalog, idFor, legacy } from './catalog';
+import { catalog, idFor } from './catalog';
 
 const sections = Object.entries(catalog).map(([name, demos]) => ({
     name,
@@ -53,7 +53,6 @@ const example = computed(() => allDemos.find(({ id }) => id === selected.value) 
         </aside>
         <main id="example" tabindex="-1">
             <h1>{{ example.name }}</h1>
-            <p v-if="example.names.some((name) => legacy.has(name))" class="legacy">Legacy component</p>
             <div class="sample" :data-example="example.id">
                 <component :is="example.component" :key="example.id" />
             </div>

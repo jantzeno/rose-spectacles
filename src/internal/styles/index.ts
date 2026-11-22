@@ -102,9 +102,6 @@ export * as ImageStyle from './image/index';
 // ImageCompare
 export * as ImageCompareStyle from './imagecompare/index';
 
-// InlineMessage
-export * as InlineMessageStyle from './inlinemessage/index';
-
 // Inplace
 export * as InplaceStyle from './inplace/index';
 
@@ -222,17 +219,8 @@ export * as SplitterStyle from './splitter/index';
 // Stepper
 export * as StepperStyle from './stepper/index';
 
-// Steps
-export * as StepsStyle from './steps/index';
-
-// TabMenu
-export * as TabMenuStyle from './tabmenu/index';
-
 // Tabs
 export * as TabsStyle from './tabs/index';
-
-// TabView
-export * as TabViewStyle from './tabview/index';
 
 // Tag
 export * as TagStyle from './tag/index';

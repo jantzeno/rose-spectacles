@@ -28,17 +28,4 @@ export const catalog: Readonly<Record<string, Example[]>> = {
     Icons: [example('Base icon', ['BaseIcon'], () => () => h(DiamondIcon, { label: 'Diamond' })), ...icons]
 };
 
-export const legacy = new Set<ComponentName>([
-    'AccordionTab',
-    'Calendar',
-    'Chips',
-    'Dropdown',
-    'InlineMessage',
-    'InputSwitch',
-    'OverlayPanel',
-    'Sidebar',
-    'Steps',
-    'TabMenu',
-    'TabView'
-]);
 export const idFor = (name: string) => name.toLowerCase().replaceAll(' ', '-');

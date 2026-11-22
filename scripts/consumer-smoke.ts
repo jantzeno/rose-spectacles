@@ -129,13 +129,13 @@ try {
         </template>
     `;
     await write('SlotTypes.vue', slotTypes);
-    const menuComponents = ['Breadcrumb', 'ContextMenu', 'MegaMenu', 'Menu', 'Menubar', 'PanelMenu', 'SplitButton', 'Steps', 'TabMenu', 'TieredMenu'];
+    const menuComponents = ['Breadcrumb', 'ContextMenu', 'MegaMenu', 'Menu', 'Menubar', 'PanelMenu', 'SplitButton', 'TieredMenu'];
     await write(
         'ModelTypes.vue',
         `
         <script setup lang="ts">
         import { ref } from 'vue';
-        import { ${menuComponents.join(', ')}, Calendar, DatePicker, Form, InputText, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
+        import { ${menuComponents.join(', ')}, DatePicker, Form, InputText, OrganizationChart, Tree, TreeSelect } from 'rose-spectacles';
         import DataTable, { type DataTableFilterMetaData, type DataTablePassThroughOptions } from 'rose-spectacles/datatable';
         import type { FormSubmitEvent } from 'rose-spectacles/forms/form';
         import type { MenuItem } from 'rose-spectacles/menuitem';
@@ -199,7 +199,7 @@ try {
             <InputText v-model="label" @value-change="acceptLabel" />
             <DatePicker v-model="day" @update:model-value="acceptDay" />
             <DatePicker v-model="range" selection-mode="range" update-model-type="string" @update:model-value="acceptRange" />
-            <Calendar model-value="2024-07-01" />
+            <DatePicker model-value="2024-07-01" update-model-type="string" />
         </template>
     `
     );

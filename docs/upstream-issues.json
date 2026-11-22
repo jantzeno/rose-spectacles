@@ -4762,14 +4762,14 @@
             "component": "Drawer, Sidebar",
             "disposition": "fixed",
             "evidence": [
-                "The production Firefox gallery reproduced the overflow using the retained Sidebar alias with a long custom container slot. Content exceeded the panel, but the panel was not scrollable.",
-                "The same check passes after setting vertical overflow on the headless Drawer container. Firefox verifies auto scrolling and a changed scroll offset."
+                "The production Firefox gallery reproduced the overflow using the former Sidebar alias with a long custom container slot. Content exceeded the panel, but the panel was not scrollable.",
+                "Setting vertical overflow fixed the headless Drawer container. The browser regression now uses Drawer directly and verifies automatic overflow and a changed scroll offset."
             ],
             "reproducer": "https://stackblitz.com/github/loglinn05/dazzle?file=src%2Fviews%2FProducts.vue&initialpath=products",
             "resolvingCommit": "752e0a2bccbd6596dbbc14ae4be645e2f9887fda",
             "test": {
                 "path": "scripts/browser-smoke.ts",
-                "name": "Overflowing headless Sidebar content can scroll"
+                "name": "Overflowing headless Drawer content can scroll"
             }
         },
         {
@@ -5481,17 +5481,13 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/491",
             "title": "TabView: Show active tab with autoscroll ",
             "labels": ["bug"],
-            "component": "TabView, Tab",
-            "disposition": "fixed",
+            "component": "TabView",
+            "disposition": "out-of-scope",
             "evidence": [
-                "Mounted a scrollable legacy TabView with the eleventh tab initially selected. The test saw no scroll request before the fix and then verified that the selected header is scrolled into view on mount."
+                "Commit cef165abde247d87878a93e97c3afaab0197c8bd fixed initial scrolling in legacy TabView and verified it in src/tabview/TabView.spec.ts.",
+                "The report and its regression covered the removed TabView component."
             ],
-            "reproducer": "https://codesandbox.io/p/sandbox/green-wave-7x2d4y?file=%2Fsrc%2FApp.vue%3A23%2C11",
-            "resolvingCommit": "cef165abde247d87878a93e97c3afaab0197c8bd",
-            "test": {
-                "path": "src/tabview/TabView.spec.ts",
-                "name": "scrolls the initially active header into view in a scrollable TabView"
-            }
+            "reproducer": "https://codesandbox.io/p/sandbox/green-wave-7x2d4y?file=%2Fsrc%2FApp.vue%3A23%2C11"
         },
         {
             "number": 493,

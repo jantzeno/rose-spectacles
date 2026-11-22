@@ -4,18 +4,15 @@ import type { AccordionPassThroughOptions } from 'rose-spectacles/accordion';
 import type { AccordionContentPassThroughOptions } from 'rose-spectacles/accordioncontent';
 import type { AccordionHeaderPassThroughOptions } from 'rose-spectacles/accordionheader';
 import type { AccordionPanelPassThroughOptions } from 'rose-spectacles/accordionpanel';
-import type { AccordionTabPassThroughOptions } from 'rose-spectacles/accordiontab';
 import type { AnimateOnScrollDirectivePassThroughOptions } from 'rose-spectacles/animateonscroll';
 import type { AutoCompletePassThroughOptions } from 'rose-spectacles/autocomplete';
 import type { AvatarPassThroughOptions } from 'rose-spectacles/avatar';
 import type { AvatarGroupPassThroughOptions } from 'rose-spectacles/avatargroup';
 import type { BadgePassThroughOptions } from 'rose-spectacles/badge';
-import type { BadgeDirectivePassThroughOptions } from 'rose-spectacles/badgedirective';
 import type { BlockUIPassThroughOptions } from 'rose-spectacles/blockui';
 import type { BreadcrumbPassThroughOptions } from 'rose-spectacles/breadcrumb';
 import type { ButtonPassThroughOptions } from 'rose-spectacles/button';
 import type { ButtonGroupPassThroughOptions } from 'rose-spectacles/buttongroup';
-import type { CalendarPassThroughOptions } from 'rose-spectacles/calendar';
 import type { CardPassThroughOptions } from 'rose-spectacles/card';
 import type { CarouselPassThroughOptions } from 'rose-spectacles/carousel';
 import type { CascadeSelectPassThroughOptions } from 'rose-spectacles/cascadeselect';
@@ -23,7 +20,6 @@ import type { ChartPassThroughOptions } from '../chart/ChartPassThrough';
 import type { CheckboxPassThroughOptions } from 'rose-spectacles/checkbox';
 import type { CheckboxGroupPassThroughOptions } from 'rose-spectacles/checkboxgroup';
 import type { ChipPassThroughOptions } from 'rose-spectacles/chip';
-import type { ChipsPassThroughOptions } from 'rose-spectacles/chips';
 import type { ColorPickerPassThroughOptions } from 'rose-spectacles/colorpicker';
 import type { ColumnPassThroughOptions } from 'rose-spectacles/column';
 import type { ColumnGroupPassThroughOptions } from 'rose-spectacles/columngroup';
@@ -38,7 +34,6 @@ import type { DialogPassThroughOptions } from 'rose-spectacles/dialog';
 import type { DividerPassThroughOptions } from 'rose-spectacles/divider';
 import type { DockPassThroughOptions } from 'rose-spectacles/dock';
 import type { DrawerPassThroughOptions } from 'rose-spectacles/drawer';
-import type { DropdownPassThroughOptions } from 'rose-spectacles/dropdown';
 import type { EditorPassThroughOptions } from '../editor/EditorPassThrough';
 import type { FieldsetPassThroughOptions } from 'rose-spectacles/fieldset';
 import type { FileUploadPassThroughOptions } from 'rose-spectacles/fileupload';
@@ -50,7 +45,6 @@ import type { IconFieldPassThroughOptions } from 'rose-spectacles/iconfield';
 import type { IftaLabelPassThroughOptions } from 'rose-spectacles/iftalabel';
 import type { ImagePassThroughOptions } from 'rose-spectacles/image';
 import type { ImageComparePassThroughOptions } from 'rose-spectacles/imagecompare';
-import type { InlineMessagePassThroughOptions } from 'rose-spectacles/inlinemessage';
 import type { InplacePassThroughOptions } from 'rose-spectacles/inplace';
 import type { InputChipsPassThroughOptions } from 'rose-spectacles/inputchips';
 import type { InputGroupPassThroughOptions } from 'rose-spectacles/inputgroup';
@@ -59,7 +53,6 @@ import type { InputIconPassThroughOptions } from 'rose-spectacles/inputicon';
 import type { InputMaskPassThroughOptions } from 'rose-spectacles/inputmask';
 import type { InputNumberPassThroughOptions } from 'rose-spectacles/inputnumber';
 import type { InputOtpPassThroughOptions } from 'rose-spectacles/inputotp';
-import type { InputSwitchPassThroughOptions } from 'rose-spectacles/inputswitch';
 import type { InputTextPassThroughOptions } from 'rose-spectacles/inputtext';
 import type { KeyFilterDirectivePassThroughOptions } from 'rose-spectacles/keyfilter';
 import type { KnobPassThroughOptions } from 'rose-spectacles/knob';
@@ -73,7 +66,6 @@ import type { MultiSelectPassThroughOptions } from 'rose-spectacles/multiselect'
 import type { OrderListPassThroughOptions } from 'rose-spectacles/orderlist';
 import type { OrganizationChartPassThroughOptions } from 'rose-spectacles/organizationchart';
 import type { OverlayBadgePassThroughOptions } from 'rose-spectacles/overlaybadge';
-import type { OverlayPanelPassThroughOptions } from 'rose-spectacles/overlaypanel';
 import type { PaginatorPassThroughOptions } from 'rose-spectacles/paginator';
 import type { PanelPassThroughOptions } from 'rose-spectacles/panel';
 import type { PanelMenuPassThroughOptions } from 'rose-spectacles/panelmenu';
@@ -92,7 +84,6 @@ import type { ScrollPanelPassThroughOptions } from 'rose-spectacles/scrollpanel'
 import type { ScrollTopPassThroughOptions } from 'rose-spectacles/scrolltop';
 import type { SelectPassThroughOptions } from 'rose-spectacles/select';
 import type { SelectButtonPassThroughOptions } from 'rose-spectacles/selectbutton';
-import type { SidebarPassThroughOptions } from 'rose-spectacles/sidebar';
 import type { SkeletonPassThroughOptions } from 'rose-spectacles/skeleton';
 import type { SliderPassThroughOptions } from 'rose-spectacles/slider';
 import type { SpeedDialPassThroughOptions } from 'rose-spectacles/speeddial';
@@ -105,15 +96,12 @@ import type { StepListPassThroughOptions } from 'rose-spectacles/steplist';
 import type { StepPanelPassThroughOptions } from 'rose-spectacles/steppanel';
 import type { StepPanelsPassThroughOptions } from 'rose-spectacles/steppanels';
 import type { StepperPassThroughOptions } from 'rose-spectacles/stepper';
-import type { StepsPassThroughOptions } from 'rose-spectacles/steps';
 import type { StyleClassDirectivePassThroughOptions } from 'rose-spectacles/styleclass';
 import type { TabPassThroughOptions } from 'rose-spectacles/tab';
 import type { TabListPassThroughOptions } from 'rose-spectacles/tablist';
-import type { TabMenuPassThroughOptions } from 'rose-spectacles/tabmenu';
 import type { TabPanelPassThroughOptions } from 'rose-spectacles/tabpanel';
 import type { TabPanelsPassThroughOptions } from 'rose-spectacles/tabpanels';
 import type { TabsPassThroughOptions } from 'rose-spectacles/tabs';
-import type { TabViewPassThroughOptions } from 'rose-spectacles/tabview';
 import type { TagPassThroughOptions } from 'rose-spectacles/tag';
 import type { TerminalPassThroughOptions } from 'rose-spectacles/terminal';
 import type { TextareaPassThroughOptions } from 'rose-spectacles/textarea';
@@ -157,7 +145,6 @@ export interface PrimeVuePTOptions {
     /**
      * @deprecated since v4. Use the new structure of Accordion instead.
      */
-    accordiontab?: DefaultPassThrough<AccordionTabPassThroughOptions>;
     autocomplete?: DefaultPassThrough<AutoCompletePassThroughOptions>;
     avatar?: DefaultPassThrough<AvatarPassThroughOptions>;
     avatargroup?: DefaultPassThrough<AvatarGroupPassThroughOptions>;
@@ -169,7 +156,6 @@ export interface PrimeVuePTOptions {
     /**
      * @deprecated since v4. Use the new structure of DatePicker instead.
      */
-    calendar?: DefaultPassThrough<CalendarPassThroughOptions>;
     card?: DefaultPassThrough<CardPassThroughOptions>;
     carousel?: DefaultPassThrough<CarouselPassThroughOptions>;
     cascadeselect?: DefaultPassThrough<CascadeSelectPassThroughOptions>;
@@ -180,7 +166,6 @@ export interface PrimeVuePTOptions {
     /**
      * @deprecated since v4. Use the new structure of InputChips instead.
      */
-    chips?: DefaultPassThrough<ChipsPassThroughOptions>;
     colorpicker?: DefaultPassThrough<ColorPickerPassThroughOptions>;
     column?: DefaultPassThrough<ColumnPassThroughOptions>;
     columngroup?: DefaultPassThrough<ColumnGroupPassThroughOptions>;
@@ -198,7 +183,6 @@ export interface PrimeVuePTOptions {
     /**
      * @deprecated since v4. Use the new structure of Select instead.
      */
-    dropdown?: DefaultPassThrough<DropdownPassThroughOptions>;
     dynamicdialog?: DefaultPassThrough<DialogPassThroughOptions>;
     editor?: DefaultPassThrough<EditorPassThroughOptions>;
     fieldset?: DefaultPassThrough<FieldsetPassThroughOptions>;
@@ -210,7 +194,6 @@ export interface PrimeVuePTOptions {
     iftalabel?: DefaultPassThrough<IftaLabelPassThroughOptions>;
     image?: DefaultPassThrough<ImagePassThroughOptions>;
     imagecompare?: DefaultPassThrough<ImageComparePassThroughOptions>;
-    inlinemessage?: DefaultPassThrough<InlineMessagePassThroughOptions>;
     inplace?: DefaultPassThrough<InplacePassThroughOptions>;
     inputchips?: DefaultPassThrough<InputChipsPassThroughOptions>;
     inputgroup?: DefaultPassThrough<InputGroupPassThroughOptions>;
@@ -222,7 +205,6 @@ export interface PrimeVuePTOptions {
      * @deprecated since v4. Use the new structure of ToggleSwitch instead.
      */
     inputotp?: DefaultPassThrough<InputOtpPassThroughOptions>;
-    inputswitch?: DefaultPassThrough<InputSwitchPassThroughOptions>;
     inputtext?: DefaultPassThrough<InputTextPassThroughOptions>;
     knob?: DefaultPassThrough<KnobPassThroughOptions>;
     listbox?: DefaultPassThrough<ListboxPassThroughOptions>;
@@ -238,7 +220,6 @@ export interface PrimeVuePTOptions {
     /**
      * @deprecated since v4. Use the new structure of Popover instead.
      */
-    overlaypanel?: DefaultPassThrough<OverlayPanelPassThroughOptions>;
     paginator?: DefaultPassThrough<PaginatorPassThroughOptions>;
     panel?: DefaultPassThrough<PanelPassThroughOptions>;
     panelmenu?: DefaultPassThrough<PanelMenuPassThroughOptions>;
@@ -256,7 +237,6 @@ export interface PrimeVuePTOptions {
     /**
      * @deprecated since v4. Use the new structure of Drawer instead.
      */
-    sidebar?: DefaultPassThrough<SidebarPassThroughOptions>;
     skeleton?: DefaultPassThrough<SkeletonPassThroughOptions>;
     slider?: DefaultPassThrough<SliderPassThroughOptions>;
     speeddial?: DefaultPassThrough<SpeedDialPassThroughOptions>;
@@ -271,8 +251,6 @@ export interface PrimeVuePTOptions {
     steppanel?: DefaultPassThrough<StepPanelPassThroughOptions>;
     steppanels?: DefaultPassThrough<StepPanelsPassThroughOptions>;
     stepper?: DefaultPassThrough<StepperPassThroughOptions>;
-    steps?: DefaultPassThrough<StepsPassThroughOptions>;
-    tabmenu?: DefaultPassThrough<TabMenuPassThroughOptions>;
     tabs?: DefaultPassThrough<TabsPassThroughOptions>;
     tablist?: DefaultPassThrough<TabListPassThroughOptions>;
     tab?: DefaultPassThrough<TabPassThroughOptions>;
@@ -281,7 +259,6 @@ export interface PrimeVuePTOptions {
     /**
      * @deprecated since v4. Use tabs instead.
      */
-    tabview?: DefaultPassThrough<TabViewPassThroughOptions>;
     tag?: DefaultPassThrough<TagPassThroughOptions>;
     terminal?: DefaultPassThrough<TerminalPassThroughOptions>;
     textarea?: DefaultPassThrough<TextareaPassThroughOptions>;
@@ -297,7 +274,6 @@ export interface PrimeVuePTOptions {
     virtualscroller?: DefaultPassThrough<VirtualScrollerPassThroughOptions>;
     directives?: {
         animate?: AnimateOnScrollDirectivePassThroughOptions;
-        badge?: BadgeDirectivePassThroughOptions;
         focustrap?: FocusTrapDirectivePassThroughOptions;
         keyfilter?: KeyFilterDirectivePassThroughOptions;
         ripple?: RippleDirectivePassThroughOptions;

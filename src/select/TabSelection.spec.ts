@@ -1,12 +1,10 @@
 import { mount } from '@vue/test-utils';
 import { h, nextTick, ref, type Component } from 'vue';
 import AutoComplete from '../autocomplete/AutoComplete.vue';
-import Dropdown from '../dropdown/Dropdown.vue';
 import Select from './Select.vue';
 
 it.each([
     ['Select', Select],
-    ['Dropdown', Dropdown],
     ['AutoComplete', AutoComplete]
 ] as const)('commits the active %s option on Tab without taking focus back', async (name, component) => {
     vi.useFakeTimers();

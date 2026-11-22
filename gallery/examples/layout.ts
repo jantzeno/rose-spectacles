@@ -14,11 +14,6 @@ export const layout: Example[] = [
             )
     ),
     example(
-        'Legacy accordion',
-        ['AccordionTab'],
-        () => () => demo('Accordion', { activeIndex: 0 }, () => demo('AccordionTab', { header: 'Field notes' }, () => 'Pine woodland and outcrops.'))
-    ),
-    example(
         'Tabs',
         ['Tabs', 'TabList', 'Tab', 'TabPanels', 'TabPanel'],
         () => () =>
@@ -28,15 +23,6 @@ export const layout: Example[] = [
                     demo('TabPanel', { value: 'notes' }, () => 'First observations.'),
                     demo('TabPanel', { value: 'details' }, () => 'Collected after sunrise.')
                 ])
-            ])
-    ),
-    example(
-        'Legacy tabs',
-        ['TabView'],
-        () => () =>
-            demo('TabView', {}, () => [
-                demo('TabPanel', { header: 'Notes' }, () => 'First observations.'),
-                demo('TabPanel', { header: 'Details' }, () => 'Collected after sunrise.')
             ])
     ),
     example(

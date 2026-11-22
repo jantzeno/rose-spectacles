@@ -136,7 +136,6 @@ describe('compound gallery examples', () => {
 
 const examplesWithSelectors = [
     ['Button group', 'button', ['Previous', 'Next']],
-    ['Legacy accordion', 'button', ['Field notes']],
     ['Checkbox group', 'label', ['maps', 'notes']],
     ['Input group', '.rs-inputgroupaddon', ['https://']],
     ['Icon field', '.rs-inputicon svg', ['']],
@@ -146,8 +145,6 @@ const examplesWithSelectors = [
     ['MeterGroup', '.rs-metergroup-label', ['Draft (30%)', 'Review (25%)']],
     ['Overlay badge', '.rs-badge', ['3']],
     ['Portal', 'p', ['The portal can render its content locally or in another container.']],
-    ['Steps', '.rs-steps-item-label', ['Overview', 'Activity', 'Settings']],
-    ['TabMenu', '.rs-tabmenu-item-label', ['Overview', 'Activity', 'Settings']],
     ['Toolbar', 'button, .rs-tag', ['New note', 'Draft']]
 ] as const;
 
@@ -157,14 +154,14 @@ for (const [name, selector, content] of examplesWithSelectors) {
     });
 }
 
-const legacyExamples = [
-    ['Calendar', 'input', '11/21/2026'],
-    ['Dropdown', 'output', '"Kyoto"'],
-    ['Chips', 'output', '["research"]']
+const examplesWithInitialValues = [
+    ['DatePicker', 'input', '11/21/2026'],
+    ['Select', 'output', '"Oslo"'],
+    ['InputChips', 'output', '["research","review"]']
 ] as const;
 
-for (const [name, selector, initial] of legacyExamples) {
-    it(`preserves the initial value in the legacy ${name} component`, async () => {
+for (const [name, selector, initial] of examplesWithInitialValues) {
+    it(`preserves the initial value in the ${name} example`, async () => {
         await mountCase(name, (wrapper) => {
             const node = wrapper.get(selector);
             expect(selector === 'input' ? (node.element as HTMLInputElement).value : node.text()).toBe(initial);
@@ -206,22 +203,20 @@ describe('interactive gallery examples', () => {
         });
     });
 
-    for (const name of ['Popover', 'OverlayPanel']) {
-        it(`anchors and toggles the ${name} example from its trigger`, async () => {
-            await mountCase(name, async (wrapper) => {
-                const trigger = wrapper.get('button');
-                await trigger.trigger('click');
-                expect(document.body.textContent).toContain('Positioned next to the trigger.');
-                await trigger.trigger('click');
-                expect(document.body.textContent).not.toContain('Positioned next to the trigger.');
-            });
+    it('anchors and toggles the Popover example from its trigger', async () => {
+        await mountCase('Popover', async (wrapper) => {
+            const trigger = wrapper.get('button');
+            await trigger.trigger('click');
+            expect(document.body.textContent).toContain('Positioned next to the trigger.');
+            await trigger.trigger('click');
+            expect(document.body.textContent).not.toContain('Positioned next to the trigger.');
         });
-    }
+    });
 
-    it('opens legacy Sidebar content in a dialog', async () => {
-        await mountCase('Sidebar', async (wrapper) => {
+    it('opens headless Drawer content in a dialog', async () => {
+        await mountCase('Headless drawer', async (wrapper) => {
             await wrapper.get('button').trigger('click');
-            expect(document.querySelector('[role="complementary"], [role="dialog"]')?.textContent).toContain('Review these notes');
+            expect(document.querySelector('.rs-drawer[role="complementary"], .rs-drawer[role="dialog"]')?.textContent).toContain('Review these notes');
         });
     });
 
