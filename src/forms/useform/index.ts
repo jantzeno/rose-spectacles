@@ -219,7 +219,8 @@ export const useForm = (options: useFormOptions = {}) => {
                     result = mergeKeys(result, fieldResult);
                 }
 
-                const errors = getValueByPath(result.errors, fieldName) ?? [];
+                const fieldErrors = getValueByPath(result.errors, fieldName);
+                const errors = Array.isArray(fieldErrors) ? fieldErrors : [];
 
                 //const value = result.values?.[fieldName] ?? _states[sField].value;
                 _states[fieldName].invalid = errors.length > 0;

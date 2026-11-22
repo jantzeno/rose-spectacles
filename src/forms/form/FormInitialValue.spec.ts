@@ -4,6 +4,25 @@ import InputText from '../../inputtext/InputText.vue';
 import FormField from '../formfield/FormField.vue';
 import Form from './Form.vue';
 
+it('keeps error arrays from nested and literal Form resolver paths', async () => {
+    const titleError = { message: 'Title is required' };
+    const addressError = { message: 'Address is invalid' };
+    const wrapper = mount(Form, {
+        props: { resolver: () => ({ errors: { emails: [{ title: [titleError] }], 'emails[0].address': [addressError] } }) },
+        slots: {
+            default: () => [h(InputText, { name: 'emails[0].title' }), h(InputText, { name: 'emails[0].address' })]
+        }
+    });
+
+    try {
+        await wrapper.vm.validate();
+        expect(wrapper.vm.getFieldState('emails[0].title')).toMatchObject({ invalid: true, errors: [titleError], error: titleError });
+        expect(wrapper.vm.getFieldState('emails[0].address')).toMatchObject({ invalid: true, errors: [addressError], error: addressError });
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it('sets nested form values without clearing omitted fields and accepts literal paths', async () => {
     const wrapper = mount(Form, {
         props: { initialValues: { emails: [{ title: 'Work', address: 'first@example.test' }] } },
