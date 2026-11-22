@@ -767,10 +767,17 @@
             "title": "Datatable with rowspan,frozen columns is not working expected",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "In headless Firefox with horizontal and vertical scroll, the frozen Name header and first row of each group started at x=128, while continuation rows started at x=8. Those rows had no previous frozen sibling because the Representative cell already spanned them.",
+                "Frozen cells in rowspan groups now take their offsets from the first data row, which contains all grouped columns. Firefox measured x=128 for every Name cell after the fix."
+            ],
             "reproducer": "https://stackblitz.com/edit/g5dcd8zj-xmfqfxdd?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “<DataTable :value=\"customers\" rowGroupMode=\"rowspan\" groupRowsBy=\"representative.name\" sortMode=\"single\" sortField=\"representative.name\" :sortOrder=\"1\" showGridlines scrollable scrollHeight=\"500px\">” in the retained component. Verify the expected result “Frozen columns should sticky properly”."
+            "resolvingCommit": "2a35348e5d5a40063c51e28182e225d9bc692be4",
+            "test": {
+                "path": "src/datatable/BodyCell.spec.ts",
+                "name": "keeps a frozen cell offset when its neighboring frozen column continues an earlier rowspan"
+            }
         },
         {
             "number": 93,
@@ -850,10 +857,16 @@
             "title": "DataTable: Incorrect typing for groupRowsBy (and/or incomplete doc)",
             "labels": ["typescript"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The strict packed Vue consumer rejected a groupRowsBy callback returning a string because the return type required an object. The packed declarations now infer the callback row from value and preserve the string key in the expansion event."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-zrbz2qu5?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Pass a function that returns a string to the groupRowsBy property” in the retained component. Verify the expected result “Edit: I have seen this other issue”."
+            "resolvingCommit": "72f698331dbc807ed34813fda3ff2cdb18547fdc",
+            "test": {
+                "path": "scripts/consumer-smoke.ts",
+                "name": "Packed DataTable grouping accepts nested fields and infers callback rows with string group keys"
+            }
         },
         {
             "number": 100,
@@ -870,10 +883,17 @@
             "title": "API Docs show that DataTable groupRowsBy prop can take array of field keys but in practice it does not work",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A single dotted field inside an array previously left its column visible and produced an undefined group key. Multiple fields now produce one subheader and footer for each contiguous combination, and expansion compares the arrays of group values in field order.",
+                "The regression suite also confirms that a one-element array produces the same grouping and expansion keys as the scalar field. Hierarchical headers were an additional behavior proposed by the reporter, while the documented field-array contract now groups by the combined values."
+            ],
             "reproducer": "https://stackblitz.com/edit/td8v9s84?file=src%2FApp.vue",
-            "evidenceGap": "Check “API Docs show that DataTable groupRowsBy prop can take array of field…” in the retained component in Chrome (Version 142.0.7444.176) after the reported step “Even :groupRowsBy=\"['representative.name']\" which should be the same as groupRowsBy=\"representative.name\" does not work”."
+            "resolvingCommit": "72f698331dbc807ed34813fda3ff2cdb18547fdc",
+            "test": {
+                "path": "src/datatable/Grouping.spec.ts",
+                "name": "renders and expands distinct combinations of subheader grouping fields"
+            }
         },
         {
             "number": 102,
@@ -1670,10 +1690,12 @@
             "title": "Sorting on column group with rowspan",
             "labels": ["bug"],
             "component": "DataTable, ColumnGroup",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/tzf4bp9k?file=src%2FApp.vue",
-            "evidenceGap": "Check “Sorting on column group with rowspan” in the retained component with the reported setup “When I add a sortable attribute to the product column for the…”."
+            "disposition": "enhancement",
+            "evidence": [
+                "The posted Product header inside ColumnGroup sets sortable and rowspan without a field or sortField. The click handler reads its field from the clicked header, so setting sortable on the separate body Column cannot supply it.",
+                "Firefox verified ascending Product sort when the grouped header declared field=product. The documented grouped-header contract specifies a field on a sortable leaf header. Inferring it from the body Column based on grid position would require a new mapping. https://primevue.dev/datatable/#column-group"
+            ],
+            "reproducer": "https://stackblitz.com/edit/tzf4bp9k?file=src%2FApp.vue"
         },
         {
             "number": 172,
@@ -1961,10 +1983,17 @@
             "title": "DataTable: Table layout shifts when groupRowsBy is rowspan and row expansion is enabled",
             "labels": ["bug", "styling"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The reported layout shift reproduced when an expansion row after the second record consumed part of a four-record span. Rendered rowspans now end above the expansion and resume below it.",
+                "Headless Firefox verified the full table width and aligned trailing data cells. The unit regression verifies that collapsing restores the original rowspan."
+            ],
             "reproducer": "https://stackblitz.com/edit/vitejs-vite-ocwubtnt",
-            "evidenceGap": "Check “DataTable: Table layout shifts when groupRowsBy is rowspan and row expansion is…” in the retained component in Chrome 133.0.6943.127 (Official Build) (64-bit) (cohort: Stable) after the reported step “Be sure the table is grouped by any column as rowspan”."
+            "resolvingCommit": "72f698331dbc807ed34813fda3ff2cdb18547fdc",
+            "test": {
+                "path": "src/datatable/Grouping.spec.ts",
+                "name": "ends rowspans at full-width expansion rows and resumes them on the next record"
+            }
         },
         {
             "number": 198,
@@ -3254,10 +3283,17 @@
             "title": "DataTable: frozen column doesn't work correctly with Column Group",
             "labels": ["bug", "styling"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The first frozen header spans two rows and occupies a logical column absent from the later row's DOM siblings. Both following frozen headers were 70 pixels left of their body columns in Firefox.",
+                "Sticky offsets now use the header's logical cell order across rowspans and colspans. Firefox measured exact horizontal alignment after scrolling."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-6yzszvle?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable: frozen column doesn't work correctly with Column Group” in the retained component in Chrome 134 after the reported step “You can see that the frozen column is not working correctly in…”."
+            "resolvingCommit": "2a35348e5d5a40063c51e28182e225d9bc692be4",
+            "test": {
+                "path": "src/datatable/ColumnGroup.spec.ts",
+                "name": "aligns frozen grouped headers with columns occupied by an earlier rowspan"
+            }
         },
         {
             "number": 305,
@@ -3298,10 +3334,17 @@
             "title": "DataTable: \"Row Group\" doesn't work correctly with virtual scrolling",
             "labels": ["bug"],
             "component": "DataTable, Row",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "already-fixed",
+            "evidence": [
+                "The baseline uses the complete processed list for virtual subheader boundaries. The retained regression starts the rendered window within a group and checks the header and footer counts.",
+                "A native Firefox scroll from the initial window to records 29–34 produced just the Group 6 subheader before record 30. The additional theme-specific spacing observation lacks the original theme and dimensions."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-6kwoifer?file=src%2FTable.vue",
-            "evidenceGap": "Check “DataTable: \"Row Group\" doesn't work correctly with virtual scrolling” in the retained component with the reported setup “DataTable's \"Row Group\" doesn't work correctly with virtual scrolling, past the initial…”."
+            "resolvingCommit": "e3a1df2f67135ec65ada522ece07b7fa8eb2b50a",
+            "test": {
+                "path": "src/datatable/DataTable.spec.ts",
+                "name": "should use absolute group boundaries in a window that starts inside a group"
+            }
         },
         {
             "number": 310,
@@ -3469,10 +3512,16 @@
             "title": "DataTable: Rowspan not working correctly when returning it from passThrough bodyCell (of Column)",
             "labels": ["bug"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A null rowspan supplied to BodyCell fell through after the native td pass-through binding and removed its lowercase rowspan attribute. Declaring the prop applies the input before pass-through, so the reported callback produces rowspan=2."
+            ],
             "reproducer": "https://stackblitz.com/edit/p1zsnpbi-vo2vl6p9?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “In DataTable component, add bodyCell pt function to Column and let…” in the retained component. Verify the expected result “Lowercase letters should also work rowspan (it works for colspan)”."
+            "resolvingCommit": "2a35348e5d5a40063c51e28182e225d9bc692be4",
+            "test": {
+                "path": "src/datatable/BodyCell.spec.ts",
+                "name": "applies a lowercase rowspan from the Column body cell pass-through callback"
+            }
         },
         {
             "number": 327,
@@ -3778,10 +3827,16 @@
             "title": "DataTable: `multiSortMeta` prop and `d_multiSortMeta` ref are out of sync - Grouping + sorting issue",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "After switching from Status to Representative, an old Status priority remained ahead of the new meta and split representatives across the table. The table now sorts from the current metadata, and clicks on other columns carry the active grouping prefix into the emitted sort model."
+            ],
             "reproducer": "https://stackblitz.com/edit/u5ymw3-pk13sm?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable: `multiSortMeta` prop and `d_multiSortMeta` ref are out of sync - Grouping…” in the retained component after the reported step “Observe that multiSortMeta prop and d_multiSortMeta are equal in the container at…”."
+            "resolvingCommit": "72f698331dbc807ed34813fda3ff2cdb18547fdc",
+            "test": {
+                "path": "src/datatable/Grouping.spec.ts",
+                "name": "uses the replacement group sort and retains it when sorting inside the new groups"
+            }
         },
         {
             "number": 355,
@@ -4289,10 +4344,11 @@
             "title": "DataTable: ColumnGroup with v-if Results in Duplicated Columns when within an AccordionContent",
             "labels": ["bug"],
             "component": "DataTable, ColumnGroup, AccordionContent",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-wda5u6?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Have a DataTable with a ColumnGroup containing v-if directive as a…” in the retained component. Verify the expected result “Columns outside of ColumnGroup should not be duplicated”."
+            "disposition": "not-reproducible",
+            "evidence": [
+                "Firefox rendered a DataTable inside AccordionContent with a conditional header ColumnGroup. Six group toggles followed by closing and reopening the accordion kept the two standalone body columns in their original order and switched between the expected grouped and standalone headers."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-wda5u6?file=src%2FApp.vue"
         },
         {
             "number": 402,
@@ -4323,9 +4379,12 @@
             "labels": ["bug"],
             "component": "DataTable, Column",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "Firefox applied the retained DataTable-level rowToggleButton pass-through to the group button and Column-level rowToggleButton to the separate record button.",
+                "The report names the PrimeVue 3 Column key rowGroupToggler. The retained runtime uses its DataTable-level section for group buttons."
+            ],
             "reproducer": "https://stackblitz.com/edit/dkmxlv?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Try to style a Column with rowGroupToggler” in the retained component. Verify the expected result “The element should be stylable”."
+            "evidenceGap": "Test the DataTable-level rowToggleButton section in a strict packed Vue consumer. The public DataTablePassThroughOptions currently omits that section."
         },
         {
             "number": 405,
@@ -4560,10 +4619,12 @@
             "title": "DataTable: Frozen Column Breaks Frozen RowSpan Column",
             "labels": ["bug"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "duplicate",
+            "evidence": [
+                "The attached recording and report describe the grouped frozen column overlapping its neighbor only on rows after the first. The same missing DOM sibling caused the offset regression verified in #92."
+            ],
             "reproducer": "https://stackblitz.com/edit/ocgexk?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable: Frozen Column Breaks Frozen RowSpan Column” in the retained component with the reported setup “If there is a frozen column next to a frozen rowspan column…”."
+            "primaryIssue": 92
         },
         {
             "number": 426,
@@ -5224,10 +5285,16 @@
             "title": "DataTable: RowGroupMode rowspan does not work with virtual scroller",
             "labels": ["bug"],
             "component": "DataTable, VirtualScroller",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "The rowspan code indexed a sliced virtual window using absolute row indexes, causing later groups to lose their spans. It now calculates spans within the rendered window. A native Firefox scroll confirmed that groups after the initial window still span all their visible records."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-create-vue-issue-template-d27mhp?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable: RowGroupMode rowspan does not work with virtual scroller” in the retained component after the reported step “Simply scroll through the table and see the rows not being grouped…”."
+            "resolvingCommit": "72f698331dbc807ed34813fda3ff2cdb18547fdc",
+            "test": {
+                "path": "src/datatable/Grouping.spec.ts",
+                "name": "groups rowspans within a virtual window that begins inside an existing group"
+            }
         },
         {
             "number": 486,
@@ -5696,10 +5763,13 @@
             "title": "DataTable: Frozen Column Rendering Issue When Columns Automatically Resized",
             "labels": ["bug", "styling"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "duplicate",
+            "evidence": [
+                "This report widens the first frozen column by replacing the table data. Firefox verified the replacement recomputes the later header and body offsets and that they remain aligned through a second horizontal scroll.",
+                "The width observer and sticky-offset recalculation validated in #159 handle the same change to the measured column width."
+            ],
             "reproducer": "https://stackblitz.com/edit/3nra9g-l7cch5?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Horizontal scroll and notice the ID columns stay frozen and in…” in the retained component in Firefox. Verify the expected result “The 2nd ID column should not shift. Video”."
+            "primaryIssue": 159
         },
         {
             "number": 531,
