@@ -178,10 +178,12 @@
             "title": "DataTable: different default match mode for global/local filters",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-nvgk4fbb?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “The local filter is much more strict, because it uses STARTS_WITH…” in the retained component. Verify the expected result “Filtering locally and globally both match using CONTAINS”."
+            "disposition": "enhancement",
+            "evidence": [
+                "The retained global fallback is contains and the column fallback is startsWith. Both paths use an explicit matchMode when supplied.",
+                "The request changes the default for existing consumers that rely on prefix matching in a column. The upstream report also identifies that compatibility impact."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-nvgk4fbb?file=src%2FApp.vue"
         },
         {
             "number": 45,
@@ -1647,10 +1649,17 @@
             "title": "DataTable: stateful tables using local storage fail to display filters when adding a new column",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "In Firefox, restoring older local storage kept the saved Code filter but left the new Name filter with no input. Merging the saved filters over the current defaults preserves Code and initializes Name.",
+                "The regression and Firefox both verify that the two filters work together and that the new filter is saved."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-khxwljql?file=src%2Fcomponents%2FTest.vue",
-            "evidenceGap": "Check “DataTable: stateful tables using local storage fail to display filters when adding…” in the retained component after the reported step “Add a new column to the datatable with filters”."
+            "resolvingCommit": "d444efba9d7e6edb186958ad18138daf213d9012",
+            "test": {
+                "path": "src/datatable/ColumnFilter.spec.ts",
+                "name": "restores saved filters and initializes filters for newly added columns"
+            }
         },
         {
             "number": 168,
@@ -2086,10 +2095,17 @@
             "title": "DataTable showClearButton doesn't appear anymore",
             "labels": ["bug", "regression"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Typing into an inline filter with showClearButton enabled filtered the rows without exposing a clear control. The restored button honors the configured inline button props and icon slot.",
+                "Firefox and the local regression verify that clearing empties the field, restores the rows, and returns focus to the field."
+            ],
             "reproducer": "https://stackblitz.com/edit/pnnxb5ba-abdaoqbu?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable showClearButton doesn't appear anymore” in the retained component after the reported step “Type in some text in the \"name\" or \"country\" filters. Those columns…”."
+            "resolvingCommit": "c5521d5d42164b1a0833e90eda0555d73b1ee03b",
+            "test": {
+                "path": "src/datatable/ColumnFilter.spec.ts",
+                "name": "clears an active inline filter and returns focus to its input"
+            }
         },
         {
             "number": 205,
@@ -2231,10 +2247,17 @@
             "title": "Datatable @value-change inconsistency",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "After sorting, the rendered filtered rows were Alpha then Zulu, while value-change reported Zulu then Alpha. DataTable now emits the processed rows after sorting.",
+                "The regression confirms that the displayed and emitted order agree in single-sort and multiple-sort modes."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-xg58azxb?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Create a datatable with sorting and filtering, hook to @value-change event…” in the retained component in Chrome 137. Verify the expected result “@value-change should give a correctly sorted data when filtering after sorting”."
+            "resolvingCommit": "8041ed336d687fea37074a89709032ced9b04832",
+            "test": {
+                "path": "src/datatable/DataTable.spec.ts",
+                "name": "emits the displayed sort order when filtering a %s-sort table"
+            }
         },
         {
             "number": 216,
