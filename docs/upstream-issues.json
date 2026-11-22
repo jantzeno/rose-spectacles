@@ -208,9 +208,12 @@
             "labels": ["bug", "styling"],
             "component": "Card",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "In Firefox, a nested Card inherited its outer Card’s background custom property from dt. The corresponding Pass Through example styled the outer Card directly and the inner Card kept its default background.",
+                "The scoped-token documentation demonstrates overriding one of two sibling instances. It does not define an inheritance boundary for a nested instance: https://primevue.org/theming/styled/#scopedtokens."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-qvh6szob?file=src%2FApp.vue",
-            "evidenceGap": "Nest two Cards, set a background design token on the outer Card, and compare both computed backgrounds against the equivalent Pass Through example. Confirm whether the inner Card inherits the outer token."
+            "evidenceGap": "Confirm the supported nesting contract for scoped tokens before deciding whether nested instances should reset inherited custom properties."
         },
         {
             "number": 46,
