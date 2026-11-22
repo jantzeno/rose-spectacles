@@ -545,6 +545,35 @@ describe('DataTable.vue', () => {
     });
 
     // filtering
+    it.each(['single', 'multiple'])('emits the displayed sort order when filtering a %s-sort table', async (sortMode) => {
+        const rows = [
+            { name: 'Zulu', category: 'Keep' },
+            { name: 'Bravo', category: 'Hide' },
+            { name: 'Alpha', category: 'Keep' }
+        ];
+        const table = mount(DataTable, {
+            global: { plugins: [PrimeVue], components: { Column } },
+            props: {
+                value: rows,
+                sortMode,
+                filters: { category: { value: null, matchMode: FilterMatchMode.EQUALS } }
+            },
+            slots: { default: '<Column field="name" header="Name" sortable />' }
+        });
+
+        try {
+            await table.get('thead th').trigger('click');
+            expect(table.findAll('tbody tr').map((row) => row.text())).toEqual(['Alpha', 'Bravo', 'Zulu']);
+
+            const previousChanges = table.emitted<[typeof rows]>('value-change')?.length ?? 0;
+            await table.setProps({ filters: { category: { value: 'Keep', matchMode: FilterMatchMode.EQUALS } } });
+            expect(table.findAll('tbody tr').map((row) => row.text())).toEqual(['Alpha', 'Zulu']);
+            expect(table.emitted<[typeof rows]>('value-change')?.slice(previousChanges)).toEqual([[[rows[2], rows[0]]]]);
+        } finally {
+            table.unmount();
+        }
+    });
+
     it('should filtered globally', async () => {
         await wrapper.setProps({ filters: { global: { value: 'b', matchMode: FilterMatchMode.STARTS_WITH } } });
 

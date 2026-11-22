@@ -927,7 +927,6 @@ export default defineComponent({
 
             filterEvent.filteredValue = filteredValue;
             this.$emit('filter', filterEvent);
-            this.$emit('value-change', filteredValue);
 
             return filteredValue;
         },
@@ -2579,13 +2578,18 @@ export default defineComponent({
 
             if (!this.lazy && !this.virtualScrollerOptions?.lazy) {
                 if (data && data.length) {
-                    if (this.hasFilters) {
+                    const hasFilters = this.hasFilters;
+                    if (hasFilters) {
                         data = this.filter(data);
                     }
 
                     if (this.sorted) {
                         if (this.sortMode === 'single') data = this.sortSingle(data);
                         else if (this.sortMode === 'multiple') data = this.sortMultiple(data);
+                    }
+
+                    if (hasFilters) {
+                        this.$emit('value-change', data);
                     }
                 }
             }
