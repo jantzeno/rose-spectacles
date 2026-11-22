@@ -983,13 +983,17 @@
             "title": "Invalid columns widths when reorder columns in DataTable",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
+            "disposition": "fixed",
             "evidence": [
-                "Firefox moved Name between Category and Quantity in two ways. Dropping before Quantity switched their measured widths from 220 px and 100 px to 100 px and 220 px. Dropping after Category kept the intended widths.",
-                "The flat drop handler moves the width list using the target header's index before adjusting the destination used for the column order."
+                "In Firefox, dropping Name before Quantity swapped their widths from 220 px and 100 px to 100 px and 220 px. Dropping after Category produced the same order with the intended widths.",
+                "Both drop edges now preserve widths in Firefox. The regression also covers a filter row, a hidden column that is later shown, and a second drop before the header renders."
             ],
             "reproducer": "https://stackblitz.com/run?file=src%2FApp.vue",
-            "evidenceGap": "Verify a local fix preserves width identity for drops on either side of a target, including when some columns are hidden."
+            "resolvingCommit": "1d9b8bb1dd82614f5a7b9305290821c230e68bd1",
+            "test": {
+                "path": "src/datatable/FlatColumnReorder.spec.ts",
+                "name": "keeps flat widths with their fields after a drop against $anchor"
+            }
         },
         {
             "number": 110,
@@ -1800,10 +1804,17 @@
             "title": "DataTable: Column reorder causes columns to overlap / break layout when dragging quickly",
             "labels": ["bug", "styling"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "A reduced Firefox fixture with wide and narrow columns lost width identity on successive drops. A second drop could read widths already applied to their destination positions while the live headers were still in their earlier order.",
+                "The updated fixture preserves order, per-column widths and header-to-body alignment across successive drops. The regression applies positioned widths during the intervening render to exercise the stale-measurement case."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-ifnqv7ef?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Drag a column quickly across others (especially a wide column into…” in the retained component. Verify the expected result “Columns should smoothly reorder without losing width”."
+            "resolvingCommit": "1d9b8bb1dd82614f5a7b9305290821c230e68bd1",
+            "test": {
+                "path": "src/datatable/FlatColumnReorder.spec.ts",
+                "name": "keeps flat widths with their fields after a drop against $anchor"
+            }
         },
         {
             "number": 181,
@@ -2494,9 +2505,11 @@
             "labels": ["bug", "accessibility"],
             "component": "DataTable",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "A Firefox fixture with Name and Code columns and a Name-only inline filter rendered a second row of th elements. The Code spacer had neither text nor a control."
+            ],
             "reproducer": "https://stackblitz.com/edit/hpf4ry51",
-            "evidenceGap": "Recreate “WAVE reports Empty table header error” in the retained component. Verify the expected result “WAVE does not report empty table header error”."
+            "evidenceGap": "Verify the accessibility semantics and table layout of the filter-control row after replacing empty header semantics. The WAVE extension used in the original report is unavailable in this environment."
         },
         {
             "number": 237,
@@ -2806,9 +2819,11 @@
             "title": "`bodyClass` in <Column> Fails to Render Dynamic Classes in DataTable",
             "labels": ["bug", "typescript"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Recreate “Set up a DataTable with a <Column> using :bodyClass bound to…” in the retained component. Verify the expected result “The <td> should have the class returned by getCellStatus, e.g”."
+            "disposition": "enhancement",
+            "evidence": [
+                "The PrimeVue 4.3.1 declaration describes a body class and does not specify a row callback. The retained BaseColumn runtime declares a string prop. https://raw.githubusercontent.com/primefaces/primevue/4.3.1/packages/primevue/src/column/Column.d.ts",
+                "Firefox confirmed the proposed bodyClass callback does not run. A Column pt.bodyCell callback received the row through parent.props.rowData and applied distinct classes to the two records. Accepting a callback directly in bodyClass would extend the retained prop."
+            ]
         },
         {
             "number": 262,
@@ -3828,10 +3843,17 @@
             "title": "Datatable: reorderableColumns ",
             "labels": ["bug"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "Firefox reproduced the first selection column growing from one to two and then three copies after dragging a table with unnamed selection and expansion columns.",
+                "Stable order keys preserve exactly one of each control across repeated moves. The legacy-state regression also restores an order containing null keys for unnamed columns."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-vbu13c?file=src%2FApp.vue",
-            "evidenceGap": "A retained Vue/Vite fixture in Chrome must verify “Datatable: reorderableColumns”. The linked fixture needs to be reduced to local props, state, and interactions."
+            "resolvingCommit": "1d9b8bb1dd82614f5a7b9305290821c230e68bd1",
+            "test": {
+                "path": "src/datatable/FlatColumnReorder.spec.ts",
+                "name": "reorders unnamed selection and expansion columns without duplicating either one"
+            }
         },
         {
             "number": 354,
@@ -5106,10 +5128,17 @@
             "title": "DataTable: Reorder blink effect",
             "labels": ["styling"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "In Firefox, the marker disappeared between adjacent data rows and returned on the next dragover. Canceling the drag also left the marker on the target boundary.",
+                "The indicator now stays on the same boundary across child-cell and neighboring-row transitions and is cleared when the drag ends. A separate regression verifies that only one marker appears and the indicated drop still emits the correct row order."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue-create-vue-typescript-issue-template-vr3vsk?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable: Reorder blink effect” in the retained component in Chrome after the reported step “2 - Drag and hold the selected row in between 2 row”."
+            "resolvingCommit": "c2e0a8e69df32e3b8f77c36f0497f13e3674b611",
+            "test": {
+                "path": "src/datatable/RowReorder.spec.ts",
+                "name": "keeps the same drop marker across adjacent rows and clears it when the drag is canceled"
+            }
         },
         {
             "number": 468,
