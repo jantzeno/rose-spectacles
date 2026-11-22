@@ -1334,9 +1334,11 @@
             "title": "`emptyMessage` prop for DataTable needs to be better documented",
             "labels": ["documentation"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Use the linked DataTable example with an empty result set. Determine the expected empty content under the reported configuration and whether it can be expressed through the existing empty slot."
+            "disposition": "enhancement",
+            "evidence": [
+                "The public DataTable interface defines emptyMessage and emptyMessageCell as pass-through sections, and empty as a slot. It exposes no emptyMessage prop.",
+                "BodyRow renders the empty slot inside the existing full-width table cell. A caller can supply plain text in that slot and use the existing table structure. The report asks for a string prop."
+            ]
         },
         {
             "number": 142,
@@ -6290,11 +6292,18 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/576",
             "title": "DataTable: ColumnFilter doesn't support column fields which are functions",
             "labels": ["bug"],
-            "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
+            "component": "DataTable, Column",
+            "disposition": "fixed",
+            "evidence": [
+                "In the retained table, the filter model was keyed by the string form of a callback, but row resolution looked for a property with that string. The local filter now resolves the registered callback for both field and filterField.",
+                "The regression covers both forms with an inline filter and a grouped header menu using a unique columnKey."
+            ],
             "reproducer": "https://codesandbox.io/p/sandbox/serverless-wildflower-8rvlkh?file=%2Fsrc%2FApp.vue%3A29%2C38",
-            "evidenceGap": "Recreate “Essentially if you use a function as your 'field' prop for…” in the retained component. Verify the expected result “The table filter works as expected”."
+            "resolvingCommit": "7366a96d3a5c40b8964fe8d9ab364842b3855a83",
+            "test": {
+                "path": "src/datatable/ColumnFilter.spec.ts",
+                "name": "filters by a function-valued column %s"
+            }
         },
         {
             "number": 578,
