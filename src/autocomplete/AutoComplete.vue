@@ -912,7 +912,7 @@ export default defineComponent({
         },
         onTabKey(event: KeyboardEvent) {
             if (this.focusedOptionIndex !== -1) {
-                this.onOptionSelect(event, this.visibleOptions[this.focusedOptionIndex]);
+                this.onOptionSelect(event, this.visibleOptions[this.focusedOptionIndex], false);
             }
 
             this.overlayVisible && this.hide();

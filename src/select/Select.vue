@@ -891,10 +891,10 @@ export default defineComponent({
                     event.preventDefault();
                 } else {
                     if (this.focusedOptionIndex !== -1) {
-                        this.onOptionSelect(event, this.visibleOptions[this.focusedOptionIndex]);
+                        this.onOptionSelect(event, this.visibleOptions[this.focusedOptionIndex], false);
                     }
 
-                    this.overlayVisible && this.hide(this.filter);
+                    this.overlayVisible && this.hide();
                 }
             }
         },
