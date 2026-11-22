@@ -11,7 +11,7 @@
             <tr role="row" v-bind="ptm('headerRow')">
                 <template v-for="(col, i) of columns" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || i">
                     <DTHeaderCell
-                        v-if="!columnProp(col, 'hidden') && (rowGroupMode !== 'subheader' || groupRowsBy !== columnProp(col, 'field'))"
+                        v-if="isColumnVisible(col)"
                         :column="col"
                         :index="i"
                         @column-click="$emit('column-click', $event)"
@@ -55,11 +55,7 @@
             <tr v-for="(row, i) of getHeaderRows()" :key="i" role="row" v-bind="{ ...ptm('headerRow'), ...getRowPT(row, 'root', i) }">
                 <template v-for="(col, j) of getHeaderColumns(row)" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || j">
                     <DTHeaderCell
-                        v-if="
-                            !columnProp(col, 'hidden') &&
-                            (rowGroupMode !== 'subheader' || groupRowsBy !== columnProp(col, 'field')) &&
-                            typeof col.children !== 'string'
-                        "
+                        v-if="isColumnVisible(col) && typeof col.children !== 'string'"
                         :column="col"
                         @column-click="$emit('column-click', $event)"
                         @column-mousedown="$emit('column-mousedown', $event)"
@@ -93,7 +89,7 @@
         <tr v-if="filterDisplay === 'row'" role="row" v-bind="ptm('headerRow')">
             <template v-for="(col, i) of columns" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || i">
                 <DTFilterHeaderCell
-                    v-if="!columnProp(col, 'hidden') && (rowGroupMode !== 'subheader' || groupRowsBy !== columnProp(col, 'field'))"
+                    v-if="isColumnVisible(col)"
                     :column="col"
                     :index="i"
                     :allRowsSelected="allRowsSelected"
@@ -127,6 +123,7 @@ import { HelperSet, getVNodeProp } from '../core/utils/Utils';
 import { defineComponent, mergeProps, type PropType, type VNode } from 'vue';
 import FilterHeaderCell from './FilterHeaderCell.vue';
 import HeaderCell from './HeaderCell.vue';
+import { isRowGroupField, type RowGroupFields } from './row-groups';
 
 export default defineComponent({
     name: 'TableHeader',
@@ -164,7 +161,7 @@ export default defineComponent({
             default: null
         },
         groupRowsBy: {
-            type: [Array, String, Function],
+            type: [Array, String, Function] as PropType<RowGroupFields>,
             default: null
         },
         resizableColumns: {
@@ -245,6 +242,12 @@ export default defineComponent({
         this.d_headerColumns.clear();
     },
     methods: {
+        isColumnVisible(column: VNode) {
+            return (
+                !this.columnProp(column, 'hidden') &&
+                (this.rowGroupMode !== 'subheader' || !isRowGroupField(this.groupRowsBy, this.columnProp(column, 'field')))
+            );
+        },
         columnProp(col: VNode, prop: string) {
             return getVNodeProp(col, prop);
         },

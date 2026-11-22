@@ -1,5 +1,6 @@
 import { style } from '../../internal/styles/datatable/index';
 import BaseStyle, { type StyleContext } from '../../core/base/style/BaseStyle';
+import { isRowGroupField } from '../row-groups';
 
 const classes = {
     root: ({ props }: StyleContext) => [
@@ -31,7 +32,9 @@ const classes = {
     ],
     thead: 'rs-datatable-thead',
     headerCell: ({ instance, props, column }: StyleContext) =>
-        column && !instance.columnProp('hidden') && (props.rowGroupMode !== 'subheader' || props.groupRowsBy !== instance.columnProp(column, 'field'))
+        column &&
+        !instance.columnProp('hidden') &&
+        (props.rowGroupMode !== 'subheader' || !isRowGroupField(props.groupRowsBy, instance.columnProp(column, 'field')))
             ? [
                   'rs-datatable-header-cell',
                   {

@@ -108,6 +108,7 @@ import Badge from '../badge/Badge.vue';
 import { defineComponent, mergeProps, type CSSProperties, type PropType, type Slots, type VNode } from 'vue';
 import ColumnFilter from './ColumnFilter.vue';
 import HeaderCheckbox from './HeaderCheckbox.vue';
+import { isRowGroupField, type RowGroupFields } from './row-groups';
 
 export default defineComponent({
     name: 'HeaderCell',
@@ -145,7 +146,7 @@ export default defineComponent({
             default: false
         },
         groupRowsBy: {
-            type: [Array, String, Function],
+            type: [Array, String, Function] as PropType<RowGroupFields>,
             default: null
         },
         sortMode: {
@@ -288,9 +289,11 @@ export default defineComponent({
             return this.multiSortMeta?.findIndex((meta) => meta.field === this.columnProp('field') || meta.field === this.columnProp('sortField')) ?? -1;
         },
         getBadgeValue() {
-            let index = this.getMultiSortMetaIndex();
+            const index = this.getMultiSortMetaIndex();
 
-            return this.groupRowsBy && this.groupRowsBy === this.groupRowSortField && index > -1 ? index : index + 1;
+            if (index < 0 || !isRowGroupField(this.groupRowsBy, this.groupRowSortField)) return index + 1;
+
+            return this.multiSortMeta.slice(0, index + 1).filter((meta) => !isRowGroupField(this.groupRowsBy, meta.field)).length;
         },
         isMultiSorted() {
             return this.sortMode === 'multiple' && this.columnProp('sortable') && this.getMultiSortMetaIndex() > -1;

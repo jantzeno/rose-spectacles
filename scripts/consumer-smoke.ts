@@ -158,6 +158,8 @@ try {
         interface ReportFilters { global: DataTableFilterMetaData; name: DataTableFilterMetaData }
         const filters = ref<ReportFilters>({ global: { value: null, matchMode: 'contains' }, name: { value: null, matchMode: 'startsWith' } });
         const acceptFilters = (value: ReportFilters) => { filters.value = value; };
+        const records = [{ name: 'Copper', location: { city: 'Perth' } }];
+        const groups = ref<string[][]>([['Perth', 'Copper']]);
         const label = ref('Reports');
         const acceptLabel = (value: string) => { label.value = value; };
         const day = ref<Date | null>(null);
@@ -166,6 +168,12 @@ try {
         const acceptRange = (value: (string | null)[] | null) => { range.value = value; };
         </script>
         <template>
+            <DataTable
+                :value="records"
+                :group-rows-by="(record) => inferred(record.name).toUpperCase()"
+                @rowgroup-expand="({ data }) => inferred(data).toLowerCase()"
+            />
+            <DataTable :value="records" :group-rows-by="['location.city', 'name']" v-model:expanded-row-groups="groups" />
             ${menuComponents
                 .map(
                     (name) => `<${name} :model="menu">
@@ -256,6 +264,7 @@ try {
     console.log('Menu and tree slots preserve the declared types of extended models');
     console.log('Form infers the submit event and field slot types from its resolver');
     console.log('A packed DataTable instance returns CSV text from generateCSV');
+    console.log('Packed DataTable grouping accepts nested fields and infers callback rows with string group keys');
     console.log('Packed filter and date models preserve their value types and InputText emits strings');
 
     await write('SlotTypes.vue', slotTypes.replaceAll('.title', '.missingField'));

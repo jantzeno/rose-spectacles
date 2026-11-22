@@ -81,6 +81,7 @@ import type { TableField } from './BaseDataTable.vue';
 import BodyRow from './BodyRow.vue';
 import { getEditingRowKey, type EditingDrafts } from './editing-drafts';
 import type { VirtualScrollerContent } from './virtual-scroller-content';
+import type { RowGroupFields } from './row-groups';
 
 type TableBodyRef = Element | ComponentPublicInstance | null;
 
@@ -138,7 +139,7 @@ export default defineComponent({
             default: null
         },
         groupRowsBy: {
-            type: [Array, String, Function],
+            type: [Array, String, Function] as PropType<RowGroupFields>,
             default: null
         },
         expandableRowGroups: {

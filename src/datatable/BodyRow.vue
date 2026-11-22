@@ -7,7 +7,7 @@
             role="row"
             v-bind="ptm('rowGroupHeader')"
         >
-            <td :colspan="columnsLength - 1" v-bind="{ ...getColumnPT('bodycell'), ...ptm('rowGroupHeaderCell') }">
+            <td :colspan="Math.max(columnsLength, 1)" v-bind="{ ...getColumnPT('bodycell'), ...ptm('rowGroupHeaderCell') }">
                 <button v-if="expandableRowGroups" :class="cx('rowToggleButton')" @click="onRowGroupToggle" type="button" v-bind="ptm('rowToggleButton')">
                     <component
                         v-if="templates['rowtoggleicon'] || templates['rowgrouptogglericon']"
@@ -70,7 +70,7 @@
                     :virtualScrollerContentProps="virtualScrollerContentProps"
                     :ariaControls="expandedRowId + '_' + rowIndex + '_expansion'"
                     :name="nameAttributeSelector"
-                    :isRowExpanded="d_rowExpanded"
+                    :isRowExpanded="rowExpanded"
                     :expandedRowIcon="expandedRowIcon"
                     :collapsedRowIcon="collapsedRowIcon"
                     :editButtonProps="editButtonProps"
@@ -90,7 +90,7 @@
             </template>
         </tr>
         <tr
-            v-if="templates['expansion'] && expandedRows && d_rowExpanded"
+            v-if="templates['expansion'] && expandedRows && rowExpanded"
             :id="expandedRowId + '_' + rowIndex + '_expansion'"
             :class="cx('rowExpansion')"
             role="row"
@@ -106,7 +106,7 @@
             role="row"
             v-bind="ptm('rowGroupFooter')"
         >
-            <td :colspan="columnsLength - 1" v-bind="{ ...getColumnPT('bodycell'), ...ptm('rowGroupFooterCell') }">
+            <td :colspan="Math.max(columnsLength, 1)" v-bind="{ ...getColumnPT('bodycell'), ...ptm('rowGroupFooterCell') }">
                 <component :is="templates['groupfooter']" :data="rowData" :index="rowIndex" />
             </td>
         </tr>
@@ -127,6 +127,7 @@ import ChevronRightIcon from '../icons/chevronright/ChevronRightIcon.vue';
 import { defineComponent, mergeProps, type PropType, type Slots, type StyleValue, type VNode } from 'vue';
 import BodyCell from './BodyCell.vue';
 import type { EditingDrafts, EditingRowKey } from './editing-drafts';
+import { isRowGroupField, rowGroupKey, sameRowGroup, type RowGroupFields } from './row-groups';
 import type { VirtualScrollerContent } from './virtual-scroller-content';
 
 type ExpandedRows = unknown[] | Record<PropertyKey, unknown>;
@@ -195,7 +196,7 @@ export default defineComponent({
             default: null
         },
         groupRowsBy: {
-            type: [Array, String, Function],
+            type: [Array, String, Function] as PropType<RowGroupFields>,
             default: null
         },
         expandableRowGroups: {
@@ -365,68 +366,33 @@ export default defineComponent({
             });
         },
         shouldRenderBodyCell(column: VNode) {
-            const isHidden = this.columnProp(column, 'hidden');
+            if (this.columnProp(column, 'hidden')) return false;
 
-            if (this.rowGroupMode && !isHidden) {
-                const field = this.columnProp(column, 'field');
+            const field = this.columnProp(column, 'field');
+            if (!isRowGroupField(this.groupRowsBy, field)) return true;
+            if (this.rowGroupMode === 'subheader') return false;
+            if (this.rowGroupMode !== 'rowspan') return true;
 
-                if (this.rowGroupMode === 'subheader') {
-                    return this.groupRowsBy !== field;
-                } else if (this.rowGroupMode === 'rowspan') {
-                    if (this.isGrouped(column)) {
-                        let prevRowData = this.value[this.rowIndex - 1];
+            const previous = this.value[this.index - 1];
 
-                        if (prevRowData) {
-                            const currentRowFieldData = resolveFieldData(this.value[this.rowIndex], field);
-                            const previousRowFieldData = resolveFieldData(prevRowData, field);
-
-                            return currentRowFieldData !== previousRowFieldData;
-                        } else {
-                            return true;
-                        }
-                    } else {
-                        return true;
-                    }
-                }
-            } else {
-                return !isHidden;
-            }
+            return !previous || this.hasExpansion(previous) || resolveFieldData(previous, field) !== resolveFieldData(this.rowData, field);
         },
         calculateRowGroupSize(column: VNode) {
-            if (this.isGrouped(column)) {
-                let index = this.rowIndex;
-                const field = this.columnProp(column, 'field');
-                const currentRowFieldData = resolveFieldData(this.value[index], field);
-                let nextRowFieldData = currentRowFieldData;
-                let groupRowSpan = 0;
-
-                if (this.d_rowExpanded) groupRowSpan++;
-
-                while (currentRowFieldData === nextRowFieldData) {
-                    groupRowSpan++;
-                    let nextRowData = this.value[++index];
-
-                    if (nextRowData) {
-                        nextRowFieldData = resolveFieldData(nextRowData, field);
-                    } else {
-                        break;
-                    }
-                }
-
-                return groupRowSpan === 1 ? null : groupRowSpan;
-            } else {
-                return null;
-            }
-        },
-        isGrouped(column: VNode) {
             const field = this.columnProp(column, 'field');
+            if (!isRowGroupField(this.groupRowsBy, field)) return null;
 
-            if (this.groupRowsBy && field) {
-                if (Array.isArray(this.groupRowsBy)) return this.groupRowsBy.indexOf(field) > -1;
-                else return this.groupRowsBy === field;
-            } else {
-                return false;
+            const current = resolveFieldData(this.rowData, field);
+            let index = this.index;
+
+            // An expansion row occupies every column, so each span ends at the record above it.
+            while (this.value[index + 1] && !this.hasExpansion(this.value[index]) && current === resolveFieldData(this.value[index + 1], field)) {
+                index++;
             }
+
+            return index === this.index ? null : index - this.index + 1;
+        },
+        hasExpansion(row: unknown) {
+            return !!this.templates.expansion && this.isExpanded(row, this.expandedRows);
         },
         findIndexInSelection(data: unknown) {
             return Array.isArray(this.selection) ? this.findIndex(data, this.selection) : -1;
@@ -488,9 +454,10 @@ export default defineComponent({
             this.$emit('row-drop', event);
         },
         onRowToggle(event: { originalEvent: Event; data: unknown }) {
-            this.d_rowExpanded = !this.d_rowExpanded;
+            const expanded = !this.rowExpanded;
+            if (this.rowGroupMode !== 'rowspan') this.d_rowExpanded = expanded;
 
-            this.$emit('row-toggle', { ...event, expanded: this.d_rowExpanded });
+            this.$emit('row-toggle', { ...event, expanded });
         },
         onRadioChange(event: unknown) {
             this.$emit('radio-change', event);
@@ -524,6 +491,9 @@ export default defineComponent({
         }
     },
     computed: {
+        rowExpanded() {
+            return this.rowGroupMode === 'rowspan' ? this.isExpanded(this.rowData, this.expandedRows) : this.d_rowExpanded;
+        },
         rowIndex() {
             const getItemOptions = this.getVirtualScrollerProp('getItemOptions');
 
@@ -577,9 +547,9 @@ export default defineComponent({
         },
         isRowGroupExpanded() {
             if (this.expandableRowGroups && this.expandedRowGroups) {
-                const groupFieldValue = resolveFieldData(this.rowData, this.groupRowsBy);
+                const groupFieldValue = rowGroupKey(this.rowData, this.groupRowsBy);
 
-                return this.expandedRowGroups.indexOf(groupFieldValue) > -1;
+                return this.expandedRowGroups.some((group) => sameRowGroup(this.groupRowsBy, group, groupFieldValue));
             }
 
             return false;
@@ -604,47 +574,32 @@ export default defineComponent({
             return false;
         },
         shouldRenderRowGroupHeader() {
-            const currentRowFieldData = resolveFieldData(this.rowData, this.groupRowsBy);
             const groupRowsValue = this.groupRowsValue || this.value;
-            const prevRowData = groupRowsValue[this.rowIndex - 1];
+            const index = this.groupRowsValue ? this.rowIndex : this.index;
+            const previous = groupRowsValue[index - 1];
 
-            if (prevRowData) {
-                const previousRowFieldData = resolveFieldData(prevRowData, this.groupRowsBy);
-
-                return currentRowFieldData !== previousRowFieldData;
-            } else {
-                return this.rowIndex === 0;
-            }
+            return (
+                index === 0 ||
+                (!!previous && !sameRowGroup(this.groupRowsBy, rowGroupKey(previous, this.groupRowsBy), rowGroupKey(this.rowData, this.groupRowsBy)))
+            );
         },
         shouldRenderRowGroupFooter() {
-            if (this.expandableRowGroups && !this.isRowGroupExpanded) {
-                return false;
-            } else {
-                let currentRowFieldData = resolveFieldData(this.rowData, this.groupRowsBy);
-                let groupRowsValue = this.groupRowsValue || this.value;
-                let nextRowData = groupRowsValue[this.rowIndex + 1];
+            if (this.expandableRowGroups && !this.isRowGroupExpanded) return false;
 
-                if (nextRowData) {
-                    let nextRowFieldData = resolveFieldData(nextRowData, this.groupRowsBy);
+            const groupRowsValue = this.groupRowsValue || this.value;
+            const index = this.groupRowsValue ? this.rowIndex : this.index;
+            const next = groupRowsValue[index + 1];
 
-                    return currentRowFieldData !== nextRowFieldData;
-                } else {
-                    return true;
-                }
-            }
+            return !next || !sameRowGroup(this.groupRowsBy, rowGroupKey(next, this.groupRowsBy), rowGroupKey(this.rowData, this.groupRowsBy));
         },
         columnsLength() {
-            if (this.columns) {
-                let hiddenColLength = 0;
-
-                this.columns.forEach((column) => {
-                    if (this.columnProp(column, 'hidden')) hiddenColLength++;
-                });
-
-                return this.columns.length - hiddenColLength;
-            }
-
-            return 0;
+            return (
+                this.columns?.filter(
+                    (column) =>
+                        !this.columnProp(column, 'hidden') &&
+                        (this.rowGroupMode !== 'subheader' || !isRowGroupField(this.groupRowsBy, this.columnProp(column, 'field')))
+                ).length ?? 0
+            );
         }
     },
     components: {

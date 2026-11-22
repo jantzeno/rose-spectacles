@@ -3,6 +3,7 @@ import { defineComponent, type PropType, type StyleValue } from 'vue';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import DataTableStyle from './style/DataTableStyle';
 import type { DataTableExportFunctionOptions, DataTableFilterMeta, DataTableSortMeta } from './DataTable';
+import type { RowGroupFields } from './row-groups';
 
 export type TableRow = Record<string, unknown>;
 export type TableField = NonNullable<DataTableSortMeta['field']>;
@@ -198,7 +199,7 @@ export default defineComponent({
             default: null
         },
         groupRowsBy: {
-            type: [Array, String, Function] as PropType<TableField | TableField[]>,
+            type: [Array, String, Function] as PropType<RowGroupFields>,
             default: null
         },
         expandableRowGroups: {

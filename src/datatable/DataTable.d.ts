@@ -923,8 +923,9 @@ export interface DataTableContext {
  * Defines valid properties in DataTable component.
  */
 type FilterModel<Filters> = { [Field in keyof Filters]: DataTableFilterMeta[string] };
+type RowGroupField<T> = keyof T | `${Extract<keyof T, string>}.${string}`;
 
-export interface DataTableProps<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta> {
+export interface DataTableProps<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta, GroupKey = any> {
     /**
      * An array of objects to display.
      */
@@ -1145,18 +1146,19 @@ export interface DataTableProps<T = any, Filters extends FilterModel<Filters> = 
      */
     rowGroupMode?: HintedString<'subheader' | 'rowspan'> | undefined;
     /**
-     * One or more field names to use in row grouping.
+     * One or more field paths, or a callback that returns the group key for a row.
+     * With subheaders, multiple field paths produce one group per combination of field values.
      */
-    groupRowsBy?: ((field: NoInfer<T>) => object) | (keyof T)[] | keyof T | undefined;
+    groupRowsBy?: ((row: NoInfer<T>) => GroupKey) | readonly RowGroupField<NoInfer<T>>[] | RowGroupField<NoInfer<T>> | undefined;
     /**
      * Whether the row groups can be expandable.
      * @defaultValue false
      */
     expandableRowGroups?: boolean | undefined;
     /**
-     * An array of group field values whose groups would be rendered as expanded.
+     * Group keys to render as expanded. For multiple subheader grouping fields, each key is an array of values in field order.
      */
-    expandedRowGroups?: NoInfer<T>[] | DataTableExpandedRows;
+    expandedRowGroups?: readonly GroupKey[] | DataTableExpandedRows;
     /**
      * Defines where a stateful table keeps its state.
      * @defaultValue session
@@ -1524,7 +1526,7 @@ export interface DataTableSlots<T = any> {
 /**
  * Defines valid emits in Datatable component.
  */
-export interface DataTableEmitsOptions<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta> {
+export interface DataTableEmitsOptions<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta, GroupKey = any> {
     /**
      * Emitted when the first changes.
      * @param {number} value - New value.
@@ -1567,9 +1569,9 @@ export interface DataTableEmitsOptions<T = any, Filters extends FilterModel<Filt
     'update:expandedRows'(value: T[] | DataTableExpandedRows): void;
     /**
      * Emitted when the expandedRowGroups changes.
-     * @param {DataTableExpandedRows} value - New value.
+     * @param {GroupKey[]} value - New group keys.
      */
-    'update:expandedRowGroups'(value: T[] | DataTableExpandedRows): void;
+    'update:expandedRowGroups'(value: GroupKey[]): void;
     /**
      * Emitted when the filters changes.
      * @param {DataTableFilterMeta} value - New value.
@@ -1667,14 +1669,14 @@ export interface DataTableEmitsOptions<T = any, Filters extends FilterModel<Filt
     'row-collapse'(event: DataTableRowCollapseEvent): void;
     /**
      * Callback to invoke when a row group is expanded.
-     * @param {DataTableRowExpandEvent} event - Custom row expand event.
+     * @param {DataTableRowExpandEvent} event - Its data is the expanded group key.
      */
-    'rowgroup-expand'(event: DataTableRowExpandEvent): void;
+    'rowgroup-expand'(event: DataTableRowExpandEvent<GroupKey>): void;
     /**
      * Callback to invoke when a row group is collapsed.
-     * @param {DataTableRowCollapseEvent} event - Custom row collapse event.
+     * @param {DataTableRowExpandEvent} event - Its data is the collapsed group key.
      */
-    'rowgroup-collapse'(event: DataTableRowCollapseEvent): void;
+    'rowgroup-collapse'(event: DataTableRowExpandEvent<GroupKey>): void;
     /**
      * Callback to invoke when cell edit is initiated.
      * @param {DataTableCellEditInitEvent} event - Custom cell edit init.
@@ -1717,7 +1719,9 @@ export interface DataTableEmitsOptions<T = any, Filters extends FilterModel<Filt
     'state-save'(event: DataTableStateEvent<T>): void;
 }
 
-export declare type DataTableEmits<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta> = EmitFn<DataTableEmitsOptions<T, Filters>>;
+export declare type DataTableEmits<T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta, GroupKey = any> = EmitFn<
+    DataTableEmitsOptions<T, Filters, GroupKey>
+>;
 
 export interface DataTableMethods {
     /**
@@ -1744,9 +1748,9 @@ export interface DataTableMethods {
  *
  */
 declare const DataTable: {
-    new <T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta>(
-        props?: DataTableProps<T, Filters>
-    ): InstanceType<DefineComponent<DataTableProps<T, Filters>, DataTableSlots<T>, DataTableEmits<T, Filters>, DataTableMethods>>;
+    new <T = any, Filters extends FilterModel<Filters> = DataTableFilterMeta, GroupKey = any>(
+        props?: DataTableProps<T, Filters, GroupKey>
+    ): InstanceType<DefineComponent<DataTableProps<T, Filters, GroupKey>, DataTableSlots<T>, DataTableEmits<T, Filters, GroupKey>, DataTableMethods>>;
 };
 
 declare module 'vue' {

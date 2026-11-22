@@ -384,6 +384,7 @@ import TableBody from './TableBody.vue';
 import TableFooter from './TableFooter.vue';
 import TableHeader from './TableHeader.vue';
 import { getEditingRowKey, type EditingDraftChange, type EditingDrafts } from './editing-drafts';
+import { isRowGroupField, rowGroupKey, sameRowGroup } from './row-groups';
 import type {
     DataTableCellEditCancelEvent,
     DataTableCellEditCompleteEvent,
@@ -564,7 +565,16 @@ export default defineComponent({
             this.d_nullSortOrder = newValue;
         },
         multiSortMeta(newValue: DataTableSortMeta[] | null) {
-            this.d_multiSortMeta = newValue ?? [];
+            this.d_multiSortMeta = newValue ? [...newValue] : [];
+        },
+        d_multiSortMeta: {
+            immediate: true,
+            handler() {
+                this.updateGroupSortMeta();
+            }
+        },
+        groupRowsBy() {
+            this.updateGroupSortMeta();
         },
         selection: {
             immediate: true,
@@ -695,7 +705,11 @@ export default defineComponent({
                         let metaKey = event.metaKey || event.ctrlKey;
 
                         if (!metaKey) {
-                            this.d_multiSortMeta = this.d_multiSortMeta.filter((meta) => meta.field === columnField);
+                            const firstUngrouped = this.d_multiSortMeta.findIndex((meta) => !isRowGroupField(this.groupRowsBy, meta.field));
+
+                            this.d_multiSortMeta = this.d_multiSortMeta.filter(
+                                (meta, index) => firstUngrouped === -1 || index < firstUngrouped || meta.field === columnField
+                            );
                         }
 
                         this.addMultiSortField(columnField);
@@ -710,13 +724,19 @@ export default defineComponent({
             }
         },
         sortSingle(value: TableRow[]): TableRow[] {
-            if (this.groupRowsBy && this.groupRowsBy === this.sortField) {
-                this.d_multiSortMeta = [
+            const groupFields = this.groupRowsBy;
+            const primaryGroupField = Array.isArray(groupFields) ? groupFields[0] : groupFields;
+
+            if (this.sortField && primaryGroupField === this.sortField) {
+                const additionalFields: readonly string[] = Array.isArray(groupFields) ? groupFields.slice(1) : [];
+                const groupSort: TableSortMeta[] = [
                     { field: this.sortField, order: this.sortOrder || this.defaultSortOrder },
-                    { field: this.d_sortField ?? undefined, order: this.d_sortOrder }
+                    ...additionalFields.map((field) => ({ field, order: this.defaultSortOrder }))
                 ];
 
-                return this.sortMultiple(value);
+                if (!isRowGroupField(this.groupRowsBy, this.d_sortField)) groupSort.push({ field: this.d_sortField ?? undefined, order: this.d_sortOrder });
+
+                return this.sortMultiple(value, groupSort);
             }
 
             let data = [...value];
@@ -737,37 +757,25 @@ export default defineComponent({
 
             return data;
         },
-        sortMultiple(value: TableRow[]): TableRow[] {
-            if (this.groupRowsBy && (this.d_groupRowsSortMeta || (this.d_multiSortMeta.length && this.groupRowsBy === this.d_multiSortMeta[0].field))) {
-                const firstSortMeta = this.d_multiSortMeta[0];
-
-                !this.d_groupRowsSortMeta && (this.d_groupRowsSortMeta = firstSortMeta);
-
-                if (this.d_groupRowsSortMeta && firstSortMeta?.field !== this.d_groupRowsSortMeta.field) {
-                    this.d_multiSortMeta = [this.d_groupRowsSortMeta, ...this.d_multiSortMeta];
-                }
-            }
-
-            let data = [...value];
-
-            data.sort((data1, data2) => {
-                return this.multisortField(data1, data2, 0);
-            });
-
-            return data;
-        },
-        multisortField(data1: TableRow, data2: TableRow, index: number): number {
-            const value1 = resolveFieldData(data1, this.d_multiSortMeta[index].field);
-            const value2 = resolveFieldData(data2, this.d_multiSortMeta[index].field);
+        sortMultiple(value: TableRow[], meta?: TableSortMeta[]): TableRow[] {
             const comparer = localeComparator();
+            const sortMeta = meta ?? this.d_multiSortMeta;
 
-            if (value1 === value2) {
-                return this.d_multiSortMeta.length - 1 > index ? this.multisortField(data1, data2, index + 1) : 0;
-            }
+            return [...value].sort((first, second) => {
+                for (const { field, order } of sortMeta) {
+                    const firstValue = resolveFieldData(first, field);
+                    const secondValue = resolveFieldData(second, field);
 
-            const order = this.d_multiSortMeta[index].order;
+                    if (firstValue !== secondValue) return sort(firstValue, secondValue, order === null ? 0 : order, comparer, this.d_nullSortOrder);
+                }
 
-            return sort(value1, value2, order === null ? 0 : order, comparer, this.d_nullSortOrder);
+                return 0;
+            });
+        },
+        updateGroupSortMeta() {
+            const firstSort = this.d_multiSortMeta[0];
+
+            this.d_groupRowsSortMeta = firstSort && isRowGroupField(this.groupRowsBy, firstSort.field) ? firstSort : null;
         },
         addMultiSortField(field: DataTableSortMeta['field']) {
             let index = this.d_multiSortMeta.findIndex((meta) => meta.field === field);
@@ -1508,7 +1516,10 @@ export default defineComponent({
             const keys: ColumnKey[] = [];
 
             (this.columns || []).forEach((column, index) => {
-                if (this.columnProp(column, 'hidden') || (this.rowGroupMode === 'subheader' && this.groupRowsBy === this.columnProp(column, 'field'))) {
+                if (
+                    this.columnProp(column, 'hidden') ||
+                    (this.rowGroupMode === 'subheader' && isRowGroupField(this.groupRowsBy, this.columnProp(column, 'field')))
+                ) {
                     return;
                 }
 
@@ -1883,11 +1894,11 @@ export default defineComponent({
         toggleRowGroup(e: Omit<RowEvent, 'index'>) {
             const event = e.originalEvent;
             const data = e.data;
-            const groupFieldValue = resolveFieldData(data, this.groupRowsBy);
+            const groupFieldValue = rowGroupKey(data, this.groupRowsBy);
             let _expandedRowGroups = this.expandedRowGroups ? [...this.expandedRowGroups] : [];
 
             if (this.isRowGroupExpanded(data)) {
-                _expandedRowGroups = _expandedRowGroups.filter((group) => group !== groupFieldValue);
+                _expandedRowGroups = _expandedRowGroups.filter((group) => !sameRowGroup(this.groupRowsBy, group, groupFieldValue));
                 this.$emit('update:expandedRowGroups', _expandedRowGroups);
                 this.$emit('rowgroup-collapse', { originalEvent: event, data: groupFieldValue });
             } else {
@@ -1898,9 +1909,9 @@ export default defineComponent({
         },
         isRowGroupExpanded(rowData: TableRow) {
             if (this.expandableRowGroups && this.expandedRowGroups) {
-                let groupFieldValue = resolveFieldData(rowData, this.groupRowsBy);
+                const groupFieldValue = rowGroupKey(rowData, this.groupRowsBy);
 
-                return this.expandedRowGroups.indexOf(groupFieldValue) > -1;
+                return this.expandedRowGroups.some((group) => sameRowGroup(this.groupRowsBy, group, groupFieldValue));
             }
 
             return false;
@@ -2422,10 +2433,10 @@ export default defineComponent({
                     return itemSize;
                 }
 
-                const groupValue = resolveFieldData(items[index], groupRowsBy);
-                const isFirstOfGroup = index === 0 || resolveFieldData(items[index - 1], groupRowsBy) !== groupValue;
-                const isLastOfGroup = index === items.length - 1 || resolveFieldData(items[index + 1], groupRowsBy) !== groupValue;
-                const isExpanded = !expandable || (expandedGroups && expandedGroups.indexOf(groupValue) > -1);
+                const groupValue = rowGroupKey(items[index], groupRowsBy);
+                const isFirstOfGroup = index === 0 || !sameRowGroup(groupRowsBy, rowGroupKey(items[index - 1], groupRowsBy), groupValue);
+                const isLastOfGroup = index === items.length - 1 || !sameRowGroup(groupRowsBy, rowGroupKey(items[index + 1], groupRowsBy), groupValue);
+                const isExpanded = !expandable || expandedGroups?.some((group) => sameRowGroup(groupRowsBy, group, groupValue));
                 const rowHeight = isExpanded ? (typeof customItemSize === 'function' ? customItemSize(index) : itemSize) : 0;
                 const groupHeaderHeight = isFirstOfGroup && hasGroupHeader ? headerHeight || itemSize : 0;
                 const groupFooterHeight = isLastOfGroup && hasGroupFooter && isExpanded ? footerHeight || itemSize : 0;
@@ -2455,7 +2466,7 @@ export default defineComponent({
             }
         },
         groupRowSortField() {
-            return this.sortMode === 'single' ? this.sortField : this.d_groupRowsSortMeta ? this.d_groupRowsSortMeta.field : null;
+            return this.sortMode === 'single' ? this.sortField : this.d_groupRowsSortMeta?.field;
         },
         headerFilterButtonProps() {
             return {
