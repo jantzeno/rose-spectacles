@@ -115,6 +115,7 @@
                             :columnGroup="headerColumnGroup"
                             :columnOrder="groupedColumnOrder"
                             :columns="slotProps.columns"
+                            :columnKeys="getRenderedColumnKeys(slotProps.columns)"
                             :rowGroupMode="rowGroupMode"
                             :groupRowsBy="groupRowsBy"
                             :groupRowSortField="groupRowSortField ?? undefined"
@@ -137,11 +138,11 @@
                             @column-mousedown="onColumnHeaderMouseDown($event)"
                             @filter-change="onFilterChange"
                             @filter-apply="onFilterApply"
-                            @column-dragstart="onColumnHeaderDragStart($event)"
+                            @column-dragstart="onColumnHeaderDragStart"
                             @column-dragover="onColumnHeaderDragOver($event)"
                             @column-dragleave="onColumnHeaderDragLeave($event)"
-                            @column-dragend="endGroupedColumnDrag"
-                            @column-drop="onColumnHeaderDrop($event)"
+                            @column-dragend="endColumnDrag"
+                            @column-drop="onColumnHeaderDrop"
                             @column-resizestart="onColumnResizeStart"
                             @checkbox-change="toggleRowsWithCheckbox($event)"
                             :unstyled="unstyled"
@@ -556,6 +557,7 @@ export default defineComponent({
             colReorderIconWidth: 0,
             colReorderIconHeight: 0,
             draggedColumn: null as VNode | null,
+            draggedColumnKey: null as ColumnKey | null,
             draggedColumnElement: null as HTMLTableCellElement | null,
             dropPosition: null as number | null,
             draggedRowIndex: null as number | null,
@@ -1571,9 +1573,10 @@ export default defineComponent({
 
             (this.columns || []).forEach((column, index) => {
                 if (this.isVisibleColumn(column)) {
-                    const key = this.headerColumnGroup
-                        ? this.groupedColumnKeys.get(column)
-                        : this.columnProp(column, 'columnKey') || this.columnProp(column, 'field');
+                    const key =
+                        this.headerColumnGroup || this.reorderableColumns
+                            ? this.columnOrderKeys.get(column)
+                            : this.columnProp(column, 'columnKey') || this.columnProp(column, 'field');
                     keys.push(key ?? index);
                 }
             });
@@ -1596,20 +1599,29 @@ export default defineComponent({
         },
         cacheColumnWidthsByKey(widths: ColumnWidth[]) {
             const keys = this.getVisibleColumnKeys();
-            const values = (keys || []).map((_, index) => parseFloat(String(widths[index])));
+            const values = widths.map((width) => (width === undefined ? undefined : parseFloat(String(width))));
 
-            if (!keys || widths.length !== keys.length || values.some((value) => !isFinite(value) || value <= 0)) {
+            if (
+                !keys ||
+                widths.length !== keys.length ||
+                values.every((value) => value === undefined) ||
+                values.some((value) => value !== undefined && (!isFinite(value) || value <= 0))
+            ) {
                 return;
             }
 
             const columnWidths = (this.columnWidthsByKey ??= new Map());
-            keys.forEach((key, index) => columnWidths.set(key, values[index]));
+            keys.forEach((key, index) => {
+                const value = values[index];
+
+                if (value !== undefined) columnWidths.set(key, value);
+            });
             this.columnWidthsKeys = keys;
         },
         restoreColumnWidthsByKey() {
             const columnWidths = this.columnWidthsByKey;
 
-            if (!this.resizableColumns || !columnWidths) {
+            if ((!this.resizableColumns && !this.reorderableColumns) || !columnWidths) {
                 return;
             }
 
@@ -1696,7 +1708,7 @@ export default defineComponent({
                 );
             }
         },
-        onColumnHeaderDragStart(e: ColumnEvent<DragEvent>) {
+        onColumnHeaderDragStart(e: ColumnEvent<DragEvent>, key?: ColumnKey | null) {
             const { originalEvent: event, column } = e;
 
             if (!this.reorderableColumns || this.columnResizing || this.columnProp(column, 'reorderableColumn') === false) {
@@ -1709,6 +1721,7 @@ export default defineComponent({
             this.colReorderIconHeight = getHiddenElementOuterHeight(this.$refs.reorderIndicatorUp as HTMLElement);
 
             this.draggedColumn = column;
+            this.draggedColumnKey = key ?? null;
             this.draggedColumnElement = this.findParentHeader(event.target);
             event.dataTransfer?.setData('text', 'b'); // Firefox requires this to make dragging possible
         },
@@ -1735,8 +1748,7 @@ export default defineComponent({
             } else {
                 event.preventDefault();
                 if (this.draggedColumnElement !== dropHeader) {
-                    const center = getOffset(dropHeader).left + dropHeader.offsetWidth / 2;
-                    this.showColumnReorderIndicators(dropHeader, event.pageX > center);
+                    this.showColumnReorderIndicators(dropHeader, this.isColumnDropRight(event, dropHeader));
                 }
             }
         },
@@ -1765,71 +1777,94 @@ export default defineComponent({
                 downIndicator.style.display = 'none';
             }
         },
-        onColumnHeaderDrop(e: ColumnEvent<DragEvent>) {
-            const { originalEvent: event, column } = e;
+        onColumnHeaderDrop(e: ColumnEvent<DragEvent>, key?: ColumnKey | null) {
+            const event = e.originalEvent;
             const dropHeader = this.findParentHeader(event.target);
 
-            if (this.headerColumnGroup) {
-                if (dropHeader) this.reorderGroupedColumns(e, dropHeader);
-                this.endGroupedColumnDrag();
-                return;
+            try {
+                if (this.reorderableColumns && this.draggedColumnElement && dropHeader && !this.columnProp(e.column, 'frozen')) {
+                    event.preventDefault();
+
+                    if (this.headerColumnGroup) this.reorderGroupedColumns(e, dropHeader);
+                    else if (key != null) this.reorderFlatColumns(e, dropHeader, key);
+                }
+            } finally {
+                this.endColumnDrag();
+            }
+        },
+        isColumnDropRight(event: DragEvent, header: HTMLTableCellElement) {
+            const rect = header.getBoundingClientRect();
+
+            return event.clientX > rect.left + rect.width / 2;
+        },
+        reorderFlatColumns(e: ColumnEvent<DragEvent>, dropHeader: HTMLTableCellElement, targetKey: ColumnKey) {
+            if (this.draggedColumnKey == null) return;
+
+            const visible = this.visibleColumns;
+            const from = visible.findIndex((column) => this.columnOrderKeys.get(column) === this.draggedColumnKey);
+            const target = visible.findIndex((column) => this.columnOrderKeys.get(column) === targetKey);
+
+            if (from < 0 || target < 0 || from === target) return;
+
+            const after = this.isColumnDropRight(e.originalEvent, dropHeader) !== isRTL(this.$el);
+            const to = target + Number(after) - Number(from < target);
+
+            if (from === to) return;
+
+            const reordered = [...visible];
+            const measured = this.measureFlatColumnWidths();
+
+            reorderArray(reordered, from, to);
+
+            const widths = reordered.map((column) => {
+                const key = this.columnOrderKeys.get(column)!;
+
+                return measured.get(key) ?? this.columnWidthsByKey?.get(key);
+            });
+            const dragIndex = this.columns.indexOf(visible[from]);
+            const dropIndex = this.columns.indexOf(visible[to]);
+
+            this.applyVisibleColumnOrder(reordered, widths);
+            this.$emit('column-reorder', { originalEvent: e.originalEvent, dragIndex, dropIndex });
+        },
+        getRenderedColumnKeys(columns?: VNode[]) {
+            return (columns ?? []).map((column, index) => {
+                const source = columns?.length === this.columns.length ? this.columns[index] : column;
+
+                return this.columnOrderKeys.get(source) ?? null;
+            });
+        },
+        measureFlatColumnWidths() {
+            const header = this.$refs.tableHeader as { columns?: VNode[]; columnKeys?: VNode['key'][] } | undefined;
+            const keys = header?.columnKeys?.filter((_, index) => header.columns && this.isVisibleColumn(header.columns[index])) ?? [];
+            const cells = (this.$refs.table as HTMLTableElement).tHead?.rows[0]?.cells;
+            const widths = new Map<ColumnKey, number>();
+            const expected = this.getVisibleColumnKeys();
+
+            // A second drop can arrive before Vue moves the headers. At that point the CSS widths already follow the new order.
+            if (this.columnWidthsByKey && expected && (keys.length !== expected.length || keys.some((key, index) => key !== expected[index]))) {
+                return widths;
             }
 
-            const upIndicator = this.$refs.reorderIndicatorUp as HTMLElement;
-            const downIndicator = this.$refs.reorderIndicatorDown as HTMLElement;
+            if (cells?.length === keys.length) {
+                keys.forEach((key, index) => {
+                    const cell = cells[index];
+                    const width = cell.getBoundingClientRect().width || getOuterWidth(cell);
 
-            event.preventDefault();
+                    if (key != null && width > 0) widths.set(key, width);
+                });
+            }
 
-            if (this.draggedColumnElement && dropHeader) {
-                let dragIndex = getIndex(this.draggedColumnElement);
-                let dropIndex = getIndex(dropHeader);
-                let allowDrop = dragIndex !== dropIndex;
+            return widths;
+        },
+        applyVisibleColumnOrder(reordered: VNode[], widths: ColumnWidth[]) {
+            let index = 0;
 
-                if (allowDrop && ((dropIndex - dragIndex === 1 && this.dropPosition === -1) || (dropIndex - dragIndex === -1 && this.dropPosition === 1))) {
-                    allowDrop = false;
-                }
+            this.d_columnOrder = this.columns.map((column) => this.columnOrderKeys.get(this.isVisibleColumn(column) ? reordered[index++] : column)!);
 
-                if (allowDrop) {
-                    const isSameColumn = (col1: VNode, col2: VNode | null) =>
-                        this.columnProp(col1, 'columnKey') || this.columnProp(col2, 'columnKey')
-                            ? this.columnProp(col1, 'columnKey') === this.columnProp(col2, 'columnKey')
-                            : this.columnProp(col1, 'field') === this.columnProp(col2, 'field');
-                    let dragColIndex = this.columns.findIndex((child) => isSameColumn(child, this.draggedColumn));
-                    let dropColIndex = this.columns.findIndex((child) => isSameColumn(child, column));
-                    const widths: number[] = [];
-                    let headers = find(this.$el, 'thead[data-pc-section="thead"] > tr > th');
-
-                    headers.forEach((header) => widths.push(getOuterWidth(header)));
-                    const movedItem = widths.find((_, index) => index === dragColIndex);
-                    const remainingItems = widths.filter((_, index) => index !== dragColIndex);
-                    const reorderedWidths = [...remainingItems.slice(0, dropColIndex), movedItem, ...remainingItems.slice(dropColIndex)];
-
-                    this.addColumnWidthStyles(reorderedWidths);
-
-                    if (dropColIndex < dragColIndex && this.dropPosition === 1) {
-                        dropColIndex++;
-                    }
-
-                    if (dropColIndex > dragColIndex && this.dropPosition === -1) {
-                        dropColIndex--;
-                    }
-
-                    reorderArray(this.columns, dragColIndex, dropColIndex);
-                    this.updateReorderableColumns();
-
-                    this.$emit('column-reorder', {
-                        originalEvent: event,
-                        dragIndex: dragColIndex,
-                        dropIndex: dropColIndex
-                    });
-                }
-
-                upIndicator.style.display = 'none';
-                downIndicator.style.display = 'none';
-                this.draggedColumnElement.draggable = false;
-                this.draggedColumnElement = null;
-                this.draggedColumn = null;
-                this.dropPosition = null;
+            if (widths.some((width) => width !== undefined)) {
+                this.cacheColumnWidthsByKey(widths);
+                this.addColumnWidthStyles(widths);
             }
         },
         acceptsGroupedColumnOrder(order: number[]) {
@@ -1848,8 +1883,7 @@ export default defineComponent({
             const to = cells.find((cell) => cell.column === e.column);
             if (!from || !to || this.columnProp(from.column, 'frozen') || this.columnProp(to.column, 'frozen')) return null;
 
-            const rect = dropHeader.getBoundingClientRect();
-            const right = e.originalEvent.clientX > rect.left + rect.width / 2;
+            const right = this.isColumnDropRight(e.originalEvent, dropHeader);
             const move = getColumnGroupMove(cells, from, to, this.visibleColumns.length, right !== isRTL(this.$el));
             if (!move) return null;
 
@@ -1868,20 +1902,11 @@ export default defineComponent({
             const reordered = move.order.map((index) => this.visibleColumns[index]);
             const dragIndex = this.columns.indexOf(this.visibleColumns[move.source.start]);
             const dropIndex = this.columns.indexOf(this.visibleColumns[move.insertAt]);
-            let visibleIndex = 0;
 
-            this.d_columnOrder = this.columns.map((column) => this.groupedColumnKeys.get(this.isVisibleColumn(column) ? reordered[visibleIndex++] : column)!);
-
-            if (widths.length === reordered.length) {
-                const orderedWidths = move.order.map((index) => widths[index]);
-                this.cacheColumnWidthsByKey(orderedWidths);
-                this.addColumnWidthStyles(orderedWidths);
-            }
-
-            e.originalEvent.preventDefault();
+            this.applyVisibleColumnOrder(reordered, widths.length === reordered.length ? move.order.map((index) => widths[index]) : []);
             this.$emit('column-reorder', { originalEvent: e.originalEvent, dragIndex, dropIndex });
         },
-        endGroupedColumnDrag() {
+        endColumnDrag() {
             if (!this.draggedColumnElement) return;
 
             const up = this.$refs.reorderIndicatorUp as HTMLElement | undefined;
@@ -1891,23 +1916,11 @@ export default defineComponent({
             this.draggedColumnElement.draggable = false;
             this.draggedColumnElement = null;
             this.draggedColumn = null;
+            this.draggedColumnKey = null;
             this.dropPosition = null;
         },
         findParentHeader(element: EventTarget | null): HTMLTableCellElement | null {
             return element instanceof Element ? element.closest<HTMLTableCellElement>('th') : null;
-        },
-        findColumnByKey(columns: VNode[] | null, key: ColumnKey) {
-            if (columns && columns.length) {
-                for (let i = 0; i < columns.length; i++) {
-                    let column = columns[i];
-
-                    if (this.columnProp(column, 'columnKey') === key || this.columnProp(column, 'field') === key) {
-                        return column;
-                    }
-                }
-            }
-
-            return null;
         },
         onRowMouseDown(event: MouseEvent) {
             const { target, currentTarget } = event;
@@ -2411,12 +2424,6 @@ export default defineComponent({
 
             return cloned;
         },
-        updateReorderableColumns() {
-            const columnOrder: ColumnKey[] = [];
-
-            this.columns.forEach((col) => columnOrder.push(this.columnProp(col, 'columnKey') || this.columnProp(col, 'field')));
-            this.d_columnOrder = columnOrder;
-        },
         createStyleElement() {
             if (this.styleElement) {
                 return;
@@ -2503,7 +2510,7 @@ export default defineComponent({
         sourceColumns(): VNode[] {
             return this.d_columns.get(this) ?? [];
         },
-        groupedColumnKeys(): Map<VNode, ColumnKey> {
+        columnOrderKeys(): Map<VNode, ColumnKey> {
             const identifiers: (ColumnKey | null | undefined)[] = this.sourceColumns.map(
                 (column) => this.columnProp(column, 'columnKey') ?? this.columnProp(column, 'field') ?? column.key
             );
@@ -2537,21 +2544,25 @@ export default defineComponent({
             return order.every((index, position) => index === position) ? null : order;
         },
         columns(): VNode[] {
-            const cols = this.headerColumnGroup ? this.sourceColumns : (this.d_columns.get(this) ?? []);
+            const cols = this.sourceColumns;
 
             if (this.reorderableColumns && this.d_columnOrder) {
-                const orderedColumns: VNode[] = [];
-                const grouped = this.headerColumnGroup ? new Map(Array.from(this.groupedColumnKeys, ([column, key]) => [key, column] as const)) : null;
+                const ordered = new Set<VNode>();
+                const byKey = new Map(Array.from(this.columnOrderKeys, ([column, key]) => [key, column] as const));
 
-                for (let columnKey of this.d_columnOrder) {
-                    let column = grouped ? grouped.get(columnKey) : this.findColumnByKey(cols, columnKey);
+                for (const key of this.d_columnOrder) {
+                    const column =
+                        byKey.get(key) ??
+                        cols.find((item) => {
+                            const field = this.columnProp(item, 'columnKey') ?? this.columnProp(item, 'field');
 
-                    if (column && !this.columnProp(column, 'hidden')) {
-                        orderedColumns.push(column);
-                    }
+                            return !ordered.has(item) && (field === key || (field == null && key == null));
+                        });
+
+                    if (column) ordered.add(column);
                 }
 
-                return [...orderedColumns, ...cols.filter((item) => orderedColumns.indexOf(item) < 0)];
+                return [...ordered, ...cols.filter((column) => !ordered.has(column))];
             }
 
             return cols;

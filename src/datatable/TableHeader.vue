@@ -10,17 +10,18 @@
     >
         <template v-if="!columnGroup">
             <tr role="row" v-bind="ptm('headerRow')">
-                <template v-for="(col, i) of columns" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || i">
+                <template v-for="(col, i) of columns" :key="columnKeys[i] ?? i">
                     <DTHeaderCell
                         v-if="isColumnVisible(col)"
                         :column="col"
                         :index="i"
                         @column-click="$emit('column-click', $event)"
                         @column-mousedown="$emit('column-mousedown', $event)"
-                        @column-dragstart="$emit('column-dragstart', $event)"
+                        @column-dragstart="$emit('column-dragstart', $event, columnKeys[i])"
                         @column-dragover="$emit('column-dragover', $event)"
                         @column-dragleave="$emit('column-dragleave', $event)"
-                        @column-drop="$emit('column-drop', $event)"
+                        @column-drop="$emit('column-drop', $event, columnKeys[i])"
+                        @dragend="$emit('column-dragend')"
                         :groupRowsBy="groupRowsBy"
                         :groupRowSortField="groupRowSortField"
                         :reorderableColumns="reorderableColumns"
@@ -98,7 +99,7 @@
             </tr>
         </template>
         <tr v-if="filterDisplay === 'row'" role="row" v-bind="ptm('headerRow')">
-            <template v-for="(col, i) of columns" :key="columnProp(col, 'columnKey') || columnProp(col, 'field') || i">
+            <template v-for="(col, i) of columns" :key="columnKeys[i] ?? i">
                 <DTFilterHeaderCell
                     v-if="isColumnVisible(col)"
                     :column="col"
@@ -172,6 +173,10 @@ export default defineComponent({
         columns: {
             type: null as unknown as PropType<VNode[]>,
             default: null
+        },
+        columnKeys: {
+            type: Array as PropType<VNode['key'][]>,
+            default: () => []
         },
         rowGroupMode: {
             type: String,
