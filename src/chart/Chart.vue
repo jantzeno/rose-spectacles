@@ -1,186 +1,146 @@
 <template>
     <div :class="cx('root')" :style="sx('root')" v-bind="ptmi('root')">
-        <canvas ref="canvas" :width="width" :height="height" @click="onCanvasClick($event)" v-bind="{ ...canvasProps, ...ptm('canvas') }"></canvas>
+        <ul v-if="legend.length" :class="cx('legend')" aria-label="Chart legend">
+            <li v-for="(entry, index) in legend" :key="index"><span aria-hidden="true" :style="{ backgroundColor: entry.color }"></span>{{ entry.label }}</li>
+        </ul>
+        <div
+            ref="plot"
+            :class="[cx('plot'), { 'rs-chart-themed': themed && !isUnstyled }]"
+            :style="plotSize"
+            role="img"
+            v-bind="{ ...canvasProps, ...containerProps, ...ptm('canvas'), ...ptm('plot') }"
+        ></div>
     </div>
 </template>
 
 <script lang="ts">
-import { ThemeService } from '../internal/styled/index';
-import type { Chart as CanvasChart } from 'chart.js';
-import { defineComponent, ref, shallowRef, toRaw } from 'vue';
+import { defineComponent, shallowRef } from 'vue';
 import BaseChart from './BaseChart.vue';
-import { applyPalette, getChartTheme, mergeOptions } from './utils/ChartTheme';
+import { chartColor, themedColor } from './model';
+import type { createChart } from './render';
 
 export default defineComponent({
     name: 'Chart',
     extends: BaseChart,
     inheritAttrs: false,
     emits: ['select', 'loaded'],
-    setup() {
+    data() {
         return {
-            chart: shallowRef<CanvasChart | null>(null),
-            isDestroyed: ref(false),
-            themeChangeListener: shallowRef<(() => void) | null>(null),
-            themeObserver: shallowRef<MutationObserver | null>(null)
+            binding: shallowRef<ReturnType<typeof createChart> | null>(null),
+            generation: 0
         };
     },
-    watch: {
-        /*
-         * Use deep watch to enable triggering watch for changes within structure
-         * otherwise the entire data object needs to be replaced to trigger watch
-         */
-        data: {
-            handler() {
-                this.syncChart();
-            },
-            deep: true
+    computed: {
+        plotSize() {
+            return { width: this.options?.responsive === false ? `${this.width}px` : '100%', height: `${this.height}px` };
         },
-        type() {
-            this.reinit();
-        },
-        options: {
-            handler() {
-                this.syncChart();
-            },
-            deep: true
-        },
-        themed() {
-            this.unbindThemeListeners();
-            this.bindThemeListeners();
-            this.syncChart();
+        legend() {
+            if (this.options?.legend === false || this.options?.plugins?.legend?.display === false || !this.data) return [];
+            const fill = (index: number) => (this.themed ? themedColor(index) : `var(--vis-color${index % 6})`);
+
+            if (this.type === 'pie' || this.type === 'doughnut') {
+                return (this.data.labels ?? []).map((label, index) => ({
+                    label,
+                    color: chartColor(this.data?.datasets[0]?.backgroundColor, index) ?? fill(index)
+                }));
+            }
+
+            return this.data.datasets.flatMap((dataset, index) =>
+                dataset.label
+                    ? [
+                          {
+                              label: dataset.label,
+                              color: chartColor(dataset.backgroundColor ?? dataset.borderColor, 0) ?? fill(index)
+                          }
+                      ]
+                    : []
+            );
         }
     },
+    watch: {
+        data: { handler: 'refresh', deep: true },
+        options: { handler: 'refresh', deep: true },
+        type: 'reinit',
+        width: 'refresh',
+        height: 'refresh',
+        themed: 'refresh'
+    },
     mounted() {
-        this.initChart();
-        this.bindThemeListeners();
+        void this.reinit();
     },
     beforeUnmount() {
-        this.isDestroyed = true;
-        this.unbindThemeListeners();
-        this.destroyChart();
+        this.generation++;
+        this.binding?.destroy();
+        this.binding = null;
     },
     methods: {
-        initChart() {
-            import('chart.js/auto')
-                .then((module) => {
-                    this.destroyChart();
+        async reinit() {
+            const generation = ++this.generation;
+            const plot = this.$refs.plot as HTMLElement;
 
-                    /*
-                     * The import is async, so the component may already be unmounted by the time it resolves.
-                     * Creating the chart here would leave an instance attached to a detached canvas.
-                     */
-                    if (this.isDestroyed) {
-                        return;
-                    }
-
-                    if (module && module.default) {
-                        const { data, options } = this.resolveConfig();
-
-                        this.chart = new module.default(this.getCanvas(), {
-                            type: this.type!,
-                            data: data!,
-                            options,
-                            plugins: this.plugins
-                        });
-                    }
-
-                    this.$emit('loaded', this.chart);
-                })
-                .catch((error) => {
-                    console.error('[Rose Spectacles] Chart requires chart.js to be installed. Run "npm install chart.js" to use this component.', error);
-                });
-        },
-        resolveConfig() {
-            /*
-             * Chart.js writes bookkeeping such as _stacks and _custom into the data objects (directly
-             * into the user's points when parsing is false). Handing it the reactive proxies would make
-             * every render trip the deep watchers below and loop through update() indefinitely.
-             */
-            const rawData = toRaw(this.data);
-            const rawOptions = toRaw(this.options);
-            const theme = this.themed ? getChartTheme(this.$el, this.type, rawData?.datasets?.length ?? 0) : null;
-
-            return {
-                data: theme ? applyPalette(rawData, this.type, theme.palette) : rawData,
-                options: theme ? mergeOptions(theme.options, rawOptions) : rawOptions
-            };
-        },
-        syncChart() {
-            if (!this.chart) {
-                return;
+            try {
+                const { createChart } = await import('./render');
+                if (generation !== this.generation) return;
+                this.binding?.destroy();
+                this.binding = null;
+                this.binding = createChart(
+                    plot,
+                    () => ({
+                        type: this.type,
+                        data: this.data ?? { datasets: [] },
+                        options: this.options ?? {},
+                        width: this.width,
+                        height: this.height,
+                        themed: this.themed
+                    }),
+                    (event) => this.$emit('select', event)
+                );
+                this.$emit('loaded', this.binding.chart);
+            } catch (error) {
+                console.error('[Rose Spectacles] Could not load the Unovis chart.', error);
             }
-
-            const { data, options } = this.resolveConfig();
-
-            /*
-             * Chart.js keeps a reference to the config passed on construction, so replaced data and
-             * options objects have to be reassigned before update() can pick the new values up.
-             */
-            this.chart.data = data!;
-            this.chart.options = options!;
-            this.chart.update();
-        },
-        bindThemeListeners() {
-            if (!this.themed || typeof window === 'undefined') {
-                return;
-            }
-
-            this.themeChangeListener = () => this.syncChart();
-            ThemeService.on('theme:change', this.themeChangeListener);
-
-            /*
-             * A preset swap emits through ThemeService, but toggling dark mode only rewrites CSS
-             * custom properties, which fires nothing. Watching the attributes that scope those
-             * properties covers the toggle however the application implements it.
-             */
-            if (typeof MutationObserver !== 'undefined') {
-                this.themeObserver = new MutationObserver(this.themeChangeListener);
-                this.themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
-            }
-        },
-        unbindThemeListeners() {
-            if (this.themeChangeListener) {
-                ThemeService.off('theme:change', this.themeChangeListener);
-                this.themeChangeListener = null;
-            }
-
-            if (this.themeObserver) {
-                this.themeObserver.disconnect();
-                this.themeObserver = null;
-            }
-        },
-        destroyChart() {
-            if (this.chart) {
-                this.chart.destroy();
-                this.chart = null;
-            }
-        },
-        getCanvas() {
-            return this.$refs.canvas as HTMLCanvasElement;
-        },
-        getChart() {
-            return this.chart;
-        },
-        getBase64Image() {
-            return this.chart!.toBase64Image();
         },
         refresh() {
-            if (this.chart) {
-                this.chart.update();
-            }
+            this.binding?.update();
         },
-        reinit() {
-            this.initChart();
+        getChart() {
+            return this.binding?.chart ?? null;
         },
-        onCanvasClick(event: MouseEvent) {
-            if (this.chart) {
-                const element = this.chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
-                const dataset = this.chart.getElementsAtEventForMode(event, 'dataset', { intersect: true }, false);
+        getSVG() {
+            const svg = this.getChart()?.element;
+            if (!svg) return '';
 
-                if (element && element[0] && dataset) {
-                    this.$emit('select', { originalEvent: event, element: element[0], dataset: dataset });
+            const clone = svg.cloneNode(true) as SVGSVGElement;
+            const styleProperties = [
+                'display',
+                'visibility',
+                'opacity',
+                'fill',
+                'fill-opacity',
+                'stroke',
+                'stroke-width',
+                'stroke-opacity',
+                'stroke-dasharray',
+                'font-family',
+                'font-size',
+                'font-weight',
+                'text-anchor'
+            ];
+            const children = clone.querySelectorAll<SVGElement>('*');
+            svg.querySelectorAll('*').forEach((element, index) => {
+                const style = getComputedStyle(element);
+                for (const property of styleProperties) {
+                    const value = style.getPropertyValue(property);
+                    if (value) children[index].style.setProperty(property, value);
                 }
-            }
+            });
+            return new XMLSerializer().serializeToString(clone);
+        },
+        getBase64Image() {
+            const svg = this.getSVG();
+            if (!svg) return '';
+            const bytes = new TextEncoder().encode(svg);
+            return `data:image/svg+xml;base64,${btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(''))}`;
         }
     }
 });

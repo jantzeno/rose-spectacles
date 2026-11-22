@@ -1,6 +1,6 @@
 /**
  *
- * Chart groups a collection of contents in tabs.
+ * Chart styles.
  *
  *
  * @module chartstyle
@@ -12,7 +12,9 @@ export enum ChartClasses {
     /**
      * Class name of the root element
      */
-    root = 'rs-chart'
+    root = 'rs-chart',
+    plot = 'rs-chart-plot',
+    legend = 'rs-chart-legend'
 }
 
 export interface ChartStyle extends BaseStyle {}

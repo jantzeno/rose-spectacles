@@ -21,7 +21,7 @@ async function write(name: string, content: string) {
     await writeFile(join(consumer, name), content);
 }
 
-const optionalDependencies = { 'chart.js': manifest.devDependencies['chart.js'], quill: manifest.devDependencies.quill };
+const visualizationAndEditorPeers = Object.entries(manifest.peerDependencies).filter(([name]) => name === '@unovis/ts' || name.startsWith('@tiptap/'));
 const baseDependencies = { [manifest.name]: `file:./${tarball}`, vue: manifest.devDependencies.vue };
 const tools = ['@vitejs/plugin-vue', 'typescript', 'vite', 'vue-tsc'] as const;
 
@@ -259,7 +259,7 @@ try {
     );
 
     run(['install', '--omit', 'peer']);
-    for (const name of Object.keys(optionalDependencies)) {
+    for (const [name] of visualizationAndEditorPeers) {
         assert.equal(existsSync(join(consumer, 'node_modules', name)), false, `${name} is absent in the base consumer`);
     }
     run(['x', '--no-install', 'vue-tsc', '--noEmit']);
@@ -287,7 +287,7 @@ try {
     run(['x', '--no-install', 'vite', 'build']);
 
     await write('SlotTypes.vue', slotTypes);
-    run(['add', '--exact', ...Object.entries(optionalDependencies).map(([name, version]) => `${name}@${version}`)]);
+    run(['add', '--exact', ...visualizationAndEditorPeers.map(([name, version]) => `${name}@${version}`)]);
     await write(
         'App.vue',
         `

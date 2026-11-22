@@ -39,7 +39,7 @@ import type { DividerPassThroughOptions } from 'rose-spectacles/divider';
 import type { DockPassThroughOptions } from 'rose-spectacles/dock';
 import type { DrawerPassThroughOptions } from 'rose-spectacles/drawer';
 import type { DropdownPassThroughOptions } from 'rose-spectacles/dropdown';
-import type { EditorPassThroughOptions } from 'rose-spectacles/editor';
+import type { EditorPassThroughOptions } from '../editor/EditorPassThrough';
 import type { FieldsetPassThroughOptions } from 'rose-spectacles/fieldset';
 import type { FileUploadPassThroughOptions } from 'rose-spectacles/fileupload';
 import type { FloatLabelPassThroughOptions } from 'rose-spectacles/floatlabel';

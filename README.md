@@ -41,9 +41,22 @@ import Select from 'rose-spectacles/select';
 </script>
 ```
 
-Install `chart.js@4.6.1` before importing Chart from `rose-spectacles/chart`, or `quill@2.0.3` before importing Editor from `rose-spectacles/editor`. Import forms and icons by name from the package root or from their dedicated subpaths such as `rose-spectacles/forms/form` and `rose-spectacles/icons/check`. Schema resolvers use `rose-spectacles/forms/resolvers/<library>` with the corresponding validator installed.
+Import forms and icons by name from the package root or from their dedicated subpaths such as `rose-spectacles/forms/form` and `rose-spectacles/icons/check`. Schema resolvers use `rose-spectacles/forms/resolvers/<library>` with the corresponding validator installed.
 
-Quill 2.0.3's HTML exporter is affected by CVE-2025-15056. Treat Editor's HTML model and `htmlValue` events as untrusted HTML and sanitize them before displaying them as markup. [Quill advisory](https://github.com/advisories/GHSA-v3m3-f69x-jf25)
+### Chart and Editor
+
+Install the optional peers for the component you use.
+
+```sh
+bun add '@unovis/ts@1.8.1'
+bun add '@tiptap/core@3.35.0' '@tiptap/pm@3.35.0' '@tiptap/starter-kit@3.35.0' '@tiptap/extension-image@3.35.0' '@tiptap/extension-text-align@3.35.0' '@tiptap/extension-text-style@3.35.0'
+```
+
+Import Chart from `rose-spectacles/chart`. It accepts labels and datasets for bar, line, scatter, bubble, pie, and doughnut charts. Pie and doughnut use the first dataset. Set `options.stacked` for stacked bars and `options.indexAxis` to `'y'` for horizontal bars. Use `options.xAxis` and `options.yAxis` for Unovis axis configuration. Use `containerProps` and `pt.plot` for the SVG host. The old `canvasProps` and `pt.canvas` names still pass attributes to that host. `getChart()` returns the Unovis container. Use `getSVG()` for SVG markup or `getBase64Image()` for an SVG data URL.
+
+Radar and polar-area charts, Chart.js plugins, canvas access, and PNG export were specific to the old engine. Consumers using those APIs need to update their chart configuration.
+
+Import Editor from `rose-spectacles/editor`. Its `v-model` value is HTML. Use `extensions` to add Tiptap extensions and the `#toolbar="{ editor }"` slot to build a toolbar with native commands. The load and change events expose the Tiptap instance. Text-change events provide a ProseMirror transaction, and selection ranges use `from` and `to` document positions. Quill modules, Deltas, and toolbar classes need to be migrated to those APIs.
 
 ## Gallery and checks
 

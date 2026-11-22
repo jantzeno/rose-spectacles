@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { QuillOptions } from 'quill';
+import type { AnyExtension } from '@tiptap/core';
 import { defineComponent, type PropType, type StyleValue } from 'vue';
 import BaseEditableHolder from '../core/baseeditableholder/BaseEditableHolder.vue';
 import EditorStyle from './style/EditorStyle';
@@ -12,7 +12,7 @@ export default defineComponent({
         readonly: Boolean,
         formats: Array as PropType<string[]>,
         editorStyle: [String, Object, Array] as PropType<StyleValue>,
-        modules: Object as PropType<QuillOptions['modules']>
+        extensions: Array as PropType<AnyExtension[]>
     },
     style: EditorStyle,
     provide() {

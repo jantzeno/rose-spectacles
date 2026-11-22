@@ -1,6 +1,6 @@
 /**
  *
- * Editor groups a collection of contents in tabs.
+ * Editor styles.
  *
  *
  * @module editorstyle
@@ -17,6 +17,7 @@ export enum EditorClasses {
      * Class name of the toolbar element
      */
     toolbar = 'rs-editor-toolbar',
+    formats = 'rs-editor-formats',
     /**
      * Class name of the content element
      */

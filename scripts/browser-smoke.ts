@@ -126,33 +126,36 @@ try {
         console.log('Frozen table columns update their offsets after a container resize');
 
         await show('#chart');
-        await wait(
-            `(() => {
-            const canvas = document.querySelector('canvas');
-            return canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data.some((channel, i) => i % 4 === 3 && channel > 0);
-        })()`,
-            'Chart paints its canvas'
-        );
-        const snapshot = await browser.evaluate<string>('document.querySelector("canvas").toDataURL()');
+        const bar = '[data-example="chart"] svg [data-rs-chart-mark="bar"]';
+        await wait(`document.querySelector(${JSON.stringify(bar)})?.getAttribute('d')?.length > 0`, 'Chart renders a Unovis SVG bar');
+        const snapshot = await browser.evaluate<string>(`document.querySelector(${JSON.stringify(bar)}).getAttribute('d')`);
         await browser.click('[data-testid="chart-update"]');
-        await wait(`document.querySelector('canvas').toDataURL() !== ${JSON.stringify(snapshot)}`, 'Chart repaints after a dataset update');
-        console.log('Chart repaints after a dataset update');
+        await wait(
+            `document.querySelector(${JSON.stringify(bar)})?.getAttribute('d')?.length > 0 && document.querySelector(${JSON.stringify(bar)}).getAttribute('d') !== ${JSON.stringify(snapshot)}`,
+            'Unovis redraws the SVG plot after a dataset update'
+        );
+        console.log('Unovis redraws the SVG plot after a dataset update');
+        await browser.click(bar);
+        await wait(
+            'document.querySelector("[data-testid=chart-selection]")?.textContent === "Notes: 7"',
+            'Unovis bar selection identifies the updated data point'
+        );
 
         await show('#editor');
-        await wait('document.querySelector(".ql-editor")?.textContent.includes("Field notes")', 'Editor initializes with its model value');
-        await browser.click('.ql-editor');
+        await wait('document.querySelector(".rs-editor-content .tiptap")?.textContent.includes("Field notes")', 'Editor initializes with its HTML model');
+        await browser.click('.rs-editor-content .tiptap');
         await browser.keys(['End', '!', 'R', 'S']);
-        await wait('document.querySelector("[data-testid=editor-value]").textContent.includes("!RS")', 'User edits update the Vue model');
-        await browser.click('button.ql-list[value="bullet"]');
+        await wait('document.querySelector("[data-testid=editor-value]").textContent.includes("!RS")', 'Tiptap edits update the Vue model');
+        await browser.click('button[aria-label="Bullet list"]');
         await wait(
             `(() => {
-            const marker = document.querySelector('.ql-editor li[data-list="bullet"] .ql-ui');
-            return marker && getComputedStyle(marker, '::before').content.includes('•');
-        })()`,
-            'The Quill toolbar displays a bullet marker'
+                const item = document.querySelector('.rs-editor-content .tiptap ul > li');
+                return item && getComputedStyle(item).listStyleType === 'disc';
+            })()`,
+            'The Tiptap toolbar formats an unordered list with a bullet marker'
         );
         assert.match(await browser.evaluate<string>('document.querySelector("[data-testid=editor-value]").textContent'), /<ul>/);
-        console.log('Quill edits update the model and the bullet toolbar formats the list');
+        console.log('Tiptap edits update the model and the toolbar formats an unordered list');
 
         await show('#dialog');
         await browser.click('[data-testid="overlay-open"]');

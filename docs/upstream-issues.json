@@ -625,12 +625,12 @@
             "component": "Editor",
             "disposition": "fixed",
             "evidence": [
-                "Firefox reproduced a numbered marker in the editable DOM while Quill exported an unordered list. The Quill 2 stylesheet produces a bullet marker and the model still exports an unordered list."
+                "Firefox reproduced a numbered marker in the editable DOM while Quill exported an unordered list. The original Quill stylesheet fix produced a bullet marker and unordered HTML. The current Tiptap regression checks both a bullet marker and an unordered list in the HTML model."
             ],
             "reproducer": "https://stackblitz.com/edit/primevue-4-vite-issue-template-oreedpum?file=src%2FApp.vue",
             "test": {
                 "path": "scripts/browser-smoke.ts",
-                "name": "The Quill toolbar displays a bullet marker"
+                "name": "The Tiptap toolbar formats an unordered list with a bullet marker"
             },
             "resolvingCommit": "9a708c8238d709966b589d432523b1beaf23f87e"
         },
@@ -672,7 +672,7 @@
             "component": "Editor",
             "disposition": "out-of-scope",
             "evidence": [
-                "The advisory identifies Quill 2.0.3 as affected and lists no patched version. The optional Editor exposes HTML returned by Quill’s exporter. A Quill patch is outside the fork’s retained Vue and Vite code, and the migration plan pins version 2.0.3. The README identifies HTML output as untrusted. https://github.com/advisories/GHSA-v3m3-f69x-jf25"
+                "The advisory identifies Quill 2.0.3 as affected and lists no patched version. The optional Editor exposes HTML returned by Quill’s exporter. The original migration temporarily pinned 2.0.3. The current Editor uses Tiptap and no longer includes the affected Quill exporter. https://github.com/advisories/GHSA-v3m3-f69x-jf25"
             ]
         },
         {
@@ -2227,10 +2227,11 @@
             "title": "Editor: quill-delta",
             "labels": ["bug"],
             "component": "Editor",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://primevue.org/editor/#pt.viewer",
-            "evidenceGap": "Recreate “<Editor v-model=\"content\" editorStyle=\"height: 320px\" />” in the retained component in Opera. Verify the expected result “Only I'll like tesolve that”."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The report requests Quill Delta values. The retained Tiptap Editor uses an HTML model and exposes native ProseMirror transactions instead of Quill Deltas."
+            ],
+            "reproducer": "https://primevue.org/editor/#pt.viewer"
         },
         {
             "number": 212,
@@ -3673,7 +3674,10 @@
             "labels": ["enhancement"],
             "component": "Editor",
             "disposition": "enhancement",
-            "evidence": ["The requested behavior would add an option, integration, or interaction to the retained API."]
+            "evidence": [
+                "The requested behavior would add an option, integration, or interaction to the retained API.",
+                "The current Editor documents additional Tiptap extensions and provides its native instance through the toolbar slot. Quill-specific configuration remains outside the retained integration."
+            ]
         },
         {
             "number": 332,
@@ -4974,10 +4978,11 @@
             "title": "[bug] Editor: remove quill styles",
             "labels": ["bug", "styling"],
             "component": "Editor",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://v3.primevue.org/editor/",
-            "evidenceGap": "Check “[bug] Editor: remove quill styles” in the retained component after the reported step “try fresh project, install fresh quill (2.0.2)”."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The replacement removed both the Quill dependency and its imported Snow stylesheet. The retained Editor uses local structural styles."
+            ],
+            "reproducer": "https://v3.primevue.org/editor/"
         },
         {
             "number": 446,
@@ -5818,10 +5823,11 @@
             "title": "Editor: v-model makes editor color and background color selectors disappear",
             "labels": ["bug"],
             "component": "Editor",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/vitejs-vite-2m3atv?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “press the button in the demo so the v-model changes” in the retained component. Verify the expected result “the editor text color and background color selectors should just stay there”."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The reported disappearing selectors were Quill toolbar controls. The retained Editor uses Vue color inputs and Tiptap formatting commands."
+            ],
+            "reproducer": "https://stackblitz.com/edit/vitejs-vite-2m3atv?file=src%2FApp.vue"
         },
         {
             "number": 522,
@@ -5829,10 +5835,11 @@
             "title": "Editor: Errors after inserting any type of content into the editor using the quill instance",
             "labels": ["bug"],
             "component": "Editor",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://stackblitz.com/edit/primevue-nuxt-issue-template-rpm5wr?file=app.vue",
-            "evidenceGap": "Check “Editor: Errors after inserting any type of content into the editor using…” in the retained component after the reported step “3.Delete all text from the editor, when you reach the end the…”."
+            "disposition": "out-of-scope",
+            "evidence": [
+                "The reported insertion and deletion failure uses the Quill instance API. The retained Editor exposes Tiptap commands through the load event and toolbar slot."
+            ],
+            "reproducer": "https://stackblitz.com/edit/primevue-nuxt-issue-template-rpm5wr?file=app.vue"
         },
         {
             "number": 523,

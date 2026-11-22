@@ -126,7 +126,7 @@ output {
     overflow-wrap: anywhere;
 }
 
-button:not([class^='ql-']),
+button,
 input:not([type='range']),
 textarea,
 select {

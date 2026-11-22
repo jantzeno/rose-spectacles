@@ -1,48 +1,28 @@
 /**
  *
- * Editor groups a collection of contents in tabs.
+ * Editor edits rich text with Tiptap.
  *
  *
  * @module editor
  *
  */
 import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spectacles/core';
-import type { ComponentHooks } from 'rose-spectacles/core/basecomponent';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
-import { VNode } from 'vue';
+import type { StyleValue, VNode } from 'vue';
+import type { AnyExtension, Editor as TiptapEditor, EditorEvents } from '@tiptap/core';
 
-export declare type EditorPassThroughOptionType =
-    | EditorPassThroughAttributes
-    | ((options: EditorPassThroughMethodOptions) => EditorPassThroughAttributes | string)
-    | string
-    | null
-    | undefined;
+import type {
+    EditorPassThroughMethodOptions as PassThroughMethod,
+    EditorPassThroughOptionType as PassThroughOption,
+    EditorPassThroughOptions as PassThroughConfig
+} from './EditorPassThrough';
 
-/**
- * Custom passthrough(pt) option method.
- */
-export interface EditorPassThroughMethodOptions {
-    /**
-     * Defines instance.
-     */
-    instance: any;
-    /**
-     * Defines valid properties.
-     */
-    props: EditorProps;
-    /**
-     * Defines valid attributes.
-     */
-    attrs: any;
-    /**
-     * Defines parent options.
-     */
-    parent: any;
-    /**
-     * Defines passthrough(pt) options in global config.
-     */
-    global: object | undefined;
-}
+export type { EditorPassThroughAttributes } from './EditorPassThrough';
+export type EditorPassThroughOptionType = PassThroughOption<EditorProps>;
+export type EditorPassThroughMethodOptions = PassThroughMethod<EditorProps>;
+export type EditorPassThroughOptions = PassThroughConfig<EditorProps>;
+
+export type EditorRange = { from: number; to: number };
 
 /**
  * Custom text change event.
@@ -56,19 +36,15 @@ export interface EditorTextChangeEvent {
     /**
      * Current value as text.
      */
-    textValue: any;
+    textValue: string;
     /**
      * Representation of the change.
      */
-    delta: any;
-    /**
-     * Source of change. Will be either 'user' or 'api'.
-     */
-    source: string;
+    transaction: EditorEvents['update']['transaction'];
     /**
      * Text editor instance.
      */
-    instance: any;
+    instance: TiptapEditor;
 }
 /**
  * Custom selection change event.
@@ -82,23 +58,19 @@ export interface EditorSelectionChangeEvent {
     /**
      * Current value as text.
      */
-    textValue: any;
+    textValue: string;
     /**
      * Representation of the selection boundaries.
      */
-    range: any;
+    range: EditorRange | null;
     /**
      * Representation of the previous selection boundaries.
      */
-    oldRange: any;
-    /**
-     * Source of change. Will be either 'user' or 'api'.
-     */
-    source: string;
+    oldRange: EditorRange | null;
     /**
      * Text editor instance.
      */
-    instance: any;
+    instance: TiptapEditor;
 }
 /**
  * Custom load event.
@@ -108,94 +80,7 @@ export interface EditorLoadEvent {
     /**
      * Text editor instance.
      */
-    instance: any;
-}
-
-/**
- * Custom passthrough(pt) options.
- * @see {@link EditorProps.pt}
- */
-export interface EditorPassThroughOptions {
-    /**
-     * Used to pass attributes to the root's DOM element.
-     */
-    root?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the toolbar's DOM element.
-     */
-    toolbar?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the formats' DOM element.
-     */
-    formats?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the header's DOM element.
-     */
-    header?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the option's DOM element.
-     */
-    option?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the bold's DOM element.
-     */
-    bold?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the italic's DOM element.
-     */
-    italic?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the underline's DOM element.
-     */
-    underline?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the color's DOM element.
-     */
-    color?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the background's DOM element.
-     */
-    background?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the list's DOM element.
-     */
-    list?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the select's DOM element.
-     */
-    select?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the link's DOM element.
-     */
-    link?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the image's DOM element.
-     */
-    image?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the code block's DOM element.
-     */
-    codeBlock?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the clean's DOM element.
-     */
-    clean?: EditorPassThroughOptionType;
-    /**
-     * Used to pass attributes to the content's DOM element.
-     */
-    content?: EditorPassThroughOptionType;
-    /**
-     * Used to manage all lifecycle hooks.
-     * @see {@link BaseComponent.ComponentHooks}
-     */
-    hooks?: ComponentHooks;
-}
-
-/**
- * Custom passthrough attributes for each DOM elements
- */
-export interface EditorPassThroughAttributes {
-    [key: string]: any;
+    instance: TiptapEditor;
 }
 
 /**
@@ -205,11 +90,11 @@ export interface EditorProps {
     /**
      * Value of the content.
      */
-    modelValue?: string | undefined;
+    modelValue?: string | null;
     /**
      * The default value for the input when not controlled by `modelValue`.
      */
-    defaultValue?: any;
+    defaultValue?: string | null;
     /**
      * The name attribute for the element, typically used in form submissions.
      */
@@ -223,23 +108,24 @@ export interface EditorProps {
      * @defaultValue false
      */
     readonly?: boolean | undefined;
+    disabled?: boolean;
     /**
      * When present, it specifies that the component should have invalid state style.
      * @defaultValue false
      */
     invalid?: boolean | undefined;
     /**
-     * Whitelist of formats to display, see [here](https://quilljs.com/docs/formats/) for available options.
+     * Whitelist of built-in formatting options, such as header, bold, list, and link.
      */
-    formats?: any[];
+    formats?: string[];
     /**
      * Inline style of the container.
      */
-    editorStyle?: any;
+    editorStyle?: StyleValue;
     /**
-     * Modules configuration, see [here](https://quilljs.com/docs/modules/) for available options.
+     * Additional Tiptap extensions to load alongside the built-in extensions.
      */
-    modules?: any;
+    extensions?: AnyExtension[];
     /**
      * Form control object, typically used for handling validation and form state.
      */
@@ -272,7 +158,7 @@ export interface EditorSlots {
     /**
      * Custom toolbar template.
      */
-    toolbar: () => VNode[];
+    toolbar: (scope: { editor: TiptapEditor | null }) => VNode[];
 }
 
 /**
@@ -300,7 +186,7 @@ export interface EditorEmitsOptions {
      */
     'selection-change'(event: EditorSelectionChangeEvent): void;
     /**
-     * Callback to invoke when the quill modules are loaded.
+     * Callback to invoke when the Tiptap instance is ready.
      * @param {EditorLoadEvent} event - Custom load event.
      */
     load(event: EditorLoadEvent): void;
@@ -311,7 +197,7 @@ export declare type EditorEmits = EmitFn<EditorEmitsOptions>;
 /**
  * **Rose Spectacles - Editor**
  *
- * _Editor groups a collection of contents in tabs._
+ * _Editor edits rich text with Tiptap._
  *
  *
  * @group Component

@@ -1,302 +1,114 @@
 import { flushPromises, mount } from '@vue/test-utils';
+import { reactive } from 'vue';
 import { vi } from 'vitest';
-import { isReactive, reactive } from 'vue';
-import ChartJS from 'chart.js/auto';
-import type { ChartConfiguration, ChartData, ChartOptions } from 'chart.js';
-import type { ChartProps } from 'rose-spectacles/chart';
 import Chart from './Chart.vue';
-import { applyPalette, mergeOptions } from './utils/ChartTheme';
+import { chartRows } from './model';
+import { createChart } from './render';
 
-interface MockChart {
-    canvas: HTMLCanvasElement;
-    data: ChartData;
-    options?: ChartOptions;
-    update: ReturnType<typeof vi.fn>;
-    destroy: ReturnType<typeof vi.fn>;
-    toBase64Image: ReturnType<typeof vi.fn>;
-    getElementsAtEventForMode?: () => { index: number }[];
-}
+vi.mock('./render', () => ({
+    createChart: vi.fn((_plot, read: () => unknown) => {
+        const element = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        element.append(document.createElementNS(element.namespaceURI, 'path'));
+        return { chart: { element }, update: vi.fn(read), destroy: vi.fn() };
+    })
+}));
 
-vi.mock('chart.js/auto', () => {
-    const instances: MockChart[] = [];
+const chartFactory = vi.mocked(createChart);
 
-    class ChartJSMock implements MockChart {
-        static instances = instances;
-        canvas: HTMLCanvasElement;
-        data: ChartData;
-        options?: ChartOptions;
-        update = vi.fn();
-        destroy = vi.fn();
-        toBase64Image = vi.fn(() => 'data:image/png;base64,stub');
-
-        constructor(canvas: HTMLCanvasElement, config: ChartConfiguration) {
-            this.canvas = canvas;
-            this.data = config.data;
-            this.options = config.options;
-            instances.push(this);
-        }
-    }
-
-    return { default: ChartJSMock };
+beforeEach(() => {
+    chartFactory.mockClear();
 });
 
-const { instances } = ChartJS as unknown as { instances: MockChart[] };
+it('updates a single chart for nested data mutations, replacements, and layout changes', async () => {
+    const data = reactive({ datasets: [{ data: [1, 2] }] });
+    const wrapper = mount(Chart, { props: { data } });
+    try {
+        await flushPromises();
+        const instance = wrapper.vm.getChart();
+        expect(instance).toBeTruthy();
+        expect(wrapper.emitted('loaded')).toEqual([[instance]]);
 
-const data = {
-    labels: ['Q1', 'Q2'],
-    datasets: [{ label: 'Sales', data: [1, 2] }]
-};
+        data.datasets[0].data[1] = 3;
+        await wrapper.vm.$nextTick();
+        expect(chartFactory.mock.results[0].value.update).toHaveReturnedWith(expect.objectContaining({ data }));
 
-const mountChart = async (props: ChartProps = {}) => {
-    const wrapper = mount(Chart, { props: { type: 'bar', data, ...props } });
+        const replacement = { datasets: [{ data: [9] }] };
+        await wrapper.setProps({ data: replacement, options: { responsive: false } });
+        expect(chartFactory.mock.results[0].value.update).toHaveLastReturnedWith(
+            expect.objectContaining({ data: replacement, options: { responsive: false } })
+        );
+        expect(wrapper.vm.getChart()).toBe(instance);
+        expect(chartFactory).toHaveBeenCalledTimes(1);
+    } finally {
+        wrapper.unmount();
+    }
+});
 
+it('replaces the plot when its type changes and disposes both plots', async () => {
+    const wrapper = mount(Chart);
+    await flushPromises();
+    await wrapper.setProps({ type: 'pie' });
     await flushPromises();
 
-    return wrapper;
-};
-
-describe('Chart.vue', () => {
-    beforeEach(() => {
-        instances.length = 0;
-    });
-
-    it('is canvas element exist', async () => {
-        const wrapper = await mountChart();
-
-        expect(wrapper.find('canvas').exists()).toBe(true);
-        expect(instances.length).toBe(1);
-    });
-
-    it('is getCanvas returning the rendered canvas element', async () => {
-        const wrapper = await mountChart();
-
-        expect(wrapper.vm.getCanvas()).toBe(wrapper.find('canvas').element);
-    });
-
-    it('is getChart returning the chart instance', async () => {
-        const wrapper = await mountChart();
-
-        expect(wrapper.vm.getChart()).toBe(instances[0]);
-    });
-
-    it('is loaded event emitted with the chart instance', async () => {
-        const wrapper = await mountChart();
-
-        expect(wrapper.emitted('loaded')?.[0]?.[0]).toBe(instances[0]);
-    });
-
-    it('is data change updating the chart instead of recreating it', async () => {
-        const wrapper = await mountChart();
-        const chart = instances[0];
-
-        await wrapper.setProps({ data: { labels: ['Q1'], datasets: [{ label: 'Sales', data: [9] }] } });
-
-        expect(chart.update).toHaveBeenCalled();
-        expect(chart.destroy).not.toHaveBeenCalled();
-        expect(instances.length).toBe(1);
-    });
-
-    it('is replaced data reassigned before updating', async () => {
-        const wrapper = await mountChart();
-        const chart = instances[0];
-        const next = { labels: ['Q1'], datasets: [{ label: 'Sales', data: [9] }] };
-
-        await wrapper.setProps({ data: next });
-
-        expect(chart.data).toEqual(next);
-    });
-
-    it('is options change updating the chart instead of recreating it', async () => {
-        const wrapper = await mountChart({ options: { responsive: true } });
-        const chart = instances[0];
-
-        await wrapper.setProps({ options: { responsive: false } });
-
-        expect(chart.options).toEqual({ responsive: false });
-        expect(chart.update).toHaveBeenCalled();
-        expect(instances.length).toBe(1);
-    });
-
-    it('is chart given raw data rather than reactive proxies', async () => {
-        const source = reactive({ datasets: [{ label: 'Sales', data: [{ x: 1, y: 2 }] }] });
-
-        await mountChart({ data: source, options: reactive({ parsing: false as const }) });
-
-        expect(isReactive(instances[0].data.datasets[0].data)).toBe(false);
-        expect(isReactive(instances[0].options)).toBe(false);
-    });
-
-    it('is chart.js writing into the data not retriggering an update', async () => {
-        const source = reactive({ datasets: [{ label: 'Sales', data: [{ x: 1, y: 2 }] }] });
-
-        await mountChart({ data: source, options: { parsing: false, scales: { y: { stacked: true } } } });
-
-        const chart = instances[0];
-
-        // what Chart.js does to each point while stacking with parsing disabled
-        Object.assign(chart.data.datasets[0].data[0] as object, { _stacks: { y: {} } });
-        await flushPromises();
-
-        expect(chart.update).not.toHaveBeenCalled();
-    });
-
-    it('is type change recreating the chart', async () => {
-        const wrapper = await mountChart();
-        const first = instances[0];
-
-        await wrapper.setProps({ type: 'line' });
-        await flushPromises();
-
-        expect(first.destroy).toHaveBeenCalled();
-        expect(instances.length).toBe(2);
-    });
-
-    it('is chart destroyed on unmount', async () => {
-        const wrapper = await mountChart();
-        const chart = instances[0];
-
-        wrapper.unmount();
-
-        expect(chart.destroy).toHaveBeenCalled();
-    });
-
-    it('is no chart created when unmounted before the import resolves', async () => {
-        const wrapper = mount(Chart, { props: { type: 'bar', data } });
-
-        wrapper.unmount();
-        await flushPromises();
-
-        expect(instances.length).toBe(0);
-    });
-
-    it('is theme applied from design tokens when they resolve', async () => {
-        const wrapper = await mountChart();
-
-        /*
-         * jsdom does not inherit custom properties to descendants the way browsers do,
-         * so the tokens are set on the element the component reads from.
-         */
-        const el = wrapper.element;
-
-        el.style.setProperty('--rs-text-color', '#111827');
-        el.style.setProperty('--rs-text-muted-color', '#6b7280');
-        el.style.setProperty('--rs-content-border-color', '#e5e7eb');
-        el.style.setProperty('--rs-content-background', '#ffffff');
-        el.style.setProperty('--rs-blue-500', '#3b82f6');
-
-        wrapper.vm.syncChart();
-
-        expect(wrapper.vm.getChart()).toMatchObject({
-            options: { scales: { x: { ticks: { color: '#6b7280' } } }, plugins: { legend: { labels: { color: '#111827' } } } },
-            data: { datasets: [{ backgroundColor: '#3b82f6' }] }
-        });
-    });
-
-    it('is dark scheme selected from the resolved surface', async () => {
-        const wrapper = await mountChart();
-        const el = wrapper.element;
-
-        el.style.setProperty('--rs-text-color', '#f8fafc');
-        el.style.setProperty('--rs-content-background', '#0f172a');
-        el.style.setProperty('--rs-blue-500', '#3b82f6');
-        el.style.setProperty('--rs-amber-600', '#d97706');
-
-        wrapper.vm.syncChart();
-
-        // second slot resolves the dark step (amber.600) rather than the light one
-        expect(wrapper.vm.getChart()?.options).toMatchObject({ plugins: { legend: { labels: { color: '#f8fafc' } } } });
-    });
-
-    it('is user options taking precedence over token defaults', async () => {
-        const wrapper = await mountChart({ options: { scales: { x: { ticks: { color: 'rebeccapurple' } } } } });
-
-        expect(wrapper.vm.getChart()?.options).toMatchObject({ scales: { x: { ticks: { color: 'rebeccapurple' } } } });
-    });
-
-    it('is themed disabled passing options through untouched', async () => {
-        const options = { scales: { x: { ticks: { color: 'red' } } } };
-        const wrapper = await mountChart({ themed: false, options });
-
-        expect(wrapper.vm.getChart()?.options).toEqual(options);
-    });
-
-    it('is select event emitted on canvas click', async () => {
-        const wrapper = await mountChart();
-        const element = { index: 0 };
-
-        instances[0].getElementsAtEventForMode = vi.fn(() => [element]);
-
-        await wrapper.find('canvas').trigger('click');
-
-        expect(wrapper.emitted<[{ element: typeof element }]>('select')?.[0]?.[0].element).toBe(element);
-    });
+    expect(chartFactory).toHaveBeenCalledTimes(2);
+    expect(chartFactory.mock.results[0].value.destroy).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.getChart()).toBe(chartFactory.mock.results[1].value.chart);
+    expect(wrapper.vm.getSVG()).toContain('<path');
+    expect(wrapper.vm.getBase64Image()).toMatch(/^data:image\/svg\+xml;base64,/);
+    wrapper.unmount();
+    expect(chartFactory.mock.results[1].value.destroy).toHaveBeenCalledTimes(1);
 });
 
-describe('ChartTheme.mergeOptions', () => {
-    it('is user value winning at any depth', () => {
-        const merged = mergeOptions({ scales: { x: { ticks: { color: 'token' } } } }, { scales: { x: { ticks: { color: 'user' } } } });
-
-        expect(merged).toMatchObject({ scales: { x: { ticks: { color: 'user' } } } });
-    });
-
-    it('is token defaults kept where the user set nothing', () => {
-        const merged = mergeOptions({ scales: { x: { ticks: { color: 'token' }, grid: { color: 'grid' } } } }, { scales: { x: { ticks: { color: 'user' } } } });
-
-        expect(merged).toMatchObject({ scales: { x: { grid: { color: 'grid' } } } });
-    });
-
-    it('is arrays replaced rather than merged', () => {
-        expect(mergeOptions({ list: [1, 2, 3] }, { list: [9] })).toEqual({ list: [9] });
-    });
+it('does not create a chart when unmounted before the engine loads', async () => {
+    const wrapper = mount(Chart);
+    wrapper.unmount();
+    await flushPromises();
+    expect(chartFactory).not.toHaveBeenCalled();
 });
 
-describe('ChartTheme.applyPalette', () => {
-    const palette = ['#111', '#222', '#333'];
+it('aligns labeled datasets and retains nulls and repeated scatter coordinates', () => {
+    const labeled = chartRows({ labels: ['Draft', 'Final'], datasets: [{ data: [1, null] }, { data: [7] }] }, 'bar');
+    expect([...labeled.labels]).toEqual([
+        [0, 'Draft'],
+        [1, 'Final']
+    ]);
+    expect(labeled.rows.map((row) => row.points.map((point) => point?.y))).toEqual([[1, 7], [null]]);
 
-    it('is slots assigned by dataset index', () => {
-        const result = applyPalette({ datasets: [{ data: [1] }, { data: [2] }] }, 'line', palette);
+    const scatter = chartRows(
+        {
+            datasets: [
+                {
+                    data: [
+                        { x: 3, y: 1 },
+                        { x: 3, y: 4, r: 8 }
+                    ]
+                },
+                { data: [[3, 6]] }
+            ]
+        },
+        'bubble'
+    );
+    expect(scatter.rows.map((row) => [row.x, row.points.map((point) => [point?.y, point?.radius])])).toEqual([
+        [
+            3,
+            [
+                [1, undefined],
+                [6, undefined]
+            ]
+        ],
+        [3, [[4, 8]]]
+    ]);
+});
 
-        expect(result.datasets[0]).toHaveProperty('borderColor', '#111');
-        expect(result.datasets[1]).toHaveProperty('borderColor', '#222');
-    });
-
-    it('is user supplied colors left alone', () => {
-        const result = applyPalette({ datasets: [{ data: [1], borderColor: 'hotpink' }] }, 'line', palette);
-
-        expect(result.datasets[0]).toHaveProperty('borderColor', 'hotpink');
-    });
-
-    it('is radial types colored per data point', () => {
-        const result = applyPalette({ datasets: [{ data: [1, 2, 3] }] }, 'pie', palette);
-
-        expect(result.datasets[0]).toHaveProperty('backgroundColor', palette);
-    });
-
-    it('is scatter keeping its points visible', () => {
-        const result = applyPalette({ datasets: [{ data: [{ x: 1, y: 2 }] }] }, 'scatter', palette);
-
-        // the points are the whole chart, so hiding them the way a line does renders nothing
-        expect((result.datasets[0] as { pointRadius?: number }).pointRadius).toBeGreaterThan(0);
-    });
-
-    it('is line hiding its points until hover', () => {
-        const result = applyPalette({ datasets: [{ data: [1, 2] }] }, 'line', palette);
-
-        expect(result.datasets[0]).toHaveProperty('pointRadius', 0);
-        expect((result.datasets[0] as { pointHoverRadius?: number }).pointHoverRadius).toBeGreaterThan(0);
-    });
-
-    it('is bubble radius left to the data', () => {
-        const result = applyPalette({ datasets: [{ data: [{ x: 1, y: 2, r: 9 }] }] }, 'bubble', palette);
-
-        expect(result.datasets[0]).not.toHaveProperty('pointRadius');
-    });
-
-    it('is source data not mutated', () => {
-        const source = { datasets: [{ data: [1] }] };
-
-        applyPalette(source, 'bar', palette);
-
-        expect(source.datasets[0]).not.toHaveProperty('borderColor');
-    });
+it('maps named points to the declared order without mutating the caller’s data', () => {
+    const point = { x: 'March', y: 2 };
+    const data = { labels: ['March', 'April'], datasets: [{ data: [{ x: 'April', y: 5 }, point] }, { data: [{ x: 'March', y: 7 }] }] };
+    const { rows } = chartRows(data, 'bar');
+    expect(rows.map((row) => [row.label, row.points.map((value) => value?.y)])).toEqual([
+        ['March', [2, 7]],
+        ['April', [5]]
+    ]);
+    const first = rows[0].points[0];
+    if (first) first.y = 10;
+    expect(point.y).toBe(2);
 });

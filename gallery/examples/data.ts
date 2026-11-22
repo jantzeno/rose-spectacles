@@ -1,4 +1,5 @@
 import { h, ref } from 'vue';
+import type { ChartSelectEvent } from 'rose-spectacles/chart';
 import { demo, example, locations, onePixel, sample, tree, type Example } from './shared';
 
 type LocationSlot = { item: (typeof locations)[number] };
@@ -153,6 +154,7 @@ export const data: Example[] = [
     ),
     example('Chart', ['Chart'], () => {
         const values = ref([3, 6, 4]);
+        const selected = ref('');
         return () =>
             h('div', [
                 h('button', { type: 'button', 'data-testid': 'chart-update', onClick: () => (values.value = [7, 2, 6]) }, 'Update chart'),
@@ -162,8 +164,10 @@ export const data: Example[] = [
                     height: 180,
                     data: { labels: ['Drafts', 'In review', 'Published'], datasets: [{ label: 'Notes', backgroundColor: '#a73d5c', data: values.value }] },
                     options: { animation: false, responsive: false },
-                    canvasProps: { 'aria-label': 'Field notes by status', role: 'img' }
-                })
+                    containerProps: { 'aria-label': 'Field notes by status' },
+                    onSelect: ({ dataset, point }: ChartSelectEvent) => (selected.value = `${dataset.label}: ${point}`)
+                }),
+                selected.value && h('output', { 'data-testid': 'chart-selection' }, selected.value)
             ]);
     }),
     example('Editor', ['Editor'], () => {

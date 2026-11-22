@@ -10,13 +10,13 @@
 
 - Consolidate the full Vue 3 catalog into one Bun-managed `rose-spectacles` source package. Keep components, legacy aliases, forms, icons, directives, and services. Declare Vue 3.5 as a peer, preserve named and direct imports, and document Git commit pinning and Vite configuration. Defer installation in Mission Control and Box Please.
 - Convert all retained JavaScript, Vue script blocks, configs, tests, and examples to TypeScript. Preserve public component contracts. Use strict `vue-tsc`, Oxlint, and Oxfmt.
-- Upgrade Chart.js to **4.6.1** and standardize Quill on **2.0.3**. Keep both as optional peers behind dedicated Chart and Editor imports, with both present in the gallery and test environment. [Chart.js versions](https://www.npmjs.com/package/chart.js?activeTab=versions) · [Quill releases](https://github.com/slab/quill/releases)
+- Use **Unovis 1.8.1** for Chart and **Tiptap 3.35.0** for Editor. Keep their dependencies as optional peers behind dedicated imports, with both present in the gallery and test environment. [Unovis](https://github.com/f5/unovis) · [Tiptap](https://github.com/ueberdosis/tiptap)
 - Replace OpenUX dependencies with local helpers. Remove upstream themes, branding, sites, and distribution tooling while preserving required MIT attribution. Keep structural CSS and `rs-` styling hooks for app-owned visuals. Retain one Vite gallery with examples for every public component and document legacy components for later review.
 
 ## Tests and completion criteria
 
 - Port the existing **777 passing tests** to TypeScript with Vitest, Vue Test Utils, and jsdom. Require a meaningful test and a gallery example for every public component, counting alternate imports of the same component once. Cover compound children in their intended parent. Reproduce confirmed issues with failing tests before applying fixes, then verify the tests pass.
-- Run browser checks for gallery rendering, Chart canvas updates, Quill editing, and overlay focus and dismissal. Use Chromium when available. Otherwise, use headless Firefox with an isolated temporary profile and clean it up on exit. Chromium was absent locally. Firefox 159 launched successfully outside the workspace sandbox, and profile cleanup was verified.
+- Run browser checks for gallery rendering, Unovis SVG chart updates, Tiptap editing, and overlay focus and dismissal. Use Chromium when available. Otherwise, use headless Firefox with an isolated temporary profile and clean it up on exit. Chromium was absent locally. Firefox 159 launched successfully outside the workspace sandbox, and profile cleanup was verified.
 - Finish with a frozen Bun install, lint, format, type checks, unit and browser tests, a production gallery build, and a disposable Vite consumer check. Reconcile the ledger against the snapshot and require a disposition for every issue, a fix for every confirmed in-scope defect, and a specific evidence gap for anything still unverified.
 
 ## Commit checkpoints
@@ -24,7 +24,7 @@
 1. Capture the issue snapshot and establish the Bun, Oxc, and Vitest baseline.
 2. Consolidate the package and remove upstream infrastructure.
 3. Migrate and audit one component family at a time. Keep TypeScript conversions and defect fixes in separate reviewable commits. Group defects that share a verified root cause.
-4. Upgrade Chart and Editor, then verify their behavior in a real browser.
+4. Migrate Chart to Unovis and Editor to Tiptap, then verify their behavior in a real browser.
 5. Complete the gallery, CI checks, consumer verification, and ledger reconciliation.
 
 Create local Conventional Commits after each validated chunk under the approval already given. Stage only task-related changes, include test results in each commit, and preserve unrelated work.

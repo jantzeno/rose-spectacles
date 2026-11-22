@@ -1,15 +1,19 @@
 /**
  *
- * Chart is a wrapper around Chart.js, rendering data driven charts on a canvas element.
+ * Chart renders data-driven SVG charts with Unovis.
  *
  *
  * @module chart
  *
  */
-import type { ChartData, ChartOptions, ChartType, Plugin } from 'chart.js';
+import type { ChartData, ChartOptions, ChartSelection, ChartType } from './model';
+import type { ChartInstance } from './render';
+
+export type { ChartData, ChartDataset, ChartOptions, ChartPoint, ChartType } from './model';
+export type { ChartInstance } from './render';
 import type { DefineComponent, DesignToken, EmitFn, PassThrough } from 'rose-spectacles/core';
 import type { PassThroughOptions } from 'rose-spectacles/passthrough';
-import { CanvasHTMLAttributes } from 'vue';
+import type { HTMLAttributes } from 'vue';
 
 import type {
     ChartPassThroughMethodOptions as PassThroughMethod,
@@ -26,20 +30,7 @@ export type ChartPassThroughOptions = PassThroughConfig<ChartProps>;
  * Custom select event.
  * @see {@link ChartEmitsOptions.select}
  */
-export interface ChartSelectEvent {
-    /**
-     * Browser event.
-     */
-    originalEvent: Event;
-    /**
-     * Selected element.
-     */
-    element: HTMLElement | any;
-    /**
-     * Selected dataset.
-     */
-    dataset: any;
-}
+export type ChartSelectEvent = ChartSelection;
 
 /**
  * Defines valid properties in Chart component.
@@ -56,31 +47,17 @@ export interface ChartProps<TType extends ChartType = ChartType> {
     /**
      * Options to customize the chart.
      */
-    options?: ChartOptions<TType> | undefined;
-    /**
-     * Used to custom plugins of the chart.
-     */
-    plugins?: Plugin<TType>[];
-    /**
-     * Width of the chart in non-responsive mode.
-     * @defaultValue 300
-     */
-    width?: number | undefined;
-    /**
-     * Height of the chart in non-responsive mode.
-     * @defaultValue 150
-     */
-    height?: number | undefined;
-    /**
-     * Used to pass all properties of the CanvasHTMLAttributes to canvas element inside the component.
-     */
-    canvasProps?: CanvasHTMLAttributes | undefined;
-    /**
-     * When enabled, colors, fonts and grid lines are derived from the active theme's design tokens
-     * and kept in sync with theme changes. Any option passed via the options property takes precedence.
-     * @defaultValue true
-     */
-    themed?: boolean | undefined;
+    options?: ChartOptions | undefined;
+    /** Width of the plot when responsiveness is disabled. Defaults to 300. */
+    width?: number;
+    /** Height of the plot in pixels. Defaults to 150. */
+    height?: number;
+    /** HTML attributes for the element that contains the SVG plot. */
+    containerProps?: HTMLAttributes;
+    /** @deprecated Use containerProps for attributes on the SVG plot host. */
+    canvasProps?: HTMLAttributes;
+    /** Use Rose Spectacles CSS tokens for default chart colors. Defaults to true. */
+    themed?: boolean;
     /**
      * It generates scoped CSS variables using design tokens for the component.
      */
@@ -115,9 +92,9 @@ export interface ChartEmitsOptions {
     select(event: ChartSelectEvent): void;
     /**
      * Callback to invoke when chart is loaded.
-     * @param {*} chart - Chart instance.
+     * @param {ChartInstance} chart - Unovis container.
      */
-    loaded(chart: any): void;
+    loaded(chart: ChartInstance): void;
 }
 
 export declare type ChartEmits = EmitFn<ChartEmitsOptions>;
@@ -135,30 +112,18 @@ export interface ChartMethods {
      * @memberof Chart
      */
     reinit(): void;
-    /**
-     * Returns the canvas element the chart is rendered on.
-     *
-     * @memberof Chart
-     */
-    getCanvas(): HTMLCanvasElement | undefined;
-    /**
-     * Returns a base64 encoded png image of the chart.
-     *
-     * @memberof Chart
-     */
+    /** Returns the rendered SVG markup, or an empty string until the chart loads. */
+    getSVG(): string;
+    /** Returns a base64-encoded SVG data URL, or an empty string until the chart loads. */
     getBase64Image(): string;
-    /**
-     * Returns Chart instance.
-     *
-     * @memberof Chart
-     */
-    getChart(): any;
+    /** Returns the underlying Unovis container. */
+    getChart(): ChartInstance | null;
 }
 
 /**
  * **OpenVue - Chart**
  *
- * _Chart is a wrapper around Chart.js, rendering data driven charts on a canvas element._
+ * _Chart renders data-driven SVG charts with Unovis._
  *
  *
  * @group Component

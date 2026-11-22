@@ -42,9 +42,11 @@ export interface ChartPassThroughOptions<P = Record<string, unknown>> {
      */
     root?: ChartPassThroughOptionType<P>;
     /**
-     * Used to pass attributes to the canvas's DOM element.
+     * @deprecated Use plot for attributes on the SVG plot host.
      */
     canvas?: ChartPassThroughOptionType<P>;
+    /** Attributes for the element that contains the SVG plot. */
+    plot?: ChartPassThroughOptionType<P>;
     /**
      * Used to manage all lifecycle hooks.
      * @see {@link BaseComponent.ComponentHooks}
