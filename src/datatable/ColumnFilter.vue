@@ -219,6 +219,7 @@ type FilterMap = Record<string, FieldFilter>;
 
 type FilterOption = { label?: string; value: string };
 type FilterOverlay = HTMLElement & { $focustrap?: { autoFocus(): void } };
+type FilterScrollPosition = { container: HTMLElement; left: number; top: number };
 type FilterButtons = {
     filter?: Record<string, unknown>;
     popover?: Partial<Record<'clear' | 'apply' | 'addRule' | 'removeRule', Record<string, unknown>>>;
@@ -353,6 +354,7 @@ export default defineComponent({
             overlayEventListener: null as ((event: unknown) => void) | null,
             outsideClickListener: null as ((event: MouseEvent) => void) | null,
             scrollHandler: null as ConnectedOverlayScrollHandler | null,
+            scrollBeforeFilter: null as FilterScrollPosition | null,
             resizeListener: null as (() => void) | null
         };
     },
@@ -565,6 +567,14 @@ export default defineComponent({
             }
         },
         filterCallback() {
+            const scrollableParents = this.scrollHandler?.scrollableParents;
+            if (scrollableParents && !this.scrollBeforeFilter) {
+                const container = this.getIconElement()?.closest('table')?.parentElement;
+                if (container && scrollableParents.includes(container)) {
+                    this.scrollBeforeFilter = { container, left: container.scrollLeft, top: container.scrollTop };
+                }
+            }
+
             this.$emit('filter-apply');
         },
         findNextItem(item: HTMLElement): HTMLElement | null {
@@ -679,16 +689,33 @@ export default defineComponent({
             const icon = this.getIconElement();
 
             if (!this.scrollHandler && icon) {
-                this.scrollHandler = new ConnectedOverlayScrollHandler(icon, () => {
-                    if (this.overlayVisible) {
-                        this.hide();
-                    }
-                });
+                this.scrollHandler = new ConnectedOverlayScrollHandler(icon, this.onScroll);
             }
 
             this.scrollHandler?.bindScrollListener();
         },
+        onScroll(event: Event) {
+            const before = this.scrollBeforeFilter;
+            this.scrollBeforeFilter = null;
+            if (!this.overlayVisible) return;
+
+            const icon = this.getIconElement();
+            if (before && before.container === event.currentTarget && this.overlay && icon) {
+                const { scrollLeft, scrollTop, scrollWidth, clientWidth } = before.container;
+                const limit = Math.max(0, scrollWidth - clientWidth);
+                const clampedLeft = Math.sign(before.left) * limit;
+
+                // A filter can shrink the table and force the browser to clamp its horizontal offset.
+                if (Math.abs(before.left) > limit + 1 && Math.abs(scrollLeft - clampedLeft) <= 1 && scrollTop === before.top) {
+                    absolutePosition(this.overlay, icon);
+                    return;
+                }
+            }
+
+            this.hide();
+        },
         unbindScrollListener() {
+            this.scrollBeforeFilter = null;
             if (this.scrollHandler) {
                 this.scrollHandler.unbindScrollListener();
             }

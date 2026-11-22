@@ -86,6 +86,68 @@ describe('ColumnFilter', () => {
         }
     });
 
+    it('keeps a live filter open when the table shrinks and dismisses it on manual scroll', async () => {
+        const wrapper = mount(
+            {
+                components: { DataTable, Column },
+                data: () => ({ products, filters: { name: { value: null, matchMode: FilterMatchMode.STARTS_WITH } } }),
+                template: `
+                    <DataTable :value="products" v-model:filters="filters" filterDisplay="menu" scrollable>
+                        <Column field="id" header="Code" />
+                        <Column field="name" header="Name" :showApplyButton="false">
+                            <template #filter="{ filterModel, filterCallback }">
+                                <input aria-label="Filter name" v-model="filterModel.value" @input="filterCallback()" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue], stubs: { teleport: false } }, attachTo: document.body }
+        );
+
+        try {
+            const scroller = wrapper.get<HTMLElement>('.rs-datatable-table-container');
+            const toggle = wrapper.get<HTMLButtonElement>('thead button[aria-haspopup]');
+            const anchor = vi.spyOn(toggle.element, 'getBoundingClientRect');
+            scroller.element.style.overflow = 'auto';
+            Object.defineProperty(scroller.element, 'clientWidth', { value: 300 });
+            Object.defineProperty(scroller.element, 'scrollWidth', { value: 900, configurable: true });
+            scroller.element.scrollLeft = 600;
+
+            await toggle.trigger('click');
+            const overlay = elementWithin(document, '.rs-datatable-filter-overlay') as HTMLElement;
+            wrapper.getComponent(ColumnFilter).vm.onOverlayEnter(overlay);
+            const input = elementWithin(overlay, '[aria-label="Filter name"]') as HTMLInputElement;
+            input.focus();
+            input.value = 'Bl';
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            await nextTick();
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['1001Black Watch']);
+
+            Object.defineProperty(scroller.element, 'scrollWidth', { value: 400 });
+            scroller.element.scrollLeft = 100;
+            input.value = 'Black';
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            await nextTick();
+            const measurementsBeforeScroll = anchor.mock.calls.length;
+            await scroller.trigger('scroll');
+            expect(toggle.attributes('aria-expanded')).toBe('true');
+            expect(document.activeElement).toBe(input);
+            expect(anchor.mock.calls.length).toBeGreaterThan(measurementsBeforeScroll);
+
+            input.value = 'Black Watch';
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            await nextTick();
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['1001Black Watch']);
+            scroller.element.scrollLeft = 50;
+            await scroller.trigger('scroll');
+            expect(toggle.attributes('aria-expanded')).toBe('false');
+            expect(document.activeElement).toBe(toggle.element);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('keeps the filter menu open while expanding, collapsing, and selecting nested TreeSelect nodes', async () => {
         const wrapper = mount(
             {
