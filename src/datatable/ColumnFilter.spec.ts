@@ -4,6 +4,8 @@ import { mount } from '@vue/test-utils';
 import PrimeVue from '../config/Config';
 import { h, nextTick } from 'vue';
 import Column from '../column/Column.vue';
+import ColumnGroup from '../columngroup/ColumnGroup.vue';
+import Row from '../row/Row.vue';
 import TreeSelect from '../treeselect/TreeSelect.vue';
 import DataTable from './DataTable.vue';
 import ColumnFilter from './ColumnFilter.vue';
@@ -279,6 +281,79 @@ describe('ColumnFilter', () => {
 
             expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['Black Watch']);
             expect(wrapper.getComponent(DataTable).emitted('update:filters')).toEqual([[{ name: { value: 'Watch', matchMode: FilterMatchMode.CONTAINS } }]]);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it.each(['field', 'filterField'])('filters by a function-valued column %s', async (source) => {
+        const resolveValue = ({ name }: (typeof products)[number]) => name.split(' ').at(-1) ?? '';
+        const key = String(resolveValue);
+        const wrapper = mount(
+            {
+                components: { DataTable, Column },
+                data: () => ({
+                    products,
+                    field: source === 'field' ? resolveValue : 'name',
+                    filterField: source === 'filterField' ? resolveValue : undefined,
+                    filters: { [key]: { value: null, matchMode: FilterMatchMode.STARTS_WITH } }
+                }),
+                template: `
+                    <DataTable :value="products" v-model:filters="filters" filterDisplay="row">
+                        <Column :field="field" :filterField="filterField" header="Name" :showFilterMenu="false">
+                            <template #filter="{ filterModel, filterCallback }">
+                                <input aria-label="Filter by last word" v-model="filterModel.value" @input="filterCallback()" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue] } }
+        );
+
+        try {
+            expect(wrapper.findAll('tbody tr')).toHaveLength(2);
+            await wrapper.get<HTMLInputElement>('[aria-label="Filter by last word"]').setValue('Wat');
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual([source === 'field' ? 'Watch' : 'Black Watch']);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
+    it('uses the column key for a computed filter in a grouped header menu', async () => {
+        const wrapper = mount(
+            {
+                components: { DataTable, Column, ColumnGroup, Row },
+                data: () => ({
+                    products,
+                    resolveValue: ({ name }: (typeof products)[number]) => name.split(' ').at(-1) ?? '',
+                    filters: { suffix: { value: 'Wat', matchMode: FilterMatchMode.STARTS_WITH } }
+                }),
+                template: `
+                    <DataTable :value="products" v-model:filters="filters" filterDisplay="menu">
+                        <ColumnGroup type="header">
+                            <Row>
+                                <Column header="Name" :filterField="resolveValue" columnKey="suffix" :showFilterMatchModes="false">
+                                    <template #filter="{ field, filterModel }">
+                                        <input :aria-label="'Filter ' + field" v-model="filterModel.value" />
+                                    </template>
+                                </Column>
+                            </Row>
+                        </ColumnGroup>
+                        <Column field="name" />
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue], stubs: { teleport: true } } }
+        );
+
+        try {
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['Black Watch']);
+            await wrapper.get('thead button[aria-haspopup]').trigger('click');
+            const input = wrapper.get<HTMLInputElement>('[aria-label="Filter suffix"]');
+            await input.setValue('Con');
+            await wrapper.get('button[aria-label="Apply"]').trigger('click');
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['Game Controller']);
         } finally {
             wrapper.unmount();
         }

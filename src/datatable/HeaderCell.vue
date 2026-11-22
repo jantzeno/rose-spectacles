@@ -53,7 +53,7 @@
             />
             <DTColumnFilter
                 v-if="filterDisplay === 'menu' && columnSlots.filter"
-                :field="columnProp('filterField') || columnProp('field')"
+                :field="filterKey"
                 :type="columnProp('dataType')"
                 display="menu"
                 :showMenu="columnProp('showFilterMenu')"
@@ -97,6 +97,7 @@
 <script lang="ts">
 import type { TableSortMeta } from './BaseDataTable.vue';
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
+import { getColumnFilterKey } from './filter-fields';
 import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/frozen-column-layout';
 import { getAttribute } from '../internal/utils/dom/index';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
@@ -321,6 +322,9 @@ export default defineComponent({
         }
     },
     computed: {
+        filterKey() {
+            return getColumnFilterKey(this.column, this.filters);
+        },
         columnSlots(): Slots {
             return (this.column.children as Slots | null) ?? {};
         },

@@ -17,7 +17,7 @@
         />
         <DTColumnFilter
             v-if="columnSlots.filter"
-            :field="columnProp('filterField') || columnProp('field')"
+            :field="filterKey"
             :type="columnProp('dataType')"
             display="row"
             :showMenu="columnProp('showFilterMenu')"
@@ -59,6 +59,7 @@
 
 <script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
+import { getColumnFilterKey } from './filter-fields';
 import { observeFrozenColumn, updateFrozenColumnOffset } from '../internal/frozen-column-layout';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
 import { getVNodeProp } from '../core/utils/Utils';
@@ -175,6 +176,9 @@ export default defineComponent({
         }
     },
     computed: {
+        filterKey() {
+            return getColumnFilterKey(this.column, this.filters);
+        },
         columnSlots(): Slots {
             return (this.column.children as Slots | null) ?? {};
         },

@@ -398,6 +398,7 @@ import Paginator from '../paginator/Paginator.vue';
 import type { PageState } from '../paginator/Paginator';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
 import BaseDataTable, { type TableField, type TableRow, type TableSortMeta } from './BaseDataTable.vue';
+import { getColumnFilterField } from './filter-fields';
 import TableBody from './TableBody.vue';
 import TableFooter from './TableFooter.vue';
 import TableHeader from './TableHeader.vue';
@@ -851,6 +852,7 @@ export default defineComponent({
             if (!data) return [];
 
             const activeFilters = this.getActiveFilters(this.filters);
+            const filterFields = this.filterFieldResolvers;
             const globalFilter = activeFilters.global as DataTableFilterMetaData | undefined;
             let globalFilterFieldsArray: TableField[] | undefined;
 
@@ -869,8 +871,8 @@ export default defineComponent({
                 for (let prop in activeFilters) {
                     if (Object.prototype.hasOwnProperty.call(activeFilters, prop) && prop !== 'global') {
                         localFiltered = true;
-                        let filterField = prop;
-                        let filterMeta = activeFilters[filterField];
+                        const filterField = filterFields.get(prop) ?? prop;
+                        const filterMeta = activeFilters[prop];
 
                         if (typeof filterMeta === 'object' && filterMeta !== null && 'operator' in filterMeta && filterMeta.operator) {
                             for (let filterConstraint of filterMeta.constraints) {
@@ -930,7 +932,7 @@ export default defineComponent({
 
             return filteredValue;
         },
-        executeLocalFilter(field: string, rowData: TableRow, filterMeta: FilterValue) {
+        executeLocalFilter(field: TableField, rowData: TableRow, filterMeta: FilterValue) {
             const { value: filterValue, matchMode } = filterMeta as DataTableFilterMetaData;
             const filterMatchMode = matchMode || FilterMatchMode.STARTS_WITH;
             let dataFieldValue = resolveFieldData(rowData, field);
@@ -2572,6 +2574,26 @@ export default defineComponent({
         },
         hasFilters() {
             return this.filters && Object.keys(this.filters).length > 0 && this.filters.constructor === Object;
+        },
+        filterFieldResolvers(): ReadonlyMap<string, TableField> {
+            let columns = this.columns;
+            const group = this.headerColumnGroup;
+            if (group && this.filterDisplay === 'menu') {
+                const rows = new HelperSet({ type: 'Row' }).get(group, group.children) ?? [];
+                columns = [...rows.flatMap((row) => this.d_columns.get(row, row.children) ?? []), ...columns];
+            }
+
+            const fields = new Map<string, TableField>();
+            for (const column of columns) {
+                const field = getColumnFilterField(column);
+                if (typeof field !== 'function') continue;
+
+                const key = String(field);
+                const columnKey = this.columnProp(column, 'columnKey');
+                if (!fields.has(key)) fields.set(key, field);
+                if (typeof columnKey === 'string' && !fields.has(columnKey)) fields.set(columnKey, field);
+            }
+            return fields;
         },
         processedData(): TableRow[] {
             let data = this.value || [];

@@ -383,7 +383,8 @@ export interface ColumnProps {
      */
     sortField?: string | ((item: any) => string) | undefined;
     /**
-     * Property name to use in filtering, defaults to field.
+     * Property or function to use in filtering, defaults to field.
+     * For a function, key the filter model by the column's unique columnKey or by String(callback).
      */
     filterField?: string | ((item: any) => string) | undefined;
     /**
