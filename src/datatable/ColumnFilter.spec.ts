@@ -206,6 +206,46 @@ describe('ColumnFilter', () => {
         }
     });
 
+    it('clears an active inline filter and returns focus to its input', async () => {
+        const wrapper = mount(
+            {
+                components: { DataTable, Column },
+                data: () => ({ products, filters: { name: { value: null, matchMode: FilterMatchMode.STARTS_WITH } } }),
+                template: `
+                    <DataTable :value="products" v-model:filters="filters" filterDisplay="row"
+                        :filterButtonProps="{ inline: { clear: { 'data-testid': 'clear-name' } } }">
+                        <Column field="name" header="Name" showClearButton :showFilterMenu="false">
+                            <template #filter="{ filterModel, filterCallback }">
+                                <input aria-label="Filter name" v-model="filterModel.value" @input="filterCallback()" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                `
+            },
+            { global: { plugins: [PrimeVue] }, attachTo: document.body }
+        );
+
+        try {
+            const input = wrapper.get<HTMLInputElement>('[aria-label="Filter name"]');
+            expect(wrapper.find('[data-testid="clear-name"]').exists()).toBe(false);
+            await input.setValue('Black');
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['Black Watch']);
+
+            const clear = wrapper.get<HTMLButtonElement>('button[data-testid="clear-name"]');
+            expect(clear.attributes('aria-label')).toBe('Clear');
+            clear.element.focus();
+            clear.element.click();
+            await nextTick();
+            const clearedInput = wrapper.get<HTMLInputElement>('[aria-label="Filter name"]');
+            expect(clearedInput.element.value).toBe('');
+            expect(wrapper.findAll('tbody tr').map((row) => row.text())).toEqual(['Game Controller', 'Black Watch']);
+            expect(wrapper.find('[data-testid="clear-name"]').exists()).toBe(false);
+            expect(document.activeElement).toBe(clearedInput.element);
+        } finally {
+            wrapper.unmount();
+        }
+    });
+
     it('keeps the filter menu open while expanding, collapsing, and selecting nested TreeSelect nodes', async () => {
         const wrapper = mount(
             {

@@ -1,6 +1,11 @@
 <template>
     <div :class="cx('filter')" v-bind="getColumnPT('filter')">
-        <div v-if="display === 'row'" :class="cx('filterElementContainer')" v-bind="{ ...filterInputProps, ...getColumnPT('filterElementContainer') }">
+        <div
+            v-if="display === 'row'"
+            ref="filterElementContainer"
+            :class="cx('filterElementContainer')"
+            v-bind="{ ...filterInputProps, ...getColumnPT('filterElementContainer') }"
+        >
             <component :is="filterElement" :field="field" :filterModel="fieldFilter" :filterCallback="filterCallback" />
         </div>
         <Button
@@ -22,6 +27,19 @@
                     :class="slotProps.class"
                     v-bind="getColumnPT('filterMenuIcon')"
                 />
+            </template>
+        </Button>
+        <Button
+            v-if="display === 'row' && showClearButton && hasRowFilter()"
+            type="button"
+            :aria-label="clearButtonLabel"
+            :class="cx('pcColumnFilterClearButton')"
+            :unstyled="unstyled"
+            @click="clearInlineFilter"
+            v-bind="{ ...getColumnPT('pcColumnFilterClearButton', ptmHeaderFilterClearParams), ...filterButtonProps?.inline?.clear }"
+        >
+            <template #icon="slotProps">
+                <component :is="filterClearIconTemplate || 'FilterSlashIcon'" :class="slotProps.class" v-bind="getColumnPT('filterClearIcon')" />
             </template>
         </Button>
         <Portal>
@@ -186,7 +204,7 @@
 
 <script lang="ts">
 import { getColumnPassThroughProps } from '../internal/column-pass-through';
-import { absolutePosition, addStyle, focus, getAttribute, isTouchDevice } from '../internal/utils/dom/index';
+import { absolutePosition, addStyle, focus, getAttribute, getFirstFocusableElement, isTouchDevice } from '../internal/utils/dom/index';
 import { ZIndex } from '../internal/utils/zindex/index';
 import { FilterOperator } from '../core/api/Api';
 import BaseComponent from '../core/basecomponent/BaseComponent.vue';
@@ -222,6 +240,7 @@ type FilterOverlay = HTMLElement & { $focustrap?: { autoFocus(): void } };
 type FilterScrollPosition = { container: HTMLElement; left: number; top: number };
 type FilterButtons = {
     filter?: Record<string, unknown>;
+    inline?: { clear?: Record<string, unknown> };
     popover?: Partial<Record<'clear' | 'apply' | 'addRule' | 'removeRule', Record<string, unknown>>>;
 };
 
@@ -423,6 +442,16 @@ export default defineComponent({
             this.$emit('filter-change', _filters);
             this.$emit('filter-apply');
             this.hide();
+        },
+        clearInlineFilter() {
+            this.clearFilter();
+            this.$nextTick(() => {
+                const container = this.$refs.filterElementContainer;
+                if (container instanceof HTMLElement) {
+                    const control = getFirstFocusableElement(container);
+                    if (control instanceof HTMLElement) focus(control);
+                }
+            });
         },
         applyFilter() {
             this.$emit('apply-click', { field: this.field, constraints: this.fieldFilter });
@@ -810,7 +839,7 @@ export default defineComponent({
         ptmHeaderFilterClearParams() {
             return {
                 context: {
-                    hidden: this.hasRowFilter()
+                    hidden: !this.hasRowFilter()
                 }
             };
         },
