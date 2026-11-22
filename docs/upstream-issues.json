@@ -984,9 +984,12 @@
             "labels": ["bug"],
             "component": "DataTable",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "Firefox moved Name between Category and Quantity in two ways. Dropping before Quantity switched their measured widths from 220 px and 100 px to 100 px and 220 px. Dropping after Category kept the intended widths.",
+                "The flat drop handler moves the width list using the target header's index before adjusting the destination used for the column order."
+            ],
             "reproducer": "https://stackblitz.com/run?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Reorder it between \"Category\" and \"Quantity\" columns, dropping it to the…” in the retained component. Verify the expected result “Column widths are not swapped”."
+            "evidenceGap": "Verify a local fix preserves width identity for drops on either side of a target, including when some columns are hidden."
         },
         {
             "number": 110,
@@ -3175,13 +3178,18 @@
             "title": "DataTable Using Column Group can not adjust column width and drag column",
             "labels": ["bug"],
             "component": "DataTable, Column",
-            "disposition": "unverified",
+            "disposition": "fixed",
             "evidence": [
-                "Firefox rendered two resize handles in the flat-header table and zero with ColumnGroup under the same resize settings.",
-                "A header drag and drop moved Price before Product in the flat table. The grouped table kept the original body order. The grouped TableHeader branch forwards mouse-down and omits the resize and drag/drop bindings."
+                "Firefox reproduced missing resize handles and a no-op drop in a ColumnGroup table with the same options as a working flat table.",
+                "A grouped header now resizes the logical column at its trailing edge. Browser regressions measured the expected 30 px change in expand and fit modes, and the unit regressions cover a merged header and a neighboring column spanning an earlier row.",
+                "Grouped drag and drop moves siblings within a group or moves complete groups across a shared boundary. Header and footer spans stay aligned with the body. The unit regression rejects stored orders that would split a merged group. Firefox verified that different widths followed their columns and restored when the table remounted."
             ],
             "reproducer": "https://stackblitz.com/edit/nm732nw6?file=src%2FApp.vue",
-            "evidenceGap": "Verify the expected sizing and movement of leaf columns under merged headers, including whether dragging across groups should move a parent group or preserve group membership."
+            "resolvingCommit": "9d9d17f8906d14e531d6c059243afee3a0468b12",
+            "test": {
+                "path": "src/datatable/ColumnGroup.spec.ts",
+                "name": "reorders grouped headers and body columns while preserving merged groups"
+            }
         },
         {
             "number": 295,
@@ -4461,9 +4469,15 @@
             "title": "Wrong default value for Column reorderableColumn property",
             "labels": ["documentation", "typescript"],
             "component": "Column",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Check “Wrong default value for Column reorderableColumn property” in the retained component with the reported setup “In documentation and in Column.d.ts file, the reorderableColumn default value is set…”."
+            "disposition": "fixed",
+            "evidence": [
+                "DataTable made the column draggable when reorderableColumn was omitted and honored the explicit false value. The public declaration incorrectly described false as its default. The documentation regression failed before the default was corrected to true."
+            ],
+            "resolvingCommit": "afba63c0a15316a55153d6ad74e6debda6f39aa4",
+            "test": {
+                "path": "src/column/Column.spec.ts",
+                "name": "documents the reorderable column default used by DataTable"
+            }
         },
         {
             "number": 411,
