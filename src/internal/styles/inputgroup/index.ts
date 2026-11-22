@@ -40,6 +40,12 @@ export const style = /*css*/ `
         border-inline-end: 1px solid dt('inputgroup.addon.border.color');
     }
 
+    .rs-inputgroup:has(> .rs-inputtext-sm, > :is(.rs-iconfield, .rs-floatlabel, .rs-iftalabel) > .rs-inputtext-sm) > .rs-inputgroupaddon:not(:has(.rs-button)) {
+        font-size: dt('inputtext.sm.font.size');
+        padding-block: dt('inputtext.sm.padding.y');
+        padding-inline: dt('inputtext.sm.padding.x');
+    }
+
     .rs-inputgroupaddon:has(.rs-button) {
         padding: 0;
         overflow: hidden;

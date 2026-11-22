@@ -85,6 +85,27 @@ try {
         await wait(`!document.querySelector(${JSON.stringify(longChip)})`, 'The long chip can be removed');
         console.log('Long chips keep their remove controls inside the input');
 
+        await show('#input-group');
+        const smallGroupSizing = await browser.evaluate(`(() => {
+            const group = document.querySelector('[data-example="input-group"] .rs-inputgroup');
+            group.style.setProperty('--rs-inputgroup-addon-padding', '12px 16px');
+            group.style.setProperty('--rs-inputtext-sm-font-size', '12px');
+            group.style.setProperty('--rs-inputtext-sm-padding-y', '3px');
+            group.style.setProperty('--rs-inputtext-sm-padding-x', '7px');
+            return [group.querySelector('input'), group.querySelector('.rs-inputgroupaddon')].map((element) => {
+                const style = getComputedStyle(element);
+                return [style.fontSize, style.paddingBlockStart, style.paddingInlineStart];
+            });
+        })()`);
+        assert.deepEqual(
+            smallGroupSizing,
+            [
+                ['12px', '3px', '7px'],
+                ['12px', '3px', '7px']
+            ],
+            'A small input group gives its text add-on the same font size and padding'
+        );
+
         await show('#frozen-table-columns');
         const frozenHeader = '[data-example="frozen-table-columns"] th[data-p-frozen-column="true"]';
         const firstWidth = await browser.evaluate<number>(`document.querySelector(${JSON.stringify(frozenHeader)}).offsetWidth`);

@@ -92,10 +92,25 @@ export const inputs: Example[] = [
         'Input group',
         ['InputGroup', 'InputGroupAddon'],
         () => () =>
-            demo('InputGroup', {}, () => [
-                demo('InputGroupAddon', {}, () => 'https://'),
-                demo('InputText', { placeholder: 'example.com', 'aria-label': 'Domain' })
-            ])
+            demo(
+                'InputGroup',
+                {
+                    style: {
+                        '--rs-inputtext-sm-font-size': '0.875rem',
+                        '--rs-inputtext-sm-padding-y': '0.25rem',
+                        '--rs-inputtext-sm-padding-x': '0.5rem'
+                    }
+                },
+                () => [
+                    demo('InputGroupAddon', {}, () => 'https://'),
+                    demo('InputText', {
+                        size: 'small',
+                        placeholder: 'example.com',
+                        'aria-label': 'Domain',
+                        style: { paddingBlock: 'var(--rs-inputtext-sm-padding-y)', paddingInline: 'var(--rs-inputtext-sm-padding-x)' }
+                    })
+                ]
+            )
     ),
     example(
         'Icon field',
