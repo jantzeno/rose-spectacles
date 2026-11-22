@@ -1,6 +1,0 @@
-{
-    "main": "./FormFieldStyle.js",
-    "module": "./FormFieldStyle.js",
-    "types": "./FormFieldStyle.d.ts",
-    "sideEffects": false
-}

@@ -1,5 +1,0 @@
-{
-    "main": "./Api.js",
-    "module": "./Api.js",
-    "types": "./Api.d.ts"
-}
