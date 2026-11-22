@@ -48,7 +48,7 @@
                                         :label="String(getLabelByValue(item))"
                                         :removeIcon="chipIcon || removeTokenIcon"
                                         :removeTabindex="-1"
-                                        removable
+                                        :removable="canRemoveChip(item)"
                                         :unstyled="unstyled"
                                         @remove="removeOption($event, item)"
                                         :pt="ptm('pcChip')"
@@ -1044,7 +1044,7 @@ export default defineComponent({
         isNestedOverlayVisible() {
             return !!this.overlay?.querySelector('[aria-expanded="true"]');
         },
-        getLabelByValue(value: unknown) {
+        getOptionByValue(value: unknown) {
             let matchedOption = this.optionsBySelectionKey.get(this.getSelectionKey(value));
 
             // An equal copy of an option object has a different key, so it can only be found by deep equality.
@@ -1054,7 +1054,10 @@ export default defineComponent({
                 matchedOption = options.find((option) => !this.isOptionGroup(option) && equals(this.getOptionValue(option), value, this.equalityKey));
             }
 
-            return this.getOptionLabel(matchedOption);
+            return matchedOption;
+        },
+        getLabelByValue(value: unknown) {
+            return this.getOptionLabel(this.getOptionByValue(value));
         },
         getSelectedItemsLabel() {
             const selectedItemsLabel = this.selectedItemsLabel || this.$primevue?.config.locale?.selectionMessage || '';
@@ -1072,9 +1075,19 @@ export default defineComponent({
                 this.updateModel(event, value);
             }
         },
+        canRemoveChip(value: unknown) {
+            if (this.disabled) return false;
+            if (!this.optionDisabled) return true;
+
+            const option = this.getOptionByValue(value);
+
+            return option === undefined || !this.isOptionDisabled(option);
+        },
         removeOption(event: Event, optionValue: unknown) {
             event.stopPropagation();
-            let value = this.modelValues.filter((val) => !equals(val, optionValue, this.equalityKey));
+            if (!this.canRemoveChip(optionValue)) return;
+
+            const value = this.modelValues.filter((val) => !equals(val, optionValue, this.equalityKey));
 
             this.updateModel(event, value);
         },

@@ -2,7 +2,7 @@ import { mount, type VueWrapper } from '@vue/test-utils';
 import type { MultiSelectProps } from 'rose-spectacles/multiselect';
 import PrimeVue from '../config/Config';
 import OverlayEventBus from '../overlayeventbus/OverlayEventBus';
-import { defineComponent, nextTick, reactive, toRaw, type Component } from 'vue';
+import { defineComponent, h, nextTick, reactive, toRaw, type Component } from 'vue';
 import VirtualScroller from '../virtualscroller/VirtualScroller.vue';
 import MultiSelect from './MultiSelect.vue';
 
@@ -72,6 +72,62 @@ const headerCheckbox = (wrapper: MultiSelectWrapper) => wrapper.get<HTMLInputEle
 const selectedLabel = (wrapper: MultiSelectWrapper) => wrapper.find('.rs-multiselect-label').text();
 
 const lastEmittedValue = <T = unknown>(wrapper: MultiSelectWrapper) => wrapper.emitted<[T]>('update:modelValue')?.at(-1)?.[0];
+
+it('hides removal for selected disabled chips and keeps enabled chips removable', async () => {
+    const options = cities();
+    options[1].disabled = true;
+    const wrapper = mountMultiSelect({ options, optionValue: 'code', optionDisabled: 'disabled', modelValue: ['NY', 'RM'], display: 'chip' });
+
+    try {
+        const chips = wrapper.findAll('.rs-multiselect-chip-item');
+        expect(chips.map((chip) => chip.text())).toEqual(['New York', 'Rome']);
+        expect(chips[1].find('button').exists()).toBe(false);
+
+        await chips[0].get('button[aria-label="Remove New York"]').trigger('click');
+        expect(lastEmittedValue(wrapper)).toEqual(['RM']);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
+it('rejects removal of a grouped disabled option through a custom chip callback', async () => {
+    const options = [
+        {
+            label: 'Europe',
+            items: [
+                { name: 'Rome', code: 'RM', disabled: true },
+                { name: 'Paris', code: 'PRS' }
+            ]
+        }
+    ];
+    const wrapper = mount(MultiSelect, {
+        props: {
+            options,
+            optionLabel: 'name',
+            optionValue: 'code',
+            optionGroupLabel: 'label',
+            optionGroupChildren: 'items',
+            optionDisabled: (option: City) => option.disabled === true,
+            modelValue: ['RM', 'PRS'],
+            display: 'chip'
+        },
+        slots: {
+            chip: ({ value, removeCallback }: { value: string; removeCallback: (event: Event) => void }) =>
+                h('button', { type: 'button', onClick: removeCallback }, value)
+        }
+    });
+
+    try {
+        const [rome, paris] = wrapper.findAll('.rs-multiselect-chip-item button');
+        await rome.trigger('click');
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+        await paris.trigger('click');
+        expect(wrapper.emitted('update:modelValue')).toEqual([[['RM']]]);
+    } finally {
+        wrapper.unmount();
+    }
+});
 
 describe('MultiSelect.vue', () => {
     let wrapper: MultiSelectWrapper;
