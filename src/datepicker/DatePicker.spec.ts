@@ -33,6 +33,26 @@ it.each([10, 11, 12])('preserves the first typed month digit until month %i is c
     }
 });
 
+it('blocks click and keyboard selection of a month whose model date is disabled', async () => {
+    const wrapper = mount(DatePicker, {
+        props: { inline: true, view: 'month', modelValue: new Date(2025, 0, 1), disabledDates: [new Date(2025, 1, 1)] },
+        global: { plugins: [PrimeVue] }
+    });
+
+    try {
+        const [, february, march] = wrapper.findAll('[data-pc-section="month"]');
+        await february.trigger('click');
+        await february.trigger('keydown', { code: 'Enter' });
+        expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+        expect(february.attributes('data-p-disabled')).toBe('true');
+
+        await march.trigger('click');
+        expect(wrapper.emitted('update:modelValue')).toEqual([[new Date(2025, 2, 1)]]);
+    } finally {
+        wrapper.unmount();
+    }
+});
+
 it('changes the range end time on successive hour increments without changing the start', async () => {
     const start = new Date(2026, 5, 10, 9, 30);
     const wrapper = mount(DatePicker, {

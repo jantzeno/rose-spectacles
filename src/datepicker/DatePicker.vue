@@ -3212,7 +3212,7 @@ export default defineComponent({
                     }
                 }
 
-                return true;
+                return this.view !== 'month' || !this.isDateDisabled(1, baseMonth, this.currentYear);
             };
 
             for (let i = 0; i <= 11; i++) {
