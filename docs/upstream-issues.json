@@ -3029,10 +3029,17 @@
             "url": "https://github.com/openvi-foundation/openvue/issues/277",
             "title": "onMenuMatchModeChange with menu filters without constraints and operator does not work",
             "labels": ["bug"],
-            "component": "Shared Vue behavior",
-            "disposition": "unverified",
-            "evidence": [],
-            "evidenceGap": "Check “onMenuMatchModeChange with menu filters without constraints and operator does not work” in the retained component after the reported step “Make DataTable component, binding it with filterDisplay = 'menu' and v-model:filters =…”."
+            "component": "DataTable, Column",
+            "disposition": "fixed",
+            "evidence": [
+                "The report describes an exception. The retained fork already guarded the missing constraints array, but selecting a new match mode silently left the single-value model unchanged.",
+                "The regression chooses Contains through the menu and verifies that the direct filter model and displayed rows both update."
+            ],
+            "resolvingCommit": "8e24fafe100b0a9fc77ed6c8dcd210fc299923e5",
+            "test": {
+                "path": "src/datatable/ColumnFilter.spec.ts",
+                "name": "changes the match mode of a menu filter with a single value"
+            }
         },
         {
             "number": 278,
