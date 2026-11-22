@@ -2504,12 +2504,17 @@
             "title": "DataTable: empty table header error",
             "labels": ["bug", "accessibility"],
             "component": "DataTable",
-            "disposition": "unverified",
+            "disposition": "fixed",
             "evidence": [
-                "A Firefox fixture with Name and Code columns and a Name-only inline filter rendered a second row of th elements. The Code spacer had neither text nor a control."
+                "In Firefox, the inline filter row exposed its empty spacers as unnamed column headers. The filter row now uses native data cells, so the first row supplies the column headings.",
+                "The regression checks empty spacers, the frozen offset, and filtering. Firefox also verified that the resized heading, filter, and body columns align after horizontal scrolling. The WAVE extension was unavailable."
             ],
             "reproducer": "https://stackblitz.com/edit/hpf4ry51",
-            "evidenceGap": "Verify the accessibility semantics and table layout of the filter-control row after replacing empty header semantics. The WAVE extension used in the original report is unavailable in this environment."
+            "resolvingCommit": "39338a4c5a68a1df0190117440fcd4dff1dd3bf1",
+            "test": {
+                "path": "src/datatable/ColumnFilter.spec.ts",
+                "name": "renders inline filters and empty spacers as data cells under the column headers"
+            }
         },
         {
             "number": 237,
@@ -3012,10 +3017,12 @@
             "title": "Enhancement - Datatable filter menu does not close on enter",
             "labels": ["bug", "accessibility"],
             "component": "DataTable",
-            "disposition": "unverified",
-            "evidence": [],
-            "reproducer": "https://primevue.org/datatable/#advanced_filter",
-            "evidenceGap": "Recreate “Click on the filter icon in the Name column header” in the retained component. Verify the expected result “The menu closes and the filter is applied”."
+            "disposition": "enhancement",
+            "evidence": [
+                "Firefox confirmed that Enter in a slotted text input leaves the draft and menu open. The footer exposes a focusable Apply button, which applied the draft and closed the menu when clicked. A slot can bind its own shortcut through the applyFilter callback.",
+                "The request adds an automatic Enter shortcut on the input. See https://primevue.org/datatable/#accessibility and https://github.com/primefaces/primevue/issues/7554."
+            ],
+            "reproducer": "https://primevue.org/datatable/#advanced_filter"
         },
         {
             "number": 279,
@@ -3578,9 +3585,12 @@
             "labels": ["bug"],
             "component": "ColumnGroup",
             "disposition": "unverified",
-            "evidence": [],
+            "evidence": [
+                "A Firefox fixture with a two-column group retained its spanning heading and filtered to the matching row when #filter was on the header Column inside ColumnGroup type=\"header\".",
+                "Moving #filter to the matching body Column kept the grouped headings and left the group header without a filter button. Upstream comments show a working grouped-header example and mention a null filter error specific to the original sandbox: https://github.com/primefaces/primevue/issues/7069."
+            ],
             "reproducer": "https://stackblitz.com/edit/vitejs-vite-m3gnvfyz?file=src%2FApp.vue",
-            "evidenceGap": "Recreate “Add a filter template to the data table” in the retained component. Verify the expected result “We expect having Column group and the menu filter on the group headers”."
+            "evidenceGap": "The original StackBlitz fixture was unavailable. Its exact Column placement and null filter state are needed to reproduce the disappearing group or the reported exception."
         },
         {
             "number": 330,
@@ -4173,10 +4183,17 @@
             "title": "DataTable: Column Filter Menu Closes Unexpectedly When DataTable Width Changes After Filter Application",
             "labels": ["bug"],
             "component": "DataTable, Column, Menu",
-            "disposition": "unverified",
-            "evidence": [],
+            "disposition": "fixed",
+            "evidence": [
+                "In Firefox, live filtering removed the long row, narrowed the table from about 2,941 px to 179 px, reset the horizontal offset to zero, and dismissed the filter. The overlay now realigns with its trigger, keeps focus, and accepts the remaining letters of the search.",
+                "The regression also covers another keystroke before the browser reports the scroll reset and verifies dismissal when the user scrolls through the remaining range."
+            ],
             "reproducer": "https://stackblitz.com/edit/primevue4-column-filter-menu-issue?file=src%2FApp.vue",
-            "evidenceGap": "Check “DataTable: Column Filter Menu Closes Unexpectedly When DataTable Width Changes After Filter…” in the retained component after the reported step “As soon as you type \"sh\", DataTable width gets smaller and filter…”."
+            "resolvingCommit": "f107710ee4cb6c15c726735f386972af6e2bfdfe",
+            "test": {
+                "path": "src/datatable/ColumnFilter.spec.ts",
+                "name": "keeps a live filter open when the table shrinks and dismisses it on manual scroll"
+            }
         },
         {
             "number": 384,
